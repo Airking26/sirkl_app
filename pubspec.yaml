@@ -28,11 +28,11 @@ flutter:
   uses-material-design: true
 
   assets:
-     - assets/images/chat-1-fill@3x.png
-     - assets/images/group-fill@3x.png
-     - assets/images/home-6-fill@3x.png
-     - assets/images/user-6-fill@3x.png
-     - assets/images/phone-fill@3x.png
+     - assets/images/chat_tab.png
+     - assets/images/group-tab.png
+     - assets/images/home_tab.png
+     - assets/images/profile_tab.png
+     - assets/images/call_tab.png
      - assets/images/people.png
      - assets/images/wallet.png
      - assets/images/empty_box.png

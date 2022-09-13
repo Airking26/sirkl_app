@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/common/constants.dart' as con;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -37,8 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0xFF111D28),//.withAlpha(195),
-                        Color(0xFF1E2032)//.withAlpha(195)
+                        Color(0xFF111D28),
+                        Color(0xFF1E2032)
                       ]
                   ),
                 ),
@@ -54,30 +53,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 120,),
-            Container(height: 150, width: 150, child: Image.asset("assets/images/wallet.png")),
+            const SizedBox(height: 100,),
+            Image.asset("assets/images/wallet.png", width: 150, height: 150,),
             const SizedBox(height: 30,),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 54.0),
-              child: Text("Connect your wallet", textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 25, fontFamily: "Gilroy", fontWeight: FontWeight.w700),),
+             Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 54.0),
+              child: Text(con.connectYourWalletRes.tr, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 25, fontFamily: "Gilroy", fontWeight: FontWeight.w700),),
             ),
             const SizedBox(height: 15,),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 54.0),
-              child: Text("Talk with other wallets and your NFT groups", textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF9BA0A5), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 54.0),
+              child: Text(con.talkWithRes.tr, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF9BA0A5), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
             ),
             const SizedBox(height: 50,),
            Obx(() => NiceButtons(
               stretch: false,
                 borderThickness: 5,
                 progress: _homeController.progress.value,
-                borderColor: Color(0xff0063FB).withOpacity(0.5),
-                startColor: Color(0xff1DE99B),
-                endColor: Color(0xff0063FB),
+                borderColor: const Color(0xff0063FB).withOpacity(0.5),
+                startColor: const Color(0xff1DE99B),
+                endColor: const Color(0xff0063FB),
                 gradientOrientation: GradientOrientation.Horizontal,
                 onTap: (finish){
                 },
-               child: Text("Get Started", style: TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
+               child: Text(con.getStartedRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
            )),
           ],
         ));

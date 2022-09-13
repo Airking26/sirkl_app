@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:sirkl/common/language.dart';
 
 import 'navigation/ui/navigation_screen.dart';
 
@@ -11,14 +13,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+    return GetMaterialApp(
+      translations: Language(),
+      locale: const Locale('en'),
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(
-      ),
+      home: const MyHomePage(),
     );
   }
 }

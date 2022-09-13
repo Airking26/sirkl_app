@@ -9,6 +9,7 @@ import '../../groups/ui/groups_screen.dart';
 import '../../home/ui/home_screen.dart';
 import '../../profile/ui/profile_screen.dart';
 import '../controller/navigation_controller.dart';
+import 'package:sirkl/common/constants.dart' as con;
 
 class NavigationScreen extends StatefulWidget {
   const NavigationScreen({Key? key}) : super(key: key);
@@ -31,7 +32,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //backgroundColor: const Color(0xFF102437),
       extendBody: true,
       bottomNavigationBar: FloatingNavbar(
         margin: EdgeInsets.zero,
@@ -43,11 +43,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
         padding: const EdgeInsets.only(top: 8, bottom: 16, left: 8, right: 8),
         topMarginText: 0,
         items: [
-          FloatingNavbarItem(icon: "assets/images/home-6-fill@3x.png", title: 'Home'),
-          FloatingNavbarItem(icon: "assets/images/phone-fill@3x.png", title: 'Calls'),
-          FloatingNavbarItem(icon: "assets/images/group-fill@3x.png", title: 'Groups'),
-          FloatingNavbarItem(icon: "assets/images/chat-1-fill@3x.png", title: 'Chats'),
-          FloatingNavbarItem(icon: "assets/images/user-6-fill@3x.png", title: 'Profile'),
+          FloatingNavbarItem(icon: "assets/images/home_tab.png", title: con.homeTabRes.tr),
+          FloatingNavbarItem(icon: "assets/images/call_tab.png", title: con.callsTabRes.tr),
+          FloatingNavbarItem(icon: "assets/images/group-tab.png", title: con.groupsTabRes.tr),
+          FloatingNavbarItem(icon: "assets/images/chat_tab.png", title: con.chatsTabRes.tr),
+          FloatingNavbarItem(icon: "assets/images/profile_tab.png", title: con.profileTabRes.tr),
         ],
         onTap: (int val){
           setState((){
