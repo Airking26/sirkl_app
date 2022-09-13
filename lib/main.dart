@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sirkl/navigation/navigation_screen.dart';
+
+import 'navigation/ui/navigation_screen.dart';
 
 void main() {
   runApp(const MyApp());
