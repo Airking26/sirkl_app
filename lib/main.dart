@@ -16,9 +16,9 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       translations: Language(),
       locale: const Locale('en'),
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      darkTheme: ThemeData(brightness: Brightness.dark, dividerColor: Colors.transparent),
+      themeMode: ThemeMode.system,
+      theme: ThemeData(brightness: Brightness.light, dividerColor: Colors.transparent),
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(),
     );

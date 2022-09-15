@@ -19,36 +19,44 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color(0xFF102437),
+        backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
         body: Column(
           children: [
             Container(
               height: 115,
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(45))
-              ),
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 0.25),
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(45)),
-                  gradient:  LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFF111D28),
-                        Color(0xFF1E2032)
-                      ]
+              margin: const EdgeInsets.only(bottom: 0.25),
+              decoration: BoxDecoration(
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.grey,
+                    offset: Offset(0.0, 0.01), //(x,y)
+                    blurRadius: 0.01,
                   ),
+                ],
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(35)),
+                gradient:  LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+                      Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                    ]
                 ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 44.0),
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(onPressed: (){}, icon: Image.asset("assets/images/arrow_left.png")),
-                      SvgPicture.asset("assets/images/logo.svg"),
-                      IconButton(onPressed: (){}, icon: Image.asset("assets/images/more.png")),
+                      IconButton(onPressed: (){}, icon: Image.asset("assets/images/arrow_left.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12.0),
+                        child: SvgPicture.asset("assets/images/logo.svg"),
+                      ),
+                      IconButton(onPressed: (){}, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
                   ],),
                 ),
               ),
@@ -58,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 30,),
              Padding(
               padding: const EdgeInsets.symmetric(horizontal: 54.0),
-              child: Text(con.connectYourWalletRes.tr, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 25, fontFamily: "Gilroy", fontWeight: FontWeight.w700),),
+              child: Text(con.connectYourWalletRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontFamily: "Gilroy", fontWeight: FontWeight.w700),),
             ),
             const SizedBox(height: 15,),
             Padding(

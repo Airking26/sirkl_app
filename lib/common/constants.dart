@@ -10,3 +10,6 @@ const String profileTabRes = "profile";
 const String connectYourWalletRes = "connect_your_wallet";
 const String talkWithRes = "talk_with";
 const String getStartedRes = "get_started";
+
+/// Profile page ///
+const String myNFTCollectionRes = "my_nft_collection";

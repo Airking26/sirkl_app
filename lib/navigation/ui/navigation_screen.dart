@@ -36,7 +36,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       bottomNavigationBar: FloatingNavbar(
         margin: EdgeInsets.zero,
         borderRadius: 0,
-        elevation: 5,
+        elevation: 10,
         currentIndex: _navigationController.currentPage.value,
         selectedBackgroundColor: Colors.transparent,
         selectedItemColor: const Color(0xFF00CB7D),

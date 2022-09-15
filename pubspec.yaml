@@ -16,6 +16,7 @@ dependencies:
   get_storage: ^2.0.3
   nice_buttons: ^0.0.2
   flutter_svg: ^1.1.5
+  wallet_connect: ^1.0.2
 
 dev_dependencies:
   flutter_test:
@@ -39,6 +40,12 @@ flutter:
      - assets/images/logo.svg
      - assets/images/arrow_left.png
      - assets/images/more.png
+     - assets/images/bell.png
+     - assets/images/plus.png
+     - assets/images/arrow_down.png
+     - assets/images/arrow_up.png
+     - assets/images/arrow_up_rev.png
+     - assets/images/arrow_down_rev.png
 
   fonts:
     - family: Gilroy

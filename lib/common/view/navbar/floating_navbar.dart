@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/navbar/floating_navbar_item.dart';
 
 typedef ItemBuilder = Widget Function(
@@ -81,14 +82,14 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
           Container(
             padding: widget.padding,
             margin: widget.margin,
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.white, width: 0.1)),
+            decoration:  BoxDecoration(
+              border: const Border(top: BorderSide(color: Colors.grey, width: 0.01)),
               gradient:  LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF111D28),//.withAlpha(195),
-                  Color(0xFF1E2032)//.withAlpha(195)
+                  Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+                  Get.isDarkMode ? const Color(0xFF1E2032): Colors.white
                 ]
               ),
             ),
