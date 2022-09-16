@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/view/dialog/custom_dial.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -60,15 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             padding: const EdgeInsets.only(top: 12.0),
                             child: Text("Anthony Park", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
                           ),
-                          IconButton(onPressed: (){dialogPopMenu();}, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
-                          /*PopupMenuButton(
-                            elevation: 5,
-                            position: PopupMenuPosition.under,
-                            color: Colors.white.withOpacity(0.5),
-                            icon: ImageIcon(AssetImage("assets/images/more.png"), size: 40,),
-                              itemBuilder: (context) => [
-                                PopupMenuItem(child: Text("Gef"), value: Text("G"),)
-                          ])*/
+                          IconButton(onPressed: (){Utils().dialogPopMenu(context);}, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
                         ],),
                     ),
                   ),
@@ -178,33 +170,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: SizedBox.fromSize(
               child: Image.network(fit: BoxFit.cover,"https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640", width: 80, height: 70,))),
       );
-  }
-
-  YYDialog dialogPopMenu() {
-    return YYDialog().build(context)
-      ..width = 120
-      ..borderRadius = 10.0
-      ..gravity = Gravity.rightTop
-      ..barrierColor = Colors.transparent
-      ..margin = EdgeInsets.only(top: 90, right: 20)
-      ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-        child: Align(alignment: Alignment.centerLeft, child: Text("• Edit profile", style: TextStyle(fontSize: 14, color: Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text("• Contact us", style: TextStyle(fontSize: 14, color: Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text("• Logout", style: TextStyle(fontSize: 14, color: Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..show();
   }
 }
 
