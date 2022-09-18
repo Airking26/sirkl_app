@@ -19,7 +19,10 @@ class Language extends Translations{
       c.logoutRes: "• Logout",
       c.noGroupYetRes: "No Group Yet",
       c.errorFindingCollection: "You don't find your collection here and you own the NFT",
-      c.addGroupRes: "+ Add the group chat to the list"
+      c.addGroupRes: "+ Add the group chat to the list",
+      c.newMessageRes: "New Message",
+      c.toRes: "To",
+      c.contactsRes: "Contacts"
     }
   };
 

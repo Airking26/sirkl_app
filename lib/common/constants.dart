@@ -21,3 +21,8 @@ const String logoutRes = "logout";
 const String noGroupYetRes = "no_group_yet";
 const String errorFindingCollection = "error_finding_collection";
 const String addGroupRes = "add_group";
+
+/// Inbox Page ///
+const String newMessageRes = "new_message";
+const String toRes = "to";
+const String contactsRes = "contacts";
