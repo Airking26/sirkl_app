@@ -18,104 +18,182 @@ class _GroupsScreenState extends State<GroupsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color
-            .fromARGB(255, 247, 253, 255),
-        body: Column(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Get.isDarkMode
+            ? const Color(0xFF102437)
+            : const Color.fromARGB(255, 247, 253, 255),
+        body: Column(children: [
+          Stack(
+            clipBehavior: Clip.none,
+            alignment: AlignmentDirectional.topCenter,
+            fit: StackFit.loose,
             children: [
-              Stack(
-                clipBehavior: Clip.none,
-                alignment: AlignmentDirectional.topCenter,
-                fit: StackFit.loose,
-                children: [
-                  Container(
-                    height: 140,
-                    margin: const EdgeInsets.only(bottom: 0.25),
-                    decoration: BoxDecoration(
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.grey,
-                          offset: Offset(0.0, 0.01), //(x,y)
-                          blurRadius: 0.01,
-                        ),
-                      ],
-                      borderRadius: const BorderRadius.vertical(
-                          bottom: Radius.circular(35)),
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Get.isDarkMode ? const Color(0xFF111D28) : Colors
-                                .white,
-                            Get.isDarkMode ? const Color(0xFF1E2032) : Colors
-                                .white
-                          ]
-                      ),
+              Container(
+                height: 140,
+                margin: const EdgeInsets.only(bottom: 0.25),
+                decoration: BoxDecoration(
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      offset: Offset(0.0, 0.01), //(x,y)
+                      blurRadius: 0.01,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 44.0),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(onPressed: () {},
-                                icon: Image.asset(
-                                  "assets/images/arrow_left.png",
-                                  color: Get.isDarkMode ? Colors.white : Colors
-                                      .black,)),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 12.0),
-                              child: Text("Groups", style: TextStyle(
-                                  color: Get.isDarkMode ? Colors.white : Colors
-                                      .black,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: "Gilroy",
-                                  fontSize: 20),),
-                            ),
-                            IconButton(onPressed: () {
+                  ],
+                  borderRadius:
+                      const BorderRadius.vertical(bottom: Radius.circular(35)),
+                  gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+                        Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                      ]),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 44.0),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                            onPressed: () {},
+                            icon: Image.asset(
+                              "assets/images/arrow_left.png",
+                              color:
+                                  Get.isDarkMode ? Colors.white : Colors.black,
+                            )),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12.0),
+                          child: Text(
+                            con.groupsTabRes.tr,
+                            style: TextStyle(
+                                color: Get.isDarkMode
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: "Gilroy",
+                                fontSize: 20),
+                          ),
+                        ),
+                        IconButton(
+                            onPressed: () {
                               Utils().dialogPopMenu(context);
                             },
-                                icon: Image.asset("assets/images/more.png",
-                                  color: Get.isDarkMode ? Colors.white : Colors
-                                      .black,)),
-                          ],),
-                      ),
+                            icon: Image.asset(
+                              "assets/images/more.png",
+                              color:
+                                  Get.isDarkMode ? Colors.white : Colors.black,
+                            )),
+                      ],
                     ),
                   ),
-                  Positioned(
-                      top: 80,
-                      child: Container(height: 90, width: MediaQuery.of(context).size.width, child: buildFloatingSearchBar()))
-                ],
+                ),
               ),
-        const SizedBox(height: 100,),
-        Image.asset("assets/images/people.png", width: 150, height: 150,),
-        const SizedBox(height: 30,),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 54.0),
-          child: Text(con.noGroupYetRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontFamily: "Gilroy", fontWeight: FontWeight.w700),),
+              Positioned(
+                  top: 80,
+                  child: Container(
+                      height: 90,
+                      width: MediaQuery.of(context).size.width,
+                      child: buildFloatingSearchBar()))
+            ],
+          ),
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: ListView.separated(
+                itemCount: 50,
+                  itemBuilder: groupTile,
+                separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
+              ),
+            ),
+          )
+        ]));
+  }
+
+  Widget groupTile(BuildContext context, int index){
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: ListTile(
+        leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png"),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text("2 Days", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),
+            Container(height: 24, width: 24, decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: Color(0xFF00CB7D)), child: Padding(padding: EdgeInsets.all(0), child: Align(alignment: Alignment.center, child: Text(textAlign: TextAlign.center,"2", style: TextStyle(color: Get.isDarkMode ? Color(0xFF232323) : Colors.white, fontFamily: 'Gilroy', fontSize: 12, fontWeight: FontWeight.w600),)),),)
+          ],
         ),
-        const SizedBox(height: 15,),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 54.0),
-          child: Text(con.errorFindingCollection.tr, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF9BA0A5), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
-        ),
-        const SizedBox(height: 50,),
-        NiceButtons(
-            stretch: false,
-            width: 350,
-            borderThickness: 5,
-            progress: true,
-            borderColor: const Color(0xff0063FB).withOpacity(0.5),
-            startColor: const Color(0xff1DE99B),
-            endColor: const Color(0xff0063FB),
-            gradientOrientation: GradientOrientation.Horizontal,
-            onTap: (finish){
-            },
-            child: Text(con.addGroupRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
-        ),
-            ])
+        title: Text("Bored Ape Yacht Club", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
+        subtitle: Text("Lorem Ipsum is simply...", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),
+      ),
     );
+  }
+
+  Column noGroupUI() {
+    return Column(
+          children: [
+            const SizedBox(
+              height: 100,
+            ),
+            Image.asset(
+              "assets/images/people.png",
+              width: 150,
+              height: 150,
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 54.0),
+              child: Text(
+                con.noGroupYetRes.tr,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Get.isDarkMode ? Colors.white : Colors.black,
+                    fontSize: 25,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w700),
+              ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 54.0),
+              child: Text(
+                con.errorFindingCollection.tr,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    color: Color(0xFF9BA0A5),
+                    fontSize: 16,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+            const SizedBox(
+              height: 50,
+            ),
+            NiceButtons(
+                stretch: false,
+                width: 350,
+                borderThickness: 5,
+                progress: true,
+                borderColor: const Color(0xff0063FB).withOpacity(0.5),
+                startColor: const Color(0xff1DE99B),
+                endColor: const Color(0xff0063FB),
+                gradientOrientation: GradientOrientation.Horizontal,
+                onTap: (finish) {},
+                child: Text(
+                  con.addGroupRes.tr,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontFamily: "Gilroy",
+                      fontWeight: FontWeight.w700),
+                )),
+          ],
+        );
   }
 
   Widget buildFloatingSearchBar() {
@@ -129,16 +207,25 @@ class _GroupsScreenState extends State<GroupsScreen> {
       transitionDuration: const Duration(milliseconds: 800),
       transitionCurve: Curves.easeInOut,
       physics: const BouncingScrollPhysics(),
-      axisAlignment: 0.0 ,
+      axisAlignment: 0.0,
       openAxisAlignment: 0.0,
-      queryStyle: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500),
-      hintStyle: TextStyle(color: Get.isDarkMode ? Color(0xff9BA0A5) : Color(0xFF828282), fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500),
+      queryStyle: TextStyle(
+          color: Get.isDarkMode ? Colors.white : Colors.black,
+          fontSize: 15,
+          fontFamily: "Gilroy",
+          fontWeight: FontWeight.w500),
+      hintStyle: TextStyle(
+          color: Get.isDarkMode ? Color(0xff9BA0A5) : Color(0xFF828282),
+          fontSize: 15,
+          fontFamily: "Gilroy",
+          fontWeight: FontWeight.w500),
       elevation: 5,
       showCursor: true,
-      width:350,
+      width: 350,
       accentColor: Get.isDarkMode ? Colors.white : Colors.black,
       borderRadius: BorderRadius.circular(10),
-      backgroundColor: Get.isDarkMode ? Color(0xFF2D465E).withOpacity(1) : Colors.white,
+      backgroundColor:
+          Get.isDarkMode ? Color(0xFF2D465E).withOpacity(1) : Colors.white,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
         // Call your model, bloc, controller here.
@@ -148,16 +235,17 @@ class _GroupsScreenState extends State<GroupsScreen> {
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
         FloatingSearchBarAction.icon(
-          icon: Image.asset("assets/images/search.png", width: 24, height: 24,),
+          icon: Image.asset(
+            "assets/images/search.png",
+            width: 24,
+            height: 24,
+          ),
           showIfClosed: true,
           showIfOpened: true,
-          onTap: () {
-          },
+          onTap: () {},
         ),
       ],
-      actions: [
-
-      ],
+      actions: [],
       builder: (context, transition) {
         return SizedBox(
           height: 0,
@@ -165,5 +253,4 @@ class _GroupsScreenState extends State<GroupsScreen> {
       },
     );
   }
-
 }

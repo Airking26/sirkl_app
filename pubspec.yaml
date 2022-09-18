@@ -18,6 +18,7 @@ dependencies:
   flutter_svg: ^1.1.5
   wallet_connect: ^1.0.2
   material_floating_search_bar: ^0.3.7
+  floating_tabbar: ^0.0.5
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +49,9 @@ flutter:
      - assets/images/arrow_up_rev.png
      - assets/images/arrow_down_rev.png
      - assets/images/search.png
+     - assets/images/outgoing.png
+     - assets/images/incoming.png
+     - assets/images/missed.png
 
   fonts:
     - family: Gilroy
