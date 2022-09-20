@@ -1,23 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:nice_buttons/nice_buttons.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
-
 import '../../common/utils.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class NotificationScreen extends StatefulWidget {
+  const NotificationScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-
-  final _homeController = Get.put(HomeController());
-
+class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,39 +49,40 @@ class _HomeScreenState extends State<HomeScreen> {
                       IconButton(onPressed: (){}, icon: Image.asset("assets/images/arrow_left.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
                       Padding(
                         padding: const EdgeInsets.only(top: 12.0),
-                        child: Image.asset("assets/images/logo.png", height: 20,),
+                        child: Text(con.notificationsRes.tr, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
                       ),
                       IconButton(onPressed: (){Utils().dialogPopMenu(context);}, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
-                  ],),
+                    ],),
                 ),
               ),
             ),
-            const SizedBox(height: 100,),
-            Image.asset("assets/images/wallet.png", width: 150, height: 150,),
-            const SizedBox(height: 30,),
-             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 54.0),
-              child: Text(con.connectYourWalletRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontFamily: "Gilroy", fontWeight: FontWeight.w700),),
-            ),
-            const SizedBox(height: 15,),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 54.0),
-              child: Text(con.talkWithRes.tr, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF9BA0A5), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
-            ),
-            const SizedBox(height: 50,),
-           Obx(() => NiceButtons(
-              stretch: false,
-                borderThickness: 5,
-                progress: _homeController.progress.value,
-                borderColor: const Color(0xff0063FB).withOpacity(0.5),
-                startColor: const Color(0xff1DE99B),
-                endColor: const Color(0xff0063FB),
-                gradientOrientation: GradientOrientation.Horizontal,
-                onTap: (finish){
-                },
-               child: Text(con.getStartedRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
-           )),
+            Expanded(child: ListView.separated(
+              itemCount: 20,
+                separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 20,);},
+                itemBuilder: buildNotificationTile)
+            )
           ],
         ));
+  }
+
+  Widget buildNotificationTile(BuildContext context, int index){
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: ListTile(
+        onTap: (){},
+        leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png"),
+        title: RichText(
+          text: TextSpan(
+            style: TextStyle(),
+            children: [
+              TextSpan(text: "You have added", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w400, color: Get.isDarkMode ? Colors.white : Colors.black)),
+              TextSpan(text: " Grodongoner.eth ", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Color(0xff00CB7D))),
+              TextSpan(text: "in your SIRKL - 2hrs ago", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w400, color: Get.isDarkMode ? Colors.white : Colors.black)),
+            ]
+          ),
+        ),
+        //subtitle: Text("Lorem Ipsum is simply...", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),
+      ),
+    );
   }
 }

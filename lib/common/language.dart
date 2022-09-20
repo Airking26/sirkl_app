@@ -22,7 +22,9 @@ class Language extends Translations{
       c.addGroupRes: "+ Add the group chat to the list",
       c.newMessageRes: "New Message",
       c.toRes: "To",
-      c.contactsRes: "Contacts"
+      c.contactsRes: "Contacts",
+      c.writeHereRes: "Write here...",
+      c.notificationsRes: "Notifications"
     }
   };
 

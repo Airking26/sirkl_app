@@ -6,7 +6,6 @@ import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/new_message_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
-import '../../common/utils.dart';
 
 class ChatsScreen extends StatefulWidget {
   const ChatsScreen({Key? key}) : super(key: key);
@@ -28,7 +27,6 @@ class _ChatsScreenState extends State<ChatsScreen>
     });
 
     return Scaffold(
-        resizeToAvoidBottomInset: false,
         backgroundColor: Get.isDarkMode
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
@@ -72,7 +70,7 @@ class _ChatsScreenState extends State<ChatsScreen>
                               chatController.searchIsActive.value = !chatController.searchIsActive.value;
                             },
                             icon: Image.asset(
-                              chatController.searchIsActive.value ? "assets/images/plus.png" : "assets/images/search.png",
+                              chatController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
                               color:
                                   Get.isDarkMode ? Colors.white : Colors.black,
                             ))),
@@ -238,7 +236,7 @@ class _ChatsScreenState extends State<ChatsScreen>
                   children: [
                     ListView.separated(
                       itemCount: 50,
-                      itemBuilder: callTile,
+                      itemBuilder: inboxTile,
                       separatorBuilder: (context, index) {
                         return const Divider(
                           color: Color(0xFF828282),
@@ -250,7 +248,7 @@ class _ChatsScreenState extends State<ChatsScreen>
                     ),
                     ListView.separated(
                       itemCount: 50,
-                      itemBuilder: callTile,
+                      itemBuilder: inboxTile,
                       separatorBuilder: (context, index) {
                         return const Divider(
                           color: Color(0xFF828282),
@@ -266,7 +264,7 @@ class _ChatsScreenState extends State<ChatsScreen>
         ]));
   }
 
-  Widget callTile(BuildContext context, int index) {
+  Widget inboxTile(BuildContext context, int index) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(

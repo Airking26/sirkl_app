@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/profile/ui/notifications_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -55,7 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          IconButton(onPressed: (){}, icon: Image.asset("assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                          IconButton(onPressed: (){Get.to(() => const NotificationScreen());}, icon: Image.asset("assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
                           Padding(
                             padding: const EdgeInsets.only(top: 12.0),
                             child: Text("Anthony Park", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),

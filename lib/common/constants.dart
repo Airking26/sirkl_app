@@ -26,3 +26,7 @@ const String addGroupRes = "add_group";
 const String newMessageRes = "new_message";
 const String toRes = "to";
 const String contactsRes = "contacts";
+const String writeHereRes = "write_here";
+
+/// Notification Screen ///
+const String notificationsRes = "notifications";
