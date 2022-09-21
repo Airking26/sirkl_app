@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
@@ -26,9 +28,9 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             children: [
               buildAppBar(),
               Positioned(
-                  top: 80,
+                  top: Platform.isAndroid ? 80 : 60,
                   child: SizedBox(
-                      height: 90,
+                      height: 110,
                       width: MediaQuery.of(context).size.width,
                       child: buildFloatingSearchBar())),
             ],
@@ -79,9 +81,16 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                                 Get.isDarkMode ? Colors.white : Colors.black),
                       ),
                     ),
-                    Expanded(
-                        child:
-                            ListView.builder(itemBuilder: buildNewMessageTile))
+                    MediaQuery.removePadding(
+                      context: context,
+                      removeTop: true,
+                      child: Expanded(
+                          child:
+                              ListView.builder(
+                                itemCount: 20,
+                                  padding: EdgeInsets.symmetric(vertical: 16),
+                                  itemBuilder: buildNewMessageTile)),
+                    )
                   ],
                 )),
           ),

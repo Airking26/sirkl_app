@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -67,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 Positioned(
-                  top: 105,
+                  top: Platform.isAndroid ? 105 : 95,
                   child: Container(
                     decoration: BoxDecoration(border: Border.all(color: Get.isDarkMode ? const Color(0xFF122034) : Colors.white, width: 5), borderRadius: BorderRadius.circular(90)),
                     child: const CircleAvatar(
@@ -78,8 +80,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 Positioned(
-                  top: 210,
-                    right: 130,
+                  top: Platform.isAndroid ? 210 : 190,
+                    right: MediaQuery.of(context).size.width / 3.25,
                     child:
                     Container(
                       width: 40,
@@ -117,12 +119,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.only(left: 24.0),
               child: Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),)),
             ),
-            Flexible(
-              child: ListView.builder(
-                //shrinkWrap: true,
-                padding: const EdgeInsets.only(top: 10, bottom: 100),
-                  itemCount: 10,
-                  itemBuilder: nftDisplayWidget
+            MediaQuery.removePadding(
+              context:  context,
+              removeTop: true,
+              child: Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: SafeArea(
+                    child: ListView.builder(
+                        itemCount: 10,
+                        itemBuilder: nftDisplayWidget
+                    ),
+                  ),
+                ),
               ),
             )
           ],

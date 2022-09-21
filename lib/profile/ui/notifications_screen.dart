@@ -46,7 +46,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(onPressed: (){}, icon: Image.asset("assets/images/arrow_left.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                      IconButton(onPressed: (){Get.back();}, icon: Image.asset("assets/images/arrow_left.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
                       Padding(
                         padding: const EdgeInsets.only(top: 12.0),
                         child: Text(con.notificationsRes.tr, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
@@ -56,10 +56,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
               ),
             ),
-            Expanded(child: ListView.separated(
-              itemCount: 20,
-                separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 20,);},
-                itemBuilder: buildNotificationTile)
+            MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              child: Expanded(child: ListView.separated(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                itemCount: 20,
+                  separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 20,);},
+                  itemBuilder: buildNotificationTile)
+              ),
             )
           ],
         ));

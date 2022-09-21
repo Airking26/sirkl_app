@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -93,20 +95,27 @@ class _GroupsScreenState extends State<GroupsScreen> {
                 ),
               ),
               Positioned(
-                  top: 80,
+                  top: Platform.isAndroid ? 80 : 60,
                   child: Container(
-                      height: 90,
+                      height: 110,
                       width: MediaQuery.of(context).size.width,
                       child: buildFloatingSearchBar()))
             ],
           ),
-          Flexible(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: ListView.separated(
-                itemCount: 50,
-                  itemBuilder: groupTile,
-                separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
+          MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top:24.0),
+                child: SafeArea(
+                  child: ListView.separated(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    itemCount: 50,
+                      itemBuilder: groupTile,
+                    separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
+                  ),
+                ),
               ),
             ),
           )

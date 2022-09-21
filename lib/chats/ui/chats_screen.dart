@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -102,9 +104,9 @@ class _ChatsScreenState extends State<ChatsScreen>
                 ),
               ),
               Obx(()=>Positioned(
-                  top: chatController.searchIsActive.value ? 80 : 110,
+                  top: chatController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
                   child: chatController.searchIsActive.value ? Container(
-                      height: 90,
+                      height: 110,
                       width: MediaQuery.of(context).size.width,
                       child:buildFloatingSearchBar()): Container(
                       height: 50,
@@ -228,13 +230,17 @@ class _ChatsScreenState extends State<ChatsScreen>
                       ))))
             ],
           ),
-          Flexible(
-            child: Padding(
-                padding: const EdgeInsets.only(top: 20.0),
+          MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: Expanded(
+              child: SafeArea(
+                minimum: EdgeInsets.only(top: 24),
                 child: TabBarView(
                   controller: _tabController,
                   children: [
                     ListView.separated(
+                      padding: EdgeInsets.symmetric(vertical: 16),
                       itemCount: 50,
                       itemBuilder: inboxTile,
                       separatorBuilder: (context, index) {
@@ -247,6 +253,7 @@ class _ChatsScreenState extends State<ChatsScreen>
                       },
                     ),
                     ListView.separated(
+                      padding: EdgeInsets.symmetric(vertical: 16),
                       itemCount: 50,
                       itemBuilder: inboxTile,
                       separatorBuilder: (context, index) {
@@ -259,7 +266,9 @@ class _ChatsScreenState extends State<ChatsScreen>
                       },
                     ),
                   ],
-                )),
+                ),
+              ),
+            ),
           )
         ]));
   }
@@ -270,74 +279,21 @@ class _ChatsScreenState extends State<ChatsScreen>
       child: ListTile(
           leading: Image.network(
               "https://ik.imagekit.io/bayc/assets/bayc-footer.png"),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Text("2 Days",
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontFamily: "Gilroy",
-                        fontWeight: FontWeight.w600,
-                        color: Get.isDarkMode
-                            ? const Color(0xFF9BA0A5)
-                            : const Color(0xFF828282))),
-              ),
-              SizedBox(
-                width: 100,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Image.asset(
-                      "assets/images/call_tab.png",
-                      color: const Color(0xFF00CB7D),
-                      width: 20,
-                      height: 20,
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    Image.asset(
-                      "assets/images/chat_tab.png",
-                      width: 20,
-                      height: 20,
-                      color: const Color(0xFF9BA0A5),
-                    ),
-                    const SizedBox(
-                      width: 4,
-                    ),
-                    Image.asset("assets/images/more.png",
-                        width: 20, height: 20, color: const Color(0xFF9BA0A5))
-                  ],
-                ),
-              )
-            ],
-          ),
-          title: Text("Bored Ape Yacht Club",
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text("2 Days", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),
+            Container(height: 24, width: 24, decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: Color(0xFF00CB7D)), child: Padding(padding: EdgeInsets.all(0), child: Align(alignment: Alignment.center, child: Text(textAlign: TextAlign.center,"2", style: TextStyle(color: Get.isDarkMode ? Color(0xFF232323) : Colors.white, fontFamily: 'Gilroy', fontSize: 12, fontWeight: FontWeight.w600),)),),)
+          ],
+        ),
+        title: Text("Bored Ape Yacht Club",
               style: TextStyle(
                   fontSize: 16,
                   fontFamily: "Gilroy",
                   fontWeight: FontWeight.w600,
                   color: Get.isDarkMode ? Colors.white : Colors.black)),
-          subtitle: Row(
-            children: [
-              Image.asset(
-                "assets/images/outgoing.png",
-                width: 10,
-                height: 10,
-              ),
-              Text("  Outgoing  - 12:15PM",
-                  style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: "Gilroy",
-                      fontWeight: FontWeight.w500,
-                      color: Get.isDarkMode
-                          ? const Color(0xFF9BA0A5)
-                          : const Color(0xFF828282)))
-            ],
-          )),
+        subtitle: Text("Lorem Ipsum is simply...", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),
+      ),
     );
   }
 

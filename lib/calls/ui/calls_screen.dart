@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'dart:io';
 
 import '../../common/utils.dart';
 
@@ -91,20 +92,27 @@ class _CallsScreenState extends State<CallsScreen> {
                 ),
               ),
               Positioned(
-                  top: 80,
+                  top: Platform.isAndroid? 80 : 60,
                   child: SizedBox(
-                      height: 90,
+                      height: 110,
                       width: MediaQuery.of(context).size.width,
                       child: buildFloatingSearchBar()))
             ],
           ),
-          Flexible(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: ListView.separated(
-                itemCount: 50,
-                itemBuilder: callTile,
-                separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
+          MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(top: 24),
+                child: SafeArea(
+                  child: ListView.separated(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    itemCount: 50,
+                    itemBuilder: callTile,
+                    separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
+                  ),
+                ),
               ),
             ),
           )
