@@ -123,7 +123,7 @@ class _CallsScreenState extends State<CallsScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
-        leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png"),
+        leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -146,12 +146,15 @@ class _CallsScreenState extends State<CallsScreen> {
             )
           ],
         ),
-        title: Text("Bored Ape Yacht Club", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
+        title: Transform.translate(offset: Offset(-8, 0),child: Text("Bored Ape Yacht Club", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
         subtitle:
-            Row(children: [
-              Image.asset("assets/images/outgoing.png", width: 10, height: 10,),
-              Text( "  Outgoing  - 12:15PM", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
-            ],)
+            Transform.translate(
+              offset: Offset(-8, 0),
+              child: Row(children: [
+                Image.asset("assets/images/outgoing.png", width: 10, height: 10,),
+                Text( "  Outgoing  - 12:15PM", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
+              ],),
+            )
       ),
     );
   }

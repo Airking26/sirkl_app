@@ -237,7 +237,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   Widget buildNewMessageTile(BuildContext context, int index) {
     return ListTile(
         leading:
-            Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png"),
+            Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
         trailing: Checkbox(
           onChanged: (selected) {},
           value: true,
@@ -247,28 +247,34 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             (states) => const BorderSide(width: 1.0, color: Color(0xFF00CB7D)),
           ),
         ),
-        title: Text("Bored Ape Yacht Club",
-            style: TextStyle(
-                fontSize: 16,
-                fontFamily: "Gilroy",
-                fontWeight: FontWeight.w600,
-                color: Get.isDarkMode ? Colors.white : Colors.black)),
-        subtitle: Row(
-          children: [
-            Image.asset(
-              "assets/images/outgoing.png",
-              width: 10,
-              height: 10,
-            ),
-            Text("  Outgoing  - 12:15PM",
-                style: TextStyle(
-                    fontSize: 13,
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w500,
-                    color: Get.isDarkMode
-                        ? const Color(0xFF9BA0A5)
-                        : const Color(0xFF828282)))
-          ],
+        title: Transform.translate(
+          offset: Offset(-8, 0),
+          child: Text("Bored Ape Yacht Club",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w600,
+                  color: Get.isDarkMode ? Colors.white : Colors.black)),
+        ),
+        subtitle: Transform.translate(
+          offset: Offset(-8, 0),
+          child: Row(
+            children: [
+              Image.asset(
+                "assets/images/outgoing.png",
+                width: 10,
+                height: 10,
+              ),
+              Text("  Outgoing  - 12:15PM",
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontFamily: "Gilroy",
+                      fontWeight: FontWeight.w500,
+                      color: Get.isDarkMode
+                          ? const Color(0xFF9BA0A5)
+                          : const Color(0xFF828282)))
+            ],
+          ),
         ));
   }
 

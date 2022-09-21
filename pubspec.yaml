@@ -19,6 +19,7 @@ dependencies:
   wallet_connect: ^1.0.2
   material_floating_search_bar: ^0.3.7
   flutter_chat_ui: ^1.6.4
+  azlistview: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -154,10 +154,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
         child: ExpansionTile(
-          leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png"),
+          leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
           trailing: Obx(() => Image.asset(_profileController.isCardExpanded.value ? "assets/images/arrow_up_rev.png" : "assets/images/arrow_down_rev.png", color: Get.isDarkMode ? Colors.white : Colors.black, height: 20, width: 20,),),
-          title: Text("Bored Ape Yacht Club", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
-          subtitle: const Text("1 available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
+          title: Transform.translate(offset: Offset(-8, 0),child: Text("Bored Ape Yacht Club", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+          subtitle: Transform.translate(offset: Offset(-8, 0), child: const Text("1 available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
           onExpansionChanged: (expanded){
             _profileController.isCardExpanded.value = expanded;
           },

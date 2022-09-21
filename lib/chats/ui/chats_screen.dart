@@ -278,7 +278,7 @@ class _ChatsScreenState extends State<ChatsScreen>
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
           leading: Image.network(
-              "https://ik.imagekit.io/bayc/assets/bayc-footer.png"),
+              "https://ik.imagekit.io/bayc/assets/bayc-footer.png", height: 60, width: 60, fit: BoxFit.cover,),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -286,13 +286,16 @@ class _ChatsScreenState extends State<ChatsScreen>
             Container(height: 24, width: 24, decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: Color(0xFF00CB7D)), child: Padding(padding: EdgeInsets.all(0), child: Align(alignment: Alignment.center, child: Text(textAlign: TextAlign.center,"2", style: TextStyle(color: Get.isDarkMode ? Color(0xFF232323) : Colors.white, fontFamily: 'Gilroy', fontSize: 12, fontWeight: FontWeight.w600),)),),)
           ],
         ),
-        title: Text("Bored Ape Yacht Club",
-              style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w600,
-                  color: Get.isDarkMode ? Colors.white : Colors.black)),
-        subtitle: Text("Lorem Ipsum is simply...", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),
+        title: Transform.translate(
+          offset: Offset(-8, 0),
+          child: Text("Bored Ape Yacht Club",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600,
+                    color: Get.isDarkMode ? Colors.white : Colors.black)),
+        ),
+        subtitle: Transform.translate(offset: Offset(-8, 0), child: Text("Lorem Ipsum is simply...", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282)))),
       ),
     );
   }

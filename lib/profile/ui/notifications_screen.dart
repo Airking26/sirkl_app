@@ -75,15 +75,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
         onTap: (){},
-        leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png"),
-        title: RichText(
-          text: TextSpan(
-            style: TextStyle(),
-            children: [
-              TextSpan(text: "You have added", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w400, color: Get.isDarkMode ? Colors.white : Colors.black)),
-              TextSpan(text: " Grodongoner.eth ", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Color(0xff00CB7D))),
-              TextSpan(text: "in your SIRKL - 2hrs ago", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w400, color: Get.isDarkMode ? Colors.white : Colors.black)),
-            ]
+        leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
+        title: Transform.translate(
+          offset: Offset(-8, 0),
+          child: RichText(
+            text: TextSpan(
+              style: TextStyle(),
+              children: [
+                TextSpan(text: "You have added", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w400, color: Get.isDarkMode ? Colors.white : Colors.black)),
+                TextSpan(text: " Grodongoner.eth ", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Color(0xff00CB7D))),
+                TextSpan(text: "in your SIRKL - 2hrs ago", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w400, color: Get.isDarkMode ? Colors.white : Colors.black)),
+              ]
+            ),
           ),
         ),
         //subtitle: Text("Lorem Ipsum is simply...", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),

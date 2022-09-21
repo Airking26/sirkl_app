@@ -1,7 +1,9 @@
+import 'package:azlistview/azlistview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
+import 'package:sirkl/common/model/example.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
@@ -17,9 +19,39 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
 
   final _homeController = Get.put(HomeController());
+  final items = <Example>[
+    Example(name: "Amerique", tagIndex: "A"),
+    Example(name: "Ameque", tagIndex: "A"),
+    Example(name: "Amerque", tagIndex: "A"),
+    Example(name: "Ameriqe", tagIndex: "A"),
+    Example(name: "Ameriq", tagIndex: "A"),
+    Example(name: "Ame", tagIndex: "A"),
+    Example(name: "Boli", tagIndex: "B"),
+    Example(name: "Alo", tagIndex: "A"),
+    Example(name: "Dilo", tagIndex: "D"),
+    Example(name: "Fea", tagIndex: "F"),
+    Example(name: "Amerique", tagIndex: "A"),
+    Example(name: "Ameque", tagIndex: "A"),
+    Example(name: "Amerque", tagIndex: "A"),
+    Example(name: "Ameriqe", tagIndex: "A"),
+    Example(name: "Ameriq", tagIndex: "A"),
+    Example(name: "Ame", tagIndex: "A"),
+    Example(name: "Boli", tagIndex: "B"),
+    Example(name: "Boli", tagIndex: "B"),
+    Example(name: "Boli", tagIndex: "B"),
+    Example(name: "Boli", tagIndex: "B"),
+    Example(name: "Boli", tagIndex: "B"),
+    Example(name: "Boli", tagIndex: "B"),
+    Example(name: "Boli", tagIndex: "B"),
+    Example(name: "Alo", tagIndex: "A"),
+    Example(name: "Dilo", tagIndex: "D"),
+    Example(name: "Fea", tagIndex: "F"),
+  ];
 
   @override
   Widget build(BuildContext context) {
+    SuspensionUtil.sortListBySuspensionTag(items);
+    SuspensionUtil.setShowSuspensionStatus(items);
     return Scaffold(
         backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
         body: Column(
@@ -63,32 +95,144 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 100,),
-            Image.asset("assets/images/wallet.png", width: 150, height: 150,),
-            const SizedBox(height: 30,),
-             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 54.0),
-              child: Text(con.connectYourWalletRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontFamily: "Gilroy", fontWeight: FontWeight.w700),),
+            MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              child: Expanded(
+                  child: Padding(padding: EdgeInsets.only(top: 0),
+                  child: SafeArea(child:
+                  AzListView(
+                    indexBarMargin: EdgeInsets.only(right: 8, top: 42, bottom: 42),
+                    indexHintBuilder: (context, hint){
+                      return Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xff00CB7D)),
+                        alignment: Alignment.center, child: Text(hint, style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Colors.white, fontSize: 18)),);
+                    },
+                    indexBarItemHeight: 18,
+                    indexBarOptions: IndexBarOptions(
+                      textStyle: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
+                        decoration: getIndexBarDecoration(Color(0xFF828282).withOpacity(0.8)),
+                        downDecoration: getIndexBarDecoration(Color(0xFF828282).withOpacity(0.8)),
+                        selectTextStyle: TextStyle(color: Color(0xff00CB7D), fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
+                        selectItemDecoration: BoxDecoration(),
+                        needRebuild: true,
+                        indexHintAlignment: Alignment.centerRight,
+                        indexHintOffset: Offset(0, 0)),
+                    padding: EdgeInsets.only(top: 16),
+                    data: items,
+                    itemCount: items.length,
+                    itemBuilder: buildSirklRepertoire,
+                  ),),)),
             ),
-            const SizedBox(height: 15,),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 54.0),
-              child: Text(con.talkWithRes.tr, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF9BA0A5), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
-            ),
-            const SizedBox(height: 50,),
-           Obx(() => NiceButtons(
-              stretch: false,
-                borderThickness: 5,
-                progress: _homeController.progress.value,
-                borderColor: const Color(0xff0063FB).withOpacity(0.5),
-                startColor: const Color(0xff1DE99B),
-                endColor: const Color(0xff0063FB),
-                gradientOrientation: GradientOrientation.Horizontal,
-                onTap: (finish){
-                },
-               child: Text(con.getStartedRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
-           )),
+
           ],
         ));
   }
+
+  Decoration getIndexBarDecoration(Color color) {
+    return BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20.0),);
+  }
+
+  Widget buildSirklRepertoire(BuildContext context, int index){
+    return Column(
+      children: [
+        Offstage(
+          offstage: !items[index].isShowSuspension,
+          child: Container(
+            padding: const EdgeInsets.only(left: 20, right: 60),
+            width: double.infinity,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: [
+                Text(items[index].tagIndex!, softWrap: false, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w700, color: Colors.black, fontSize: 20),),
+                const Expanded(
+                    child: Divider(
+                      color: Color(0xFF828282),
+                      height: 2,
+                      indent: 10.0,
+                    ))
+              ],
+            ),
+          ),
+        ),
+        buildSirklTile(context, index),
+      ],
+    );
+  }
+
+  Column buildConnectWalletUI() {
+    return Column(
+            children: [
+              const SizedBox(height: 100,),
+              Image.asset("assets/images/wallet.png", width: 150, height: 150,),
+              const SizedBox(height: 30,),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 54.0),
+                child: Text(con.connectYourWalletRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontFamily: "Gilroy", fontWeight: FontWeight.w700),),
+              ),
+              const SizedBox(height: 15,),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 54.0),
+                child: Text(con.talkWithRes.tr, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF9BA0A5), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
+              ),
+              const SizedBox(height: 50,),
+              Obx(() => NiceButtons(
+                  stretch: false,
+                  borderThickness: 5,
+                  progress: _homeController.progress.value,
+                  borderColor: const Color(0xff0063FB).withOpacity(0.5),
+                  startColor: const Color(0xff1DE99B),
+                  endColor: const Color(0xff0063FB),
+                  gradientOrientation: GradientOrientation.Horizontal,
+                  onTap: (finish){
+                  },
+                  child: Text(con.getStartedRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
+              )),
+            ],
+          );
+  }
+
+  Widget buildSirklTile(BuildContext context, int index){
+    return Padding(
+      padding: const EdgeInsets.only(right: 36.0),
+      child: Column(
+        children: [
+          ListTile(
+              leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Text("2 Days", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282))),
+                  ),
+                  SizedBox(
+                    width: 100,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Image.asset("assets/images/call_tab.png", color: const Color(0xFF00CB7D), width: 20, height: 20,),
+                        const SizedBox(width: 8,),
+                        Image.asset("assets/images/chat_tab.png", width: 20, height: 20, color: const Color(0xFF9BA0A5),),
+                        const SizedBox(width: 4,),
+                        Image.asset("assets/images/more.png", width: 20, height: 20,color: const Color(0xFF9BA0A5))
+                      ],),
+                  )
+                ],
+              ),
+              title: Transform.translate(offset: Offset(-8, 0),child: Text("Garyvee", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+            subtitle: Transform.translate(offset: Offset(-8, 0),child: Text("Lorem Ipsum is simply...", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282)))),
+
+          ),
+          Divider(color: Color(0xFF828282),indent: 0,endIndent: 24, thickness: 0.2)
+        ],
+      ),
+    );
+  }
+
 }
