@@ -7,6 +7,7 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
+import 'package:sirkl/common/view/detailed_message/detailed_message_screen_other.dart';
 
 import '../../common/utils.dart';
 
@@ -126,7 +127,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
-        onTap: (){Get.to(() => const DetailedMessageScreen());},
+        onTap: (){Get.to(() => const DetailedMessageScreenOther());},
         leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", height: 60, width: 60, fit: BoxFit.cover,),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

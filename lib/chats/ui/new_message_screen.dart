@@ -58,9 +58,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                       height: 15,
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
                       height: 50,
                       child: ListView.builder(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
                           scrollDirection: Axis.horizontal,
                           itemCount: 7,
                           itemBuilder: buildToSendChip),

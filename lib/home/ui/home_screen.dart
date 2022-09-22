@@ -1,6 +1,8 @@
+import 'dart:io';
+
+import 'package:advstory/advstory.dart';
 import 'package:azlistview/azlistview.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/model/example.dart';
@@ -8,6 +10,7 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
 import '../../common/utils.dart';
+import '../../common/view/detailed_message/detailed_message_screen_other.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -95,6 +98,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            Container(
+              padding: EdgeInsets.only(top: 16),
+              height: 122,
+              child: AdvStory(
+                style: AdvStoryStyle(indicatorStyle: IndicatorStyle(padding: EdgeInsets.symmetric(horizontal: 4, vertical: Platform.isAndroid ? 8 : 48))),
+                storyCount: 6,
+                storyBuilder: (storyIndex) => Story(
+                  contentCount: 3,
+                  contentBuilder: (contentIndex) => ImageContent(
+                      url: "https://i1.adis.ws/i/canon/canon-get-inspired-party-1-1920?",
+                  errorBuilder: () {
+                  return const Center(
+                  child: Text("An error occured!"),
+                  );}),
+                ),
+                trayBuilder: (index) => AdvStoryTray(url: "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640",
+                  username: Text("Samuel", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color: Get.isDarkMode ? Colors.white : Colors.black),
+                  ), gapSize: 0, borderGradientColors: [Color(0xFF1DE99B), Color(0xFF0063FB), Color(0xFF1DE99B), Color(0xFF0063FB)],),
+              ),
+            ),
             MediaQuery.removePadding(
               context: context,
               removeTop: true,
@@ -102,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Padding(padding: EdgeInsets.only(top: 0),
                   child: SafeArea(child:
                   AzListView(
-                    indexBarMargin: EdgeInsets.only(right: 8, top: 42, bottom: 42),
+                    indexBarMargin: EdgeInsets.only(right: 8, top: 12, bottom: 12),
                     indexHintBuilder: (context, hint){
                       return Container(
                         width: 60,
@@ -126,7 +149,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: buildSirklRepertoire,
                   ),),)),
             ),
-
           ],
         ));
   }
@@ -148,10 +170,10 @@ class _HomeScreenState extends State<HomeScreen> {
             alignment: Alignment.centerLeft,
             child: Row(
               children: [
-                Text(items[index].tagIndex!, softWrap: false, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w700, color: Colors.black, fontSize: 20),),
-                const Expanded(
+                Text(items[index].tagIndex!, softWrap: false, style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w700, color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20),),
+                Expanded(
                     child: Divider(
-                      color: Color(0xFF828282),
+                      color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282),
                       height: 2,
                       indent: 10.0,
                     ))
@@ -177,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 15,),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 54.0),
-                child: Text(con.talkWithRes.tr, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF9BA0A5), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
+                child: Text(con.talkWithRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
               ),
               const SizedBox(height: 50,),
               Obx(() => NiceButtons(
@@ -229,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
             subtitle: Transform.translate(offset: Offset(-8, 0),child: Text("Lorem Ipsum is simply...", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282)))),
 
           ),
-          Divider(color: Color(0xFF828282),indent: 0,endIndent: 24, thickness: 0.2)
+          Divider(color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282),indent: 0,endIndent: 24, thickness: 0.2)
         ],
       ),
     );
