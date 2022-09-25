@@ -23,100 +23,108 @@ class _CallsScreenState extends State<CallsScreen> {
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Column(children: [
-          Stack(
-            clipBehavior: Clip.none,
-            alignment: AlignmentDirectional.topCenter,
-            fit: StackFit.loose,
-            children: [
-              Container(
-                height: 140,
-                margin: const EdgeInsets.only(bottom: 0.25),
-                decoration: BoxDecoration(
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.grey,
-                      offset: Offset(0.0, 0.01), //(x,y)
-                      blurRadius: 0.01,
-                    ),
-                  ],
-                  borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(35)),
-                  gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
-                        Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
-                      ]),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 44.0),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                            onPressed: () {},
-                            icon: Image.asset(
-                              "assets/images/arrow_left.png",
-                              color:
-                              Get.isDarkMode ? Colors.white : Colors.black,
-                            )),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12.0),
-                          child: Text(
-                            con.callsTabRes.tr,
-                            style: TextStyle(
-                                color: Get.isDarkMode
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: "Gilroy",
-                                fontSize: 20),
-                          ),
-                        ),
-                        IconButton(
-                            onPressed: () {
-                              Utils().dialogPopMenu(context);
-                            },
-                            icon: Image.asset(
-                              "assets/images/more.png",
-                              color:
-                              Get.isDarkMode ? Colors.white : Colors.black,
-                            )),
-                      ],
-                    ),
-                  ),
-                ),
+          buildAppbar(context),
+          buildListCall(context)
+        ]));
+  }
+
+  Stack buildAppbar(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: AlignmentDirectional.topCenter,
+      fit: StackFit.loose,
+      children: [
+        Container(
+          height: 140,
+          margin: const EdgeInsets.only(bottom: 0.25),
+          decoration: BoxDecoration(
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.grey,
+                offset: Offset(0.0, 0.01), //(x,y)
+                blurRadius: 0.01,
               ),
-              Positioned(
-                  top: Platform.isAndroid? 80 : 60,
-                  child: SizedBox(
-                      height: 110,
-                      width: MediaQuery.of(context).size.width,
-                      child: buildFloatingSearchBar()))
             ],
+            borderRadius:
+            const BorderRadius.vertical(bottom: Radius.circular(35)),
+            gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+                  Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                ]),
           ),
-          MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(top: 24),
-                child: SafeArea(
-                  child: ListView.separated(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    itemCount: 50,
-                    itemBuilder: callTile,
-                    separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
+          child: Padding(
+            padding: const EdgeInsets.only(top: 44.0),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                      onPressed: () {},
+                      icon: Image.asset(
+                        "assets/images/arrow_left.png",
+                        color:
+                        Get.isDarkMode ? Colors.white : Colors.black,
+                      )),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Text(
+                      con.callsTabRes.tr,
+                      style: TextStyle(
+                          color: Get.isDarkMode
+                              ? Colors.white
+                              : Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: "Gilroy",
+                          fontSize: 20),
+                    ),
                   ),
+                  IconButton(
+                      onPressed: () {
+                        Utils().dialogPopMenu(context);
+                      },
+                      icon: Image.asset(
+                        "assets/images/more.png",
+                        color:
+                        Get.isDarkMode ? Colors.white : Colors.black,
+                      )),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+            top: Platform.isAndroid? 80 : 60,
+            child: SizedBox(
+                height: 110,
+                width: MediaQuery.of(context).size.width,
+                child: buildFloatingSearchBar()))
+      ],
+    );
+  }
+
+  MediaQuery buildListCall(BuildContext context) {
+    return MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(top: 24),
+              child: SafeArea(
+                child: ListView.separated(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  itemCount: 50,
+                  itemBuilder: callTile,
+                  separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
                 ),
               ),
             ),
-          )
-        ]));
+          ),
+        );
   }
 
   Widget callTile(BuildContext context, int index){

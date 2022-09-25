@@ -22,7 +22,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
 
   final _homeController = Get.put(HomeController());
-  final items = <Example>[
+  final items =
+  <Example>[
     Example(name: "Amerique", tagIndex: "A"),
     Example(name: "Ameque", tagIndex: "A"),
     Example(name: "Amerque", tagIndex: "A"),
