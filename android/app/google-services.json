@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "208005039506",
+    "project_id": "sirkl-e138d",
+    "storage_bucket": "sirkl-e138d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:208005039506:android:043d322518f49448892d4b",
+        "android_client_info": {
+          "package_name": "com.example.sirkl"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "208005039506-brp8lj802fkg891usmhv9trl2ans4ojk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqK0bZj-qbKDkjC2jH_RLKNfpnAI3_DP8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "208005039506-brp8lj802fkg891usmhv9trl2ans4ojk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "208005039506-v8hdtf1gq1hkbs58l6hsiui8kfbprqfv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.sirkl"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

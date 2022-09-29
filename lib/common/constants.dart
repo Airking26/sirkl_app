@@ -1,3 +1,8 @@
+/// Common ///
+const String URL_SERVER = "http://sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com/";
+const String ACCESS_TOKEN = "access_token";
+const String REFRESH_TOKEN = "refresh_token";
+const String USER = "user";
 
 /// Navigation page ///
 const String homeTabRes = "home";

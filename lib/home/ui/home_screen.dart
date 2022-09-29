@@ -10,7 +10,6 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
 import '../../common/utils.dart';
-import '../../common/view/detailed_message/detailed_message_screen_other.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -58,100 +57,112 @@ class _HomeScreenState extends State<HomeScreen> {
     SuspensionUtil.setShowSuspensionStatus(items);
     return Scaffold(
         backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
-        body: Column(
+        body: Obx(() => Column(
           children: [
-            Container(
-              height: 115,
-              margin: const EdgeInsets.only(bottom: 0.25),
-              decoration: BoxDecoration(
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.grey,
-                    offset: Offset(0.0, 0.01), //(x,y)
-                    blurRadius: 0.01,
-                  ),
-                ],
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(35)),
-                gradient:  LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
-                      Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
-                    ]
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 44.0),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(onPressed: (){}, icon: Image.asset("assets/images/arrow_left.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
-                        child: Image.asset("assets/images/logo.png", height: 20,),
-                      ),
-                      IconButton(onPressed: (){Utils().dialogPopMenu(context);}, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
-                  ],),
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 16),
-              height: 122,
-              child: AdvStory(
-                style: AdvStoryStyle(indicatorStyle: IndicatorStyle(padding: EdgeInsets.symmetric(horizontal: 4, vertical: Platform.isAndroid ? 8 : 48))),
-                storyCount: 6,
-                storyBuilder: (storyIndex) => Story(
-                  contentCount: 3,
-                  contentBuilder: (contentIndex) => ImageContent(
-                      url: "https://i1.adis.ws/i/canon/canon-get-inspired-party-1-1920?",
-                  errorBuilder: () {
-                  return const Center(
-                  child: Text("An error occured!"),
-                  );}),
-                ),
-                trayBuilder: (index) => AdvStoryTray(url: "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640",
-                  username: Text("Samuel", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color: Get.isDarkMode ? Colors.white : Colors.black),
-                  ), gapSize: 0, borderGradientColors: [Color(0xFF1DE99B), Color(0xFF0063FB), Color(0xFF1DE99B), Color(0xFF0063FB)],),
-              ),
-            ),
-            MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: Expanded(
-                  child: Padding(padding: EdgeInsets.only(top: 0),
-                  child: SafeArea(child:
-                  AzListView(
-                    indexBarMargin: EdgeInsets.only(right: 8, top: 12, bottom: 12),
-                    indexHintBuilder: (context, hint){
-                      return Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xff00CB7D)),
-                        alignment: Alignment.center, child: Text(hint, style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Colors.white, fontSize: 18)),);
-                    },
-                    indexBarItemHeight: 18,
-                    indexBarOptions: IndexBarOptions(
-                      textStyle: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
-                        decoration: getIndexBarDecoration(Color(0xFF828282).withOpacity(0.8)),
-                        downDecoration: getIndexBarDecoration(Color(0xFF828282).withOpacity(0.8)),
-                        selectTextStyle: TextStyle(color: Color(0xff00CB7D), fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
-                        selectItemDecoration: BoxDecoration(),
-                        needRebuild: true,
-                        indexHintAlignment: Alignment.centerRight,
-                        indexHintOffset: Offset(0, 0)),
-                    padding: EdgeInsets.only(top: 16),
-                    data: items,
-                    itemCount: items.length,
-                    itemBuilder: buildSirklRepertoire,
-                  ),),)),
-            ),
+            buildAppbar(context),
+            _homeController.isLoggedIn.value ? buildStoryList() : buildConnectWalletUI(),
+            _homeController.isLoggedIn.value ? buildRepertoireList(context) : Container(),
           ],
-        ));
+        )));
+  }
+
+  Container buildAppbar(BuildContext context) {
+    return Container(
+            height: 115,
+            margin: const EdgeInsets.only(bottom: 0.25),
+            decoration: BoxDecoration(
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.grey,
+                  offset: Offset(0.0, 0.01), //(x,y)
+                  blurRadius: 0.01,
+                ),
+              ],
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(35)),
+              gradient:  LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+                    Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                  ]
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 44.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(onPressed: (){}, icon: Image.asset("assets/images/arrow_left.png", color: Get.isDarkMode ? Colors.transparent : Colors.transparent,)),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: Image.asset("assets/images/logo.png", height: 20,),
+                    ),
+                    IconButton(onPressed: (){Utils().dialogPopMenu(context);}, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                ],),
+              ),
+            ),
+          );
+  }
+
+  Container buildStoryList() {
+    return Container(
+            padding: EdgeInsets.only(top: 16),
+            height: 122,
+            child: AdvStory(
+              style: AdvStoryStyle(indicatorStyle: IndicatorStyle(padding: EdgeInsets.symmetric(horizontal: 4, vertical: Platform.isAndroid ? 8 : 48))),
+              storyCount: 6,
+              storyBuilder: (storyIndex) => Story(
+                contentCount: 3,
+                contentBuilder: (contentIndex) => ImageContent(
+                    url: "https://i1.adis.ws/i/canon/canon-get-inspired-party-1-1920?",
+                errorBuilder: () {
+                return const Center(
+                child: Text("An error occured!"),
+                );}),
+              ),
+              trayBuilder: (index) => AdvStoryTray(url: "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640",
+                username: Text("Samuel", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color: Get.isDarkMode ? Colors.white : Colors.black),
+                ), gapSize: 0, borderGradientColors: [Color(0xFF1DE99B), Color(0xFF0063FB), Color(0xFF1DE99B), Color(0xFF0063FB)],),
+            ),
+          );
+  }
+
+  MediaQuery buildRepertoireList(BuildContext context) {
+    return MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: Expanded(
+                child: Padding(padding: EdgeInsets.only(top: 0),
+                child: SafeArea(child:
+                AzListView(
+                  indexBarMargin: EdgeInsets.only(right: 8, top: 12, bottom: 12),
+                  indexHintBuilder: (context, hint){
+                    return Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xff00CB7D)),
+                      alignment: Alignment.center, child: Text(hint, style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Colors.white, fontSize: 18)),);
+                  },
+                  indexBarItemHeight: MediaQuery.of(context).size.height / 50,
+                  indexBarOptions: IndexBarOptions(
+                    textStyle: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
+                      decoration: getIndexBarDecoration(Color(0xFF828282).withOpacity(0.8)),
+                      downDecoration: getIndexBarDecoration(Color(0xFF828282).withOpacity(0.8)),
+                      selectTextStyle: TextStyle(color: Color(0xff00CB7D), fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
+                      selectItemDecoration: BoxDecoration(),
+                      needRebuild: true,
+                      indexHintAlignment: Alignment.centerRight,
+                      indexHintOffset: Offset(0, 0)),
+                  padding: EdgeInsets.only(top: 16),
+                  data: items,
+                  itemCount: items.length,
+                  itemBuilder: buildSirklRepertoire,
+                ),),)),
+          );
   }
 
   Decoration getIndexBarDecoration(Color color) {
@@ -187,6 +198,45 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget buildSirklTile(BuildContext context, int index){
+    return Padding(
+      padding: const EdgeInsets.only(right: 36.0),
+      child: Column(
+        children: [
+          ListTile(
+            leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Text("2 Days", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282))),
+                ),
+                SizedBox(
+                  width: 100,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Image.asset("assets/images/call_tab.png", color: const Color(0xFF00CB7D), width: 20, height: 20,),
+                      const SizedBox(width: 8,),
+                      Image.asset("assets/images/chat_tab.png", width: 20, height: 20, color: const Color(0xFF9BA0A5),),
+                      const SizedBox(width: 4,),
+                      Image.asset("assets/images/more.png", width: 20, height: 20,color: const Color(0xFF9BA0A5))
+                    ],),
+                )
+              ],
+            ),
+            title: Transform.translate(offset: Offset(-8, 0),child: Text("Garyvee", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+            subtitle: Transform.translate(offset: Offset(-8, 0),child: Text("Lorem Ipsum is simply...", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282)))),
+
+          ),
+          Divider(color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282),indent: 0,endIndent: 24, thickness: 0.2)
+        ],
+      ),
+    );
+  }
+
   Column buildConnectWalletUI() {
     return Column(
             children: [
@@ -211,7 +261,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   startColor: const Color(0xff1DE99B),
                   endColor: const Color(0xff0063FB),
                   gradientOrientation: GradientOrientation.Horizontal,
-                  onTap: (finish){
+                  onTap: (finish) async{
+                    await _homeController.connectWallet();
                   },
                   child: Text(con.getStartedRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
               )),
@@ -219,43 +270,5 @@ class _HomeScreenState extends State<HomeScreen> {
           );
   }
 
-  Widget buildSirklTile(BuildContext context, int index){
-    return Padding(
-      padding: const EdgeInsets.only(right: 36.0),
-      child: Column(
-        children: [
-          ListTile(
-              leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Text("2 Days", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282))),
-                  ),
-                  SizedBox(
-                    width: 100,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Image.asset("assets/images/call_tab.png", color: const Color(0xFF00CB7D), width: 20, height: 20,),
-                        const SizedBox(width: 8,),
-                        Image.asset("assets/images/chat_tab.png", width: 20, height: 20, color: const Color(0xFF9BA0A5),),
-                        const SizedBox(width: 4,),
-                        Image.asset("assets/images/more.png", width: 20, height: 20,color: const Color(0xFF9BA0A5))
-                      ],),
-                  )
-                ],
-              ),
-              title: Transform.translate(offset: Offset(-8, 0),child: Text("Garyvee", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
-            subtitle: Transform.translate(offset: Offset(-8, 0),child: Text("Lorem Ipsum is simply...", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282)))),
-
-          ),
-          Divider(color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282),indent: 0,endIndent: 24, thickness: 0.2)
-        ],
-      ),
-    );
-  }
 
 }
