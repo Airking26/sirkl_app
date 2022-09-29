@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:advstory/advstory.dart';
 import 'package:azlistview/azlistview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/model/example.dart';
@@ -21,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
 
   final _homeController = Get.put(HomeController());
+  final _passwordController = TextEditingController();
   final items =
   <Example>[
     Example(name: "Amerique", tagIndex: "A"),
@@ -60,8 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Obx(() => Column(
           children: [
             buildAppbar(context),
-            _homeController.isLoggedIn.value ? buildStoryList() : buildConnectWalletUI(),
-            _homeController.isLoggedIn.value ? buildRepertoireList(context) : Container(),
+            _homeController.accessToken.value.isNotEmpty ? buildStoryList() : _homeController.address.value.isEmpty ? buildConnectWalletUI() : buildSignUp(),
+            _homeController.accessToken.value.isNotEmpty ? buildRepertoireList(context) : Container(),
           ],
         )));
   }
@@ -253,10 +255,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Text(con.talkWithRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
               ),
               const SizedBox(height: 50,),
-              Obx(() => NiceButtons(
+              NiceButtons(
                   stretch: false,
                   borderThickness: 5,
-                  progress: _homeController.progress.value,
+                  progress: false,
                   borderColor: const Color(0xff0063FB).withOpacity(0.5),
                   startColor: const Color(0xff1DE99B),
                   endColor: const Color(0xff0063FB),
@@ -265,7 +267,50 @@ class _HomeScreenState extends State<HomeScreen> {
                     await _homeController.connectWallet();
                   },
                   child: Text(con.getStartedRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
-              )),
+              ),
+            ],
+          );
+  }
+
+  Column buildSignUp() {
+    return Column(
+            children: [
+              const SizedBox(height: 35,),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextField(
+                    controller: _passwordController,
+                  decoration: InputDecoration(border: OutlineInputBorder(borderSide: BorderSide())),
+                ),
+              ),
+              const SizedBox(height: 10,),
+              FlutterPwValidator(
+                  controller: _passwordController,
+                  minLength: 6,
+                  uppercaseCharCount: 2,
+                  numericCharCount: 3,
+                  specialCharCount: 1,
+                  width: 350,
+                  height: 120,
+                  onSuccess: (){},
+                  onFail: (){}
+              ),
+              const SizedBox(height: 30,),
+              Container( width: 350, height: 50, padding: EdgeInsets.all(8), child: Text("Hello darkness my old friend", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16),)),
+              const SizedBox(height: 30,),
+              NiceButtons(
+                  stretch: false,
+                  borderThickness: 5,
+                  progress: false,
+                  borderColor: const Color(0xff0063FB).withOpacity(0.5),
+                  startColor: const Color(0xff1DE99B),
+                  endColor: const Color(0xff0063FB),
+                  gradientOrientation: GradientOrientation.Horizontal,
+                  onTap: (finish) async{
+                    await _homeController.signUp(_homeController.address.value, _passwordController.text, "Hello Darkness My Old Friend");
+                  },
+                  child: Text(con.getStartedRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
+              ),
             ],
           );
   }

@@ -24,7 +24,9 @@ class Language extends Translations{
       c.toRes: "To",
       c.contactsRes: "Contacts",
       c.writeHereRes: "Write here...",
-      c.notificationsRes: "Notifications"
+      c.notificationsRes: "Notifications",
+      c.errorRes: "Error",
+      c.errorWalletAlreadyUsedRes: "This user already exists. Try to sign in instead."
     }
   };
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/common/language.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 
 import 'navigation/ui/navigation_screen.dart';
 
@@ -10,10 +11,11 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await GetStorage.init();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({Key? key}) : super(key: key);
 
   @override
@@ -39,6 +41,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  final _homeController = Get.put(HomeController());
+
+  @override
+  void initState() {
+    _homeController.retrieveAccessToken();
+    if(_homeController.accessToken.value.isNotEmpty) _homeController.putFCMToken();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

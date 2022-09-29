@@ -25,6 +25,7 @@ dependencies:
   url_launcher: ^6.1.5
   firebase_core: ^1.23.0
   firebase_messaging: ^13.0.3
+  flutter_pw_validator: ^1.4.2
 
 dev_dependencies:
   flutter_test:

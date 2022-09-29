@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -25,7 +24,6 @@ class HomeController extends GetxController{
   var id = "".obs;
   var userMe = User().obs;
   var progress = true.obs;
-  var isLoggedIn = false.obs;
   var isLoading = false.obs;
   var address = "".obs;
   var sessionStatus;
@@ -44,8 +42,11 @@ class HomeController extends GetxController{
     );
 
     // Subscribe to events
-    connector.on('connect', (session) {
+    connector.on('connect', (session) async{
       address.value = sessionStatus?.accounts[0];
+      progress.value = false;
+      var k = await _homeService.isUserExists(address.value);
+      var f = "";
     });
 
     connector.on('session_request', (payload) {
@@ -94,13 +95,13 @@ class HomeController extends GetxController{
       await putFCMToken();
       isLoading.value = false;
     }
-    else if(requestSignUp.bodyString != null && requestSignUp.bodyString!.contains("EMAIL_ALREADY_USED")){
+    else if(requestSignUp.bodyString != null && requestSignUp.bodyString!.contains("WALLET_ALREADY_USED")){
       isLoading.value = false;
-      //Get.snackbar(con.error.tr, con.error_mail_already_used.tr);
+      Get.snackbar(con.errorRes.tr, con.errorWalletAlreadyUsedRes.tr);
     }
     else {
       isLoading.value = false;
-      //Get.snackbar(con.error.tr, requestSignUp.statusText ?? "");
+      Get.snackbar(con.errorRes.tr, requestSignUp.statusText ?? "");
     }
   }
 
@@ -122,4 +123,9 @@ class HomeController extends GetxController{
     return user;
   }
 
+  retrieveAccessToken() async{
+    var accessTok = box.read(con.ACCESS_TOKEN);
+    accessToken.value = accessTok ?? '';
+    id.value = userFromJson(box.read(con.USER) ?? "").id ?? "";
+  }
 }
