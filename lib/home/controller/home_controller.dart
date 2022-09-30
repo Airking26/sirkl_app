@@ -26,6 +26,7 @@ class HomeController extends GetxController{
   var progress = true.obs;
   var isLoading = false.obs;
   var address = "".obs;
+  var isUserExists = false.obs;
   var sessionStatus;
 
   connectWallet() async {
@@ -45,8 +46,12 @@ class HomeController extends GetxController{
     connector.on('connect', (session) async{
       address.value = sessionStatus?.accounts[0];
       progress.value = false;
-      var k = await _homeService.isUserExists(address.value);
-      var f = "";
+      var isUserExistsBool = await _homeService.isUserExists(address.value);
+      if(isUserExistsBool.body == "false") {
+        isUserExists.value = true;
+      } else {
+        isUserExists.value = false;
+      }
     });
 
     connector.on('session_request', (payload) {

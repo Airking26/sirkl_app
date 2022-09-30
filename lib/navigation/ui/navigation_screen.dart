@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 
 import '../../calls/ui/calls_screen.dart';
 import '../../chats/ui/chats_screen.dart';
@@ -21,6 +22,7 @@ class NavigationScreen extends StatefulWidget {
 class _NavigationScreenState extends State<NavigationScreen> {
 
   final _navigationController = Get.put(NavigationController());
+  final _homeController = Get.put(HomeController());
   final List<Widget> _pages = [
     const HomeScreen(),
     const CallsScreen(),
@@ -34,6 +36,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     return Scaffold(
       extendBody: true,
       bottomNavigationBar: FloatingNavbar(
+
         margin: EdgeInsets.zero,
         borderRadius: 0,
         elevation: 10,
@@ -51,8 +54,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
         ],
         onTap: (int val){
           setState((){
-            _navigationController.changeCurrentPage(val);
-            _navigationController.pageController.value.jumpToPage(val);
+            if(_homeController.accessToken.isNotEmpty) {
+              _navigationController.changeCurrentPage(val);
+              _navigationController.pageController.value.jumpToPage(val);
+            }
           });
         },
       ),

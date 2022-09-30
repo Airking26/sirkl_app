@@ -59,13 +59,15 @@ class _HomeScreenState extends State<HomeScreen> {
     SuspensionUtil.setShowSuspensionStatus(items);
     return Scaffold(
         backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
-        body: Obx(() => Column(
-          children: [
-            buildAppbar(context),
-            _homeController.accessToken.value.isNotEmpty ? buildStoryList() : _homeController.address.value.isEmpty ? buildConnectWalletUI() : buildSignUp(),
-            _homeController.accessToken.value.isNotEmpty ? buildRepertoireList(context) : Container(),
-          ],
-        )));
+        body: Obx(() =>
+            Column(
+              children: [
+                buildAppbar(context),
+                _homeController.accessToken.value.isNotEmpty ? buildStoryList() : _homeController.address.value.isEmpty ? buildConnectWalletUI() : _homeController.isUserExists.value ? buildSignIn() : buildSignUp(),
+                _homeController.accessToken.value.isNotEmpty ? buildRepertoireList(context) : Container(),
+              ],
+            ),
+        ));
   }
 
   Container buildAppbar(BuildContext context) {
@@ -133,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
   }
 
-  MediaQuery buildRepertoireList(BuildContext context) {
+  Widget buildRepertoireList(BuildContext context) {
     return MediaQuery.removePadding(
             context: context,
             removeTop: true,
@@ -174,6 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildSirklRepertoire(BuildContext context, int index){
+
     return Column(
       children: [
         Offstage(
@@ -315,5 +318,33 @@ class _HomeScreenState extends State<HomeScreen> {
           );
   }
 
+  Column buildSignIn() {
+    return Column(
+            children: [
+              const SizedBox(height: 50,),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextField(
+                    controller: _passwordController,
+                  decoration: InputDecoration(border: OutlineInputBorder(borderSide: BorderSide())),
+                ),
+              ),
+              const SizedBox(height: 30,),
+              NiceButtons(
+                  stretch: false,
+                  borderThickness: 5,
+                  progress: false,
+                  borderColor: const Color(0xff0063FB).withOpacity(0.5),
+                  startColor: const Color(0xff1DE99B),
+                  endColor: const Color(0xff0063FB),
+                  gradientOrientation: GradientOrientation.Horizontal,
+                  onTap: (finish) async{
+                    await _homeController.signIn(_homeController.address.value, _passwordController.text);
+                  },
+                  child: Text(con.getStartedRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
+              ),
+            ],
+          );
+  }
 
 }
