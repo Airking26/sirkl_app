@@ -68,7 +68,7 @@ class _CallsScreenState extends State<CallsScreen> {
                       icon: Image.asset(
                         "assets/images/arrow_left.png",
                         color:
-                        Get.isDarkMode ? Colors.white : Colors.black,
+                        Get.isDarkMode ? Colors.transparent : Colors.transparent,
                       )),
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),

@@ -114,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Container buildStoryList() {
     return Container(
-            padding: EdgeInsets.only(top: 16),
+            padding: const EdgeInsets.only(top: 16),
             height: 122,
             child: AdvStory(
               style: AdvStoryStyle(indicatorStyle: IndicatorStyle(padding: EdgeInsets.symmetric(horizontal: 4, vertical: Platform.isAndroid ? 8 : 48))),
@@ -130,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               trayBuilder: (index) => AdvStoryTray(url: "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640",
                 username: Text("Samuel", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color: Get.isDarkMode ? Colors.white : Colors.black),
-                ), gapSize: 0, borderGradientColors: [Color(0xFF1DE99B), Color(0xFF0063FB), Color(0xFF1DE99B), Color(0xFF0063FB)],),
+                ), gapSize: 0, borderGradientColors: [const Color(0xFF1DE99B), const Color(0xFF0063FB), const Color(0xFF1DE99B), const Color(0xFF0063FB)],),
             ),
           );
   }
@@ -140,28 +140,28 @@ class _HomeScreenState extends State<HomeScreen> {
             context: context,
             removeTop: true,
             child: Expanded(
-                child: Padding(padding: EdgeInsets.only(top: 0),
+                child: Padding(padding: const EdgeInsets.only(top: 0),
                 child: SafeArea(child:
                 AzListView(
-                  indexBarMargin: EdgeInsets.only(right: 8, top: 12, bottom: 12),
+                  indexBarMargin: const EdgeInsets.only(right: 8, top: 12, bottom: 12),
                   indexHintBuilder: (context, hint){
                     return Container(
                       width: 60,
                       height: 60,
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xff00CB7D)),
-                      alignment: Alignment.center, child: Text(hint, style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Colors.white, fontSize: 18)),);
+                      decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xff00CB7D)),
+                      alignment: Alignment.center, child: Text(hint, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Colors.white, fontSize: 18)),);
                   },
                   indexBarItemHeight: MediaQuery.of(context).size.height / 50,
                   indexBarOptions: IndexBarOptions(
-                    textStyle: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
-                      decoration: getIndexBarDecoration(Color(0xFF828282).withOpacity(0.8)),
-                      downDecoration: getIndexBarDecoration(Color(0xFF828282).withOpacity(0.8)),
-                      selectTextStyle: TextStyle(color: Color(0xff00CB7D), fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
-                      selectItemDecoration: BoxDecoration(),
+                    textStyle: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
+                      decoration: getIndexBarDecoration(const Color(0xFF828282).withOpacity(0.8)),
+                      downDecoration: getIndexBarDecoration(const Color(0xFF828282).withOpacity(0.8)),
+                      selectTextStyle: const TextStyle(color: const Color(0xff00CB7D), fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
+                      selectItemDecoration: const BoxDecoration(),
                       needRebuild: true,
                       indexHintAlignment: Alignment.centerRight,
-                      indexHintOffset: Offset(0, 0)),
-                  padding: EdgeInsets.only(top: 16),
+                      indexHintOffset: const Offset(0, 0)),
+                  padding: const EdgeInsets.only(top: 16),
                   data: items,
                   itemCount: items.length,
                   itemBuilder: buildSirklRepertoire,
@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(items[index].tagIndex!, softWrap: false, style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w700, color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20),),
                 Expanded(
                     child: Divider(
-                      color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282),
+                      color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282),
                       height: 2,
                       indent: 10.0,
                     ))
@@ -232,11 +232,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               ],
             ),
-            title: Transform.translate(offset: Offset(-8, 0),child: Text("Garyvee", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
-            subtitle: Transform.translate(offset: Offset(-8, 0),child: Text("Lorem Ipsum is simply...", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282)))),
+            title: Transform.translate(offset: const Offset(-8, 0),child: Text("Garyvee", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+            subtitle: Transform.translate(offset: const Offset(-8, 0),child: Text("Lorem Ipsum is simply...", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))),
 
           ),
-          Divider(color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282),indent: 0,endIndent: 24, thickness: 0.2)
+          Divider(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282),indent: 0,endIndent: 24, thickness: 0.2)
         ],
       ),
     );
@@ -255,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 15,),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 54.0),
-                child: Text(con.talkWithRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
+                child: Text(con.talkWithRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
               ),
               const SizedBox(height: 50,),
               NiceButtons(
@@ -283,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextField(
                     controller: _passwordController,
-                  decoration: InputDecoration(border: OutlineInputBorder(borderSide: BorderSide())),
+                  decoration: const InputDecoration(border: OutlineInputBorder(borderSide: BorderSide())),
                 ),
               ),
               const SizedBox(height: 10,),
@@ -299,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onFail: (){}
               ),
               const SizedBox(height: 30,),
-              Container( width: 350, height: 50, padding: EdgeInsets.all(8), child: Text("Hello darkness my old friend", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16),)),
+              Container( width: 350, height: 50, padding: const EdgeInsets.all(8), child: const Text("Hello darkness my old friend", style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16),)),
               const SizedBox(height: 30,),
               NiceButtons(
                   stretch: false,
@@ -326,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextField(
                     controller: _passwordController,
-                  decoration: InputDecoration(border: OutlineInputBorder(borderSide: BorderSide())),
+                  decoration: const InputDecoration(border: const OutlineInputBorder(borderSide: BorderSide())),
                 ),
               ),
               const SizedBox(height: 30,),

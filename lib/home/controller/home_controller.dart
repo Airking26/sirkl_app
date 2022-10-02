@@ -11,7 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
-import '../../common/model/refresh_token_dtpo.dart';
+import '../../common/model/refresh_token_dto.dart';
 import '../../common/model/sign_in_dto.dart';
 import '../../common/model/update_fcm_dto.dart';
 

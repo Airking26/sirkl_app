@@ -26,7 +26,8 @@ class Language extends Translations{
       c.writeHereRes: "Write here...",
       c.notificationsRes: "Notifications",
       c.errorRes: "Error",
-      c.errorWalletAlreadyUsedRes: "This user already exists. Try to sign in instead."
+      c.errorWalletAlreadyUsedRes: "This user already exists. Try to sign in instead.",
+      c.noDescYetRes: "No description yet. Edit your profile to tell a little bit more about you."
     }
   };
 
