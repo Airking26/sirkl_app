@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:images_picker/images_picker.dart';
+import 'package:simple_s3/simple_s3.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -21,10 +23,13 @@ class ProfileController extends GetxController{
 
   var isCardExpanded = false.obs;
   var isEditingProfile = false.obs;
-  final usernameTextEditingController = TextEditingController().obs;
-  final descriptionTextEditingController = TextEditingController().obs;
+  var isLoadingPicture = false.obs;
+  var usernameTextEditingController = TextEditingController().obs;
+  var descriptionTextEditingController = TextEditingController().obs;
+  var urlPicture = "".obs;
 
   updateMe(UpdateMeDto updateMeDto) async {
+    isLoadingPicture.value = true;
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _profileService.modifyUser(accessToken, updateMeDtoToJson(updateMeDto));
@@ -37,17 +42,29 @@ class ProfileController extends GetxController{
       if(request.isOk){
         _homeController.userMe.value = userFromJson(json.encode(request.body));
         isEditingProfile.value = false;
+        isLoadingPicture.value = false;
+      } else {
+        isLoadingPicture.value = false;
       }
     } else if(request.isOk){
       _homeController.userMe.value = userFromJson(json.encode(request.body));
       isEditingProfile.value = false;
+      isLoadingPicture.value = false;
+    } else {
+      isLoadingPicture.value = false;
     }
   }
 
   getImage() async{
-    List<Media>? res = await ImagesPicker.pick(count: 1, pickType: PickType.image, language: Language.English);
-    var o = res;
-    var j = "";
+    List<Media>? res = await ImagesPicker.pick(count: 1, pickType: PickType.image, language: Language.English,
+      cropOpt: CropOption(
+      aspectRatio: CropAspectRatio.custom,
+      cropType: CropType.circle, // currently for android
+    ), maxSize: 500, quality: 0.8);
+    //await ImagesPicker.saveImageToAlbum(File(res!.first.path), albumName: "Pictures");
+    if(res != null) isLoadingPicture.value = true;
+    urlPicture.value = await SimpleS3().uploadFile(File(res!.first.path), "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
+    isLoadingPicture.value = false;
   }
 
 }

@@ -28,6 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState(){
     _profileController.usernameTextEditingController.value.text = _homeController.userMe.value.userName!.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _homeController.userMe.value.userName!;
     _profileController.descriptionTextEditingController.value.text = _homeController.userMe.value.description == null ? "" : _homeController.userMe.value.description!;
+    _profileController.urlPicture.value = _homeController.userMe.value.picture == null ? "" : _homeController.userMe.value.picture!;
     super.initState();
   }
 
@@ -35,7 +36,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
-        body: Obx(() => Column(
+        body: Obx(() =>
+            Column(
           children: [
             Stack(
               clipBehavior: Clip.none,
@@ -71,13 +73,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          IconButton(onPressed: (){
+                          _profileController.isLoadingPicture.value ?
+                          Container(padding: EdgeInsets.all(8), width: 48, height: 48, child: CircularProgressIndicator(color: Color(0xFF00CB7D),))
+                              : IconButton(onPressed: (){
                             _profileController.isEditingProfile.value ? _profileController.updateMe(UpdateMeDto(
                               userName: _profileController.usernameTextEditingController.value.text.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _profileController.usernameTextEditingController.value.text,
-                              description: _profileController.descriptionTextEditingController.value.text.isEmpty ? null : _profileController.descriptionTextEditingController.value.text
+                              description: _profileController.descriptionTextEditingController.value.text.isEmpty ? null : _profileController.descriptionTextEditingController.value.text,
+                              picture: _profileController.urlPicture.value
                             )):
                             Get.to(() => const NotificationScreen());
-                            }, icon: Image.asset(_profileController.isEditingProfile.value ? "assets/images/done.png" : "assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                            }, icon: Image.asset(_profileController.isEditingProfile.value ? "assets/images/edit.png" : "assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
                           Padding(
                             padding: const EdgeInsets.only(top: 12.0),
                             child:
@@ -94,10 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                    decoration: const InputDecoration(
                                      border: InputBorder.none,
                                      isCollapsed: true,
-                                     //prefixIcon: IconButton(onPressed: (){}, icon: Image.asset('assets/images/edit.png', width: 18, height: 18)),
                                      hintText: ""
-                                       //hintText: _homeController.userMe.value.userName!.isEmpty ? _homeController.userMe.value.wallet! : _homeController.userMe.value.userName!,
-                                      // hintStyle: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)
                                      ),
                                  ),
                                )
@@ -118,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(90)),
                     child:
                         ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
-                          child: GestureDetector(onTap: (){ _profileController.getImage();},child: Image.network("https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640", color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0), colorBlendMode: BlendMode.difference,))
+                          child: GestureDetector(onTap: (){ if(_profileController.isEditingProfile.value) _profileController.getImage();},child: Image.network(_profileController.urlPicture.value.isEmpty ? "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640" : _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,))
                           ,),)
                   ),
                 ),

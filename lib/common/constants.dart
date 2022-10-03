@@ -5,6 +5,7 @@ const String REFRESH_TOKEN = "refresh_token";
 const String USER = "user";
 const String errorRes = "error";
 const String errorWalletAlreadyUsedRes = "error_wallet_already_used";
+const String moralisApiKey = "i9AyfrkBTZQg3gUEXqANDoGAY4h3W7zjUhpoPNtO69sCAFvSVO7ICpZSEdCsYxIj";
 
 /// Navigation page ///
 const String homeTabRes = "home";

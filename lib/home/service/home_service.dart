@@ -10,5 +10,6 @@ class HomeService extends GetConnect{
   Future<Response<String>> isUserExists(String wallet) => get('${con.URL_SERVER}auth/availability/wallet/$wallet');
   Future<Response<Map<String, dynamic>>> refreshToken(String refreshToken) => get('${con.URL_SERVER}auth/refresh', headers: {'Refresh': refreshToken});
   Future<Response<Map<String, dynamic>>> uploadFCMToken(String accessToken, String updateFcmdto) => put('${con.URL_SERVER}user/me/fcm', updateFcmdto, headers: {'Authorization':'Bearer $accessToken'});
-
+  Future<Response<Map<String, dynamic>>> getNFTs(String wallet) => get("https://deep-index.moralis.io/api/v2/$wallet/nft", headers: {"accept": 'application/json', "X-API-Key": con.moralisApiKey}, query: {"chain": 'eth', "format": 'decimal'});
+  Future<Response<Map<String, dynamic>>> getNextNFTs(String wallet, String cursor) => get("https://deep-index.moralis.io/api/v2/$wallet/nft", headers: {"accept": 'application/json', "X-API-Key": con.moralisApiKey}, query: {"chain": 'eth', "format": 'decimal', "cursor": cursor});
 }

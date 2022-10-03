@@ -4,6 +4,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sirkl/common/model/moralis_metadata_dto.dart';
+import 'package:sirkl/common/model/moralis_root_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/sign_up_dto.dart';
 import 'package:sirkl/home/service/home_service.dart';
@@ -116,7 +118,6 @@ class HomeController extends GetxController{
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var fcm = defaultTargetPlatform == TargetPlatform.android ? updateFcmdtoToJson(UpdateFcmdto(token: firebaseMessaging, platform: 'android')) : updateFcmdtoToJson(UpdateFcmdto(token: firebaseMessaging, platform: 'iOS'));
     var request = await _homeService.uploadFCMToken(accessToken!, fcm);
-    var user = userFromJson(json.encode(request.body));
     if(request.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken!);
       var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
@@ -124,8 +125,8 @@ class HomeController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _homeService.uploadFCMToken(accessToken, fcm);
     }
-    userMe.value = user;
-    return user;
+    userMe.value = userFromJson(json.encode(request.body));
+    await getNFTs();
   }
 
   retrieveAccessToken() async{
@@ -133,4 +134,24 @@ class HomeController extends GetxController{
     accessToken.value = accessTok ?? '';
     id.value = userFromJson(box.read(con.USER) ?? "").id ?? "";
   }
+
+  getNFTs() async{
+    var req = await _homeService.getNFTs("0x81269781E647eb0843Dc3a8fEbC55a38cE69B4eB");//userMe.value.wallet!);
+    var groupedCollection = moralisRootDtoFromJson(json.encode(req.body)).result?.groupBy((element) => element!.name);
+    if(moralisRootDtoFromJson(json.encode(req.body)).cursor != null) {
+      var secondReq = await _homeService.getNextNFTs("0x81269781E647eb0843Dc3a8fEbC55a38cE69B4eB", moralisRootDtoFromJson(json.encode(req.body)).cursor!);
+      var groupedCollectionSecond = moralisRootDtoFromJson(json.encode(secondReq.body)).result?.groupBy((element) => element!.name);
+      var k = "";
+    }
+    moralisRootDtoFromJson(json.encode(req.body)).result?.forEach((element) {
+      var metadata = moralisMetadataDtoFromJson(element!.metadata!);
+    });
+  }
+}
+
+extension Iterables<E> on Iterable<E> {
+  Map<K, List<E>> groupBy<K>(K Function(E) keyFunction) => fold(
+      <K, List<E>>{},
+          (Map<K, List<E>> map, E element) =>
+      map..putIfAbsent(keyFunction(element), () => <E>[]).add(element));
 }
