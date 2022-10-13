@@ -22,6 +22,7 @@ class ProfileController extends GetxController{
   final _homeController = Get.put(HomeController());
 
   var isCardExpanded = false.obs;
+  var isCardExpandedList = <int>[].obs;
   var isEditingProfile = false.obs;
   var isLoadingPicture = false.obs;
   var usernameTextEditingController = TextEditingController().obs;

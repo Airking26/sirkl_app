@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/model/db/collection_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
@@ -26,6 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState(){
+    _homeController.getNFTsTemporary();
     _profileController.usernameTextEditingController.value.text = _homeController.userMe.value.userName!.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _homeController.userMe.value.userName!;
     _profileController.descriptionTextEditingController.value.text = _homeController.userMe.value.description == null ? "" : _homeController.userMe.value.description!;
     _profileController.urlPicture.value = _homeController.userMe.value.picture == null ? "" : _homeController.userMe.value.picture!;
@@ -178,6 +180,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.only(left: 24.0),
               child: Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),)),
             ),
+            _homeController.nfts.value.isEmpty ? const Padding(
+              padding: EdgeInsets.only(top: 32.0),
+              child: CircularProgressIndicator(),
+            ) :
             MediaQuery.removePadding(
               context:  context,
               removeTop: true,
@@ -186,8 +192,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.only(top: 16.0),
                   child: SafeArea(
                     child: ListView.builder(
-                        itemCount: 10,
-                        itemBuilder: nftDisplayWidget
+                        itemCount: _homeController.nfts.value.length,
+                        itemBuilder: (context, index){
+                          return CardNFT(_homeController.nfts.value[index], _profileController, index);
+                        },
                     ),
                   ),
                 ),
@@ -213,22 +221,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
         child: ExpansionTile(
-          leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
+          leading: CircleAvatar(backgroundImage: NetworkImage(_homeController.nfts.value[index].collectionImages[0]), radius: 30, onBackgroundImageError: (_,__){
+
+          },),
           trailing: Obx(() => Image.asset(_profileController.isCardExpanded.value ? "assets/images/arrow_up_rev.png" : "assets/images/arrow_down_rev.png", color: Get.isDarkMode ? Colors.white : Colors.black, height: 20, width: 20,),),
-          title: Transform.translate(offset: const Offset(-8, 0),child: Text("Bored Ape Yacht Club", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
-          subtitle: Transform.translate(offset: const Offset(-8, 0), child: const Text("1 available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
+          title: Transform.translate(offset: const Offset(-8, 0),child: Text(_homeController.nfts.value[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+          subtitle: Transform.translate(offset: const Offset(-8, 0), child: Text("${_homeController.nfts.value[index].collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
           onExpansionChanged: (expanded){
             _profileController.isCardExpanded.value = expanded;
           },
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
-              child: SizedBox(height: 80, child: ListView.builder(itemCount: 8, itemBuilder: nftImageWidget, scrollDirection: Axis.horizontal,)),
+              child: SizedBox(height: 80, child: ListView.builder(
+                cacheExtent: 200,
+                itemCount: _homeController.nfts.value[index].collectionImages.length,
+                itemBuilder: (context, i){
+                return buildCard(index, i);
+              }, scrollDirection: Axis.horizontal,)),
             )
           ],
         ),
       ),
     );
+  }
+
+  Padding buildCard(int index, int i) {
+    return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: SizedBox.fromSize(
+                        child: Image.network(fit: BoxFit.cover, _homeController.nfts.value[index].collectionImages[i], width: 80, height: 70,))),
+              );
   }
 
   Widget nftImageWidget(BuildContext context, int index) {
@@ -237,7 +262,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
           child: SizedBox.fromSize(
-              child: Image.network(fit: BoxFit.cover,"https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640", width: 80, height: 70,))),
+              child: Image.network(fit: BoxFit.cover, _homeController.nfts.value[0].collectionImages[index], width: 80, height: 70,))),
       );
   }
 
@@ -270,6 +295,88 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ))
       ..show();
   }
+
+}
+
+class CardNFT extends StatefulWidget {
+  final CollectionDbDto collectionDbDTO;
+  final ProfileController profileController;
+  final int index;
+  CardNFT(this.collectionDbDTO, this.profileController, this.index, {Key? key}) : super(key: key);
+
+  @override
+  State<CardNFT> createState() => _CardNFTState();
+}
+
+class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
+
+    @override
+    bool get wantKeepAlive => true;
+
+    @override
+    Widget build(BuildContext context) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 6),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Get.isDarkMode ? const Color(0xFF1A2E40) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.grey,
+                offset: Offset(0.0, 0.01), //(x,y)
+                blurRadius: 0.01,
+              ),
+            ],
+          ),
+          child: ExpansionTile(
+            leading: CircleAvatar(backgroundImage: NetworkImage(widget.collectionDbDTO.collectionImages[0]), radius: 30, onBackgroundImageError: (_,__){
+
+            },),
+            trailing: Obx(() => Image.asset(
+              widget.profileController.isCardExpandedList.value.contains(widget.index) ?
+              "assets/images/arrow_up_rev.png" :
+              "assets/images/arrow_down_rev.png",
+              color: Get.isDarkMode ? Colors.white : Colors.black, height: 20, width: 20,),),
+            title: Transform.translate(offset: const Offset(-8, 0),child: Text(widget.collectionDbDTO.collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+            subtitle: Transform.translate(offset: const Offset(-8, 0), child: Text("${widget.collectionDbDTO.collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
+            onExpansionChanged: (expanded){
+              if(expanded) {
+                widget.profileController.isCardExpandedList.value.assign(widget.index);
+              } else {
+                widget.profileController.isCardExpandedList.value.remove(widget.index);
+              }
+              widget.profileController.isCardExpandedList.refresh();
+              //widget.profileController.isCardExpanded.value = expanded;
+            },
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
+                child: SizedBox(height: 80,
+                    child: ListView.builder(
+                  cacheExtent: 200,
+                  itemCount: widget.collectionDbDTO.collectionImages.length,
+                  itemBuilder: (context, i){
+                    return buildCard(i, widget.collectionDbDTO);
+                  }, scrollDirection: Axis.horizontal,)),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+
+    Padding buildCard(int i, CollectionDbDto collectionDbDTO) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: SizedBox.fromSize(
+                child: Image.network(fit: BoxFit.cover, collectionDbDTO.collectionImages[i], width: 80, height: 70,))),
+      );
+    }
+
+
 
 }
 

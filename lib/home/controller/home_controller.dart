@@ -4,7 +4,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:hive/hive.dart';
+import 'package:sirkl/common/model/db/collection_dto.dart';
 import 'package:sirkl/common/model/moralis_metadata_dto.dart';
+import 'package:sirkl/common/model/moralis_nft_contract_addresse.dart';
 import 'package:sirkl/common/model/moralis_root_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/sign_up_dto.dart';
@@ -30,6 +33,7 @@ class HomeController extends GetxController{
   var address = "".obs;
   var isUserExists = false.obs;
   var sessionStatus;
+  var nfts = <CollectionDbDto>[].obs;
 
   connectWallet() async {
     final connector = WalletConnect(
@@ -126,7 +130,6 @@ class HomeController extends GetxController{
       request = await _homeService.uploadFCMToken(accessToken, fcm);
     }
     userMe.value = userFromJson(json.encode(request.body));
-    await getNFTs();
   }
 
   retrieveAccessToken() async{
@@ -135,17 +138,88 @@ class HomeController extends GetxController{
     id.value = userFromJson(box.read(con.USER) ?? "").id ?? "";
   }
 
-  getNFTs() async{
-    var req = await _homeService.getNFTs("0x81269781E647eb0843Dc3a8fEbC55a38cE69B4eB");//userMe.value.wallet!);
-    var groupedCollection = moralisRootDtoFromJson(json.encode(req.body)).result?.groupBy((element) => element!.name);
-    if(moralisRootDtoFromJson(json.encode(req.body)).cursor != null) {
-      var secondReq = await _homeService.getNextNFTs("0x81269781E647eb0843Dc3a8fEbC55a38cE69B4eB", moralisRootDtoFromJson(json.encode(req.body)).cursor!);
-      var groupedCollectionSecond = moralisRootDtoFromJson(json.encode(secondReq.body)).result?.groupBy((element) => element!.name);
-      var k = "";
+  getNFTsContractAddresses() async{
+    //final db = Hive.box("contract_addresses");
+    var req = await _homeService.getNFTsContractAddresses(userMe.value.wallet!);
+    var initialArray = moralisNftContractAdressesFromJson(json.encode(req.body)).result!;
+    var cursor = moralisNftContractAdressesFromJson(json.encode(req.body)).cursor;
+    while(cursor != null){
+      var newReq = await _homeService.getNextNFTsContractAddresses(userMe.value.wallet!, cursor);
+      initialArray.addAll(moralisNftContractAdressesFromJson(json.encode(newReq.body)).result!);
+      cursor = moralisNftContractAdressesFromJson(json.encode(newReq.body)).cursor;
     }
-    moralisRootDtoFromJson(json.encode(req.body)).result?.forEach((element) {
-      var metadata = moralisMetadataDtoFromJson(element!.metadata!);
+
+    var contractAddresses = [];
+    for (var element in initialArray) { contractAddresses.add(element.tokenAddress);}
+
+  }
+
+  getNFTsTemporary() async{
+    nfts.value.clear();
+    var req = await _homeService.getNFTs("0x81269781E647eb0843Dc3a8fEbC55a38cE69B4eB");
+    var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
+    var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
+    while(cursor != null){
+      var newReq = await _homeService.getNextNFTs("0x81269781E647eb0843Dc3a8fEbC55a38cE69B4eB", cursor);
+      mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
+      cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
+    }
+
+    var groupedCollection = mainCollection.groupBy((p0) => p0!.name);
+
+    groupedCollection.forEach((key, value) async{
+      nfts.value.add(CollectionDbDto(collectionName: key ?? "", collectionImages: value.map((e) {
+        if(moralisMetadataDtoFromJson(e!.metadata!).image!.startsWith("ipfs://")) {
+          print("CASE 1");
+          print(key);
+          print("https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}");
+          return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
+        } else if(moralisMetadataDtoFromJson(e.metadata!).image!.contains("/ipfs/")){
+          print("CASE 2");
+          print(key);
+          print("https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}");
+          return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
+        }
+        else {
+          print("CASE 3");
+          print(key);
+          print(moralisMetadataDtoFromJson(e.metadata!).image!);
+          return moralisMetadataDtoFromJson(e.metadata!).image!;
+        }
+      }
+      ).toList()));
+      nfts.refresh();
+      var f = nfts.value;
+      var t = "";
     });
+  }
+
+  getF() {
+    var req = _homeService.getNFTs("0x81269781E647eb0843Dc3a8fEbC55a38cE69B4eB");//userMe.value.wallet!);
+    var y = req.then((value) =>
+    value.body
+    );
+    var c = "";
+  }
+
+  getNFTs() async{
+    final db = Hive.box("collections");
+    var req = await _homeService.getNFTs(userMe.value.wallet!);//userMe.value.wallet!);
+    var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
+    var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
+    while(cursor != null){
+      var newReq = await _homeService.getNextNFTs(userMe.value.wallet!, cursor);
+      mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
+      cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
+    }
+    var groupedCollection = mainCollection.groupBy((p0) => p0!.name);
+    var nfts = [];
+
+    groupedCollection.forEach((key, value) async{
+      nfts.add(CollectionDbDto(collectionName: key ?? "", collectionImages: value.map((e) => moralisMetadataDtoFromJson(e!.metadata!).image ?? "").toList()));
+    });
+
+    await db.put("nfts", nfts);
   }
 }
 

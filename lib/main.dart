@@ -1,14 +1,23 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sirkl/common/language.dart';
+import 'package:sirkl/common/model/db/collection_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 
 import 'navigation/ui/navigation_screen.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  Hive.registerAdapter(ListOfCollectionDbDtoAdapter());
+  Hive.registerAdapter(CollectionDbDtoAdapter());
+  await Hive.openBox("collections");
   await Firebase.initializeApp();
   await GetStorage.init();
   runApp(MyApp());
