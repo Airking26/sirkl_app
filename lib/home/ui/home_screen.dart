@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:advstory/advstory.dart';
 import 'package:azlistview/azlistview.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 import 'package:get/get.dart';
@@ -209,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           ListTile(
-            leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
+            leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.end,

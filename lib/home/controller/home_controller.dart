@@ -11,7 +11,9 @@ import 'package:sirkl/common/model/moralis_nft_contract_addresse.dart';
 import 'package:sirkl/common/model/moralis_root_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/sign_up_dto.dart';
+import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/home/service/home_service.dart';
+import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -23,10 +25,10 @@ import '../../common/model/update_fcm_dto.dart';
 class HomeController extends GetxController{
 
   final HomeService _homeService = HomeService();
+  final ProfileService _profileService = ProfileService();
   final box = GetStorage();
 
   var accessToken = "".obs;
-  var id = "".obs;
   var userMe = User().obs;
   var progress = true.obs;
   var isLoading = false.obs;
@@ -130,16 +132,15 @@ class HomeController extends GetxController{
       request = await _homeService.uploadFCMToken(accessToken, fcm);
     }
     userMe.value = userFromJson(json.encode(request.body));
+    await getNFTsContractAddresses();
   }
 
   retrieveAccessToken() async{
     var accessTok = box.read(con.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
-    id.value = userFromJson(box.read(con.USER) ?? "").id ?? "";
   }
 
   getNFTsContractAddresses() async{
-    //final db = Hive.box("contract_addresses");
     var req = await _homeService.getNFTsContractAddresses(userMe.value.wallet!);
     var initialArray = moralisNftContractAdressesFromJson(json.encode(req.body)).result!;
     var cursor = moralisNftContractAdressesFromJson(json.encode(req.body)).cursor;
@@ -149,18 +150,18 @@ class HomeController extends GetxController{
       cursor = moralisNftContractAdressesFromJson(json.encode(newReq.body)).cursor;
     }
 
-    var contractAddresses = [];
-    for (var element in initialArray) { contractAddresses.add(element.tokenAddress);}
-
+    List<String> contractAddresses = [];
+    for (var element in initialArray) { contractAddresses.add(element.tokenAddress!);}
+    updateMe(UpdateMeDto(contractAddresses: contractAddresses));
   }
 
   getNFTsTemporary() async{
     nfts.value.clear();
-    var req = await _homeService.getNFTs("0x81269781E647eb0843Dc3a8fEbC55a38cE69B4eB");
+    var req = await _homeService.getNFTs(userMe.value.wallet!);
     var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
     var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
     while(cursor != null){
-      var newReq = await _homeService.getNextNFTs("0x81269781E647eb0843Dc3a8fEbC55a38cE69B4eB", cursor);
+      var newReq = await _homeService.getNextNFTs(userMe.value.wallet!, cursor);
       mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
       cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
     }
@@ -189,10 +190,54 @@ class HomeController extends GetxController{
       }
       ).toList()));
       nfts.refresh();
-      var f = nfts.value;
-      var t = "";
     });
   }
+
+  updateMe(UpdateMeDto updateMeDto) async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.modifyUser(
+        accessToken, updateMeDtoToJson(updateMeDto));
+    if (request.statusCode == 401) {
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _profileService.modifyUser(
+          accessToken, updateMeDtoToJson(updateMeDto));
+      if (request.isOk) {
+        userMe.value = userFromJson(json.encode(request.body));
+      }}
+    else if (request.isOk) {
+      userMe.value = userFromJson(json.encode(request.body));
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   getF() {
     var req = _homeService.getNFTs("0x81269781E647eb0843Dc3a8fEbC55a38cE69B4eB");//userMe.value.wallet!);

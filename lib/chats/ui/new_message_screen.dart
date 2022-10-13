@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
@@ -238,7 +239,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   Widget buildNewMessageTile(BuildContext context, int index) {
     return ListTile(
         leading:
-            Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
+            CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
         trailing: Checkbox(
           onChanged: (selected) {},
           value: true,

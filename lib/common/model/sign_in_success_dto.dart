@@ -39,6 +39,7 @@ class User {
     this.description,
     this.fcmToken,
     this.wallet,
+    this.contractAddresses
   });
 
   String? id;
@@ -49,6 +50,7 @@ class User {
   String? description;
   String? fcmToken;
   String? wallet;
+  List<String>? contractAddresses;
 
   factory User.fromJson(Map<String, dynamic> json) => User(
     id: json["id"],
@@ -59,6 +61,7 @@ class User {
     description: json["description"],
     fcmToken: json["fcmToken"],
     wallet: json["wallet"],
+    contractAddresses: json["createdAt"] == null ? null : List<String>.from(json["contractAddresses"].map((x) => x))
   );
 
   Map<String, dynamic> toJson() => {
@@ -70,5 +73,6 @@ class User {
     "description": description,
     "fcmToken": fcmToken,
     "wallet": wallet,
+    "contractAddresses": contractAddresses == null ? null : List<dynamic>.from(contractAddresses!.map((x) => x)),
   };
 }

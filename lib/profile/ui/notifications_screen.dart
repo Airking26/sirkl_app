@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -75,7 +76,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
         onTap: (){},
-        leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
+        leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
         title: Transform.translate(
           offset: Offset(-8, 0),
           child: RichText(

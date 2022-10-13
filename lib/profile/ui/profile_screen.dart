@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -92,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                SizedBox(
                                  width: 200,
                                  child: TextField(
-                                   autofocus: true,
+                                   //autofocus: true,
                                    maxLines: 1,
                                    controller: _profileController.usernameTextEditingController.value,
                                    maxLength: 20,
@@ -122,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(90)),
                     child:
                         ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
-                          child: GestureDetector(onTap: (){ if(_profileController.isEditingProfile.value) _profileController.getImage();},child: Image.network(_profileController.urlPicture.value.isEmpty ? "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640" : _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,))
+                          child: GestureDetector(onTap: (){ if(_profileController.isEditingProfile.value) _profileController.getImage();},child: CachedNetworkImage(imageUrl: _profileController.urlPicture.value.isEmpty ? "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640" : _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,))
                           ,),)
                   ),
                 ),
@@ -157,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: _profileController.isEditingProfile.value ?
               TextField(
                 maxLines: null,
-                autofocus: true,
+                //autofocus: true,
                 controller: _profileController.descriptionTextEditingController.value,
                 maxLength: 120,
                 textAlign: TextAlign.center,
@@ -192,6 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.only(top: 16.0),
                   child: SafeArea(
                     child: ListView.builder(
+                        cacheExtent: 1000,
                         itemCount: _homeController.nfts.value.length,
                         itemBuilder: (context, index){
                           return CardNFT(_homeController.nfts.value[index], _profileController, index);
@@ -203,67 +205,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             )
           ],
         )));
-  }
-
-  Widget nftDisplayWidget(BuildContext context, int index){
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 6),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Get.isDarkMode ? const Color(0xFF1A2E40) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.grey,
-              offset: Offset(0.0, 0.01), //(x,y)
-              blurRadius: 0.01,
-            ),
-          ],
-        ),
-        child: ExpansionTile(
-          leading: CircleAvatar(backgroundImage: NetworkImage(_homeController.nfts.value[index].collectionImages[0]), radius: 30, onBackgroundImageError: (_,__){
-
-          },),
-          trailing: Obx(() => Image.asset(_profileController.isCardExpanded.value ? "assets/images/arrow_up_rev.png" : "assets/images/arrow_down_rev.png", color: Get.isDarkMode ? Colors.white : Colors.black, height: 20, width: 20,),),
-          title: Transform.translate(offset: const Offset(-8, 0),child: Text(_homeController.nfts.value[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
-          subtitle: Transform.translate(offset: const Offset(-8, 0), child: Text("${_homeController.nfts.value[index].collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
-          onExpansionChanged: (expanded){
-            _profileController.isCardExpanded.value = expanded;
-          },
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
-              child: SizedBox(height: 80, child: ListView.builder(
-                cacheExtent: 200,
-                itemCount: _homeController.nfts.value[index].collectionImages.length,
-                itemBuilder: (context, i){
-                return buildCard(index, i);
-              }, scrollDirection: Axis.horizontal,)),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Padding buildCard(int index, int i) {
-    return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: SizedBox.fromSize(
-                        child: Image.network(fit: BoxFit.cover, _homeController.nfts.value[index].collectionImages[i], width: 80, height: 70,))),
-              );
-  }
-
-  Widget nftImageWidget(BuildContext context, int index) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-          child: SizedBox.fromSize(
-              child: Image.network(fit: BoxFit.cover, _homeController.nfts.value[0].collectionImages[index], width: 80, height: 70,))),
-      );
   }
 
   YYDialog dialogPopMenu(BuildContext context) {
@@ -330,7 +271,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             ],
           ),
           child: ExpansionTile(
-            leading: CircleAvatar(backgroundImage: NetworkImage(widget.collectionDbDTO.collectionImages[0]), radius: 30, onBackgroundImageError: (_,__){
+            leading: CircleAvatar(backgroundImage: CachedNetworkImageProvider(widget.collectionDbDTO.collectionImages[0]), radius: 25, onBackgroundImageError: (_,__){
 
             },),
             trailing: Obx(() => Image.asset(
@@ -354,7 +295,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
                 padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
                 child: SizedBox(height: 80,
                     child: ListView.builder(
-                  cacheExtent: 200,
+                  cacheExtent: 1000,
                   itemCount: widget.collectionDbDTO.collectionImages.length,
                   itemBuilder: (context, i){
                     return buildCard(i, widget.collectionDbDTO);
@@ -369,10 +310,15 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
     Padding buildCard(int i, CollectionDbDto collectionDbDTO) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: SizedBox.fromSize(
-                child: Image.network(fit: BoxFit.cover, collectionDbDTO.collectionImages[i], width: 80, height: 70,))),
+        child: InkWell(
+          onTap: (){
+            if(widget.profileController.isEditingProfile.value) widget.profileController.urlPicture.value = collectionDbDTO.collectionImages[i];
+            },
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox.fromSize(
+                  child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: collectionDbDTO.collectionImages[i], width: 80, height: 70,))),
+        ),
       );
     }
 

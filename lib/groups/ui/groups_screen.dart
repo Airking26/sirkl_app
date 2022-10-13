@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -128,7 +129,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
         onTap: (){Get.to(() => const DetailedMessageScreenOther());},
-        leading: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", height: 60, width: 60, fit: BoxFit.cover,),
+        leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", height: 60, width: 60, fit: BoxFit.cover,),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
