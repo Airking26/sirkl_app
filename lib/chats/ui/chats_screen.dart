@@ -2,10 +2,14 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/new_message_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/model/inbox_dto.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 
 class ChatsScreen extends StatefulWidget {
@@ -18,6 +22,33 @@ class ChatsScreen extends StatefulWidget {
 class _ChatsScreenState extends State<ChatsScreen>
     with TickerProviderStateMixin {
   final chatController = Get.put(ChatsController());
+  final homeController = Get.put(HomeController());
+  final PagingController<int, InboxDto> pagingController = PagingController(firstPageKey: 0);
+  static var pageKey = 0;
+
+  @override
+  void initState() {
+    pagingController.addPageRequestListener((pageKey) {
+      fetchPage();
+    });
+    super.initState();
+  }
+
+  Future<void> fetchPage() async {
+    try {
+      final newItems = await chatController.retrieveInboxes(pageKey);
+      final isLastPage = newItems.length < 12;
+      if (isLastPage) {
+        pagingController.appendLastPage(newItems);
+        //_refreshController.refreshCompleted();
+      } else {
+        final nextPageKey = pageKey++;
+        pagingController.appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      pagingController.error = error;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,8 +211,8 @@ class _ChatsScreenState extends State<ChatsScreen>
                                         color: chatController.index.value == 0
                                             ? Colors.white
                                             : Get.isDarkMode
-                                                ? Color(0xFF9BA0A5)
-                                                : Color(0xFF828282)),
+                                                ? const Color(0xFF9BA0A5)
+                                                : const Color(0xFF828282)),
                                   )),
                             ),
                             Container(
@@ -225,8 +256,8 @@ class _ChatsScreenState extends State<ChatsScreen>
                                         color: chatController.index.value == 1
                                             ? Colors.white
                                             : Get.isDarkMode
-                                                ? Color(0xFF9BA0A5)
-                                                : Color(0xFF828282)),
+                                                ? const Color(0xFF9BA0A5)
+                                                : const Color(0xFF828282)),
                                   )),
                             )
                           ],
@@ -243,36 +274,23 @@ class _ChatsScreenState extends State<ChatsScreen>
           removeTop: true,
           child: Expanded(
             child: SafeArea(
-              minimum: EdgeInsets.only(top: 24),
+              minimum: const EdgeInsets.only(top: 28),
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  ListView.separated(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    itemCount: 50,
-                    itemBuilder: inboxTile,
-                    separatorBuilder: (context, index) {
-                      return const Divider(
-                        color: Color(0xFF828282),
-                        thickness: 0.2,
-                        endIndent: 20,
-                        indent: 86,
-                      );
-                    },
-                  ),
-                  ListView.separated(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    itemCount: 50,
-                    itemBuilder: inboxTile,
-                    separatorBuilder: (context, index) {
-                      return const Divider(
-                        color: Color(0xFF828282),
-                        thickness: 0.2,
-                        endIndent: 20,
-                        indent: 86,
-                      );
-                    },
-                  ),
+                  PagedListView.separated(
+                      pagingController: pagingController,
+                      builderDelegate: PagedChildBuilderDelegate<InboxDto>(
+                        itemBuilder: (context, item, index) => inboxTile(context, index, item)
+                      ),separatorBuilder: (context, index) {
+                    return const Divider(
+                      color: Color(0xFF828282),
+                      thickness: 0.2,
+                      endIndent: 20,
+                      indent: 86,
+                    );
+                  },),
+                  Container()
                 ],
               ),
             ),
@@ -280,29 +298,44 @@ class _ChatsScreenState extends State<ChatsScreen>
         );
   }
 
-  Widget inboxTile(BuildContext context, int index) {
+  @override
+  void dispose() {
+    pagingController.dispose();
+    super.dispose();
+  }
+
+  Widget inboxTile(BuildContext context, int index, InboxDto item) {
+    item.ownedBy.removeWhere((element) => element.id == homeController.userMe.value.id);
+    var nowMilli = DateTime.now().millisecondsSinceEpoch;
+    var updatedAtMilli =  DateTime.parse(item.updatedAt.toIso8601String()).millisecondsSinceEpoch;
+    var diffMilli = nowMilli - updatedAtMilli;
+    var timeSince = DateTime.now().subtract(Duration(milliseconds: diffMilli));
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
+      padding: const EdgeInsets.only(right: 8.0, left: 12),
       child: ListTile(
-          leading: CachedNetworkImage(
-              imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", height: 60, width: 60, fit: BoxFit.cover,),
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(90.0),
+            child: CachedNetworkImage(
+                imageUrl: item.ownedBy.first.picture ?? "https://ik.imagekit.io/bayc/assets/bayc-footer.png", height: 60, width: 60, fit: BoxFit.cover,),
+          ),
         trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: item.unreadMessages == 0 ? MainAxisAlignment.center : MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text("2 Days", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),
-            Container(height: 24, width: 24, decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: Color(0xFF00CB7D)), child: Padding(padding: EdgeInsets.all(0), child: Align(alignment: Alignment.center, child: Text(textAlign: TextAlign.center,"2", style: TextStyle(color: Get.isDarkMode ? Color(0xFF232323) : Colors.white, fontFamily: 'Gilroy', fontSize: 12, fontWeight: FontWeight.w600),)),),)
+            Text(timeago.format(timeSince), style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282))),
+            item.unreadMessages == 0 ? Container(height: 0, width: 0,) : Container(height: 24, width: 24, decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: const Color(0xFF00CB7D)), child: Padding(padding: const EdgeInsets.all(0), child: Align(alignment: Alignment.center, child: Text(textAlign: TextAlign.center,"2", style: TextStyle(color: Get.isDarkMode ? const Color(0xFF232323) : Colors.white, fontFamily: 'Gilroy', fontSize: 12, fontWeight: FontWeight.w600),)),),)
           ],
         ),
         title: Transform.translate(
-          offset: Offset(-8, 0),
-          child: Text("Bored Ape Yacht Club",
+          offset: const Offset(-2, 0),
+          child: Text(item.ownedBy.first.userName!,
                 style: TextStyle(
                     fontSize: 16,
                     fontFamily: "Gilroy",
                     fontWeight: FontWeight.w600,
                     color: Get.isDarkMode ? Colors.white : Colors.black)),
         ),
-        subtitle: Transform.translate(offset: Offset(-8, 0), child: Text("Lorem Ipsum is simply...", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282)))),
+        subtitle: Transform.translate(offset: const Offset(0, 0), child: Text(item.lastMessage, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: item.unreadMessages == 0 ? FontWeight.w500 : FontWeight.w700, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))),
       ),
     );
   }

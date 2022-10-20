@@ -63,6 +63,8 @@ class HomeController extends GetxController{
     });
 
     connector.on('session_request', (payload) {
+      var i = payload;
+      var k = "";
     });
 
     connector.on('disconnect', (session) {

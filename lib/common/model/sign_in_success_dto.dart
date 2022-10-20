@@ -39,7 +39,9 @@ class User {
     this.description,
     this.fcmToken,
     this.wallet,
-    this.contractAddresses
+    this.contractAddresses,
+    this.following,
+    this.isInFollowing,
   });
 
   String? id;
@@ -51,6 +53,8 @@ class User {
   String? fcmToken;
   String? wallet;
   List<String>? contractAddresses;
+  int? following;
+  bool? isInFollowing;
 
   factory User.fromJson(Map<String, dynamic> json) => User(
     id: json["id"],
@@ -61,7 +65,9 @@ class User {
     description: json["description"],
     fcmToken: json["fcmToken"],
     wallet: json["wallet"],
-    contractAddresses: json["createdAt"] == null ? null : List<String>.from(json["contractAddresses"].map((x) => x))
+    contractAddresses: json["createdAt"] == null ? null : List<String>.from(json["contractAddresses"].map((x) => x)),
+    following: json["following"],
+    isInFollowing: json["isInFollowing"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -74,5 +80,7 @@ class User {
     "fcmToken": fcmToken,
     "wallet": wallet,
     "contractAddresses": contractAddresses == null ? null : List<dynamic>.from(contractAddresses!.map((x) => x)),
+    "following": following,
+    "isInFollowing": isInFollowing,
   };
 }

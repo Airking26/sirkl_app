@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/interface/ZIMEventHandlerManager.dart';
+import 'package:zego_zim/zego_zim.dart';
 
 import '../../utils.dart';
 
@@ -12,6 +15,13 @@ class DetailedMessageScreenOther extends StatefulWidget {
 }
 
 class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther> {
+
+
+  @override
+  void initState() {
+    ZIMEventHandlerManager.loadingEventHandler();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -186,10 +196,16 @@ class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther>
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(right: 80.0),
-                  child: Container(decoration: const BoxDecoration(
+                  child: Container(decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
                     gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF102437), Color(0xFF13171B)]),
-
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey,
+                          offset: Offset(0.0, 0.01), //(x,y)
+                          blurRadius: Get.isDarkMode ? 0.25 : 0,
+                        ),
+                      ]
                   ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
@@ -213,14 +229,14 @@ class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther>
           child: Flexible(
             child: Padding(
               padding: const EdgeInsets.only(left: 80.0, right: 16),
-              child: Container(decoration: const BoxDecoration(
+              child: Container(decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomRight: Radius.circular(10), bottomLeft: Radius.circular(10), topRight: Radius.circular(10)),
                 gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFFFFFF), Color(0xFFFFFFFF)]),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey,
-                    offset: Offset(0.0, 0.01), //(x,y)
-                    blurRadius: 1,
+                    offset: Offset(0.0, Get.isDarkMode ? 0 : 0.01), //(x,y)
+                    blurRadius: Get.isDarkMode ? 0 : 0.25,
                   ),
                 ],
               ),
