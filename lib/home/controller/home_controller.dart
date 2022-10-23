@@ -157,13 +157,13 @@ class HomeController extends GetxController{
     updateMe(UpdateMeDto(contractAddresses: contractAddresses));
   }
 
-  getNFTsTemporary() async{
+  getNFTsTemporary(String wallet) async{
     nfts.value.clear();
-    var req = await _homeService.getNFTs(userMe.value.wallet!);
+    var req = await _homeService.getNFTs(wallet);
     var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
     var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
     while(cursor != null){
-      var newReq = await _homeService.getNextNFTs(userMe.value.wallet!, cursor);
+      var newReq = await _homeService.getNextNFTs(wallet, cursor);
       mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
       cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
     }
@@ -173,20 +173,11 @@ class HomeController extends GetxController{
     groupedCollection.forEach((key, value) async{
       nfts.value.add(CollectionDbDto(collectionName: key ?? "", collectionImages: value.map((e) {
         if(moralisMetadataDtoFromJson(e!.metadata!).image!.startsWith("ipfs://")) {
-          print("CASE 1");
-          print(key);
-          print("https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}");
           return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
         } else if(moralisMetadataDtoFromJson(e.metadata!).image!.contains("/ipfs/")){
-          print("CASE 2");
-          print(key);
-          print("https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}");
           return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
         }
         else {
-          print("CASE 3");
-          print(key);
-          print(moralisMetadataDtoFromJson(e.metadata!).image!);
           return moralisMetadataDtoFromJson(e.metadata!).image!;
         }
       }

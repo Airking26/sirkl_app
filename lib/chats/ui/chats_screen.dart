@@ -11,6 +11,8 @@ import 'package:sirkl/common/model/inbox_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../common/view/detailed_message/detailed_message_screen_other.dart';
+
 
 class ChatsScreen extends StatefulWidget {
   const ChatsScreen({Key? key}) : super(key: key);
@@ -313,6 +315,7 @@ class _ChatsScreenState extends State<ChatsScreen>
     return Padding(
       padding: const EdgeInsets.only(right: 8.0, left: 12),
       child: ListTile(
+        onTap: (){Get.to(() => const DetailedMessageScreenOther());},
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(90.0),
             child: CachedNetworkImage(

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/interface/ZIMEventHandlerManager.dart';
-import 'package:zego_zim/zego_zim.dart';
 
 import '../../utils.dart';
 

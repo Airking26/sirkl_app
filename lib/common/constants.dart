@@ -39,3 +39,13 @@ const String writeHereRes = "write_here";
 
 /// Notification Screen ///
 const String notificationsRes = "notifications";
+
+/// Profile else page ///
+const String addToMySirklRes = "add_to_my_sirkl";
+const String removeOfMySirklRes = "remove_of_my_sirkl";
+const String reportRes = "report";
+const String sendAMessageRes = "send_a_message";
+
+/// COMMON ///
+const String userAddedToSirklRes = "user_added_to_sirkl";
+const String userRemovedofSirklRes = "user_removed_of_sirkl";

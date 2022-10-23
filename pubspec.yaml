@@ -75,6 +75,7 @@ flutter:
      - assets/images/send.png
      - assets/images/done.png
      - assets/images/edit.png
+     - assets/images/add_user.png
 
   fonts:
     - family: Gilroy

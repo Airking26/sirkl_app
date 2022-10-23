@@ -14,4 +14,5 @@ class HomeService extends GetConnect{
   Future<Response<Map<String, dynamic>>> getNextNFTs(String wallet, String cursor) => get("https://deep-index.moralis.io/api/v2/$wallet/nft", headers: {"accept": 'application/json', "X-API-Key": con.moralisApiKey}, query: {"chain": 'eth', "format": 'decimal', "cursor": cursor});
   Future<Response<Map<String, dynamic>>> getNFTsContractAddresses(String wallet) => get("https://deep-index.moralis.io/api/v2/$wallet/nft/collections?chain=eth", headers: {"accept": 'application/json', "X-API-Key": con.moralisApiKey}, query: {"chain": 'eth', "format": 'decimal'});
   Future<Response<Map<String, dynamic>>> getNextNFTsContractAddresses(String wallet, String cursor) => get("https://deep-index.moralis.io/api/v2/$wallet/nft/collections?chain=eth", headers: {"accept": 'application/json', "X-API-Key": con.moralisApiKey}, query: {"chain": 'eth', "format": 'decimal',"cursor": cursor});
+
 }

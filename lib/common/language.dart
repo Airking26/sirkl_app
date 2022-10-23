@@ -27,7 +27,13 @@ class Language extends Translations{
       c.notificationsRes: "Notifications",
       c.errorRes: "Error",
       c.errorWalletAlreadyUsedRes: "This user already exists. Try to sign in instead.",
-      c.noDescYetRes: "No description yet. Edit your profile to tell a little bit more about you."
+      c.noDescYetRes: "No description yet. Edit your profile to tell a little bit more about you.",
+      c.addToMySirklRes: "• Add to My Sirkl",
+      c.removeOfMySirklRes: "• Remove from My Sirkl",
+      c.reportRes: "• Report",
+      c.sendAMessageRes: "• Send a message",
+      c.userAddedToSirklRes: "@user is now added to your Sirkl",
+      c.userRemovedofSirklRes: "@user is now removed from your Sirkl",
     }
   };
 

@@ -4,35 +4,30 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/db/collection_dto.dart';
-import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
-import 'package:sirkl/profile/ui/notifications_screen.dart';
-
 import '../../common/view/dialog/custom_dial.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+class ProfileElseScreen extends StatefulWidget {
+  const ProfileElseScreen({Key? key}) : super(key: key);
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<ProfileElseScreen> createState() => _ProfileElseScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
-  final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
+  final _commonController = Get.put(CommonController());
+  final utils = Utils();
   YYDialog dialogMenu = YYDialog();
 
   @override
   void initState(){
-    _profileController.retrieveTokenZegoCloud();
-    _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
-    _profileController.usernameTextEditingController.value.text = _homeController.userMe.value.userName!.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _homeController.userMe.value.userName!;
-    _profileController.descriptionTextEditingController.value.text = _homeController.userMe.value.description == null ? "" : _homeController.userMe.value.description!;
-    _profileController.urlPicture.value = _homeController.userMe.value.picture == null ? "" : _homeController.userMe.value.picture!;
+    _homeController.getNFTsTemporary(_commonController.userClicked.value.wallet!);
+    _commonController.userClickedFollowStatus.value = _commonController.userClicked.value.isInFollowing!;
     super.initState();
   }
 
@@ -77,37 +72,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _profileController.isLoadingPicture.value ?
-                          Container(padding: EdgeInsets.all(8), width: 48, height: 48, child: CircularProgressIndicator(color: Color(0xFF00CB7D),))
-                              : IconButton(onPressed: (){
-                            _profileController.isEditingProfile.value ? _profileController.updateMe(UpdateMeDto(
-                              userName: _profileController.usernameTextEditingController.value.text.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _profileController.usernameTextEditingController.value.text,
-                              description: _profileController.descriptionTextEditingController.value.text.isEmpty ? null : _profileController.descriptionTextEditingController.value.text,
-                              picture: _profileController.urlPicture.value
-                            )):
-                            Get.to(() => const NotificationScreen());
-                            }, icon: Image.asset(_profileController.isEditingProfile.value ? "assets/images/edit.png" : "assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                          IconButton(onPressed: () async{
+                            if(!_commonController.userClickedFollowStatus.value) {
+                              if( await _commonController.addUserToSirkl(_commonController.userClicked.value.id!)){
+                                utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value.userName!}));
+                              }
+                            }
+                            }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: Get.isDarkMode ? Colors.white : Colors.black, height: 28, width: 28,)),
                           Padding(
                             padding: const EdgeInsets.only(top: 12.0),
                             child:
-                                _profileController.isEditingProfile.value ?
-                               SizedBox(
-                                 width: 200,
-                                 child: TextField(
-                                   //autofocus: true,
-                                   maxLines: 1,
-                                   controller: _profileController.usernameTextEditingController.value,
-                                   maxLength: 20,
-                                   textAlign: TextAlign.center,
-                                   style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),
-                                   decoration: const InputDecoration(
-                                     border: InputBorder.none,
-                                     isCollapsed: true,
-                                     hintText: ""
-                                     ),
-                                 ),
-                               )
-                             : Text(_homeController.userMe.value.userName!.isEmpty ? "${_homeController.userMe.value.wallet!.substring(0, 20)}..." : _homeController.userMe.value.userName!, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
+                            Text(_commonController.userClicked.value.userName!.isEmpty ? "${_commonController.userClicked.value.wallet!.substring(0, 20)}..." : _commonController.userClicked.value.userName!, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
                           ),
                           IconButton(onPressed: (){
                             dialogMenu = dialogPopMenu(context);
@@ -124,53 +99,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(90)),
                     child:
                         ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
-                          child: GestureDetector(onTap: (){ if(_profileController.isEditingProfile.value) _profileController.getImage();},child: CachedNetworkImage(imageUrl: _profileController.urlPicture.value.isEmpty ? "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640" : _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,))
+                          child: GestureDetector(onTap: (){},child: CachedNetworkImage(imageUrl: _commonController.userClicked.value.picture ?? "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640", color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,))
                           ,),)
                   ),
                 ),
-                _profileController.isEditingProfile.value ? Container() : Positioned(
-                  top: Platform.isAndroid ? 210 : 190,
-                    right: MediaQuery.of(context).size.width / 3.25,
-                    child:
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: [Color(0xFF1DE99B), Color(0xFF0063FB)]),
-                          borderRadius: BorderRadius.circular(90),
-                          border: Border.all(color: Get.isDarkMode ? const Color(0xFF122034) : Colors.white, width: 2)
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Image.asset('assets/images/plus.png', width: 20, height: 20,),
-                      ),
-                    )
-                )
+                Container()
               ],
             ),
             const SizedBox(height: 90,),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 48.0),
-              child: Text("Wallet: ${_homeController.userMe.value.wallet!.substring(0,20)}...",overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF00CB7D), fontSize: 15),),
+              child: Text("Wallet: ${_commonController.userClicked.value.wallet!.substring(0,20)}...",overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF00CB7D), fontSize: 15),),
             ),
             const SizedBox(height: 10,),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 48.0),
-              child: _profileController.isEditingProfile.value ?
-              TextField(
-                maxLines: null,
-                //autofocus: true,
-                controller: _profileController.descriptionTextEditingController.value,
-                maxLength: 120,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282)),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    isCollapsed: true,
-                    hintText: ""
-                ),
-              ):
-              Text(_homeController.userMe.value.description == null ? con.noDescYetRes.tr : _homeController.userMe.value.description!,  textAlign: TextAlign.center, style: const TextStyle(height: 1.5, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282), fontSize: 15),),
+              child: Text(_commonController.userClicked.value.description == null ? con.noDescYetRes.tr : _commonController.userClicked.value.description!,  textAlign: TextAlign.center, style: const TextStyle(height: 1.5, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282), fontSize: 15),),
             ),
             const SizedBox(height: 20,),
             const Padding(
@@ -197,7 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         cacheExtent: 1000,
                         itemCount: _homeController.nfts.value.length,
                         itemBuilder: (context, index){
-                          return CardNFT(_homeController.nfts.value[index], _profileController, index);
+                          return CardNFT(_homeController.nfts.value[index], _commonController, index);
                         },
                     ),
                   ),
@@ -210,31 +154,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   YYDialog dialogPopMenu(BuildContext context) {
     return YYDialog().build(context)
-      ..width = 120
+      ..width = 180
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
       ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
       ..backgroundColor = Get.isDarkMode ? Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
-        onTap: (){
-          _profileController.isEditingProfile.value = true;
+        onTap: () async{
           dialogMenu.dismiss();
+          if(_commonController.userClickedFollowStatus.value) {
+            if(await _commonController.removeUserToSirkl(_commonController.userClicked.value.id!)) {
+              utils.showToast(context, con.userRemovedofSirklRes.trParams({"user": _commonController.userClicked.value.userName!}));
+            }
+          } else {
+            if(await _commonController.addUserToSirkl(_commonController.userClicked.value.id!)){
+              utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value.userName!}));
+            }
+          }
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.editProfileRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(_commonController.userClickedFollowStatus.value ? con.removeOfMySirklRes.tr : con.addToMySirklRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactUsRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.sendAMessageRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.logoutRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..show();
   }
@@ -243,7 +195,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 class CardNFT extends StatefulWidget {
   final CollectionDbDto collectionDbDTO;
-  final ProfileController profileController;
+  final CommonController profileController;
   final int index;
   CardNFT(this.collectionDbDTO, this.profileController, this.index, {Key? key}) : super(key: key);
 
@@ -314,7 +266,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
         padding: const EdgeInsets.symmetric(horizontal: 4.0),
         child: InkWell(
           onTap: (){
-            if(widget.profileController.isEditingProfile.value) widget.profileController.urlPicture.value = collectionDbDTO.collectionImages[i];
+            //if(widget.profileController.isEditingProfile.value) widget.profileController.urlPicture.value = collectionDbDTO.collectionImages[i];
             },
           child: ClipRRect(
               borderRadius: BorderRadius.circular(10),

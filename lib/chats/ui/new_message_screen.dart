@@ -3,8 +3,16 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/profile/ui/profile_else_screen.dart';
+
+import '../../common/view/dialog/custom_dial.dart';
+import '../../home/controller/home_controller.dart';
+import '../controller/chats_controller.dart';
 
 class NewMessageScreen extends StatefulWidget {
   const NewMessageScreen({Key? key}) : super(key: key);
@@ -14,6 +22,37 @@ class NewMessageScreen extends StatefulWidget {
 }
 
 class _NewMessageScreenState extends State<NewMessageScreen> {
+
+  final _chatController = Get.put(ChatsController());
+  final _commonController = Get.put(CommonController());
+  final _homeController = Get.put(HomeController());
+  YYDialog dialogMenu = YYDialog();
+  final PagingController<int, User> pagingController = PagingController(firstPageKey: 0);
+
+  @override
+  void initState() {
+    pagingController.addPageRequestListener((pageKey) {});
+    super.initState();
+  }
+
+  Future<void> fetchPage(String query, int pageKey) async {
+    try {
+      //pagingController.itemList = [];
+      final newItems = await _commonController.searchUsers(query, pageKey.toString());
+      final isLastPage = newItems.length < 12;
+      if (isLastPage) {
+        pagingController.refresh();
+        pagingController.appendLastPage(newItems);
+        //_refreshController.refreshCompleted();
+      } else {
+        final nextPageKey = pageKey++;
+        pagingController.appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      pagingController.error = error;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +60,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         backgroundColor: Get.isDarkMode
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
-        body: Column(children: [
+        body: Obx(() =>Column(children: [
           Stack(
             clipBehavior: Clip.none,
             alignment: AlignmentDirectional.topCenter,
@@ -42,34 +81,40 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                        con.toRes.tr,
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 20,
-                            fontFamily: "Gilroy",
-                            color:
+                    _chatController.chipsList.isNotEmpty ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Text(
+                            con.toRes.tr,
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 20,
+                                fontFamily: "Gilroy",
+                                color:
                                 Get.isDarkMode ? Colors.white : Colors.black),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 0),
-                      height: 50,
-                      child: ListView.builder(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 7,
-                          itemBuilder: buildToSendChip),
-                    ),
-                    const SizedBox(
-                      height: 25,
-                    ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 0),
+                          height: 50,
+                          child: ListView.builder(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _chatController.chipsList.length,
+                              itemBuilder: buildToSendChip),
+                        ),
+                        const SizedBox(
+                          height: 25,
+                        ),
+                      ],
+                    ) : Container(),
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
@@ -88,16 +133,27 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                       removeTop: true,
                       child: Expanded(
                           child:
-                              ListView.builder(
-                                itemCount: 20,
-                                  padding: EdgeInsets.symmetric(vertical: 16),
-                                  itemBuilder: buildNewMessageTile)),
+                              PagedListView.separated(
+                                separatorBuilder:  (context, index) {
+                                  return const Divider(
+                                    color: Color(0xFF828282),
+                                    thickness: 0.2,
+                                    endIndent: 20,
+                                    indent: 86,
+                                  );
+                                },
+                                  pagingController: pagingController,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  builderDelegate: PagedChildBuilderDelegate<User>(
+                                      itemBuilder: (context, item, index) => buildNewMessageTile(context, index, item)
+                                  ))
+                      ),
                     )
                   ],
                 )),
           ),
           buildBottomBar()
-        ]));
+        ])));
   }
 
   Container buildBottomBar() {
@@ -236,13 +292,25 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     );
   }
 
-  Widget buildNewMessageTile(BuildContext context, int index) {
+  Widget buildNewMessageTile(BuildContext context, int index, User item) {
     return ListTile(
-        leading:
-            CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
+        leading: InkWell(
+            onTap: (){
+              _commonController.userClicked.value = item;
+              Get.to(() => const ProfileElseScreen());
+            },
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(90.0), child: CachedNetworkImage(imageUrl: item.picture ?? "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,))),
         trailing: Checkbox(
-          onChanged: (selected) {},
-          value: true,
+          onChanged: (selected) {
+            if(selected!) {
+              _chatController.chipsList.add(item);
+            } else {
+              _chatController.chipsList.removeWhere((element) => element.wallet == item.wallet);
+            }
+            _chatController.chipsList.refresh();
+          },
+          value: _chatController.chipsList.map((element) => element.wallet).contains(item.wallet),
           checkColor: const Color(0xFF00CB7D),
           fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
           side: MaterialStateBorderSide.resolveWith(
@@ -250,33 +318,26 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           ),
         ),
         title: Transform.translate(
-          offset: Offset(-8, 0),
-          child: Text("Bored Ape Yacht Club",
+          offset: const Offset(-8, 0),
+          child: Text(item.userName!,
               style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontFamily: "Gilroy",
                   fontWeight: FontWeight.w600,
                   color: Get.isDarkMode ? Colors.white : Colors.black)),
         ),
         subtitle: Transform.translate(
-          offset: Offset(-8, 0),
-          child: Row(
-            children: [
-              Image.asset(
-                "assets/images/outgoing.png",
-                width: 10,
-                height: 10,
-              ),
-              Text("  Outgoing  - 12:15PM",
-                  style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: "Gilroy",
-                      fontWeight: FontWeight.w500,
-                      color: Get.isDarkMode
-                          ? const Color(0xFF9BA0A5)
-                          : const Color(0xFF828282)))
-            ],
-          ),
+          offset: const Offset(-8, 0),
+          child: Text(item.wallet!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontSize: 15,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w500,
+                  color: Get.isDarkMode
+                      ? const Color(0xFF9BA0A5)
+                      : const Color(0xFF828282))),
         ));
   }
 
@@ -290,11 +351,14 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             color: Colors.white,
           ),
           padding: const EdgeInsets.all(12),
-          onDeleted: () {},
+          onDeleted: () {
+            _chatController.chipsList.removeAt(index);
+            _chatController.chipsList.refresh();
+          },
           backgroundColor: const Color(0xFF00CB7D),
-          label: const Text(
-            "Garyvee",
-            style: TextStyle(
+          label: Text(
+            _chatController.chipsList[index].userName!,
+            style: const TextStyle(
                 fontFamily: "Gilroy",
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -337,12 +401,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       backgroundColor: Get.isDarkMode
           ? const Color(0xFF2D465E).withOpacity(1)
           : Colors.white,
-      debounceDelay: const Duration(milliseconds: 500),
+      debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) {
-        // Call your model, bloc, controller here.
+        fetchPage(query, 0);
       },
-      // Specify a custom transition to be used for
-      // animating between opened and closed stated.
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
         FloatingSearchBarAction.icon(
@@ -364,4 +426,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       },
     );
   }
+
+  @override
+  void dispose() {
+    pagingController.dispose();
+    super.dispose();
+  }
+
 }

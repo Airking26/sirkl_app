@@ -32,4 +32,15 @@ class Utils{
       ..show();
   }
 
+  void showToast(BuildContext context, String message) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        backgroundColor: Get.isDarkMode ? Colors.white : const Color(0xFF102437),
+        content: Text(message, textAlign: TextAlign.start, style: TextStyle(fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 15, color: Get.isDarkMode ? const Color(0xFF102437) : Colors.white),),
+        //action: SnackBarAction(label: 'UNDO', onPressed: scaffold.hideCurrentSnackBar),
+      ),
+    );
+  }
+
 }
