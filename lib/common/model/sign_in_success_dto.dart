@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:azlistview/azlistview.dart';
+
 SignInSuccessDto signInSuccessDtoFromJson(String str) => SignInSuccessDto.fromJson(json.decode(str));
 String signInSuccessDtoToJson(SignInSuccessDto data) => json.encode(data.toJson());
 User userFromJson(String str) => User.fromJson(json.decode(str));
@@ -29,7 +31,7 @@ class SignInSuccessDto {
   };
 }
 
-class User {
+class User extends ISuspensionBean{
   User({
     this.id,
     this.userName,
@@ -83,4 +85,7 @@ class User {
     "following": following,
     "isInFollowing": isInFollowing,
   };
+
+  @override
+  String getSuspensionTag() => userName![0];
 }

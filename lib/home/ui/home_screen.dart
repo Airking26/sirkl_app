@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
-import 'package:sirkl/common/model/example.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
@@ -24,40 +24,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final _homeController = Get.put(HomeController());
   final _passwordController = TextEditingController();
-  final items =
-  <Example>[
-    Example(name: "Amerique", tagIndex: "A"),
-    Example(name: "Ameque", tagIndex: "A"),
-    Example(name: "Amerque", tagIndex: "A"),
-    Example(name: "Ameriqe", tagIndex: "A"),
-    Example(name: "Ameriq", tagIndex: "A"),
-    Example(name: "Ame", tagIndex: "A"),
-    Example(name: "Boli", tagIndex: "B"),
-    Example(name: "Alo", tagIndex: "A"),
-    Example(name: "Dilo", tagIndex: "D"),
-    Example(name: "Fea", tagIndex: "F"),
-    Example(name: "Amerique", tagIndex: "A"),
-    Example(name: "Ameque", tagIndex: "A"),
-    Example(name: "Amerque", tagIndex: "A"),
-    Example(name: "Ameriqe", tagIndex: "A"),
-    Example(name: "Ameriq", tagIndex: "A"),
-    Example(name: "Ame", tagIndex: "A"),
-    Example(name: "Boli", tagIndex: "B"),
-    Example(name: "Boli", tagIndex: "B"),
-    Example(name: "Boli", tagIndex: "B"),
-    Example(name: "Boli", tagIndex: "B"),
-    Example(name: "Boli", tagIndex: "B"),
-    Example(name: "Boli", tagIndex: "B"),
-    Example(name: "Boli", tagIndex: "B"),
-    Example(name: "Alo", tagIndex: "A"),
-    Example(name: "Dilo", tagIndex: "D"),
-    Example(name: "Fea", tagIndex: "F"),
-  ];
+  final _commonController = Get.put(CommonController());
+
+  @override
+  void initState() {
+    _commonController.showSirklUsers(_homeController.id.value);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    SuspensionUtil.sortListBySuspensionTag(items);
-    SuspensionUtil.setShowSuspensionStatus(items);
+
     return Scaffold(
         backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() =>
@@ -137,6 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildRepertoireList(BuildContext context) {
+    SuspensionUtil.sortListBySuspensionTag(_commonController.users);
+    SuspensionUtil.setShowSuspensionStatus(_commonController.users);
     return MediaQuery.removePadding(
             context: context,
             removeTop: true,
@@ -163,8 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       indexHintAlignment: Alignment.centerRight,
                       indexHintOffset: const Offset(0, 0)),
                   padding: const EdgeInsets.only(top: 16),
-                  data: items,
-                  itemCount: items.length,
+                  data: _commonController.users,
+                  itemCount: _commonController.users.length,
                   itemBuilder: buildSirklRepertoire,
                 ),),)),
           );
@@ -177,18 +156,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildSirklRepertoire(BuildContext context, int index){
-
     return Column(
       children: [
         Offstage(
-          offstage: !items[index].isShowSuspension,
+          offstage: !_commonController.users[index].isShowSuspension,
           child: Container(
             padding: const EdgeInsets.only(left: 20, right: 60),
             width: double.infinity,
             alignment: Alignment.centerLeft,
             child: Row(
               children: [
-                Text(items[index].tagIndex!, softWrap: false, style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w700, color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20),),
+                Text(_commonController.users[index].userName?[0] ?? _commonController.users[index].wallet![0], softWrap: false, style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w700, color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20),),
                 Expanded(
                     child: Divider(
                       color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282),
@@ -199,18 +177,22 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        buildSirklTile(context, index),
+        buildSirklTile(context, index, _commonController.users[index].isShowSuspension),
       ],
     );
   }
 
-  Widget buildSirklTile(BuildContext context, int index){
+  Widget buildSirklTile(BuildContext context, int index, bool isShowSuspension){
     return Padding(
       padding: const EdgeInsets.only(right: 36.0),
       child: Column(
         children: [
+          !isShowSuspension ? Divider(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282),indent: 84,endIndent: 24, thickness: 0.2) : Container(),
+          isShowSuspension ? SizedBox(height: 8,) : Container(),
           ListTile(
-            leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(90.0),
+                child: CachedNetworkImage(imageUrl: _commonController.users[index].picture ?? "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640", width: 60, height: 60, fit: BoxFit.cover,)),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -229,11 +211,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               ],
             ),
-            title: Transform.translate(offset: const Offset(-8, 0),child: Text("Garyvee", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
-            subtitle: Transform.translate(offset: const Offset(-8, 0),child: Text("Lorem Ipsum is simply...", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))),
+            title: Transform.translate(offset: const Offset(-8, 0),child: Text(_commonController.users[index].userName ?? _commonController.users[index].wallet!, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+            subtitle: Transform.translate(offset: const Offset(-8, 0),child: Text(_commonController.users[index].wallet!, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))),
 
           ),
-          Divider(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282),indent: 0,endIndent: 24, thickness: 0.2)
+          !isShowSuspension ? SizedBox(height: 8,) : Container(),
+          //!isShowSuspension ? Divider(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282),indent: 0,endIndent: 24, thickness: 0.2) : Container()
         ],
       ),
     );

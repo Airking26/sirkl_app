@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -19,6 +17,8 @@ class CommonController extends GetxController{
   var userClicked = User().obs;
   var userClickedFollowStatus = false.obs;
   var isCardExpandedList = <int>[].obs;
+  var isLoadingUsers = true.obs;
+  var users = <User>[].obs;
 
   Future<bool> addUserToSirkl(String id) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
@@ -68,19 +68,22 @@ class CommonController extends GetxController{
     }
   }
 
-  showSirklUsers(String id, String offset) async{
+  showSirklUsers(String id) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.getSirklUsers(accessToken, id, offset);
+    var request = await _commonService.getSirklUsers(accessToken, id);
     if(request.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken!);
       var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _commonService.getSirklUsers(accessToken, id, offset);
-      if(request.isOk) return request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
+      request = await _commonService.getSirklUsers(accessToken, id);
+      users.value = request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
+      users.refresh();
     } else if(request.isOk) {
-      return request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
+      users.value = request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
+      users.sort((a,b){ return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());});
+      users.refresh();
     }
   }
 

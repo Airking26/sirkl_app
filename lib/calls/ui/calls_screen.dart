@@ -155,7 +155,7 @@ class _CallsScreenState extends State<CallsScreen> {
             )
           ],
         ),
-        title: Transform.translate(offset: Offset(-8, 0),child: Text("Bored Ape Yacht Club", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+        title: Transform.translate(offset: Offset(-8, 0),child: Text("Bored Ape Yacht", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
         subtitle:
             Transform.translate(
               offset: Offset(-8, 0),

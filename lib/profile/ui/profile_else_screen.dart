@@ -75,7 +75,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                           IconButton(onPressed: () async{
                             if(!_commonController.userClickedFollowStatus.value) {
                               if( await _commonController.addUserToSirkl(_commonController.userClicked.value.id!)){
-                                utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value.userName!}));
+                                utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value.userName ?? _commonController.userClicked.value.wallet!}));
                               }
                             }
                             }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: Get.isDarkMode ? Colors.white : Colors.black, height: 28, width: 28,)),
@@ -114,7 +114,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
             const SizedBox(height: 10,),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 48.0),
-              child: Text(_commonController.userClicked.value.description == null ? con.noDescYetRes.tr : _commonController.userClicked.value.description!,  textAlign: TextAlign.center, style: const TextStyle(height: 1.5, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282), fontSize: 15),),
+              child: Text(_commonController.userClicked.value.description ==  "" ? con.noDescYetRes.tr : _commonController.userClicked.value.description!,  textAlign: TextAlign.center, style: const TextStyle(height: 1.5, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282), fontSize: 15),),
             ),
             const SizedBox(height: 20,),
             const Padding(
@@ -126,11 +126,11 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
               padding: const EdgeInsets.only(left: 24.0),
               child: Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),)),
             ),
-            _homeController.nfts.value.isEmpty ? const Padding(
+            _homeController.isLoadingNfts.value ? const Padding(
               padding: EdgeInsets.only(top: 32.0),
               child: CircularProgressIndicator(),
             ) :
-            MediaQuery.removePadding(
+            _homeController.nfts.value.isNotEmpty ? MediaQuery.removePadding(
               context:  context,
               removeTop: true,
               child: Expanded(
@@ -147,6 +147,9 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                   ),
                 ),
               ),
+            ) :  Container(
+              margin: EdgeInsets.only(top: 24, left: 48, right: 48),
+              child: Text("You don't have any NFT", textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600),),
             )
           ],
         )));
@@ -165,11 +168,11 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
           dialogMenu.dismiss();
           if(_commonController.userClickedFollowStatus.value) {
             if(await _commonController.removeUserToSirkl(_commonController.userClicked.value.id!)) {
-              utils.showToast(context, con.userRemovedofSirklRes.trParams({"user": _commonController.userClicked.value.userName!}));
+              utils.showToast(context, con.userRemovedofSirklRes.trParams({"user": _commonController.userClicked.value.userName ?? _commonController.userClicked.value.wallet!}));
             }
           } else {
             if(await _commonController.addUserToSirkl(_commonController.userClicked.value.id!)){
-              utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value.userName!}));
+              utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value.userName ?? _commonController.userClicked.value.wallet!}));
             }
           }
         },

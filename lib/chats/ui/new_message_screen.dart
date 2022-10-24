@@ -25,27 +25,25 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
 
   final _chatController = Get.put(ChatsController());
   final _commonController = Get.put(CommonController());
-  final _homeController = Get.put(HomeController());
   YYDialog dialogMenu = YYDialog();
   final PagingController<int, User> pagingController = PagingController(firstPageKey: 0);
 
   @override
   void initState() {
-    pagingController.addPageRequestListener((pageKey) {});
+    pagingController.appendLastPage(_commonController.users);
     super.initState();
   }
 
   Future<void> fetchPage(String query, int pageKey) async {
     try {
-      //pagingController.itemList = [];
       final newItems = await _commonController.searchUsers(query, pageKey.toString());
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
         pagingController.refresh();
         pagingController.appendLastPage(newItems);
-        //_refreshController.refreshCompleted();
       } else {
         final nextPageKey = pageKey++;
+        pagingController.refresh();
         pagingController.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
@@ -319,7 +317,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         ),
         title: Transform.translate(
           offset: const Offset(-8, 0),
-          child: Text(item.userName!,
+          child: Text(item.userName ?? item.wallet!,
               style: TextStyle(
                   fontSize: 18,
                   fontFamily: "Gilroy",
@@ -357,7 +355,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           },
           backgroundColor: const Color(0xFF00CB7D),
           label: Text(
-            _chatController.chipsList[index].userName!,
+            _chatController.chipsList[index].userName ?? _chatController.chipsList[index].wallet!,
             style: const TextStyle(
                 fontFamily: "Gilroy",
                 fontSize: 18,

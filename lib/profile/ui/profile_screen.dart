@@ -6,11 +6,9 @@ import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/db/collection_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
-import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
-
 import '../../common/view/dialog/custom_dial.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -31,7 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _profileController.retrieveTokenZegoCloud();
     _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
     _profileController.usernameTextEditingController.value.text = _homeController.userMe.value.userName!.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _homeController.userMe.value.userName!;
-    _profileController.descriptionTextEditingController.value.text = _homeController.userMe.value.description == null ? "" : _homeController.userMe.value.description!;
+    _profileController.descriptionTextEditingController.value.text = _homeController.userMe.value.description == "" ? "" : _homeController.userMe.value.description!;
     _profileController.urlPicture.value = _homeController.userMe.value.picture == null ? "" : _homeController.userMe.value.picture!;
     super.initState();
   }
@@ -81,8 +79,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Container(padding: EdgeInsets.all(8), width: 48, height: 48, child: CircularProgressIndicator(color: Color(0xFF00CB7D),))
                               : IconButton(onPressed: (){
                             _profileController.isEditingProfile.value ? _profileController.updateMe(UpdateMeDto(
-                              userName: _profileController.usernameTextEditingController.value.text.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _profileController.usernameTextEditingController.value.text,
-                              description: _profileController.descriptionTextEditingController.value.text.isEmpty ? null : _profileController.descriptionTextEditingController.value.text,
+                              userName: _profileController.usernameTextEditingController.value.text.isEmpty ? _homeController.userMe.value.wallet! : _profileController.usernameTextEditingController.value.text,
+                              description: _profileController.descriptionTextEditingController.value.text.isEmpty ? "" : _profileController.descriptionTextEditingController.value.text,
                               picture: _profileController.urlPicture.value
                             )):
                             Get.to(() => const NotificationScreen());
@@ -107,7 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                      ),
                                  ),
                                )
-                             : Text(_homeController.userMe.value.userName!.isEmpty ? "${_homeController.userMe.value.wallet!.substring(0, 20)}..." : _homeController.userMe.value.userName!, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
+                             : Text(_homeController.userMe.value.userName!.isEmpty || _homeController.userMe.value.userName == _homeController.userMe.value.wallet ? "${_homeController.userMe.value.wallet!.substring(0, 20)}..." : _homeController.userMe.value.userName!, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
                           ),
                           IconButton(onPressed: (){
                             dialogMenu = dialogPopMenu(context);
@@ -170,7 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     hintText: ""
                 ),
               ):
-              Text(_homeController.userMe.value.description == null ? con.noDescYetRes.tr : _homeController.userMe.value.description!,  textAlign: TextAlign.center, style: const TextStyle(height: 1.5, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282), fontSize: 15),),
+              Text(_homeController.userMe.value.description == "" ? con.noDescYetRes.tr : _homeController.userMe.value.description!,  textAlign: TextAlign.center, style: const TextStyle(height: 1.5, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282), fontSize: 15),),
             ),
             const SizedBox(height: 20,),
             const Padding(
@@ -180,13 +178,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 10,),
             Padding(
               padding: const EdgeInsets.only(left: 24.0),
-              child: Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),)),
+              child: _homeController.nfts.value.isNotEmpty ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),)) : Container(),
             ),
-            _homeController.nfts.value.isEmpty ? const Padding(
+            _homeController.isLoadingNfts.value ? const Padding(
               padding: EdgeInsets.only(top: 32.0),
               child: CircularProgressIndicator(),
             ) :
-            MediaQuery.removePadding(
+            _homeController.nfts.value.isNotEmpty ? MediaQuery.removePadding(
               context:  context,
               removeTop: true,
               child: Expanded(
@@ -203,6 +201,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
+            ) : Container(
+              margin: EdgeInsets.only(top: 24, left: 48, right: 48),
+              child: Text("You don't have any NFT", textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600),),
             )
           ],
         )));
@@ -214,7 +215,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
       ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = Get.isDarkMode ? Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: (){

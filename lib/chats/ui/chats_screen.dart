@@ -25,12 +25,13 @@ class _ChatsScreenState extends State<ChatsScreen>
     with TickerProviderStateMixin {
   final chatController = Get.put(ChatsController());
   final homeController = Get.put(HomeController());
-  final PagingController<int, InboxDto> pagingController = PagingController(firstPageKey: 0);
+  final PagingController<int, InboxDto> pagingFriendController = PagingController(firstPageKey: 0);
+  final PagingController<int, InboxDto> pagingOtherController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
 
   @override
   void initState() {
-    pagingController.addPageRequestListener((pageKey) {
+    pagingFriendController.addPageRequestListener((pageKey) {
       fetchPage();
     });
     super.initState();
@@ -38,26 +39,31 @@ class _ChatsScreenState extends State<ChatsScreen>
 
   Future<void> fetchPage() async {
     try {
-      final newItems = await chatController.retrieveInboxes(pageKey);
+      List<InboxDto> newItems = await chatController.retrieveInboxes(pageKey);
+      List<InboxDto> newItemsFriends = newItems.where((owned) => owned.ownedBy.firstWhere((element) => element.id != homeController.userMe.value.id!).isInFollowing!).toList();
+      List<InboxDto> newItemsOthers = newItems.where((owned) => !owned.ownedBy.firstWhere((element) => element.id != homeController.userMe.value.id!).isInFollowing!).toList();
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
-        pagingController.appendLastPage(newItems);
-        //_refreshController.refreshCompleted();
+        pagingFriendController.appendLastPage(newItemsFriends);
+        pagingOtherController.appendLastPage(newItemsOthers);
       } else {
         final nextPageKey = pageKey++;
-        pagingController.appendPage(newItems, nextPageKey);
+        pagingFriendController.appendPage(newItemsFriends, nextPageKey);
+        pagingOtherController.appendPage(newItemsOthers, nextPageKey);
       }
     } catch (error) {
-      pagingController.error = error;
+      pagingFriendController.error = error;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+
     TabController _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
-      if (_tabController.indexIsChanging)
+      if (_tabController.indexIsChanging) {
         chatController.index.value = _tabController.index;
+      }
     });
 
     return Scaffold(
@@ -281,7 +287,7 @@ class _ChatsScreenState extends State<ChatsScreen>
                 controller: _tabController,
                 children: [
                   PagedListView.separated(
-                      pagingController: pagingController,
+                      pagingController: pagingFriendController,
                       builderDelegate: PagedChildBuilderDelegate<InboxDto>(
                         itemBuilder: (context, item, index) => inboxTile(context, index, item)
                       ),separatorBuilder: (context, index) {
@@ -292,18 +298,23 @@ class _ChatsScreenState extends State<ChatsScreen>
                       indent: 86,
                     );
                   },),
-                  Container()
+                  PagedListView.separated(
+                      pagingController: pagingOtherController,
+                      builderDelegate: PagedChildBuilderDelegate<InboxDto>(
+                        itemBuilder: (context, item, index) => inboxTile(context, index, item)
+                      ),separatorBuilder: (context, index) {
+                    return const Divider(
+                      color: Color(0xFF828282),
+                      thickness: 0.2,
+                      endIndent: 20,
+                      indent: 86,
+                    );
+                  },),
                 ],
               ),
             ),
           ),
         );
-  }
-
-  @override
-  void dispose() {
-    pagingController.dispose();
-    super.dispose();
   }
 
   Widget inboxTile(BuildContext context, int index, InboxDto item) {
@@ -331,7 +342,7 @@ class _ChatsScreenState extends State<ChatsScreen>
         ),
         title: Transform.translate(
           offset: const Offset(-2, 0),
-          child: Text(item.ownedBy.first.userName!,
+          child: Text(item.ownedBy.first.userName ?? item.ownedBy.first.wallet!,
                 style: TextStyle(
                     fontSize: 16,
                     fontFamily: "Gilroy",
@@ -402,5 +413,12 @@ class _ChatsScreenState extends State<ChatsScreen>
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    pagingFriendController.dispose();
+    pagingOtherController.dispose();
+    super.dispose();
   }
 }

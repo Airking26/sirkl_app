@@ -26,12 +26,14 @@ class HomeController extends GetxController{
 
   final HomeService _homeService = HomeService();
   final ProfileService _profileService = ProfileService();
+  var id = "".obs;
   final box = GetStorage();
 
   var accessToken = "".obs;
   var userMe = User().obs;
   var progress = true.obs;
   var isLoading = false.obs;
+  var isLoadingNfts = true.obs;
   var address = "".obs;
   var isUserExists = false.obs;
   var sessionStatus;
@@ -140,21 +142,33 @@ class HomeController extends GetxController{
   retrieveAccessToken() async{
     var accessTok = box.read(con.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
+    id.value = userFromJson(box.read(con.USER) ?? "").id ?? "";
   }
 
   getNFTsContractAddresses() async{
     var req = await _homeService.getNFTsContractAddresses(userMe.value.wallet!);
+    if(req.body != null){
     var initialArray = moralisNftContractAdressesFromJson(json.encode(req.body)).result!;
-    var cursor = moralisNftContractAdressesFromJson(json.encode(req.body)).cursor;
-    while(cursor != null){
-      var newReq = await _homeService.getNextNFTsContractAddresses(userMe.value.wallet!, cursor);
-      initialArray.addAll(moralisNftContractAdressesFromJson(json.encode(newReq.body)).result!);
-      cursor = moralisNftContractAdressesFromJson(json.encode(newReq.body)).cursor;
+    if(moralisNftContractAdressesFromJson(json.encode(req.body)).cursor != null) {
+      var cursor = moralisNftContractAdressesFromJson(json.encode(req.body))
+          .cursor;
+      while (cursor != null) {
+        var newReq = await _homeService.getNextNFTsContractAddresses(
+            userMe.value.wallet!, cursor);
+        initialArray.addAll(
+            moralisNftContractAdressesFromJson(json.encode(newReq.body))
+                .result!);
+        cursor =
+            moralisNftContractAdressesFromJson(json.encode(newReq.body)).cursor;
+      }
     }
 
-    List<String> contractAddresses = [];
-    for (var element in initialArray) { contractAddresses.add(element.tokenAddress!);}
-    updateMe(UpdateMeDto(contractAddresses: contractAddresses));
+      List<String> contractAddresses = [];
+      for (var element in initialArray) {
+        contractAddresses.add(element.tokenAddress!);
+      }
+      updateMe(UpdateMeDto(contractAddresses: contractAddresses));
+    }
   }
 
   getNFTsTemporary(String wallet) async{
@@ -184,6 +198,8 @@ class HomeController extends GetxController{
       ).toList()));
       nfts.refresh();
     });
+
+    isLoadingNfts.value = false;
   }
 
   updateMe(UpdateMeDto updateMeDto) async {
