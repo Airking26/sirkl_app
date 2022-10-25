@@ -25,7 +25,6 @@ dependencies:
   url_launcher: ^6.1.5
   firebase_core: ^1.23.0
   firebase_messaging: ^13.0.3
-  flutter_pw_validator: ^1.4.2
   images_picker: ^1.2.11
   simple_s3: ^0.3.2
   hive: ^2.2.3
@@ -34,6 +33,8 @@ dependencies:
   zego_zim: ^2.2.3
   infinite_scroll_pagination: ^3.2.0
   timeago: ^3.3.0
+  english_words: ^4.0.0
+  bip39: ^1.0.6
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +77,11 @@ flutter:
      - assets/images/done.png
      - assets/images/edit.png
      - assets/images/add_user.png
+     - assets/images/validation.png
+     - assets/images/screenshot.png
+     - assets/images/share.png
+     - assets/images/write.png
+     - assets/images/copy.png
 
   fonts:
     - family: Gilroy

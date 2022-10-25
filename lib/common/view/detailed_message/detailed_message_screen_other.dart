@@ -51,7 +51,7 @@ class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther>
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+                    Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
                     Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
                   ]
               ),

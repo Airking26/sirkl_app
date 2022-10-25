@@ -59,7 +59,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+                          Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
                           Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
                         ]
                     ),
@@ -124,7 +124,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
             const SizedBox(height: 10,),
             Padding(
               padding: const EdgeInsets.only(left: 24.0),
-              child: Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),)),
+              child: _homeController.nfts.value.isNotEmpty ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),)) : Container(),
             ),
             _homeController.isLoadingNfts.value ? const Padding(
               padding: EdgeInsets.only(top: 32.0),
@@ -149,7 +149,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
               ),
             ) :  Container(
               margin: EdgeInsets.only(top: 24, left: 48, right: 48),
-              child: Text("You don't have any NFT", textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600),),
+              child: Text(con.dontHaveNftRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600),),
             )
           ],
         )));

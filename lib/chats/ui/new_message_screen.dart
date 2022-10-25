@@ -242,7 +242,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+              Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
               Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
             ]),
       ),
@@ -298,7 +298,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               Get.to(() => const ProfileElseScreen());
             },
             child: ClipRRect(
-                borderRadius: BorderRadius.circular(90.0), child: CachedNetworkImage(imageUrl: item.picture ?? "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,))),
+                borderRadius: BorderRadius.circular(90.0), child: CachedNetworkImage(imageUrl: item.picture ?? "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640", width: 60, height: 60, fit: BoxFit.cover,))),
         trailing: Checkbox(
           onChanged: (selected) {
             if(selected!) {

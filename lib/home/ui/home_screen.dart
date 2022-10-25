@@ -3,13 +3,15 @@ import 'dart:io';
 import 'package:advstory/advstory.dart';
 import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_pw_validator/flutter_pw_validator.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:bip39/bip39.dart' as bip39;
 
 import '../../common/utils.dart';
 
@@ -24,7 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final _homeController = Get.put(HomeController());
   final _passwordController = TextEditingController();
+  final _passwordConfirmController = TextEditingController();
   final _commonController = Get.put(CommonController());
+  final utils = Utils();
 
   @override
   void initState() {
@@ -38,12 +42,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
         backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() =>
-            Column(
-              children: [
-                buildAppbar(context),
-                _homeController.accessToken.value.isNotEmpty ? buildStoryList() : _homeController.address.value.isEmpty ? buildConnectWalletUI() : _homeController.isUserExists.value ? buildSignIn() : buildSignUp(),
-                _homeController.accessToken.value.isNotEmpty ? buildRepertoireList(context) : Container(),
-              ],
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  buildAppbar(context),
+                  _homeController.accessToken.value.isNotEmpty ? buildStoryList() : _homeController.address.value.isEmpty ? buildConnectWalletUI() : _homeController.isUserExists.value ? _homeController.forgotPassword.value ? _homeController.recoverPassword.value ? buildSignUp() : buildRecoverPassword() : buildSignIn() : _homeController.signUpSeedPhrase.value ? buildSeedPhraseSignUp() : buildSignUp(),
+                  _homeController.accessToken.value.isNotEmpty ? buildRepertoireList(context) : Container(),
+                ],
+              ),
             ),
         ));
   }
@@ -65,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+                    Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
                     Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
                   ]
               ),
@@ -83,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.only(top: 12.0),
                       child: Image.asset("assets/images/logo.png", height: 20,),
                     ),
-                    IconButton(onPressed: (){Utils().dialogPopMenu(context);}, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                    IconButton(onPressed: (){Utils().dialogPopMenu(context);}, icon: Image.asset("assets/images/more.png", color: _homeController.accessToken.value.isEmpty ? Colors.transparent : Get.isDarkMode ? Colors.white : Colors.black,)),
                 ],),
               ),
             ),
@@ -134,8 +140,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   indexBarItemHeight: MediaQuery.of(context).size.height / 50,
                   indexBarOptions: IndexBarOptions(
                     textStyle: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
-                      decoration: getIndexBarDecoration(const Color(0xFF828282).withOpacity(0.8)),
-                      downDecoration: getIndexBarDecoration(const Color(0xFF828282).withOpacity(0.8)),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF828282).withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(20.0),),
+                      downDecoration: BoxDecoration(
+                        color: Color(0xFF828282).withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(20.0),),
                       selectTextStyle: const TextStyle(color: const Color(0xff00CB7D), fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
                       selectItemDecoration: const BoxDecoration(),
                       needRebuild: true,
@@ -147,12 +157,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: buildSirklRepertoire,
                 ),),)),
           );
-  }
-
-  Decoration getIndexBarDecoration(Color color) {
-    return BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(20.0),);
   }
 
   Widget buildSirklRepertoire(BuildContext context, int index){
@@ -188,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           !isShowSuspension ? Divider(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282),indent: 84,endIndent: 24, thickness: 0.2) : Container(),
-          isShowSuspension ? SizedBox(height: 8,) : Container(),
+          isShowSuspension ? const SizedBox(height: 8,) : Container(),
           ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(90.0),
@@ -215,12 +219,13 @@ class _HomeScreenState extends State<HomeScreen> {
             subtitle: Transform.translate(offset: const Offset(-8, 0),child: Text(_commonController.users[index].wallet!, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))),
 
           ),
-          !isShowSuspension ? SizedBox(height: 8,) : Container(),
+          !isShowSuspension ? const SizedBox(height: 8,) : Container(),
           //!isShowSuspension ? Divider(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282),indent: 0,endIndent: 24, thickness: 0.2) : Container()
         ],
       ),
     );
   }
+
 
   Column buildConnectWalletUI() {
     return Column(
@@ -255,61 +260,57 @@ class _HomeScreenState extends State<HomeScreen> {
           );
   }
 
-  Column buildSignUp() {
-    return Column(
-            children: [
-              const SizedBox(height: 35,),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: TextField(
-                    controller: _passwordController,
-                  decoration: const InputDecoration(border: OutlineInputBorder(borderSide: BorderSide())),
-                ),
-              ),
-              const SizedBox(height: 10,),
-              FlutterPwValidator(
-                  controller: _passwordController,
-                  minLength: 6,
-                  uppercaseCharCount: 2,
-                  numericCharCount: 3,
-                  specialCharCount: 1,
-                  width: 350,
-                  height: 120,
-                  onSuccess: (){},
-                  onFail: (){}
-              ),
-              const SizedBox(height: 30,),
-              Container( width: 350, height: 50, padding: const EdgeInsets.all(8), child: const Text("Hello darkness my old friend", style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16),)),
-              const SizedBox(height: 30,),
-              NiceButtons(
-                  stretch: false,
-                  borderThickness: 5,
-                  progress: false,
-                  borderColor: const Color(0xff0063FB).withOpacity(0.5),
-                  startColor: const Color(0xff1DE99B),
-                  endColor: const Color(0xff0063FB),
-                  gradientOrientation: GradientOrientation.Horizontal,
-                  onTap: (finish) async{
-                    await _homeController.signUp(_homeController.address.value, _passwordController.text, "Hello Darkness My Old Friend");
-                  },
-                  child: Text(con.getStartedRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
-              ),
-            ],
-          );
-  }
 
   Column buildSignIn() {
     return Column(
             children: [
-              const SizedBox(height: 50,),
+              const SizedBox(height: 90,),
+              Text(con.welcomeBackRes.tr,textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 24),),
+              const SizedBox(height: 48,),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 36.0),
                 child: TextField(
-                    controller: _passwordController,
-                  decoration: const InputDecoration(border: const OutlineInputBorder(borderSide: BorderSide())),
+                  obscureText: true,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+                  controller: _passwordController,
+                  onChanged: (text){
+                    if(text.length >= 6) {
+                      _homeController.isPasswordLongEnough.value = true;
+                    } else {
+                      _homeController.isPasswordLongEnough.value = false;
+                    }
+                    if(text.contains(RegExp(r'[0-9]'))) {
+                      _homeController.isPasswordIncludeNumber.value = true;
+                    } else {
+                      _homeController.isPasswordIncludeNumber.value = false;
+                    }
+                    if(text.contains(RegExp(r'[~!@#$%^&*()_+`{}|<>?;:./,=\-\[\]]'))) {
+                      _homeController.isPasswordIncludeSpecialCharacter.value = true;
+                    } else {
+                      _homeController.isPasswordIncludeSpecialCharacter.value = false;
+                    }
+                  },
+                  decoration: InputDecoration(
+                      hintStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+                      hintText: con.passwordRes.tr,
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(15))),
                 ),
               ),
-              const SizedBox(height: 30,),
+              const SizedBox(height: 8,),
+              InkWell(
+                onTap: (){
+                  _homeController.forgotPassword.value = true;
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 48.0),
+                  child: Align(alignment: Alignment.centerRight, child: Text(con.forgotPasswordRes.tr, textAlign: TextAlign.start, style: const TextStyle(color: Color(0xFF00CB7D), fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 14),)),
+                ),
+              ) ,
+              const SizedBox(height: 90,),
               NiceButtons(
                   stretch: false,
                   borderThickness: 5,
@@ -321,10 +322,266 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: (finish) async{
                     await _homeController.signIn(_homeController.address.value, _passwordController.text);
                   },
-                  child: Text(con.getStartedRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
+                  child: Text(con.loginRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
               ),
             ],
           );
   }
 
+  Column buildRecoverPassword(){
+    return Column(
+      children: [
+        const SizedBox(height: 35,),
+        Text(con.enterSeedPhraseRes.tr,textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 24),),
+        const SizedBox(height: 16,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 36.0),
+          child: Text(con.seedPhraseGivenAtCreationRes.tr,textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),),
+        ),
+        const SizedBox(height: 48,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 36.0),
+          child: TextField(
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+            decoration: InputDecoration(
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF00CB7D), width: 2), borderRadius: BorderRadius.circular(15)),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(borderSide: BorderSide.none)
+            ),
+          ),
+        ),
+        const SizedBox(height: 64,),
+        NiceButtons(
+            width: 250,
+            stretch: false,
+            borderThickness: 5,
+            progress: false,
+            borderColor: const Color(0xff0063FB).withOpacity(0.5),
+            startColor: const Color(0xff1DE99B),
+            endColor: const Color(0xff0063FB),
+            gradientOrientation: GradientOrientation.Horizontal,
+            onTap: (finish) {
+              _homeController.recoverPassword.value = true;
+            },
+            child: Text(con.recoverPasswordRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
+        ),
+      ],
+    );
+  }
+
+
+  Column buildSignUp() {
+    return Column(
+      children: [
+        const SizedBox(height: 35,),
+        Text(con.createSecurePasswordRes.tr,textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 24),),
+        const SizedBox(height: 16,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 64.0),
+          child: Row(
+            children: [
+              Image.asset("assets/images/validation.png", height: 18, width: 18, color: _homeController.isPasswordLongEnough.value ? const Color(0xFF1DE99B) : Colors.grey,),
+              const SizedBox(width: 8,),
+              Text(con.atLeast6CharsRes.tr,  style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16))
+            ],),
+        ),
+        const SizedBox(height: 12,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 64.0),
+          child: Row(
+            children: [
+              Image.asset("assets/images/validation.png", height: 18, width: 18, color: _homeController.isPasswordIncludeNumber.value ? const Color(0xFF1DE99B) : Colors.grey,),
+              const SizedBox(width: 8,),
+              Text(con.includeNumberRes.tr,  style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16))
+            ],),
+        ),
+        const SizedBox(height: 12,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 64.0),
+          child: Row(
+            children: [
+              Image.asset("assets/images/validation.png", height: 18, width: 18, color: _homeController.isPasswordIncludeSpecialCharacter.value ? const Color(0xFF1DE99B) : Colors.grey,),
+              const SizedBox(width: 8,),
+              Text(con.includeSpecialChar.tr,  style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16))
+            ],),
+        ),
+        const SizedBox(height: 30,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 36.0),
+          child: TextField(
+            obscureText: true,
+            autocorrect: false,
+            enableSuggestions: false,
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+            controller: _passwordController,
+            onChanged: (text){
+              if(text.length >= 6) {
+                _homeController.isPasswordLongEnough.value = true;
+              } else {
+                _homeController.isPasswordLongEnough.value = false;
+              }
+              if(text.contains(RegExp(r'[0-9]'))) {
+                _homeController.isPasswordIncludeNumber.value = true;
+              } else {
+                _homeController.isPasswordIncludeNumber.value = false;
+              }
+              if(text.contains(RegExp(r'[~!@#$%^&*()_+`{}|<>?;:./,=\-\[\]]'))) {
+                _homeController.isPasswordIncludeSpecialCharacter.value = true;
+              } else {
+                _homeController.isPasswordIncludeSpecialCharacter.value = false;
+              }
+            },
+            decoration: InputDecoration(
+                hintStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+                hintText: con.createPasswordRes.tr,
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(15))),
+          ),
+        ),
+        const SizedBox(height: 18,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 36.0),
+          child: TextField(
+            obscureText: true,
+            autocorrect: false,
+            enableSuggestions: false,
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+            controller: _passwordConfirmController,
+            onChanged: (text){
+              if(text.isNotEmpty && _passwordController.text != text) {
+                _homeController.arePasswordIdentical.value = false;
+              } else {
+                _homeController.arePasswordIdentical.value = true;
+              }
+            },
+            decoration: InputDecoration(
+                hintStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+                hintText: con.confirmPasswordRes.tr,
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(15))),
+          ),
+        ),
+        const SizedBox(height: 4,),
+        _homeController.arePasswordIdentical.value ? Container() : Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 48.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.passwordsNotIdentical.tr, textAlign: TextAlign.start, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 14),)),
+        ) ,
+        const SizedBox(height: 60,),
+        NiceButtons(
+            stretch: false,
+            borderThickness: 5,
+            progress: false,
+            borderColor: const Color(0xff0063FB).withOpacity(0.5),
+            startColor: const Color(0xff1DE99B),
+            endColor: const Color(0xff0063FB),
+            gradientOrientation: GradientOrientation.Horizontal,
+            onTap: (finish) async{
+              if(_homeController.recoverPassword.value) {
+                await _homeController.signIn(_homeController.address.value, _passwordController.text);
+              } else if(_homeController.isPasswordIncludeNumber.value && _homeController.isPasswordLongEnough.value && _homeController.isPasswordIncludeSpecialCharacter.value && _homeController.arePasswordIdentical.value){
+                _homeController.password.value = _passwordController.text;
+                _homeController.signUpSeedPhrase.value = true;
+              }
+            },
+            child: Text(_homeController.recoverPassword.value ? con.signinRes.tr : con.signupRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
+        ),
+      ],
+    );
+  }
+
+  Column buildSeedPhraseSignUp(){
+    final seedPhrase = bip39.generateMnemonic();
+    return Column(
+      children: [
+        const SizedBox(height: 35,),
+        Text(con.thisIsSeedPhraseRes.tr,textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 24),),
+        const SizedBox(height: 16,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 36.0),
+          child: Text(con.keepItRes.tr,textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),),
+        ),
+        const SizedBox(height: 48,),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Column(children:
+            [Image.asset("assets/images/screenshot.png", height: 24, width: 24, color: Get.isDarkMode ? Colors.white : Colors.black,),
+              const SizedBox(height: 4,),
+              Text(con.dontScreenRes.tr, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 12),)
+            ],),
+            Column(
+              children:
+              [Image.asset("assets/images/write.png", height: 24, width: 24,color: Get.isDarkMode ? Colors.white : Colors.black,),
+                const SizedBox(height: 4,),
+                Text(con.writeItRes.tr, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 12),)
+              ],
+            ),
+            Column(
+              children:
+              [Image.asset("assets/images/share.png", height: 24, width: 24,color: Get.isDarkMode ? Colors.white : Colors.black,),
+                const SizedBox(height: 4,),
+                Text(con.dontShareRes.tr, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 12),)
+              ],
+            )
+          ],),
+        const SizedBox(height: 16,),
+        InkWell(
+          onTap: () async{
+            await Clipboard.setData(const ClipboardData(text: "your text"));
+            _homeController.seedPhraseCopied.value = true;
+            utils.showToast(context, "Seed phrase is now copied");
+          },
+          child: Container(
+            child: Text(seedPhrase, textAlign: TextAlign.center, style: TextStyle(color:Colors.black, fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 16)),
+            margin: const EdgeInsets.symmetric(horizontal: 36.0),
+            padding: const EdgeInsets.symmetric(vertical: 36.0, horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(width: 1.0, color: const Color(0xFF1DE99B)),
+              borderRadius: const BorderRadius.all(Radius.circular(15.0)),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24,),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 36.0),
+          child: InkWell(
+            onTap: () async {
+              await Clipboard.setData(const ClipboardData(text: "your text"));
+              _homeController.seedPhraseCopied.value = true;
+              utils.showToast(context, "Seed phrase is now copied");
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.asset(_homeController.seedPhraseCopied.value ? "assets/images/validation.png" : "assets/images/copy.png", color: _homeController.seedPhraseCopied.value ? const Color(0xFF1DE99B) : Get.isDarkMode ? Colors.white : Colors.black, height: _homeController.seedPhraseCopied.value ? 18 : 24, width:_homeController.seedPhraseCopied.value ? 18 :  24,),
+                const SizedBox(width: 8,),
+                Flexible(child: Text(_homeController.seedPhraseCopied.value ? con.notedSeedPhraseRes.tr : con.copyItRes.tr,  style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500, fontFamily: "Gilroy", fontSize: 16))),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 64,),
+        NiceButtons(
+            stretch: false,
+            borderThickness: 5,
+            progress: false,
+            borderColor: const Color(0xff0063FB).withOpacity(0.5),
+            startColor: const Color(0xff1DE99B),
+            endColor: const Color(0xff0063FB),
+            gradientOrientation: GradientOrientation.Horizontal,
+            onTap: (finish) async{
+              await _homeController.signUp(_homeController.address.value, _homeController.password.value, seedPhrase);
+            },
+            child: Text(con.signupRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
+        ),
+      ],
+    );
+  }
 }

@@ -62,7 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+                          Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
                           Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
                         ]
                     ),
@@ -203,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ) : Container(
               margin: EdgeInsets.only(top: 24, left: 48, right: 48),
-              child: Text("You don't have any NFT", textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600),),
+              child: Text(con.dontHaveNftRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600),),
             )
           ],
         )));

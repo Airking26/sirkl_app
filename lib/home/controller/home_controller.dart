@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -28,6 +29,16 @@ class HomeController extends GetxController{
   final ProfileService _profileService = ProfileService();
   var id = "".obs;
   final box = GetStorage();
+
+  var isPasswordLongEnough = false.obs;
+  var isPasswordIncludeNumber = false.obs;
+  var isPasswordIncludeSpecialCharacter = false.obs;
+  var arePasswordIdentical = true.obs;
+  var seedPhraseCopied = false.obs;
+  var signUpSeedPhrase = false.obs;
+  var forgotPassword = false.obs;
+  var recoverPassword = false.obs;
+  var password = "".obs;
 
   var accessToken = "".obs;
   var userMe = User().obs;
@@ -172,6 +183,7 @@ class HomeController extends GetxController{
   }
 
   getNFTsTemporary(String wallet) async{
+    isLoadingNfts.value = true;
     nfts.value.clear();
     var req = await _homeService.getNFTs(wallet);
     var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;

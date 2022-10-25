@@ -49,3 +49,30 @@ const String sendAMessageRes = "send_a_message";
 /// COMMON ///
 const String userAddedToSirklRes = "user_added_to_sirkl";
 const String userRemovedofSirklRes = "user_removed_of_sirkl";
+const String dontHaveNftRes = "dont_have_nft";
+
+/// Sign up/in Screen ///
+const String createSecurePasswordRes = "create_secure_password";
+const String atLeast6CharsRes = "at_least_six_chars";
+const String includeNumberRes = "include_number";
+const String includeSpecialChar = "include_special_char";
+const String createPasswordRes = "create_password";
+const String confirmPasswordRes = "confirm_password";
+const String passwordsNotIdentical = "passwords_not_identicals";
+const String signinRes = "sign_in";
+const String thisIsSeedPhraseRes = "this_is_seed_phrase";
+const String keepItRes = "keep_it";
+const String dontScreenRes = "dont_screen";
+const String writeItRes = "write_it";
+const String dontShareRes = "dont_share";
+const String onlyTimeRes = "only_time";
+const String notedSeedPhraseRes = "noted_seed_phrase";
+const String copyItRes = "copy_it";
+const String signupRes = "sign_up";
+const String welcomeBackRes = "welcome_back";
+const String passwordRes = "password";
+const String forgotPasswordRes = "forgot_password";
+const String recoverPasswordRes = "recover_password";
+const String loginRes= "login";
+const String enterSeedPhraseRes ="enter_seed_phrase";
+const String seedPhraseGivenAtCreationRes = "seed_phrase_given_at_creation";
