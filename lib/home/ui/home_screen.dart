@@ -12,6 +12,7 @@ import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:bip39/bip39.dart' as bip39;
+import 'package:sirkl/profile/controller/profile_controller.dart';
 
 import '../../common/utils.dart';
 
@@ -25,8 +26,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
 
   final _homeController = Get.put(HomeController());
+  final _profileController = Get.put(ProfileController());
   final _passwordController = TextEditingController();
   final _passwordConfirmController = TextEditingController();
+  final _seedPhraseController = TextEditingController();
   final _commonController = Get.put(CommonController());
   final utils = Utils();
 
@@ -342,6 +345,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 36.0),
           child: TextField(
+            controller: _seedPhraseController,
             keyboardType: TextInputType.multiline,
             maxLines: null,
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
@@ -363,8 +367,8 @@ class _HomeScreenState extends State<HomeScreen> {
             startColor: const Color(0xff1DE99B),
             endColor: const Color(0xff0063FB),
             gradientOrientation: GradientOrientation.Horizontal,
-            onTap: (finish) {
-              _homeController.recoverPassword.value = true;
+            onTap: (finish) async{
+              await _homeController.signInSeedPhrase(_seedPhraseController.text);
             },
             child: Text(con.recoverPasswordRes.tr, style: const TextStyle(color: Colors.white, fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w700),)
         ),
@@ -481,8 +485,8 @@ class _HomeScreenState extends State<HomeScreen> {
             endColor: const Color(0xff0063FB),
             gradientOrientation: GradientOrientation.Horizontal,
             onTap: (finish) async{
-              if(_homeController.recoverPassword.value) {
-                await _homeController.signIn(_homeController.address.value, _passwordController.text);
+              if(_homeController.recoverPassword.value && _homeController.isPasswordIncludeNumber.value && _homeController.isPasswordLongEnough.value && _homeController.isPasswordIncludeSpecialCharacter.value && _homeController.arePasswordIdentical.value) {
+                await _profileController.modifyPassword(_passwordController.text);
               } else if(_homeController.isPasswordIncludeNumber.value && _homeController.isPasswordLongEnough.value && _homeController.isPasswordIncludeSpecialCharacter.value && _homeController.arePasswordIdentical.value){
                 _homeController.password.value = _passwordController.text;
                 _homeController.signUpSeedPhrase.value = true;

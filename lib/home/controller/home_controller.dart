@@ -10,6 +10,7 @@ import 'package:sirkl/common/model/db/collection_dto.dart';
 import 'package:sirkl/common/model/moralis_metadata_dto.dart';
 import 'package:sirkl/common/model/moralis_nft_contract_addresse.dart';
 import 'package:sirkl/common/model/moralis_root_dto.dart';
+import 'package:sirkl/common/model/sign_in_seed_phrase_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/sign_up_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
@@ -49,6 +50,7 @@ class HomeController extends GetxController{
   var isUserExists = false.obs;
   var sessionStatus;
   var nfts = <CollectionDbDto>[].obs;
+  var tempSignInSuccess = SignInSuccessDto().obs;
 
   connectWallet() async {
     final connector = WalletConnect(
@@ -108,6 +110,14 @@ class HomeController extends GetxController{
     } else {
       isLoading.value = false;
       //Get.snackbar(con.error.tr, requestSignIn.statusText ?? "");
+    }
+  }
+
+  signInSeedPhrase(String seedPhrase) async{
+    var requestSignIn = await _homeService.signIn(signInSeedPhraseDtoToJson(SignInSeedPhraseDto(wallet: address.value, seedPhrase: seedPhrase)));
+    if(requestSignIn.isOk){
+      tempSignInSuccess.value = signInSuccessDtoFromJson(json.encode(requestSignIn.body));
+      recoverPassword.value = true;
     }
   }
 

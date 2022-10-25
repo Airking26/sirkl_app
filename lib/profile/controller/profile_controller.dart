@@ -59,6 +59,19 @@ class ProfileController extends GetxController{
     }
   }
 
+  modifyPassword(String password) async{
+    var request = await _profileService.modifyPassword(_homeController.tempSignInSuccess.value.accessToken!, _homeController.tempSignInSuccess.value.user!.wallet!, password);
+    if(request.isOk){
+      _homeController.userMe.value = _homeController.tempSignInSuccess.value.user!;
+      box.write(con.ACCESS_TOKEN, _homeController.tempSignInSuccess.value.accessToken!);
+      _homeController.accessToken.value = _homeController.tempSignInSuccess.value.accessToken!;
+      box.write(con.REFRESH_TOKEN, _homeController.tempSignInSuccess.value.refreshToken!);
+      box.write(con.USER, userToJson(_homeController.tempSignInSuccess.value.user!));
+      await _homeController.putFCMToken();
+      Get.back();
+    }
+  }
+
   getImage() async{
     List<Media>? res = await ImagesPicker.pick(count: 1, pickType: PickType.image, language: Language.English,
       cropOpt: CropOption(
