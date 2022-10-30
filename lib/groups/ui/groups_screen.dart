@@ -2,15 +2,14 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
 import 'package:sirkl/common/view/detailed_message/detailed_message_screen_other.dart';
 
 import '../../common/utils.dart';
+import '../../common/view/dialog/custom_dial.dart';
 
 class GroupsScreen extends StatefulWidget {
   const GroupsScreen({Key? key}) : super(key: key);
@@ -20,6 +19,9 @@ class GroupsScreen extends StatefulWidget {
 }
 
 class _GroupsScreenState extends State<GroupsScreen> {
+
+  YYDialog dialogMenu = YYDialog();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,82 +30,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Column(children: [
-          Stack(
-            clipBehavior: Clip.none,
-            alignment: AlignmentDirectional.topCenter,
-            fit: StackFit.loose,
-            children: [
-              Container(
-                height: 140,
-                margin: const EdgeInsets.only(bottom: 0.25),
-                decoration: BoxDecoration(
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.grey,
-                      offset: Offset(0.0, 0.01), //(x,y)
-                      blurRadius: 0.01,
-                    ),
-                  ],
-                  borderRadius:
-                      const BorderRadius.vertical(bottom: Radius.circular(35)),
-                  gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-                        Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
-                      ]),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 44.0),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                            onPressed: () {},
-                            icon: Image.asset(
-                              "assets/images/arrow_left.png",
-                              color:
-                                  Get.isDarkMode ? Colors.transparent : Colors.transparent,
-                            )),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12.0),
-                          child: Text(
-                            con.groupsTabRes.tr,
-                            style: TextStyle(
-                                color: Get.isDarkMode
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: "Gilroy",
-                                fontSize: 20),
-                          ),
-                        ),
-                        IconButton(
-                            onPressed: () {
-                              Utils().dialogPopMenu(context);
-                            },
-                            icon: Image.asset(
-                              "assets/images/more.png",
-                              color:
-                                  Get.isDarkMode ? Colors.white : Colors.black,
-                            )),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                  top: Platform.isAndroid ? 80 : 60,
-                  child: Container(
-                      height: 110,
-                      width: MediaQuery.of(context).size.width,
-                      child: buildFloatingSearchBar()))
-            ],
-          ),
+          buildAppBar(context),
           MediaQuery.removePadding(
             context: context,
             removeTop: true,
@@ -122,6 +49,120 @@ class _GroupsScreenState extends State<GroupsScreen> {
             ),
           )
         ]));
+  }
+
+
+  Stack buildAppBar(BuildContext context) {
+    return Stack(
+          clipBehavior: Clip.none,
+          alignment: AlignmentDirectional.topCenter,
+          fit: StackFit.loose,
+          children: [
+            Container(
+              height: 140,
+              margin: const EdgeInsets.only(bottom: 0.25),
+              decoration: BoxDecoration(
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.grey,
+                    offset: Offset(0.0, 0.01), //(x,y)
+                    blurRadius: 0.01,
+                  ),
+                ],
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(35)),
+                gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
+                      Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                    ]),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 44.0),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                          onPressed: () {},
+                          icon: Image.asset(
+                            "assets/images/arrow_left.png",
+                            color:
+                                Get.isDarkMode ? Colors.transparent : Colors.transparent,
+                          )),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12.0),
+                        child: Text(
+                          con.groupsTabRes.tr,
+                          style: TextStyle(
+                              color: Get.isDarkMode
+                                  ? Colors.white
+                                  : Colors.black,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: "Gilroy",
+                              fontSize: 20),
+                        ),
+                      ),
+                      IconButton(
+                          onPressed: () {
+                            dialogMenu = dialogPopMenu(context);
+                          },
+                          icon: Image.asset(
+                            "assets/images/more.png",
+                            color:
+                                Get.isDarkMode ? Colors.white : Colors.black,
+                          )),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+                top: Platform.isAndroid ? 80 : 60,
+                child: Container(
+                    height: 110,
+                    width: MediaQuery.of(context).size.width,
+                    child: buildFloatingSearchBar()))
+          ],
+        );
+  }
+
+  YYDialog dialogPopMenu(BuildContext context) {
+    return YYDialog().build(context)
+      ..width = 180
+      ..borderRadius = 10.0
+      ..gravity = Gravity.rightTop
+      ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor = Get.isDarkMode ? Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..margin = const EdgeInsets.only(top: 90, right: 20)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.notificationsOffRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.claimOwnershipeRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..show();
   }
 
   Widget groupTile(BuildContext context, int index){

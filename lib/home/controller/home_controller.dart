@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:hive/hive.dart';
@@ -19,6 +20,7 @@ import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:zego_zim/zego_zim.dart';
 
 import '../../common/model/refresh_token_dto.dart';
 import '../../common/model/sign_in_dto.dart';
@@ -51,6 +53,7 @@ class HomeController extends GetxController{
   var sessionStatus;
   var nfts = <CollectionDbDto>[].obs;
   var tempSignInSuccess = SignInSuccessDto().obs;
+  var tokenZegoCloud = "".obs;
 
   connectWallet() async {
     final connector = WalletConnect(
@@ -114,7 +117,7 @@ class HomeController extends GetxController{
   }
 
   signInSeedPhrase(String seedPhrase) async{
-    var requestSignIn = await _homeService.signIn(signInSeedPhraseDtoToJson(SignInSeedPhraseDto(wallet: address.value, seedPhrase: seedPhrase)));
+    var requestSignIn = await _homeService.signInSeedPhrase(signInSeedPhraseDtoToJson(SignInSeedPhraseDto(wallet: address.value, seedPhrase: seedPhrase)));
     if(requestSignIn.isOk){
       tempSignInSuccess.value = signInSuccessDtoFromJson(json.encode(requestSignIn.body));
       recoverPassword.value = true;
@@ -157,6 +160,7 @@ class HomeController extends GetxController{
       request = await _homeService.uploadFCMToken(accessToken, fcm);
     }
     userMe.value = userFromJson(json.encode(request.body));
+    await retrieveTokenZegoCloud();
     await getNFTsContractAddresses();
   }
 
@@ -242,6 +246,43 @@ class HomeController extends GetxController{
       }}
     else if (request.isOk) {
       userMe.value = userFromJson(json.encode(request.body));
+    }
+  }
+
+  retrieveTokenZegoCloud() async{
+    ZIMUserInfo userInfo = ZIMUserInfo();
+    userInfo.userID = userMe.value.id!;
+    userInfo.userName = userMe.value.userName!;
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.retrieveTokenZegoCloud(accessToken);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _profileService.retrieveTokenZegoCloud(accessToken);
+      if(request.isOk) {
+        tokenZegoCloud.value = request.body!;
+        ZIM.getInstance()?.login(userInfo, tokenZegoCloud.value).then((value){
+        }).catchError((onError){
+          switch (onError.runtimeType) {
+            case PlatformException:
+              break;
+            default:
+          }
+        });
+      }
+    } else if (request.isOk) {
+      tokenZegoCloud.value = json.decode(request.body!);
+      ZIM.getInstance()?.login(userInfo, tokenZegoCloud.value).then((value){
+      }).catchError((onError){
+        switch (onError.runtimeType) {
+          case PlatformException:
+            break;
+          default:
+        }
+      });
     }
   }
 

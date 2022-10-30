@@ -30,10 +30,9 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   cached_network_image: ^3.2.2
-  zego_zim: ^2.2.3
+  zego_zim: ^2.4.0
   infinite_scroll_pagination: ^3.2.0
   timeago: ^3.3.0
-  english_words: ^4.0.0
   bip39: ^1.0.6
 
 dev_dependencies:

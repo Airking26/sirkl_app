@@ -14,11 +14,12 @@ class CommonController extends GetxController{
   final CommonService _commonService = CommonService();
   final box = GetStorage();
 
-  var userClicked = User().obs;
+  Rx<User?> userClicked = (null as User?).obs;
   var userClickedFollowStatus = false.obs;
   var isCardExpandedList = <int>[].obs;
   var isLoadingUsers = true.obs;
   var users = <User>[].obs;
+  var gettingStoryAndContacts = true.obs;
 
   Future<bool> addUserToSirkl(String id) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
@@ -69,6 +70,7 @@ class CommonController extends GetxController{
   }
 
   showSirklUsers(String id) async{
+    gettingStoryAndContacts.value = true;
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _commonService.getSirklUsers(accessToken, id);
@@ -85,6 +87,7 @@ class CommonController extends GetxController{
       users.sort((a,b){ return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());});
       users.refresh();
     }
+    gettingStoryAndContacts.value = false;
   }
 
   searchInSirklUsers(String substring, String offset) async{

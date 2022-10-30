@@ -7,9 +7,11 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/new_message_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/inbox_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:zego_zim/zego_zim.dart';
 
 import '../../common/view/detailed_message/detailed_message_screen_other.dart';
 
@@ -25,16 +27,33 @@ class _ChatsScreenState extends State<ChatsScreen>
     with TickerProviderStateMixin {
   final chatController = Get.put(ChatsController());
   final homeController = Get.put(HomeController());
+  final commonController = Get.put(CommonController());
   final PagingController<int, InboxDto> pagingFriendController = PagingController(firstPageKey: 0);
   final PagingController<int, InboxDto> pagingOtherController = PagingController(firstPageKey: 0);
+  final PagingController<int, ZIMConversation> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
 
   @override
   void initState() {
-    pagingFriendController.addPageRequestListener((pageKey) {
-      fetchPage();
+    pagingController.addPageRequestListener((pageKey) {
+      fetchPageConversations();
     });
     super.initState();
+  }
+
+  Future<void> fetchPageConversations() async {
+    try {
+      List<ZIMConversation> newItems = await chatController.retrieveChats();
+      final isLastPage = newItems.length < 12;
+      if (isLastPage) {
+        pagingController.appendLastPage(newItems);
+      } else {
+        final nextPageKey = pageKey++;
+        pagingController.appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      pagingFriendController.error = error;
+    }
   }
 
   Future<void> fetchPage() async {
@@ -59,10 +78,10 @@ class _ChatsScreenState extends State<ChatsScreen>
   @override
   Widget build(BuildContext context) {
 
-    TabController _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
-        chatController.index.value = _tabController.index;
+    TabController tabController = TabController(length: 2, vsync: this);
+    tabController.addListener(() {
+      if (tabController.indexIsChanging) {
+        chatController.index.value = tabController.index;
       }
     });
 
@@ -71,8 +90,8 @@ class _ChatsScreenState extends State<ChatsScreen>
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Column(children: [
-          buildAppbar(context, _tabController),
-          buildListConv(context, _tabController)
+          buildAppbar(context, tabController),
+          buildListConv(context, tabController)
         ]));
   }
 
@@ -287,8 +306,8 @@ class _ChatsScreenState extends State<ChatsScreen>
                 controller: _tabController,
                 children: [
                   PagedListView.separated(
-                      pagingController: pagingFriendController,
-                      builderDelegate: PagedChildBuilderDelegate<InboxDto>(
+                      pagingController: pagingController,
+                      builderDelegate: PagedChildBuilderDelegate<ZIMConversation>(
                         itemBuilder: (context, item, index) => inboxTile(context, index, item)
                       ),separatorBuilder: (context, index) {
                     return const Divider(
@@ -300,7 +319,7 @@ class _ChatsScreenState extends State<ChatsScreen>
                   },),
                   PagedListView.separated(
                       pagingController: pagingOtherController,
-                      builderDelegate: PagedChildBuilderDelegate<InboxDto>(
+                      builderDelegate: PagedChildBuilderDelegate<ZIMConversation>(
                         itemBuilder: (context, item, index) => inboxTile(context, index, item)
                       ),separatorBuilder: (context, index) {
                     return const Divider(
@@ -317,39 +336,47 @@ class _ChatsScreenState extends State<ChatsScreen>
         );
   }
 
-  Widget inboxTile(BuildContext context, int index, InboxDto item) {
-    item.ownedBy.removeWhere((element) => element.id == homeController.userMe.value.id);
+  Widget inboxTile(BuildContext context, int index, ZIMConversation item) {
+    //item.ownedBy.removeWhere((element) => element.id == homeController.userMe.value.id);
     var nowMilli = DateTime.now().millisecondsSinceEpoch;
-    var updatedAtMilli =  DateTime.parse(item.updatedAt.toIso8601String()).millisecondsSinceEpoch;
-    var diffMilli = nowMilli - updatedAtMilli;
+    //var updatedAtMilli =  DateTime.parse(item.updatedAt.toIso8601String()).millisecondsSinceEpoch;
+    var diffMilli = nowMilli - item.lastMessage!.timestamp;
     var timeSince = DateTime.now().subtract(Duration(milliseconds: diffMilli));
     return Padding(
       padding: const EdgeInsets.only(right: 8.0, left: 12),
       child: ListTile(
-        onTap: (){Get.to(() => const DetailedMessageScreenOther());},
+        onTap: (){
+          commonController.userClicked.value = null;
+          chatController.conv.value = item;
+          Get.to(() => const DetailedMessageScreenOther())!.then((value) => {
+            pagingController.refresh()
+          });
+          },
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(90.0),
             child: CachedNetworkImage(
-                imageUrl: item.ownedBy.first.picture ?? "https://ik.imagekit.io/bayc/assets/bayc-footer.png", height: 60, width: 60, fit: BoxFit.cover,),
+                imageUrl: item.conversationAvatarUrl == "" ? "https://ik.imagekit.io/bayc/assets/bayc-footer.png" : item.conversationAvatarUrl, height: 60, width: 60, fit: BoxFit.cover,),
           ),
         trailing: Column(
-          mainAxisAlignment: item.unreadMessages == 0 ? MainAxisAlignment.center : MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: item.unreadMessageCount == 0 ? MainAxisAlignment.center : MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(timeago.format(timeSince), style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282))),
-            item.unreadMessages == 0 ? Container(height: 0, width: 0,) : Container(height: 24, width: 24, decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: const Color(0xFF00CB7D)), child: Padding(padding: const EdgeInsets.all(0), child: Align(alignment: Alignment.center, child: Text(textAlign: TextAlign.center,"2", style: TextStyle(color: Get.isDarkMode ? const Color(0xFF232323) : Colors.white, fontFamily: 'Gilroy', fontSize: 12, fontWeight: FontWeight.w600),)),),)
+            Text(timeago.format(timeSince),
+                style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282))),
+            item.unreadMessageCount == 0 ? Container(height: 0, width: 0,) : Container(height: 24, width: 24, decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: const Color(0xFF00CB7D)), child: Padding(padding: const EdgeInsets.all(0), child: Align(alignment: Alignment.center, child: Text(textAlign: TextAlign.center, item.unreadMessageCount.toString() , style: TextStyle(color: Get.isDarkMode ? const Color(0xFF232323) : Colors.white, fontFamily: 'Gilroy', fontSize: 12, fontWeight: FontWeight.w600),)),),)
           ],
         ),
         title: Transform.translate(
           offset: const Offset(-2, 0),
-          child: Text(item.ownedBy.first.userName ?? item.ownedBy.first.wallet!,
+          child: Text(item.conversationName,
+              //.first.userName ?? item.ownedBy.first.wallet!,
                 style: TextStyle(
                     fontSize: 16,
                     fontFamily: "Gilroy",
                     fontWeight: FontWeight.w600,
                     color: Get.isDarkMode ? Colors.white : Colors.black)),
         ),
-        subtitle: Transform.translate(offset: const Offset(0, 0), child: Text(item.lastMessage, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: item.unreadMessages == 0 ? FontWeight.w500 : FontWeight.w700, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))),
+        subtitle: Transform.translate(offset: const Offset(0, 0), child: Text((item.lastMessage as ZIMTextMessage).message, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: item.unreadMessageCount == 0 ? FontWeight.w500 : FontWeight.w700, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))),
       ),
     );
   }
@@ -419,6 +446,7 @@ class _ChatsScreenState extends State<ChatsScreen>
   void dispose() {
     pagingFriendController.dispose();
     pagingOtherController.dispose();
+    pagingController.dispose();
     super.dispose();
   }
 }

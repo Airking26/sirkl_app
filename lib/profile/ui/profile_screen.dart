@@ -26,7 +26,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState(){
-    _profileController.retrieveTokenZegoCloud();
     _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
     _profileController.usernameTextEditingController.value.text = _homeController.userMe.value.userName!.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _homeController.userMe.value.userName!;
     _profileController.descriptionTextEditingController.value.text = _homeController.userMe.value.description == "" ? "" : _homeController.userMe.value.description!;

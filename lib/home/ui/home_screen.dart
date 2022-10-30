@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:advstory/advstory.dart';
 import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -15,6 +14,7 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'package:sirkl/profile/controller/profile_controller.dart';
 
 import '../../common/utils.dart';
+import '../../common/view/dialog/custom_dial.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -31,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _passwordConfirmController = TextEditingController();
   final _seedPhraseController = TextEditingController();
   final _commonController = Get.put(CommonController());
+  YYDialog dialogMenu = YYDialog();
   final utils = Utils();
 
   @override
@@ -45,15 +46,17 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
         backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() =>
-            SingleChildScrollView(
-              child: Column(
+            //SingleChildScrollView(
+              //child:
+          Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   buildAppbar(context),
-                  _homeController.accessToken.value.isNotEmpty ? buildStoryList() : _homeController.address.value.isEmpty ? buildConnectWalletUI() : _homeController.isUserExists.value ? _homeController.forgotPassword.value ? _homeController.recoverPassword.value ? buildSignUp() : buildRecoverPassword() : buildSignIn() : _homeController.signUpSeedPhrase.value ? buildSeedPhraseSignUp() : buildSignUp(),
-                  _homeController.accessToken.value.isNotEmpty ? buildRepertoireList(context) : Container(),
+                  _homeController.accessToken.value.isNotEmpty ? _commonController.gettingStoryAndContacts.value ? Container() : _commonController.users.isNotEmpty ? buildStoryList() : Container() : _homeController.address.value.isEmpty ? buildConnectWalletUI() : _homeController.isUserExists.value ? _homeController.forgotPassword.value ? _homeController.recoverPassword.value ? buildSignUp() : buildRecoverPassword() : buildSignIn() : _homeController.signUpSeedPhrase.value ? buildSeedPhraseSignUp() : buildSignUp(),
+                  _homeController.accessToken.value.isNotEmpty ? _commonController.gettingStoryAndContacts.value ? Container(margin:const EdgeInsets.only(top: 150), child: const CircularProgressIndicator()) : _commonController.users.isNotEmpty ? buildRepertoireList(context) : buildEmptyFriends() : Container(),
                 ],
               ),
-            ),
+            //),
         ));
   }
 
@@ -92,12 +95,35 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.only(top: 12.0),
                       child: Image.asset("assets/images/logo.png", height: 20,),
                     ),
-                    IconButton(onPressed: (){Utils().dialogPopMenu(context);}, icon: Image.asset("assets/images/more.png", color: _homeController.accessToken.value.isEmpty ? Colors.transparent : Get.isDarkMode ? Colors.white : Colors.black,)),
+                    IconButton(onPressed: (){dialogMenu = dialogPopMenu(context);}, icon: Image.asset("assets/images/more.png", color: _homeController.accessToken.value.isEmpty ? Colors.transparent : Get.isDarkMode ? Colors.white : Colors.black,)),
                 ],),
               ),
             ),
           );
   }
+
+  YYDialog dialogPopMenu(BuildContext context) {
+    return YYDialog().build(context)
+      ..width = 120
+      ..borderRadius = 10.0
+      ..gravity = Gravity.rightTop
+      ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..margin = const EdgeInsets.only(top: 90, right: 20)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactUsRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.rulesRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..show();
+  }
+
 
   Container buildStoryList() {
     return Container(
@@ -117,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               trayBuilder: (index) => AdvStoryTray(url: "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640",
                 username: Text("Samuel", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color: Get.isDarkMode ? Colors.white : Colors.black),
-                ), gapSize: 0, borderGradientColors: [const Color(0xFF1DE99B), const Color(0xFF0063FB), const Color(0xFF1DE99B), const Color(0xFF0063FB)],),
+                ), gapSize: 0, borderGradientColors: const [Color(0xFF1DE99B), Color(0xFF0063FB), Color(0xFF1DE99B), Color(0xFF0063FB)],),
             ),
           );
   }
@@ -128,7 +154,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return MediaQuery.removePadding(
             context: context,
             removeTop: true,
-            child: Expanded(
+            child: Flexible(
+              fit: FlexFit.loose,
                 child: Padding(padding: const EdgeInsets.only(top: 0),
                 child: SafeArea(child:
                 AzListView(
@@ -144,12 +171,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   indexBarOptions: IndexBarOptions(
                     textStyle: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
                       decoration: BoxDecoration(
-                        color: Color(0xFF828282).withOpacity(0.8),
+                        color: const Color(0xFF828282).withOpacity(0.8),
                         borderRadius: BorderRadius.circular(20.0),),
                       downDecoration: BoxDecoration(
-                        color: Color(0xFF828282).withOpacity(0.8),
+                        color: const Color(0xFF828282).withOpacity(0.8),
                         borderRadius: BorderRadius.circular(20.0),),
-                      selectTextStyle: const TextStyle(color: const Color(0xff00CB7D), fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
+                      selectTextStyle: const TextStyle(color: Color(0xff00CB7D), fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
                       selectItemDecoration: const BoxDecoration(),
                       needRebuild: true,
                       indexHintAlignment: Alignment.centerRight,
@@ -263,6 +290,25 @@ class _HomeScreenState extends State<HomeScreen> {
           );
   }
 
+  Column buildEmptyFriends() {
+    return Column(
+            children: [
+              const SizedBox(height: 150,),
+              Image.asset("assets/images/people.png", width: 150, height: 150,),
+              const SizedBox(height: 30,),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 54.0),
+                child: Text(con.noFriendsRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontFamily: "Gilroy", fontWeight: FontWeight.w700),),
+              ),
+              const SizedBox(height: 15,),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 54.0),
+                child: Text(con.addUsersToSirklRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282), fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500),),
+              ),
+            ],
+          );
+  }
+
 
   Column buildSignIn() {
     return Column(
@@ -276,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   obscureText: true,
                   autocorrect: false,
                   enableSuggestions: false,
-                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
                   controller: _passwordController,
                   onChanged: (text){
                     if(text.length >= 6) {
@@ -296,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                   },
                   decoration: InputDecoration(
-                      hintStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+                      hintStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
                       hintText: con.passwordRes.tr,
                       filled: true,
                       fillColor: Colors.white,
@@ -348,12 +394,12 @@ class _HomeScreenState extends State<HomeScreen> {
             controller: _seedPhraseController,
             keyboardType: TextInputType.multiline,
             maxLines: null,
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
             decoration: InputDecoration(
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF00CB7D), width: 2), borderRadius: BorderRadius.circular(15)),
+                enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF00CB7D), width: 2), borderRadius: BorderRadius.circular(15)),
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder(borderSide: BorderSide.none)
+                border: const OutlineInputBorder(borderSide: BorderSide.none)
             ),
           ),
         ),
@@ -419,7 +465,7 @@ class _HomeScreenState extends State<HomeScreen> {
             obscureText: true,
             autocorrect: false,
             enableSuggestions: false,
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
             controller: _passwordController,
             onChanged: (text){
               if(text.length >= 6) {
@@ -439,7 +485,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }
             },
             decoration: InputDecoration(
-                hintStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+                hintStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
                 hintText: con.createPasswordRes.tr,
                 filled: true,
                 fillColor: Colors.white,
@@ -453,7 +499,7 @@ class _HomeScreenState extends State<HomeScreen> {
             obscureText: true,
             autocorrect: false,
             enableSuggestions: false,
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
             controller: _passwordConfirmController,
             onChanged: (text){
               if(text.isNotEmpty && _passwordController.text != text) {
@@ -463,7 +509,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }
             },
             decoration: InputDecoration(
-                hintStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
+                hintStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: "Gilroy", fontSize: 16),
                 hintText: con.confirmPasswordRes.tr,
                 filled: true,
                 fillColor: Colors.white,
@@ -536,12 +582,11 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 16,),
         InkWell(
           onTap: () async{
-            await Clipboard.setData(const ClipboardData(text: "your text"));
+            await Clipboard.setData(ClipboardData(text: seedPhrase));
             _homeController.seedPhraseCopied.value = true;
-            utils.showToast(context, "Seed phrase is now copied");
+            utils.showToast(context, con.seedPhraseCopiedRes.tr);
           },
           child: Container(
-            child: Text(seedPhrase, textAlign: TextAlign.center, style: TextStyle(color:Colors.black, fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 16)),
             margin: const EdgeInsets.symmetric(horizontal: 36.0),
             padding: const EdgeInsets.symmetric(vertical: 36.0, horizontal: 12),
             decoration: BoxDecoration(
@@ -549,6 +594,7 @@ class _HomeScreenState extends State<HomeScreen> {
               border: Border.all(width: 1.0, color: const Color(0xFF1DE99B)),
               borderRadius: const BorderRadius.all(Radius.circular(15.0)),
             ),
+            child: Text(seedPhrase, textAlign: TextAlign.center, style: const TextStyle(color:Colors.black, fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 16)),
           ),
         ),
         const SizedBox(height: 24,),
@@ -556,9 +602,9 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 36.0),
           child: InkWell(
             onTap: () async {
-              await Clipboard.setData(const ClipboardData(text: "your text"));
+              await Clipboard.setData(ClipboardData(text: seedPhrase));
               _homeController.seedPhraseCopied.value = true;
-              utils.showToast(context, "Seed phrase is now copied");
+              utils.showToast(context, con.seedPhraseCopiedRes.tr);
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

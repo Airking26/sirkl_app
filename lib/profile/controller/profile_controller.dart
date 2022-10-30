@@ -30,9 +30,10 @@ class ProfileController extends GetxController{
   var usernameTextEditingController = TextEditingController().obs;
   var descriptionTextEditingController = TextEditingController().obs;
   var urlPicture = "".obs;
-  var tokenZegoCloud = "".obs;
 
   updateMe(UpdateMeDto updateMeDto) async {
+    await ZIM.getInstance()!.updateUserAvatarUrl(updateMeDto.picture ?? "");
+    await ZIM.getInstance()!.updateUserName(updateMeDto.userName ?? _homeController.userMe.value.wallet!);
     isLoadingPicture.value = true;
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
@@ -82,37 +83,6 @@ class ProfileController extends GetxController{
     if(res != null) isLoadingPicture.value = true;
     urlPicture.value = await SimpleS3().uploadFile(File(res!.first.path), "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
     isLoadingPicture.value = false;
-  }
-
-  retrieveTokenZegoCloud() async{
-    ZIMUserInfo userInfo = ZIMUserInfo();
-    userInfo.userID = _homeController.userMe.value.id!;
-    userInfo.userName = _homeController.userMe.value.userName!;
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.retrieveTokenZegoCloud(accessToken);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.retrieveTokenZegoCloud(accessToken);
-      if(request.isOk) tokenZegoCloud.value = request.body!;
-    } else if (request.isOk) {
-      tokenZegoCloud.value = json.decode(request.body!);
-      ZIM.getInstance()?.login(userInfo, tokenZegoCloud.value).then((value){
-        var t = value;
-        var c = "";
-      }).catchError((onError){
-        switch (onError.runtimeType) {
-          case PlatformException:
-            var k = "error";
-          //This will be triggered when login failed.
-            break;
-          default:
-        }
-      });
-    }
   }
 
 }

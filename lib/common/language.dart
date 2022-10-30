@@ -10,7 +10,7 @@ class Language extends Translations{
       c.groupsTabRes: "Groups",
       c.chatsTabRes: "Inbox",
       c.profileTabRes: "Profile",
-      c.connectYourWalletRes: "Connect your wallet",
+      c.connectYourWalletRes: "Connect Your Wallet",
       c.talkWithRes: "Talk with other wallets and your NFT groups",
       c.getStartedRes: "Get Started",
       c.myNFTCollectionRes: "My NFT Collection",
@@ -34,7 +34,7 @@ class Language extends Translations{
       c.sendAMessageRes: "• Send a message",
       c.userAddedToSirklRes: "@user is now added to your Sirkl",
       c.userRemovedofSirklRes: "@user is now removed from your Sirkl",
-      c.dontHaveNftRes: "You don't have any NFT",
+      c.dontHaveNftRes: "No NFT Found",
       c.createSecurePasswordRes: "Create a secure password",
       c.atLeast6CharsRes: "At least 6 characters long",
       c.includeNumberRes: "Include a number",
@@ -58,7 +58,15 @@ class Language extends Translations{
       c.recoverPasswordRes: "Recover My Password",
       c.loginRes: "Log In",
       c.enterSeedPhraseRes: "Enter your seed phrase",
-      c.seedPhraseGivenAtCreationRes: "It has been given to you when you were creating your account"
+      c.seedPhraseGivenAtCreationRes: "It has been given to you when you were creating your account",
+      c.seedPhraseCopiedRes: "Seed phrase is now copied in your clipboard",
+      c.walletCopiedRes: "Wallet is now copied in your clipboard",
+      c.noFriendsRes: "No Friends Yet",
+      c.addUsersToSirklRes: "Add users to your sirkl to start following them",
+      c.rulesRes : "• Rules",
+      c.notificationsOffRes : "• Notifications OFF",
+      c.contactOwnerRes: "• Contact owner",
+      c.claimOwnershipeRes: "• Claim ownership"
     }
   };
 
