@@ -23,11 +23,11 @@ class ChatsScreen extends StatefulWidget {
   State<ChatsScreen> createState() => _ChatsScreenState();
 }
 
-class _ChatsScreenState extends State<ChatsScreen>
-    with TickerProviderStateMixin {
-  final chatController = Get.put(ChatsController());
-  final homeController = Get.put(HomeController());
-  final commonController = Get.put(CommonController());
+class _ChatsScreenState extends State<ChatsScreen> with TickerProviderStateMixin {
+
+  final _chatController = Get.put(ChatsController());
+  final _homeController = Get.put(HomeController());
+  final _commonController = Get.put(CommonController());
   final PagingController<int, InboxDto> pagingFriendController = PagingController(firstPageKey: 0);
   final PagingController<int, InboxDto> pagingOtherController = PagingController(firstPageKey: 0);
   final PagingController<int, ZIMConversation> pagingController = PagingController(firstPageKey: 0);
@@ -35,6 +35,7 @@ class _ChatsScreenState extends State<ChatsScreen>
 
   @override
   void initState() {
+    _chatController.lastConv.value = null;
     pagingController.addPageRequestListener((pageKey) {
       fetchPageConversations();
     });
@@ -43,8 +44,8 @@ class _ChatsScreenState extends State<ChatsScreen>
 
   Future<void> fetchPageConversations() async {
     try {
-      List<ZIMConversation> newItems = await chatController.retrieveChats();
-      final isLastPage = newItems.length < 12;
+      List<ZIMConversation> newItems = await _chatController.retrieveChats(_chatController.lastConv.value);
+      final isLastPage = newItems.length < 9;
       if (isLastPage) {
         pagingController.appendLastPage(newItems);
       } else {
@@ -58,9 +59,9 @@ class _ChatsScreenState extends State<ChatsScreen>
 
   Future<void> fetchPage() async {
     try {
-      List<InboxDto> newItems = await chatController.retrieveInboxes(pageKey);
-      List<InboxDto> newItemsFriends = newItems.where((owned) => owned.ownedBy.firstWhere((element) => element.id != homeController.userMe.value.id!).isInFollowing!).toList();
-      List<InboxDto> newItemsOthers = newItems.where((owned) => !owned.ownedBy.firstWhere((element) => element.id != homeController.userMe.value.id!).isInFollowing!).toList();
+      List<InboxDto> newItems = await _chatController.retrieveInboxes(pageKey);
+      List<InboxDto> newItemsFriends = newItems.where((owned) => owned.ownedBy.firstWhere((element) => element.id != _homeController.userMe.value.id!).isInFollowing!).toList();
+      List<InboxDto> newItemsOthers = newItems.where((owned) => !owned.ownedBy.firstWhere((element) => element.id != _homeController.userMe.value.id!).isInFollowing!).toList();
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
         pagingFriendController.appendLastPage(newItemsFriends);
@@ -81,7 +82,7 @@ class _ChatsScreenState extends State<ChatsScreen>
     TabController tabController = TabController(length: 2, vsync: this);
     tabController.addListener(() {
       if (tabController.indexIsChanging) {
-        chatController.index.value = tabController.index;
+        _chatController.index.value = tabController.index;
       }
     });
 
@@ -132,10 +133,10 @@ class _ChatsScreenState extends State<ChatsScreen>
                     children: [
                       Obx(()=>IconButton(
                           onPressed: () {
-                            chatController.searchIsActive.value = !chatController.searchIsActive.value;
+                            _chatController.searchIsActive.value = !_chatController.searchIsActive.value;
                           },
                           icon: Image.asset(
-                            chatController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
+                            _chatController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
                             color:
                                 Get.isDarkMode ? Colors.white : Colors.black,
                           ))),
@@ -167,8 +168,8 @@ class _ChatsScreenState extends State<ChatsScreen>
               ),
             ),
             Obx(()=>Positioned(
-                top: chatController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
-                child: chatController.searchIsActive.value ? Container(
+                top: _chatController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
+                child: _chatController.searchIsActive.value ? Container(
                     height: 110,
                     width: MediaQuery.of(context).size.width,
                     child:buildFloatingSearchBar()): Container(
@@ -202,7 +203,7 @@ class _ChatsScreenState extends State<ChatsScreen>
                               width: 200,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                gradient: chatController.index.value == 0
+                                gradient: _chatController.index.value == 0
                                     ? const LinearGradient(
                                         begin: Alignment.centerLeft,
                                         end: Alignment.centerRight,
@@ -235,7 +236,7 @@ class _ChatsScreenState extends State<ChatsScreen>
                                         fontSize: 15,
                                         fontFamily: "Gilroy",
                                         fontWeight: FontWeight.w700,
-                                        color: chatController.index.value == 0
+                                        color: _chatController.index.value == 0
                                             ? Colors.white
                                             : Get.isDarkMode
                                                 ? const Color(0xFF9BA0A5)
@@ -247,7 +248,7 @@ class _ChatsScreenState extends State<ChatsScreen>
                               width: 200,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                gradient: chatController.index.value == 1
+                                gradient: _chatController.index.value == 1
                                     ? const LinearGradient(
                                         begin: Alignment.centerLeft,
                                         end: Alignment.centerRight,
@@ -280,7 +281,7 @@ class _ChatsScreenState extends State<ChatsScreen>
                                         fontSize: 15,
                                         fontFamily: "Gilroy",
                                         fontWeight: FontWeight.w700,
-                                        color: chatController.index.value == 1
+                                        color: _chatController.index.value == 1
                                             ? Colors.white
                                             : Get.isDarkMode
                                                 ? const Color(0xFF9BA0A5)
@@ -345,11 +346,13 @@ class _ChatsScreenState extends State<ChatsScreen>
     return Padding(
       padding: const EdgeInsets.only(right: 8.0, left: 12),
       child: ListTile(
+
         onTap: (){
-          commonController.userClicked.value = null;
-          chatController.conv.value = item;
-          Get.to(() => const DetailedMessageScreenOther())!.then((value) => {
-            pagingController.refresh()
+          _commonController.userClicked.value = null;
+          _chatController.conv.value = item;
+          Get.to(() => const DetailedMessageScreenOther())!.then((value) {
+          _chatController.lastConv.value = null;
+              pagingController.refresh();
           });
           },
           leading: ClipRRect(
@@ -369,6 +372,8 @@ class _ChatsScreenState extends State<ChatsScreen>
         title: Transform.translate(
           offset: const Offset(-2, 0),
           child: Text(item.conversationName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               //.first.userName ?? item.ownedBy.first.wallet!,
                 style: TextStyle(
                     fontSize: 16,
@@ -376,7 +381,7 @@ class _ChatsScreenState extends State<ChatsScreen>
                     fontWeight: FontWeight.w600,
                     color: Get.isDarkMode ? Colors.white : Colors.black)),
         ),
-        subtitle: Transform.translate(offset: const Offset(0, 0), child: Text((item.lastMessage as ZIMTextMessage).message, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: item.unreadMessageCount == 0 ? FontWeight.w500 : FontWeight.w700, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))),
+        subtitle: Transform.translate(offset: const Offset(0, 0), child: Text((item.lastMessage as ZIMTextMessage).message, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: item.unreadMessageCount == 0 ? FontWeight.w500 : FontWeight.w700, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))),
       ),
     );
   }

@@ -26,23 +26,31 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   final _chatController = Get.put(ChatsController());
   final _commonController = Get.put(CommonController());
   YYDialog dialogMenu = YYDialog();
+  static var _pageKey = 0;
   final PagingController<int, User> pagingController = PagingController(firstPageKey: 0);
 
   @override
   void initState() {
-    pagingController.appendLastPage(_commonController.users);
+    pagingController.addPageRequestListener((pageKey) {
+      if(_commonController.query.value.isNotEmpty) {
+        fetchPage(_commonController.query.value, _pageKey);
+      } else {
+        pagingController.refresh();
+        pagingController.appendLastPage(_commonController.users);
+      }
+    });
     super.initState();
   }
 
   Future<void> fetchPage(String query, int pageKey) async {
     try {
-      final newItems = await _commonController.searchUsers(query, pageKey.toString());
+      final newItems = await _commonController.searchUsers(query, _pageKey.toString());
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
-        pagingController.refresh();
+        if(pageKey == 0) pagingController.refresh();
         pagingController.appendLastPage(newItems);
       } else {
-        final nextPageKey = pageKey++;
+        final nextPageKey = _pageKey++;
         pagingController.refresh();
         pagingController.appendPage(newItems, nextPageKey);
       }
@@ -374,7 +382,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       hint: 'Search here...',
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
-      transitionDuration: const Duration(milliseconds: 800),
+      transitionDuration: const Duration(milliseconds: 0),
       transitionCurve: Curves.easeInOut,
       physics: const BouncingScrollPhysics(),
       axisAlignment: 0.0,
@@ -399,9 +407,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       backgroundColor: Get.isDarkMode
           ? const Color(0xFF2D465E).withOpacity(1)
           : Colors.white,
-      debounceDelay: const Duration(milliseconds: 200),
+      debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
-        fetchPage(query, 0);
+        _commonController.query.value = query;
+        _pageKey = 0;
+        fetchPage(_commonController.query.value, _pageKey);
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [

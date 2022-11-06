@@ -20,6 +20,8 @@ class CommonController extends GetxController{
   var isLoadingUsers = true.obs;
   var users = <User>[].obs;
   var gettingStoryAndContacts = true.obs;
+  var query = "".obs;
+  var queryHasChanged = false.obs;
 
   Future<bool> addUserToSirkl(String id) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
@@ -73,20 +75,36 @@ class CommonController extends GetxController{
     gettingStoryAndContacts.value = true;
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.getSirklUsers(accessToken, id);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
+    Response<List<dynamic>> request;
+    try{
       request = await _commonService.getSirklUsers(accessToken, id);
-      users.value = request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
-      users.refresh();
-    } else if(request.isOk) {
-      users.value = request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
-      users.sort((a,b){ return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());});
-      users.refresh();
+      if(request.isOk) {
+        users.value = request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
+        users.sort((a,b){ return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());});
+        users.refresh();
+      } else {
+        gettingStoryAndContacts.value = false;
+      }
+    } on CastError{
+        var requestToken = await _homeService.refreshToken(refreshToken!);
+        var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
+        accessToken = refreshTokenDto.accessToken!;
+        box.write(con.ACCESS_TOKEN, accessToken);
+        try {
+          request = await _commonService.getSirklUsers(accessToken, id);
+          if(request.isOk) {
+            users.value = request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
+            users.sort((a,b){ return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());});
+            users.refresh();
+          }
+          else {
+            gettingStoryAndContacts.value = false;
+          }
+        } on CastError{
+          gettingStoryAndContacts.value = false;
+        }
     }
+
     gettingStoryAndContacts.value = false;
   }
 
@@ -107,18 +125,25 @@ class CommonController extends GetxController{
   }
 
   searchUsers(String substring, String offset) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.searchUsers(accessToken, substring, offset);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _commonService.searchUsers(accessToken, substring, offset);
-      if(request.isOk) return request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
-    } else if(request.isOk){
-      return request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
-    }
+      var accessToken = box.read(con.ACCESS_TOKEN);
+      var refreshToken = box.read(con.REFRESH_TOKEN);
+      var request = await _commonService.searchUsers(
+          accessToken, substring, offset);
+      if (request.statusCode == 401) {
+        var requestToken = await _homeService.refreshToken(refreshToken!);
+        var refreshTokenDto = refreshTokenDtoFromJson(
+            json.encode(requestToken.body));
+        accessToken = refreshTokenDto.accessToken!;
+        box.write(con.ACCESS_TOKEN, accessToken);
+        request =
+        await _commonService.searchUsers(accessToken, substring, offset);
+        if (request.isOk) {
+          return request.body!.map<User>((user) =>
+            userFromJson(json.encode(user))).toList();
+        }
+      } else if (request.isOk) {
+        return request.body!.map<User>((user) =>
+            userFromJson(json.encode(user))).toList();
+      }
   }
 }

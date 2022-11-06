@@ -46,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
         backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() =>
+        _homeController.accessToken.isNotEmpty ?
             //SingleChildScrollView(
               //child:
           Column(
@@ -55,7 +56,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   _homeController.accessToken.value.isNotEmpty ? _commonController.gettingStoryAndContacts.value ? Container() : _commonController.users.isNotEmpty ? buildStoryList() : Container() : _homeController.address.value.isEmpty ? buildConnectWalletUI() : _homeController.isUserExists.value ? _homeController.forgotPassword.value ? _homeController.recoverPassword.value ? buildSignUp() : buildRecoverPassword() : buildSignIn() : _homeController.signUpSeedPhrase.value ? buildSeedPhraseSignUp() : buildSignUp(),
                   _homeController.accessToken.value.isNotEmpty ? _commonController.gettingStoryAndContacts.value ? Container(margin:const EdgeInsets.only(top: 150), child: const CircularProgressIndicator()) : _commonController.users.isNotEmpty ? buildRepertoireList(context) : buildEmptyFriends() : Container(),
                 ],
-              ),
+              ) :
+        SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              buildAppbar(context),
+              _homeController.accessToken.value.isNotEmpty ? _commonController.gettingStoryAndContacts.value ? Container() : _commonController.users.isNotEmpty ? buildStoryList() : Container() : _homeController.address.value.isEmpty ? buildConnectWalletUI() : _homeController.isUserExists.value ? _homeController.forgotPassword.value ? _homeController.recoverPassword.value ? buildSignUp() : buildRecoverPassword() : buildSignIn() : _homeController.signUpSeedPhrase.value ? buildSeedPhraseSignUp() : buildSignUp(),
+              _homeController.accessToken.value.isNotEmpty ? _commonController.gettingStoryAndContacts.value ? Container(margin:const EdgeInsets.only(top: 150), child: const CircularProgressIndicator()) : _commonController.users.isNotEmpty ? buildRepertoireList(context) : buildEmptyFriends() : Container(),
+            ],
+          ),
+        )
             //),
         ));
   }
@@ -171,10 +182,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   indexBarOptions: IndexBarOptions(
                     textStyle: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF828282).withOpacity(0.8),
+                        color: Get.isDarkMode ? const Color(0xff9BA0A5).withOpacity(0.8) : const Color(0xFF828282).withOpacity(0.8),
                         borderRadius: BorderRadius.circular(20.0),),
                       downDecoration: BoxDecoration(
-                        color: const Color(0xFF828282).withOpacity(0.8),
+                        color:  Get.isDarkMode ? const Color(0xff9BA0A5).withOpacity(0.8) : const Color(0xFF828282).withOpacity(0.8),
                         borderRadius: BorderRadius.circular(20.0),),
                       selectTextStyle: const TextStyle(color: Color(0xff00CB7D), fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
                       selectItemDecoration: const BoxDecoration(),

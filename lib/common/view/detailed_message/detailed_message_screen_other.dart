@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:intl/intl.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:zego_zim/zego_zim.dart';
 
 import '../../interface/ZIMEventHandlerManager.dart';
@@ -26,14 +26,15 @@ class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther>
   final _chatController = Get.put(ChatsController());
   final _homeController = Get.put(HomeController());
   final _textMessageController = TextEditingController();
-  final _navController = Get.put(NavigationController());
+  final PagingController<int, ZIMMessage> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
 
   @override
   void initState() {
     clearUnReadMessage();
-    ZIMEventHandlerManager.loadingEventHandler(_chatController);
-    _chatController.chatPagingController.value.addPageRequestListener((pageKey) {
+    ZIMEventHandlerManager.loadingEventHandler(pagingController);
+    _chatController.lastItem.value = null;
+    pagingController.addPageRequestListener((pageKey) {
       fetchPage();
     });
     super.initState();
@@ -41,16 +42,16 @@ class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther>
 
   Future<void> fetchPage() async {
     try {
-      List<ZIMMessage> newItems = await _chatController.retrieveMessages(_commonController.userClicked.value == null ? _chatController.conv.value.conversationID : _commonController.userClicked.value!.id!);
-      final isLastPage = newItems.length < 50;
+      List<ZIMMessage> newItems = await _chatController.retrieveMessages(_commonController.userClicked.value == null ? _chatController.conv.value.conversationID : _commonController.userClicked.value!.id!, _chatController.lastItem.value);
+      final isLastPage = newItems.length < 10;
       if (isLastPage) {
-        _chatController.chatPagingController.value.appendLastPage(newItems);
+        pagingController.appendLastPage(newItems);
       } else {
         final nextPageKey = pageKey++;
-        _chatController.chatPagingController.value.appendPage(newItems, nextPageKey);
+        pagingController.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
-      _chatController.chatPagingController.value.error = error;
+      pagingController.error = error;
     }
   }
 
@@ -185,7 +186,7 @@ class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther>
                     .sendPeerMessage(textMessage, _commonController.userClicked.value == null ? _chatController.conv.value.conversationID :_commonController.userClicked.value!.id!, sendConfig)
                     .then((value) {
                   setState(() {
-                    _chatController.chatPagingController.value.itemList!.insert(0, value.message);
+                    pagingController.itemList!.insert(0, value.message);
                     _textMessageController.clear();
                   });
                 })
@@ -221,7 +222,6 @@ class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther>
     );
   }
 
-
   MediaQuery buildListChat(BuildContext context) {
     return MediaQuery.removePadding(
             context: context,
@@ -229,29 +229,119 @@ class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther>
             removeBottom: true,
             child: Expanded(
               child: SafeArea(
-                child: PagedListView(
+                child: PagedListView.separated(
                   shrinkWrap: true,
                   reverse: true,
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  pagingController: _chatController.chatPagingController.value,
+                  pagingController: pagingController,
                   builderDelegate: PagedChildBuilderDelegate<ZIMMessage>(itemBuilder: (context, item, index) => buildChatTile(context, index, item as ZIMTextMessage)),
+                  separatorBuilder: (BuildContext context, int index) {
+                    return calculateSeparator(index);
+                  },
                 ),
               ),
             ),
           );
   }
 
+  Widget calculateSeparator(int index) {
+       if(index > 0  && DateTime.fromMillisecondsSinceEpoch(pagingController.itemList![index - 1].timestamp).isAfter(DateTime.fromMillisecondsSinceEpoch(pagingController.itemList![index].timestamp + (86400000 * 3)))){
+      return buildDateTile(DateFormat("dd/MM/yy").format(DateTime.fromMillisecondsSinceEpoch(pagingController.itemList![index - 1].timestamp)));
+    }
+    else if(index > 0  && DateTime.fromMillisecondsSinceEpoch(pagingController.itemList![index - 1].timestamp).isAfter(DateTime.fromMillisecondsSinceEpoch(pagingController.itemList![index].timestamp + (86400000 * 2)))){
+      return buildDateTile("YESTERDAY");
+    }
+    else if(index > 0  && DateTime.fromMillisecondsSinceEpoch(pagingController.itemList![index - 1].timestamp).isAfter(DateTime.fromMillisecondsSinceEpoch(pagingController.itemList![index].timestamp + (86400000 * 1)))){return buildDateTile("TODAY");}
+    else {return Container();}
+  }
+
+  Widget calculateSeparatorHeader(int index) {
+    if(DateTime.fromMillisecondsSinceEpoch(DateTime.now().millisecondsSinceEpoch).isAfter(DateTime.fromMillisecondsSinceEpoch(pagingController.itemList![index].timestamp + (86400000 * 3)))){
+      return buildDateTile(DateFormat("dd/MM/yy").format(DateTime.fromMillisecondsSinceEpoch(pagingController.itemList![index - 1].timestamp)));
+    }
+    else if(DateTime.fromMillisecondsSinceEpoch(DateTime.now().millisecondsSinceEpoch).isAfter(DateTime.fromMillisecondsSinceEpoch(pagingController.itemList![index].timestamp + (86400000 * 2)))){
+      return buildDateTile("YESTERDAY");
+    }
+    else if(DateTime.fromMillisecondsSinceEpoch(DateTime.now().millisecondsSinceEpoch).isAfter(DateTime.fromMillisecondsSinceEpoch(pagingController.itemList![index].timestamp + (86400000 * 1)))){return buildDateTile("TODAY");}
+    else {return Container();}
+  }
 
   Widget buildChatTile(BuildContext context, int index, ZIMTextMessage item){
-    return Align(alignment: item.senderUserID != _homeController.userMe.value.id! ? Alignment.centerLeft : Alignment.centerRight,
+    return pagingController.itemList!.length == index + 1 ?
+        Column(children: [
+          calculateSeparatorHeader(index),
+        Align(alignment: item.senderUserID != _homeController.userMe.value.id! ? Alignment.centerLeft : Alignment.centerRight,
+          child:  item.senderUserID != _homeController.userMe.value.id! ?
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 40, height: 40, fit: BoxFit.cover,),
+              ),
+              const SizedBox(width: 8,),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 80.0,top: 8, bottom: 8),
+                  child: Container(
+                    padding:  const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
+                        gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF102437), Color(0xFF13171B)]),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            offset: const Offset(0.0, 0.01), //(x,y)
+                            blurRadius: Get.isDarkMode ? 0.25 : 0,
+                          ),
+                        ]
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(item.message, textAlign: TextAlign.start,style: const TextStyle(color: Colors.white, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 15),),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Text(DateFormat("hh:mm a").format(DateTime.fromMillisecondsSinceEpoch(item.timestamp)),textAlign: TextAlign.end, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),),
+                        )
+                      ],),
+                  ),
+                ),
+              ),
+            ],
+          ):
+          Padding(
+            padding: const EdgeInsets.only(left: 80.0, right: 16, top: 8, bottom: 8),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), bottomRight: Radius.circular(10), bottomLeft: Radius.circular(10), topRight: Radius.circular(10)),
+                gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFFFFFF), Color(0xFFFFFFFF)]),
+                boxShadow: [BoxShadow(
+                  color: Colors.grey,
+                  offset: Offset(0.0, Get.isDarkMode ? 0 : 0.01), //(x,y)
+                  blurRadius: Get.isDarkMode ? 0 : 0.25,
+                ),],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(item.message, textAlign: TextAlign.start, style: const TextStyle(color: Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 15),),
+                  Padding(padding: const EdgeInsets.only(top: 4.0, left: 0), child: Text(DateFormat("hh:mm a").format(DateTime.fromMillisecondsSinceEpoch(item.timestamp)), textAlign: TextAlign.end, style: TextStyle(color: Colors.black.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),),)
+                ],),
+            ),
+          )
+        )
+        ],)
+        : Align(alignment: item.senderUserID != _homeController.userMe.value.id! ? Alignment.centerLeft : Alignment.centerRight,
         child:  item.senderUserID != _homeController.userMe.value.id! ?
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
+            (pagingController.itemList![index + 1].senderUserID != pagingController.itemList![index].senderUserID) ? Padding(
               padding: const EdgeInsets.only(left: 16.0),
               child: Image.network("https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 40, height: 40, fit: BoxFit.cover,),
-            ),
+            ) : const SizedBox(width: 56,),
             const SizedBox(width: 8,),
             Flexible(
               child: Padding(
@@ -275,7 +365,7 @@ class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther>
                       Text(item.message, textAlign: TextAlign.start,style: const TextStyle(color: Colors.white, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 15),),
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
-                      child: Text("12:23",textAlign: TextAlign.end, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),),
+                      child: Text(DateFormat("hh:mm a").format(DateTime.fromMillisecondsSinceEpoch(item.timestamp)),textAlign: TextAlign.end, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),),
                     )
                   ],),
                 ),
@@ -300,13 +390,30 @@ class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther>
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(item.message, textAlign: TextAlign.start, style: const TextStyle(color: Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 15),),
-                Padding(padding: const EdgeInsets.only(top: 4.0, left: 0), child: Text("12:23", textAlign: TextAlign.end, style: TextStyle(color: Colors.black.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),),)
+                Padding(padding: const EdgeInsets.only(top: 4.0, left: 0), child: Text(DateFormat("hh:mm a").format(DateTime.fromMillisecondsSinceEpoch(item.timestamp)), textAlign: TextAlign.end, style: TextStyle(color: Colors.black.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),),)
               ],),
           ),
         )
     ) ;
-
   }
+
+  Widget buildDateTile(String date){
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 14),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(child: Container(color: const Color(0XFFF2F2F2), height: 0.1,)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18.0),
+            child: Text(date, style: const TextStyle(color: Color(0XFF828282), fontSize: 14, fontFamily: "Gilroy", fontWeight: FontWeight.w600),),
+          ),
+          Flexible(child: Container( color: const Color(0XFFF2F2F2), height: 0.1,)),
+        ],
+      ),
+    );
+  }
+
   clearUnReadMessage() {
     ZIM.getInstance()!.clearConversationUnreadMessageCount(
         _commonController.userClicked.value == null ? _chatController.conv.value.conversationID : _commonController.userClicked.value!.id!, ZIMConversationType.peer);
@@ -314,8 +421,7 @@ class _DetailedMessageScreenOtherState extends State<DetailedMessageScreenOther>
 
   @override
   void dispose() {
-    clearUnReadMessage();
-    //_chatController.chatPagingController.value.dispose();
+    pagingController.dispose();
     super.dispose();
   }
 

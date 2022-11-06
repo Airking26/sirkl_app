@@ -19,11 +19,13 @@ class ChatsController extends GetxController{
   final _chatsService = ChatsService();
   final _homeService = HomeService();
 
-  Rx<PagingController<int, ZIMMessage>> chatPagingController = PagingController<int, ZIMMessage>(firstPageKey: 0).obs;
+  //Rx<PagingController<int, ZIMMessage>> chatPagingController = PagingController<int, ZIMMessage>(firstPageKey: 0).obs;
   var index = 0.obs;
   var searchIsActive = false.obs;
   var chipsList = <User>[].obs;
   var conv = ZIMConversation().obs;
+  Rx<ZIMMessage?> lastItem = (null as ZIMMessage?).obs;
+  Rx<ZIMConversation?> lastConv = (null as ZIMConversation?).obs;
 
   createInbox(InboxCreationDto inboxCreationDto) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
@@ -57,23 +59,40 @@ class ChatsController extends GetxController{
     }
   }
 
-  retrieveMessages(String convID) async{
+  retrieveMessages(String convID, ZIMMessage? zimMessage) async{
     ZIMMessageQueryConfig config = ZIMMessageQueryConfig();
-    config.nextMessage = null;
-    config.count = 50;
+    config.nextMessage = zimMessage;
+    config.count = 10;
     config.reverse = true;
     return await ZIM.getInstance()!.queryHistoryMessage(convID, ZIMConversationType.peer, config).then((value){
+          lastItem.value = value.messageList.reversed.toList().last;
           return value.messageList.reversed.toList();
     }).catchError((onError) {
     });
   }
 
-  retrieveChats() async{
-    ZIMConversationQueryConfig config = ZIMConversationQueryConfig();
-    config.count = 12;
-    config.nextConversation = null;
-    return await ZIM.getInstance()!.queryConversationList(config).then((value) {
-      return value.conversationList;
+  retrieveChats(ZIMConversation? zimConversation) async{
+    var list = [];
+    ZIMConversationQueryConfig conversationQueryConfig = ZIMConversationQueryConfig();
+    conversationQueryConfig.count = 9;
+    conversationQueryConfig.nextConversation = zimConversation;
+    ZIMUserInfoQueryConfig userInfoQueryConfig = ZIMUserInfoQueryConfig();
+    userInfoQueryConfig.isQueryFromServer = true;
+    return await ZIM.getInstance()!.queryConversationList(conversationQueryConfig).then((value) async {
+      if(value.conversationList.isNotEmpty){
+      var queryUsersInfos = await ZIM.getInstance()!.queryUsersInfo(value.conversationList.map((e) => e.conversationID).toList(), userInfoQueryConfig);
+      list = value.conversationList;
+      for (var e in queryUsersInfos.userList) {
+        var index = list.indexWhere((element) => element.conversationID == e.baseInfo.userID);
+        list[index].conversationAvatarUrl = e.userAvatarUrl;
+        list[index].conversationName = e.baseInfo.userName;
+        lastConv.value = list.last;
+      }
+      return list;
+      } else {
+        return list;
+      }
     });
   }
+
 }
