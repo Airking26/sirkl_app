@@ -1,70 +1,222 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ui/flutter_chat_ui.dart';
-import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:intl/intl.dart';
+import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/inbox_creation_dto.dart';
+import 'package:sirkl/common/model/inbox_modification_dto.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:tiny_avatar/tiny_avatar.dart';
+import 'package:zego_zim/zego_zim.dart';
 
+import '../../interface/ZIMEventHandlerManager.dart';
+import '../../utils.dart';
+import '../dialog/custom_dial.dart';
 
-import '../bubble/bubble.dart';
-
-
-class DetailedMessageScreen extends StatefulWidget {
-  const DetailedMessageScreen({Key? key}) : super(key: key);
+class DetailedMessageScreenOther extends StatefulWidget {
+  const DetailedMessageScreenOther({Key? key}) : super(key: key);
 
   @override
-  State<DetailedMessageScreen> createState() => _DetailedMessageScreenState();
+  State<DetailedMessageScreenOther> createState() =>
+      _DetailedMessageScreenOtherState();
 }
 
-class _DetailedMessageScreenState extends State<DetailedMessageScreen> {
-  final List<types.Message> _messages = [];
-  final _user = const types.User(id: '82091008-a484-4a89-ae75-a22bf8d6f3a');
-  final controller = TextEditingController();
+class _DetailedMessageScreenOtherState
+    extends State<DetailedMessageScreenOther> {
+  final utils = Utils();
+  YYDialog dialogMenu = YYDialog();
+  final _commonController = Get.put(CommonController());
+  final _chatController = Get.put(ChatsController());
+  final _homeController = Get.put(HomeController());
+  final _textMessageController = TextEditingController();
+  final PagingController<int, ZIMMessage> pagingController =
+      PagingController(firstPageKey: 0);
+  static var pageKey = 0;
+
+  @override
+  void initState() {
+    _chatController.clearUnreadMessages(
+        _commonController.userClicked.value == null
+            ? _commonController.inboxClicked.value.ownedBy!.first.id!
+            : _commonController.userClicked.value!.id!);
+    _commonController.userClicked.value == null
+        ? _commonController.inboxClicked.value.ownedBy!.first.isInFollowing!
+        : _commonController.userClickedFollowStatus.value =
+            _commonController.userClicked.value!.isInFollowing!;
+    ZIMEventHandlerManager.loadingEventHandler(pagingController);
+    _chatController.lastItem.value = null;
+    pagingController.addPageRequestListener((pageKey) {
+      fetchPage();
+    });
+    super.initState();
+  }
+
+  Future<void> fetchPage() async {
+    try {
+      List<ZIMMessage> newItems = await _chatController.retrieveMessages(
+          _commonController.userClicked.value == null
+              ? _commonController.inboxClicked.value.ownedBy!.first.id!
+              : _commonController.userClicked.value!.id!,
+          _chatController.lastItem.value);
+      final isLastPage = newItems.length < 10;
+      if (isLastPage) {
+        pagingController.appendLastPage(newItems);
+      } else {
+        final nextPageKey = pageKey++;
+        pagingController.appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      pagingController.error = error;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Chat(
-        theme: DefaultChatTheme(backgroundColor: Color.fromARGB(255, 247, 253, 255), 
-            sentMessageBodyTextStyle: TextStyle(color: Colors.black, fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500),
-        deliveredIcon: Image.asset("assets/images/plus.png", color: Colors.amber,),
-        seenIcon: Image.asset("assets/images/plus.png", color: Colors.amber,),
-        sendingIcon: Image.asset("assets/images/plus.png", color: Colors.amber,),),
-        customBottomWidget: buildBottomBar(),
-        showUserAvatars: true,
-        showUserNames: true,
-        bubbleBuilder: _bubbleBuilder,
-        messages: _messages,
-        onSendPressed: (message){},
-        user: _user,
+        backgroundColor: Get.isDarkMode
+            ? const Color(0xFF102437)
+            : const Color.fromARGB(255, 247, 253, 255),
+        body: Column(
+          children: [
+            buildAppbar(context),
+            buildListChat(context),
+            buildBottomBar()
+          ],
+        ));
+  }
+
+  Container buildAppbar(BuildContext context) {
+    return Container(
+      height: 115,
+      margin: const EdgeInsets.only(bottom: 0.25),
+      decoration: BoxDecoration(
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.grey,
+            offset: Offset(0.0, 0.01), //(x,y)
+            blurRadius: 0.01,
+          ),
+        ],
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(35)),
+        gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
+              Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+            ]),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 44.0),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: 250,
+                height: 50,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          Get.back();
+                        },
+                        icon: Image.asset(
+                          "assets/images/arrow_left.png",
+                          color: Get.isDarkMode ? Colors.white : Colors.black,
+                        )),
+                    InkWell(
+                      onTap: () {
+                        _commonController.userClicked.value == null ? _commonController.userClicked.value = _commonController.inboxClicked.value.ownedBy!.first : _commonController.userClicked.value = _commonController.userClicked.value;
+                        Get.to(() => const ProfileElseScreen());
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(90),
+                            child:
+                                _commonController.userClicked.value == null ?
+                                _commonController.inboxClicked.value.ownedBy!.first.picture == null ?
+                                TinyAvatar(baseString: _commonController.inboxClicked.value.ownedBy!.first.wallet!, dimension: 40, circular: true, colourScheme: _commonController.inboxClicked.value.ownedBy!.first.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)
+                                    :CachedNetworkImage(
+                                  imageUrl: _commonController.inboxClicked.value.ownedBy!.first.picture!,
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                ) :
+                                    _commonController.userClicked.value!.picture == null ?
+                                    TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 40, circular: true, colourScheme: _commonController.userClicked.value!.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
+                                    CachedNetworkImage(
+                              imageUrl: _commonController.userClicked.value!.picture!,
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            )
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Get.to(() => const ProfileElseScreen());
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              _commonController.userClicked.value == null
+                                  ? _commonController.inboxClicked.value
+                                          .ownedBy!.first.userName.isNullOrBlank! ?
+                                      "${_commonController.inboxClicked.value
+                                          .ownedBy!.first.wallet!.substring(0,15)}..." : _commonController.inboxClicked.value
+                                  .ownedBy!.first.userName!
+                                  : _commonController
+                                          .userClicked.value!.userName.isNullOrBlank! ?
+                                      "${_commonController
+                                          .userClicked.value!.wallet!.substring(0, 15)}..." : _commonController
+                                  .userClicked.value!.userName!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: "Gilroy",
+                                  color: Get.isDarkMode
+                                      ? Colors.white
+                                      : Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              IconButton(
+                  onPressed: () {
+                    dialogMenu = dialogPopMenu(context);
+                  },
+                  icon: Image.asset(
+                    "assets/images/more.png",
+                    color: Get.isDarkMode ? Colors.white : Colors.black,
+                  )),
+            ],
+          ),
+        ),
       ),
     );
   }
-
-  /*void _handleImageSelection() async {
-    final result = await ImagePicker().pickImage(
-      imageQuality: 70,
-      maxWidth: 1440,
-      source: ImageSource.gallery,
-    );
-
-    if (result != null) {
-      final bytes = await result.readAsBytes();
-      final image = await decodeImageFromList(bytes);
-
-      final message = types.ImageMessage(
-        author: _user,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        height: image.height.toDouble(),
-        id: "3R3RF3RFD3F4G4GG4",
-        name: result.name,
-        size: bytes.length,
-        uri: result.path,
-        width: image.width.toDouble(),
-      );
-
-      _addMessage(message);
-    }
-  }*/
 
   Container buildBottomBar() {
     return Container(
@@ -79,14 +231,14 @@ class _DetailedMessageScreenState extends State<DetailedMessageScreen> {
               Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
             ]),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+      padding: const EdgeInsets.all(24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Flexible(
             flex: 3,
             child: TextField(
-              controller: controller,
+              controller: _textMessageController,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -95,9 +247,7 @@ class _DetailedMessageScreenState extends State<DetailedMessageScreen> {
                         ? const Color(0xff9BA0A5)
                         : const Color(0xFF828282),
                   ),
-                  onPressed: () {
-                   // _handleImageSelection();
-                  },
+                  onPressed: () {},
                 ),
                 hintText: con.writeHereRes.tr,
                 hintStyle: TextStyle(
@@ -108,8 +258,9 @@ class _DetailedMessageScreenState extends State<DetailedMessageScreen> {
                         ? const Color(0xff9BA0A5)
                         : const Color(0xFF828282)),
                 filled: true,
-                fillColor:
-                Get.isDarkMode ? const Color(0xFF2D465E) : const Color(0xFFF2F2F2),
+                fillColor: Get.isDarkMode
+                    ? const Color(0xFF2D465E)
+                    : const Color(0xFFF2F2F2),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide.none),
@@ -118,15 +269,50 @@ class _DetailedMessageScreenState extends State<DetailedMessageScreen> {
           ),
           Flexible(
             child: InkWell(
-              onTap: (){
-                final textMessage = types.TextMessage(
-                  author: _user,
-                  createdAt: DateTime.now().millisecondsSinceEpoch,
-                  id: 'fj324FFZ2342DZ23E3D33DDD3D2E2',
-                  text: controller.text,
-                );
-                _handleSendPressed(textMessage);
-                },
+              onTap: () async {
+                ZIMTextMessage textMessage = ZIMTextMessage(message: _textMessageController.text);
+                ZIMMessageSendConfig sendConfig = ZIMMessageSendConfig();
+                if (pagingController.itemList!.isEmpty) {
+                  await _chatController.createInbox(InboxCreationDto(
+                      lastMessage: textMessage.message,
+                      updatedAt: DateTime.now(),
+                      lastSender: _homeController.id.value,
+                      unreadMessages: 1,
+                      ownedBy: [
+                        _homeController.id.value,
+                        _commonController.userClicked.value!.id!
+                      ]));
+                }
+                else {
+                  await _chatController.modifyInbox(
+                      _commonController.inboxClicked.value.id!,
+                      InboxModificationDto(
+                          lastMessage: textMessage.message,
+                          lastSender: _homeController.id.value,
+                          unreadMessages: 1));
+                }
+                await ZIM
+                    .getInstance()!
+                    .sendPeerMessage(
+                        textMessage,
+                        _commonController.userClicked.value == null
+                            ? _commonController
+                                .inboxClicked.value.ownedBy!.first.id!
+                            : _commonController.userClicked.value!.id!,
+                        sendConfig)
+                    .then((value) {
+                  setState(() {
+                    pagingController.itemList!.insert(0, value.message);
+                    _textMessageController.clear();
+                  });
+                }).catchError((onError) {
+                  switch (onError.runtimeType) {
+                    case PlatformException:
+                      break;
+                    default:
+                  }
+                });
+              },
               child: Container(
                 width: 55,
                 height: 55,
@@ -151,48 +337,535 @@ class _DetailedMessageScreenState extends State<DetailedMessageScreen> {
     );
   }
 
-  void _handleMessageTap(BuildContext _, types.Message message) async {
-    if (message is types.FileMessage) {
-      //await OpenFile.open(message.uri);
+  MediaQuery buildListChat(BuildContext context) {
+    return MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      removeBottom: true,
+      child: Expanded(
+        child: SafeArea(
+          child: PagedListView.separated(
+            shrinkWrap: true,
+            reverse: true,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            pagingController: pagingController,
+            builderDelegate: PagedChildBuilderDelegate<ZIMMessage>(
+                itemBuilder: (context, item, index) =>
+                    buildChatTile(context, index, item as ZIMTextMessage)),
+            separatorBuilder: (BuildContext context, int index) {
+              return calculateSeparator(index);
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget calculateSeparator(int index) {
+    if (index > 0 &&
+        DateTime.fromMillisecondsSinceEpoch(
+                pagingController.itemList![index - 1].timestamp)
+            .isAfter(DateTime.fromMillisecondsSinceEpoch(
+                pagingController.itemList![index].timestamp +
+                    (86400000 * 3)))) {
+      return buildDateTile(DateFormat("dd/MM/yy").format(
+          DateTime.fromMillisecondsSinceEpoch(
+              pagingController.itemList![index - 1].timestamp)));
+    } else if (index > 0 &&
+        DateTime.fromMillisecondsSinceEpoch(
+                pagingController.itemList![index - 1].timestamp)
+            .isAfter(DateTime.fromMillisecondsSinceEpoch(
+                pagingController.itemList![index].timestamp +
+                    (86400000 * 2)))) {
+      return buildDateTile("YESTERDAY");
+    } else if (index > 0 &&
+        DateTime.fromMillisecondsSinceEpoch(
+                pagingController.itemList![index - 1].timestamp)
+            .isAfter(DateTime.fromMillisecondsSinceEpoch(
+                pagingController.itemList![index].timestamp +
+                    (86400000 * 1)))) {
+      return buildDateTile("TODAY");
+    } else {
+      return Container();
     }
   }
 
-  void _addMessage(types.Message message) {
-    setState(() {
-      _messages.insert(0, message);
-    });
+  Widget calculateSeparatorHeader(int index) {
+    if (DateTime.fromMillisecondsSinceEpoch(
+            DateTime.now().millisecondsSinceEpoch)
+        .isAfter(DateTime.fromMillisecondsSinceEpoch(
+            pagingController.itemList![index].timestamp + (86400000 * 2)))) {
+      return buildDateTile(DateFormat("dd/MM/yy").format(
+          DateTime.fromMillisecondsSinceEpoch(
+              pagingController.itemList![index - 1].timestamp)));
+    } else if (DateTime.fromMillisecondsSinceEpoch(
+            DateTime.now().millisecondsSinceEpoch)
+        .isAfter(DateTime.fromMillisecondsSinceEpoch(
+            pagingController.itemList![index].timestamp + (86400000 * 1)))) {
+      return buildDateTile("YESTERDAY");
+    } else if (DateTime.fromMillisecondsSinceEpoch(
+            DateTime.now().millisecondsSinceEpoch)
+        .isAfter(DateTime.fromMillisecondsSinceEpoch(
+            pagingController.itemList![index].timestamp))) {
+      return buildDateTile("TODAY");
+    } else {
+      return Container();
+    }
   }
 
-  void _handleSendPressed(types.TextMessage message) {
-    final textMessage = types.TextMessage(
-      author: _user,
-      createdAt: DateTime.now().millisecondsSinceEpoch,
-      id: 'fj324FFZ2342DZ23E3D33DDD3D2E2',
-      text: message.text,
+  Widget buildChatTile(BuildContext context, int index, ZIMTextMessage item) {
+    return pagingController.itemList!.length == index + 1
+        ? Column(
+            children: [
+              calculateSeparatorHeader(index),
+              Align(
+                  alignment:
+                      item.senderUserID != _homeController.userMe.value.id!
+                          ? Alignment.centerLeft
+                          : Alignment.centerRight,
+                  child: item.senderUserID != _homeController.userMe.value.id!
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 16.0, top: 8),
+                              child:
+                              _commonController.userClicked.value == null ?
+                              _commonController.inboxClicked.value.ownedBy!.first.picture == null ?
+                              TinyAvatar(baseString: _commonController.inboxClicked.value.ownedBy!.first.wallet!, dimension: 60, circular: true, colourScheme: _commonController.inboxClicked.value.ownedBy!.first.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)
+                                  :ClipRRect(
+                                borderRadius: BorderRadius.circular(90),
+                                    child: CachedNetworkImage(
+                                imageUrl: _commonController.inboxClicked.value.ownedBy!.first.picture!,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                              ),
+                                  ) :
+                              _commonController.userClicked.value!.picture == null ?
+                              TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 60, circular: true, colourScheme: _commonController.userClicked.value!.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(90),
+                                child: CachedNetworkImage(
+                                  imageUrl: _commonController.userClicked.value!.picture!,
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            Flexible(
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    right: 80.0, top: 8, bottom: 8),
+                                child: Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.only(
+                                          topRight: Radius.circular(10),
+                                          bottomRight: Radius.circular(10),
+                                          bottomLeft: Radius.circular(10)),
+                                      gradient: const LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Color(0xFF102437),
+                                            Color(0xFF13171B)
+                                          ]),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey,
+                                          offset:
+                                              const Offset(0.0, 0.01), //(x,y)
+                                          blurRadius: Get.isDarkMode ? 0.25 : 0,
+                                        ),
+                                      ]),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        item.message,
+                                        textAlign: TextAlign.start,
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: "Gilroy",
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 4.0),
+                                        child: Text(
+                                          DateFormat("hh:mm a").format(DateTime
+                                              .fromMillisecondsSinceEpoch(
+                                                  item.timestamp)),
+                                          textAlign: TextAlign.end,
+                                          style: TextStyle(
+                                              color:
+                                                  Colors.white.withOpacity(0.5),
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w600,
+                                              fontFamily: "Gilroy"),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.only(
+                              left: 80.0, right: 16, top: 8, bottom: 8),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  bottomRight: Radius.circular(10),
+                                  bottomLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10)),
+                              gradient: const LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color(0xFFFFFFFF),
+                                    Color(0xFFFFFFFF)
+                                  ]),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                  offset: Offset(
+                                      0.0, Get.isDarkMode ? 0 : 0.01), //(x,y)
+                                  blurRadius: Get.isDarkMode ? 0 : 0.25,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  item.message,
+                                  textAlign: TextAlign.start,
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: "Gilroy",
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 4.0, left: 0),
+                                  child: Text(
+                                    DateFormat("hh:mm a").format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            item.timestamp)),
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                        color: Colors.black.withOpacity(0.5),
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: "Gilroy"),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ))
+            ],
+          )
+        : Align(
+            alignment: item.senderUserID != _homeController.userMe.value.id!
+                ? Alignment.centerLeft
+                : Alignment.centerRight,
+            child: item.senderUserID != _homeController.userMe.value.id!
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      (pagingController.itemList![index + 1].senderUserID !=
+                              pagingController.itemList![index].senderUserID)
+                          ? Padding(
+                              padding: const EdgeInsets.only(left: 16.0, top: 8),
+                              child:
+                              _commonController.userClicked.value == null ?
+                              _commonController.inboxClicked.value.ownedBy!.first.picture == null ?
+                              TinyAvatar(baseString: _commonController.inboxClicked.value.ownedBy!.first.wallet!, dimension: 40, circular: true, colourScheme: _commonController.inboxClicked.value.ownedBy!.first.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)
+                                  :ClipRRect(
+                                borderRadius: BorderRadius.circular(90),
+                                    child: CachedNetworkImage(
+                                imageUrl: _commonController.inboxClicked.value.ownedBy!.first.picture!,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                              ),
+                                  ) :
+                              _commonController.userClicked.value!.picture == null ?
+                              TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 40, circular: true, colourScheme: _commonController.userClicked.value!.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(90),
+                                child: CachedNetworkImage(
+                                  imageUrl: _commonController.userClicked.value!.picture!,
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            )
+                          : const SizedBox(
+                              width: 56,
+                            ),
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              right: 80.0, top: 8, bottom: 8),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.only(
+                                    topRight: Radius.circular(10),
+                                    bottomRight: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10)),
+                                gradient: const LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xFF102437),
+                                      Color(0xFF13171B)
+                                    ]),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    offset: const Offset(0.0, 0.01), //(x,y)
+                                    blurRadius: Get.isDarkMode ? 0.25 : 0,
+                                  ),
+                                ]),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  item.message,
+                                  textAlign: TextAlign.start,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "Gilroy",
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4.0),
+                                  child: Text(
+                                    DateFormat("hh:mm a").format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            item.timestamp)),
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                        color: Colors.white.withOpacity(0.5),
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: "Gilroy"),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(
+                        left: 80.0, right: 16, top: 8, bottom: 8),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            bottomRight: Radius.circular(10),
+                            bottomLeft: Radius.circular(10),
+                            topRight: Radius.circular(10)),
+                        gradient: const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Color(0xFFFFFFFF), Color(0xFFFFFFFF)]),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            offset:
+                                Offset(0.0, Get.isDarkMode ? 0 : 0.01), //(x,y)
+                            blurRadius: Get.isDarkMode ? 0 : 0.25,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            item.message,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontFamily: "Gilroy",
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0, left: 0),
+                            child: Text(
+                              DateFormat("hh:mm a").format(
+                                  DateTime.fromMillisecondsSinceEpoch(
+                                      item.timestamp)),
+                              textAlign: TextAlign.end,
+                              style: TextStyle(
+                                  color: Colors.black.withOpacity(0.5),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: "Gilroy"),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ));
+  }
+
+  Widget buildDateTile(String date) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 14),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
+              child: Container(
+            color: const Color(0XFFF2F2F2),
+            height: 0.1,
+          )),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18.0),
+            child: Text(
+              date,
+              style: const TextStyle(
+                  color: Color(0XFF828282),
+                  fontSize: 14,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w600),
+            ),
+          ),
+          Flexible(
+              child: Container(
+            color: const Color(0XFFF2F2F2),
+            height: 0.1,
+          )),
+        ],
+      ),
     );
-
-    _addMessage(textMessage);
   }
 
-  Widget _bubbleBuilder(
-      Widget child, {
-        required message,
-        required nextMessageInGroup,
-      }) =>
-      Bubble(
-        child: child,
-        radius: Radius.circular(15),
-        color: _user.id != message.author.id ||
-            message.type == types.MessageType.image
-            ? const Color(0xff102437)
-            : const Color(0xffffffff),
-        margin: nextMessageInGroup
-            ? const BubbleEdges.symmetric(horizontal: 6)
-            : null,
-        nip: nextMessageInGroup
-            ? BubbleNip.no
-            : _user.id != message.author.id
-            ? BubbleNip.leftBottom
-            : BubbleNip.no,
-      );
+  YYDialog dialogPopMenu(BuildContext context) {
+    return YYDialog().build(context)
+      ..width = 180
+      ..borderRadius = 10.0
+      ..gravity = Gravity.rightTop
+      ..barrierColor =
+          Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor =
+          Get.isDarkMode ? Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..margin = const EdgeInsets.only(top: 90, right: 20)
+      ..widget(InkWell(
+        onTap: () async {
+          dialogMenu.dismiss();
+          if (_commonController.userClickedFollowStatus.value) {
+            if (await _commonController
+                .removeUserToSirkl(_commonController.userClicked.value!.id!)) {
+              utils.showToast(
+                  context,
+                  con.userRemovedofSirklRes.trParams({
+                    "user": _commonController.userClicked.value!.userName.isNullOrBlank!?
+                        _commonController.userClicked.value!.wallet! : _commonController.userClicked.value!.userName!
+                  }));
+            }
+          } else {
+            if (await _commonController
+                .addUserToSirkl(_commonController.userClicked.value!.id!)) {
+              utils.showToast(
+                  context,
+                  con.userAddedToSirklRes.trParams({
+                    "user": _commonController.userClicked.value!.userName.isNullOrBlank! ?
+                        _commonController.userClicked.value!.wallet! : _commonController.userClicked.value!.userName!
+                  }));
+            }
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                _commonController.userClickedFollowStatus.value
+                    ? con.removeOfMySirklRes.tr
+                    : con.addToMySirklRes.tr,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Get.isDarkMode
+                        ? const Color(0xff9BA0A5)
+                        : const Color(0xFF828282),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: () {
+          Get.to(() => const ProfileElseScreen());
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                con.profileTabRes.tr,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Get.isDarkMode
+                        ? const Color(0xff9BA0A5)
+                        : const Color(0xFF828282),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: () {},
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                con.reportRes.tr,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Get.isDarkMode
+                        ? const Color(0xff9BA0A5)
+                        : const Color(0xFF828282),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..show();
+  }
+
+  @override
+  void dispose() {
+    pagingController.dispose();
+    super.dispose();
+  }
 }

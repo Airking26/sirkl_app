@@ -1,13 +1,11 @@
 import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:hive/hive.dart';
-import 'package:sirkl/common/model/db/collection_dto.dart';
+import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/moralis_metadata_dto.dart';
 import 'package:sirkl/common/model/moralis_nft_contract_addresse.dart';
 import 'package:sirkl/common/model/moralis_root_dto.dart';
@@ -80,10 +78,7 @@ class HomeController extends GetxController{
       }
     });
 
-    connector.on('session_request', (payload) {
-      var i = payload;
-      var k = "";
-    });
+    connector.on('session_request', (payload) {});
 
     connector.on('disconnect', (session) {
     });
@@ -286,58 +281,6 @@ class HomeController extends GetxController{
     }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  getF() {
-    var req = _homeService.getNFTs("0x81269781E647eb0843Dc3a8fEbC55a38cE69B4eB");//userMe.value.wallet!);
-    var y = req.then((value) =>
-    value.body
-    );
-    var c = "";
-  }
-
-  getNFTs() async{
-    final db = Hive.box("collections");
-    var req = await _homeService.getNFTs(userMe.value.wallet!);//userMe.value.wallet!);
-    var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
-    var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
-    while(cursor != null){
-      var newReq = await _homeService.getNextNFTs(userMe.value.wallet!, cursor);
-      mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
-      cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
-    }
-    var groupedCollection = mainCollection.groupBy((p0) => p0!.name);
-    var nfts = [];
-
-    groupedCollection.forEach((key, value) async{
-      nfts.add(CollectionDbDto(collectionName: key ?? "", collectionImages: value.map((e) => moralisMetadataDtoFromJson(e!.metadata!).image ?? "").toList()));
-    });
-
-    await db.put("nfts", nfts);
-  }
 }
 
 extension Iterables<E> on Iterable<E> {

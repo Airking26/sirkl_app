@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/chats/service/chats_service.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/inbox_dto.dart';
+import 'package:sirkl/common/model/inbox_modification_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:zego_zim/zego_zim.dart';
@@ -19,11 +19,11 @@ class ChatsController extends GetxController{
   final _chatsService = ChatsService();
   final _homeService = HomeService();
 
-  //Rx<PagingController<int, ZIMMessage>> chatPagingController = PagingController<int, ZIMMessage>(firstPageKey: 0).obs;
   var index = 0.obs;
   var searchIsActive = false.obs;
   var chipsList = <User>[].obs;
-  var conv = ZIMConversation().obs;
+  var convList = <ZIMConversation>[].obs;
+  var searchToRefresh = true.obs;
   Rx<ZIMMessage?> lastItem = (null as ZIMMessage?).obs;
   Rx<ZIMConversation?> lastConv = (null as ZIMConversation?).obs;
 
@@ -37,6 +37,38 @@ class ChatsController extends GetxController{
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       req = await _chatsService.createInbox(accessToken, inboxCreationDtoToJson(inboxCreationDto));
+      if(req.isOk) return inboxDtoFromJson(json.encode(req.body));
+    } else if(req.isOk){
+      return inboxDtoFromJson(json.encode(req.body));
+    }
+  }
+
+  clearUnreadMessages(String id) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var req = await _chatsService.clearUnreadMessages(accessToken, id);
+    if(req.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      req = await _chatsService.clearUnreadMessages(accessToken, id);
+      if(req.isOk) return inboxDtoFromJson(json.encode(req.body));
+    } else if(req.isOk){
+      return inboxDtoFromJson(json.encode(req.body));
+    }
+  }
+
+  modifyInbox(String id, InboxModificationDto inboxModificationDto) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var req = await _chatsService.modifyInbox(accessToken, id, inboxModificationDtoToJson(inboxModificationDto));
+    if(req.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      req = await _chatsService.modifyInbox(accessToken, id, inboxModificationDtoToJson(inboxModificationDto));
       if(req.isOk) return inboxDtoFromJson(json.encode(req.body));
     } else if(req.isOk){
       return inboxDtoFromJson(json.encode(req.body));
@@ -59,13 +91,49 @@ class ChatsController extends GetxController{
     }
   }
 
+  Future<List<InboxDto>> searchInInboxes(String search) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var req = await _chatsService.searchInInboxes(accessToken, search);
+    if(req.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken!);
+      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDto.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      req = await _chatsService.searchInInboxes(accessToken, search);
+      if(req.isOk) {
+        return req.body!.map<InboxDto>((inboxDto) => inboxDtoFromJson(json.encode(inboxDto))).toList();
+      } else {
+        return [];
+      }
+    } else if(req.isOk){
+      return req.body!.map<InboxDto>((inboxDto) => inboxDtoFromJson(json.encode(inboxDto))).toList();
+    } else {
+      return [];
+    }
+  }
+  
+  bulkPeerMessages(List<InboxCreationDto> inboxCreationDto) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    //var req = await _chatsService.bulkPeerMessage(accessToken, inboxCreationDtoToJson(inboxCreationDto));
+    if(401 == 401) {
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      //req = await _chatsService.bulkPeerMessage(accessToken, inboxCreationDtoToJson(inboxCreationDto));
+    }
+  }
+
   retrieveMessages(String convID, ZIMMessage? zimMessage) async{
     ZIMMessageQueryConfig config = ZIMMessageQueryConfig();
     config.nextMessage = zimMessage;
     config.count = 10;
     config.reverse = true;
     return await ZIM.getInstance()!.queryHistoryMessage(convID, ZIMConversationType.peer, config).then((value){
-          lastItem.value = value.messageList.reversed.toList().last;
+          lastItem.value = value.messageList.isEmpty ? null : value.messageList.reversed.toList().last;
           return value.messageList.reversed.toList();
     }).catchError((onError) {
     });
@@ -88,6 +156,7 @@ class ChatsController extends GetxController{
         list[index].conversationName = e.baseInfo.userName;
         lastConv.value = list.last;
       }
+      convList.value = list as List<ZIMConversation>;
       return list;
       } else {
         return list;

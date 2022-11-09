@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sirkl/common/model/inbox_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/service/common_service.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -22,6 +23,7 @@ class CommonController extends GetxController{
   var gettingStoryAndContacts = true.obs;
   var query = "".obs;
   var queryHasChanged = false.obs;
+  var inboxClicked = InboxDto().obs;
 
   Future<bool> addUserToSirkl(String id) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
@@ -34,12 +36,18 @@ class CommonController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _commonService.addUserToSirkl(accessToken, id);
       if(request.isOk) {
+        if(!users.map((element) => element.id).contains(userFromJson(json.encode(request.body)).id)) {
+          users.add(userFromJson(json.encode(request.body)));
+        }
         userClickedFollowStatus.value = true;
         return true;
       } else {
         return false;
       }
     } else if(request.isOk) {
+      if(!users.map((element) => element.id).contains(userFromJson(json.encode(request.body)).id)) {
+        users.add(userFromJson(json.encode(request.body)));
+      }
       userClickedFollowStatus.value = true;
       return true;
     } else {
@@ -58,12 +66,18 @@ class CommonController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _commonService.removeUserToSirkl(accessToken, id);
       if(request.isOk) {
-       userClickedFollowStatus.value = false;
+        if(users.map((element) => element.id).contains(userFromJson(json.encode(request.body)).id)) {
+          users.removeWhere((e) => e.id == userFromJson(json.encode(request.body)).id);
+        }
+        userClickedFollowStatus.value = false;
        return true;
       } else {
         return false;
       }
     } else if(request.isOk) {
+      if(users.map((element) => element.id).contains(userFromJson(json.encode(request.body)).id)) {
+        users.removeWhere((e) => e.id == userFromJson(json.encode(request.body)).id);
+      }
       userClickedFollowStatus.value = false;
       return true;
     } else {
@@ -127,8 +141,7 @@ class CommonController extends GetxController{
   searchUsers(String substring, String offset) async{
       var accessToken = box.read(con.ACCESS_TOKEN);
       var refreshToken = box.read(con.REFRESH_TOKEN);
-      var request = await _commonService.searchUsers(
-          accessToken, substring, offset);
+      var request = await _commonService.searchUsers(accessToken, substring, offset);
       if (request.statusCode == 401) {
         var requestToken = await _homeService.refreshToken(refreshToken!);
         var refreshTokenDto = refreshTokenDtoFromJson(

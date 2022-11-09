@@ -85,3 +85,6 @@ const String seedPhraseGivenAtCreationRes = "seed_phrase_given_at_creation";
 const String seedPhraseCopiedRes = "seed_phrase_copied";
 const String walletCopiedRes = "wallet_copied";
 
+/// Detailed Message Screen ///
+const String profileRes = "profile";
+

@@ -2,16 +2,19 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:tiny_avatar/tiny_avatar.dart';
+import 'package:zego_zim/zego_zim.dart';
 
 import '../../common/view/dialog/custom_dial.dart';
-import '../../home/controller/home_controller.dart';
 import '../controller/chats_controller.dart';
 
 class NewMessageScreen extends StatefulWidget {
@@ -28,9 +31,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   YYDialog dialogMenu = YYDialog();
   static var _pageKey = 0;
   final PagingController<int, User> pagingController = PagingController(firstPageKey: 0);
+  final _textMessageController = TextEditingController();
 
   @override
   void initState() {
+    _chatController.searchToRefresh.value = true;
     pagingController.addPageRequestListener((pageKey) {
       if(_commonController.query.value.isNotEmpty) {
         fetchPage(_commonController.query.value, _pageKey);
@@ -47,8 +52,13 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       final newItems = await _commonController.searchUsers(query, _pageKey.toString());
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
-        if(pageKey == 0) pagingController.refresh();
-        pagingController.appendLastPage(newItems);
+        if(pageKey == 0 && _chatController.searchToRefresh.value){
+          pagingController.itemList = [];
+          _chatController.searchToRefresh.value = false;
+          pagingController.refresh();
+        } else {
+          pagingController.appendLastPage(newItems);
+        }
       } else {
         final nextPageKey = _pageKey++;
         pagingController.refresh();
@@ -182,6 +192,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           Flexible(
             flex: 3,
             child: TextField(
+              controller: _textMessageController,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -209,23 +220,42 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               ),
             ),
           ),
-          Flexible(
-            child: Container(
-              width: 55,
-              height: 55,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: const LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [Color(0xFF1DE99B), Color(0xFF0063FB)])),
-              child: Align(
-                  alignment: Alignment.center,
-                  child: Image.asset(
-                    "assets/images/send.png",
-                    height: 32,
-                    width: 32,
-                  )),
+          InkWell(
+            onTap: () {
+              ZIMTextMessage textMessage = ZIMTextMessage(message: _textMessageController.text);
+              ZIMMessageSendConfig sendConfig = ZIMMessageSendConfig();
+              _chatController.chipsList.map((element) => element.id).forEach((id) async{
+                await ZIM
+                    .getInstance()!
+                    .sendPeerMessage(textMessage, id!, sendConfig).then((value) {})
+                    .catchError((onError) {
+                  switch (onError.runtimeType) {
+                    case PlatformException:
+                      break;
+                    default:
+                  }
+                });
+              });
+              _textMessageController.clear();
+            },
+            child: Flexible(
+              child: Container(
+                width: 55,
+                height: 55,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [Color(0xFF1DE99B), Color(0xFF0063FB)])),
+                child: Align(
+                    alignment: Alignment.center,
+                    child: Image.asset(
+                      "assets/images/send.png",
+                      height: 32,
+                      width: 32,
+                    )),
+              ),
             ),
           )
         ],
@@ -306,7 +336,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               Get.to(() => const ProfileElseScreen());
             },
             child: ClipRRect(
-                borderRadius: BorderRadius.circular(90.0), child: CachedNetworkImage(imageUrl: item.picture ?? "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640", width: 60, height: 60, fit: BoxFit.cover,))),
+                borderRadius: BorderRadius.circular(90.0), child:
+            item.picture == null ?
+            SizedBox(width: 60, height: 60, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: item.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)) :
+            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,))),
         trailing: Checkbox(
           onChanged: (selected) {
             if(selected!) {
@@ -325,14 +358,16 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         ),
         title: Transform.translate(
           offset: const Offset(-8, 0),
-          child: Text(item.userName ?? item.wallet!,
+          child: Text(item.userName.isNullOrBlank! ? item.wallet! : item.userName!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                   fontSize: 18,
                   fontFamily: "Gilroy",
                   fontWeight: FontWeight.w600,
                   color: Get.isDarkMode ? Colors.white : Colors.black)),
         ),
-        subtitle: Transform.translate(
+        subtitle: !item.userName.isNullOrBlank! ? Transform.translate(
           offset: const Offset(-8, 0),
           child: Text(item.wallet!,
               maxLines: 1,
@@ -344,7 +379,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   color: Get.isDarkMode
                       ? const Color(0xFF9BA0A5)
                       : const Color(0xFF828282))),
-        ));
+        ) : null
+    );
   }
 
   Widget buildToSendChip(BuildContext context, int index) {
@@ -363,7 +399,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           },
           backgroundColor: const Color(0xFF00CB7D),
           label: Text(
-            _chatController.chipsList[index].userName ?? _chatController.chipsList[index].wallet!,
+            _chatController.chipsList[index].userName.isNullOrBlank! ? _chatController.chipsList[index].wallet! : _chatController.chipsList[index].userName!,
             style: const TextStyle(
                 fontFamily: "Gilroy",
                 fontSize: 18,
@@ -409,9 +445,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           : Colors.white,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
+        _chatController.searchToRefresh.value = true;
         _commonController.query.value = query;
         _pageKey = 0;
-        fetchPage(_commonController.query.value, _pageKey);
+        if(query.isNotEmpty) fetchPage(_commonController.query.value, _pageKey);
+        else pagingController.refresh();
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
@@ -437,7 +475,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
 
   @override
   void dispose() {
+    _chatController.searchToRefresh.value = true;
+    _chatController.chipsList.clear();
     pagingController.dispose();
+    _commonController.query.value = "";
     super.dispose();
   }
 

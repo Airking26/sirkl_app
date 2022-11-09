@@ -6,10 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/model/db/collection_dto.dart';
+import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/common/view/detailed_message/detailed_message_screen_other.dart';
+import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
 class ProfileElseScreen extends StatefulWidget {
@@ -103,7 +104,10 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                         borderRadius: BorderRadius.circular(90)),
                     child:
                         ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
-                          child: GestureDetector(onTap: (){},child: CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture ?? "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640", color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,))
+                          child: GestureDetector(onTap: (){},
+                              child:_commonController.userClicked.value!.picture == null ?
+                              TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 140, circular: true, colourScheme: _commonController.userClicked.value!.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
+                            CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture! , color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,))
                           ,),)
                   ),
                 ),

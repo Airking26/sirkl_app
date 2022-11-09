@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/view/detailed_message/detailed_message_screen_other.dart';
+import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
 
 import '../../common/utils.dart';
 import '../../common/view/dialog/custom_dial.dart';
