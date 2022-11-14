@@ -432,7 +432,7 @@ class _DetailedMessageScreenOtherState
                               child:
                               _commonController.userClicked.value == null ?
                               _commonController.inboxClicked.value.ownedBy!.first.picture == null ?
-                              TinyAvatar(baseString: _commonController.inboxClicked.value.ownedBy!.first.wallet!, dimension: 60, circular: true, colourScheme: _commonController.inboxClicked.value.ownedBy!.first.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)
+                              TinyAvatar(baseString: _commonController.inboxClicked.value.ownedBy!.first.wallet!, dimension: 60, circular: true, colourScheme: _commonController.inboxClicked.value.ownedBy!.first.wallet![_commonController.inboxClicked.value.ownedBy!.first.wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)
                                   :ClipRRect(
                                 borderRadius: BorderRadius.circular(90),
                                     child: CachedNetworkImage(
@@ -443,7 +443,7 @@ class _DetailedMessageScreenOtherState
                               ),
                                   ) :
                               _commonController.userClicked.value!.picture == null ?
-                              TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 60, circular: true, colourScheme: _commonController.userClicked.value!.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
+                              TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 60, circular: true, colourScheme: _commonController.userClicked.value!.wallet![_commonController.userClicked.value!.wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(90),
                                 child: CachedNetworkImage(
@@ -593,7 +593,7 @@ class _DetailedMessageScreenOtherState
                               child:
                               _commonController.userClicked.value == null ?
                               _commonController.inboxClicked.value.ownedBy!.first.picture == null ?
-                              TinyAvatar(baseString: _commonController.inboxClicked.value.ownedBy!.first.wallet!, dimension: 40, circular: true, colourScheme: _commonController.inboxClicked.value.ownedBy!.first.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)
+                              TinyAvatar(baseString: _commonController.inboxClicked.value.ownedBy!.first.wallet!, dimension: 40, circular: true, colourScheme: _commonController.inboxClicked.value.ownedBy!.first.wallet![_commonController.inboxClicked.value.ownedBy!.first.wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)
                                   :ClipRRect(
                                 borderRadius: BorderRadius.circular(90),
                                     child: CachedNetworkImage(
@@ -604,7 +604,7 @@ class _DetailedMessageScreenOtherState
                               ),
                                   ) :
                               _commonController.userClicked.value!.picture == null ?
-                              TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 40, circular: true, colourScheme: _commonController.userClicked.value!.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
+                              TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 40, circular: true, colourScheme: _commonController.userClicked.value!.wallet![_commonController.userClicked.value!.wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(90),
                                 child: CachedNetworkImage(

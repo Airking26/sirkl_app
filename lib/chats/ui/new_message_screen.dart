@@ -8,8 +8,10 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:zego_zim/zego_zim.dart';
@@ -27,11 +29,13 @@ class NewMessageScreen extends StatefulWidget {
 class _NewMessageScreenState extends State<NewMessageScreen> {
 
   final _chatController = Get.put(ChatsController());
+  final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
   YYDialog dialogMenu = YYDialog();
   static var _pageKey = 0;
-  final PagingController<int, User> pagingController = PagingController(firstPageKey: 0);
+  final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final _textMessageController = TextEditingController();
+  final utils = Utils();
 
   @override
   void initState() {
@@ -160,7 +164,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                                 },
                                   pagingController: pagingController,
                                   padding: const EdgeInsets.symmetric(vertical: 16),
-                                  builderDelegate: PagedChildBuilderDelegate<User>(
+                                  builderDelegate: PagedChildBuilderDelegate<UserDTO>(
                                       itemBuilder: (context, item, index) => buildNewMessageTile(context, index, item)
                                   ))
                       ),
@@ -220,41 +224,50 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               ),
             ),
           ),
-          InkWell(
-            onTap: () {
-              ZIMTextMessage textMessage = ZIMTextMessage(message: _textMessageController.text);
-              ZIMMessageSendConfig sendConfig = ZIMMessageSendConfig();
-              _chatController.chipsList.map((element) => element.id).forEach((id) async{
-                await ZIM
-                    .getInstance()!
-                    .sendPeerMessage(textMessage, id!, sendConfig).then((value) {})
-                    .catchError((onError) {
-                  switch (onError.runtimeType) {
-                    case PlatformException:
-                      break;
-                    default:
-                  }
+          Flexible(
+            child: InkWell(
+              onTap: () async {
+                await _chatController.bulkPeerMessages(_chatController.chipsList.value.map((e) => InboxCreationDto(lastMessage: _textMessageController.text, updatedAt: DateTime.now(), lastSender: _homeController.id.value, unreadMessages: 1, ownedBy: [_homeController.id.value, e.id!])).toList());
+                ZIMTextMessage textMessage = ZIMTextMessage(message: _textMessageController.text);
+                ZIMMessageSendConfig sendConfig = ZIMMessageSendConfig();
+                _chatController.chipsList.map((element) => element.id).forEach((id) async{
+                  await ZIM
+                      .getInstance()!
+                      .sendPeerMessage(textMessage, id!, sendConfig).then((value) {
+                        var f = value;
+                  })
+                      .catchError((onError) {
+                    switch (onError.runtimeType) {
+                      case PlatformException:
+                        break;
+                      default:
+                    }
+                  });
                 });
-              });
-              _textMessageController.clear();
-            },
-            child: Flexible(
-              child: Container(
-                width: 55,
-                height: 55,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: const LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [Color(0xFF1DE99B), Color(0xFF0063FB)])),
-                child: Align(
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/images/send.png",
-                      height: 32,
-                      width: 32,
-                    )),
+                _textMessageController.clear();
+                FocusManager.instance.primaryFocus?.unfocus();
+                _chatController.chipsList.clear();
+                utils.showToast(context, con.messageSuccessfullySentRes.tr);
+
+              },
+              child: Flexible(
+                child: Container(
+                  width: 55,
+                  height: 55,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: const LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [Color(0xFF1DE99B), Color(0xFF0063FB)])),
+                  child: Align(
+                      alignment: Alignment.center,
+                      child: Image.asset(
+                        "assets/images/send.png",
+                        height: 32,
+                        width: 32,
+                      )),
+                ),
               ),
             ),
           )
@@ -328,7 +341,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     );
   }
 
-  Widget buildNewMessageTile(BuildContext context, int index, User item) {
+  Widget buildNewMessageTile(BuildContext context, int index, UserDTO item) {
     return ListTile(
         leading: InkWell(
             onTap: (){
@@ -338,7 +351,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(90.0), child:
             item.picture == null ?
-            SizedBox(width: 60, height: 60, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: item.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)) :
+            SizedBox(width: 60, height: 60, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: item.wallet![item.wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)) :
             CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,))),
         trailing: Checkbox(
           onChanged: (selected) {
@@ -399,7 +412,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           },
           backgroundColor: const Color(0xFF00CB7D),
           label: Text(
-            _chatController.chipsList[index].userName.isNullOrBlank! ? _chatController.chipsList[index].wallet! : _chatController.chipsList[index].userName!,
+            _chatController.chipsList[index].userName.isNullOrBlank! ? "${_chatController.chipsList[index].wallet!.substring(0, 10)}..." : _chatController.chipsList[index].userName!,
             style: const TextStyle(
                 fontFamily: "Gilroy",
                 fontSize: 18,

@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
+import 'package:sirkl/common/view/detailed_message/detailed_message_screen_second.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:bip39/bip39.dart' as bip39;
@@ -35,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _commonController = Get.put(CommonController());
   YYDialog dialogMenu = YYDialog();
   final utils = Utils();
+
 
   @override
   void initState() {
@@ -291,10 +293,8 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.only(top: 0),
             child: SafeArea(
               child: AzListView(
-                indexBarMargin:
-                    const EdgeInsets.only(right: 8, top: 12, bottom: 12),
-                indexHintBuilder: (context, hint) {
-                  return Container(
+                indexBarMargin: const EdgeInsets.only(right: 8, top: 12, bottom: 12),
+                indexHintBuilder: (context, hint) {return Container(
                     width: 60,
                     height: 60,
                     decoration: const BoxDecoration(
@@ -306,8 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                             fontSize: 18)),
-                  );
-                },
+                  );},
                 indexBarItemHeight: MediaQuery.of(context).size.height / 50,
                 indexBarOptions: IndexBarOptions(
                     textStyle: const TextStyle(
@@ -337,6 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     indexHintAlignment: Alignment.centerRight,
                     indexHintOffset: const Offset(0, 0)),
                 padding: const EdgeInsets.only(top: 16),
+                indexBarData: const ["0", 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',],
                 data: _commonController.users,
                 itemCount: _commonController.users.length,
                 itemBuilder: buildSirklRepertoire,
@@ -358,8 +358,8 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               children: [
                 Text(
-                  _commonController.users[index].userName?[0] ??
-                      _commonController.users[index].wallet![0],
+                  _commonController.users[index].userName.isNullOrBlank! ?
+                  _commonController.users[index].wallet![0] : _commonController.users[index].userName![0],
                   softWrap: false,
                   style: TextStyle(
                       fontFamily: "Gilroy",
@@ -407,7 +407,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         baseString: _commonController.users[index].wallet!,
                         dimension: 56,
                         circular: true,
-                        colourScheme: _commonController.users[index].wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,
+                        colourScheme: _commonController.users[index].wallet![_commonController.users[index].wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,
                       ))
                   : ClipRRect(
                       borderRadius: BorderRadius.circular(90.0),
@@ -440,7 +440,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             _commonController.userClicked.value =
                                 _commonController.users[index];
-                            Get.to(() => const DetailedMessageScreenOther());
+                            Get.to(() => const DetailedMessageScreenOtherSecond());
                           },
                           child: Image.asset(
                             "assets/images/chat_tab.png",
@@ -467,8 +467,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Transform.translate(
                     offset: const Offset(-8, 0),
                     child: Text(
-                        _commonController.users[index].userName ??
-                            _commonController.users[index].wallet!,
+                        _commonController.users[index].userName.isNullOrBlank! ?
+                            _commonController.users[index].wallet! : _commonController.users[index].userName!,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -478,7 +478,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Get.isDarkMode
                                 ? Colors.white
                                 : Colors.black)))),
-            subtitle:  _commonController.users[index].userName != null ? InkWell(
+            subtitle:  !_commonController.users[index].userName.isNullOrBlank! ? InkWell(
                 onTap: () {
                   _commonController.userClicked.value =
                       _commonController.users[index];
@@ -495,7 +495,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontWeight: FontWeight.w500,
                             color: Get.isDarkMode
                                 ? const Color(0xFF9BA0A5)
-                                : const Color(0xFF828282))))) : Container(),
+                                : const Color(0xFF828282))))) : null,
           ),
           !isShowSuspension ? const SizedBox(height: 8,) : const SizedBox(height: 8,),
         ],

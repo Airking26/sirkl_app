@@ -15,11 +15,11 @@ class CommonController extends GetxController{
   final CommonService _commonService = CommonService();
   final box = GetStorage();
 
-  Rx<User?> userClicked = (null as User?).obs;
+  Rx<UserDTO?> userClicked = (null as UserDTO?).obs;
   var userClickedFollowStatus = false.obs;
   var isCardExpandedList = <int>[].obs;
   var isLoadingUsers = true.obs;
-  var users = <User>[].obs;
+  var users = <UserDTO>[].obs;
   var gettingStoryAndContacts = true.obs;
   var query = "".obs;
   var queryHasChanged = false.obs;
@@ -93,7 +93,7 @@ class CommonController extends GetxController{
     try{
       request = await _commonService.getSirklUsers(accessToken, id);
       if(request.isOk) {
-        users.value = request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
+        users.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
         users.sort((a,b){ return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());});
         users.refresh();
       } else {
@@ -107,7 +107,7 @@ class CommonController extends GetxController{
         try {
           request = await _commonService.getSirklUsers(accessToken, id);
           if(request.isOk) {
-            users.value = request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
+            users.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
             users.sort((a,b){ return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());});
             users.refresh();
           }
@@ -132,9 +132,9 @@ class CommonController extends GetxController{
       accessToken = refreshTokenDto.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _commonService.searchSirklUsers(accessToken, substring, offset);
-      if(request.isOk) return request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
+      if(request.isOk) return request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
     } else if(request.isOk){
-      return request.body!.map<User>((user) => userFromJson(json.encode(user))).toList();
+      return request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
     }
   }
 
@@ -151,11 +151,11 @@ class CommonController extends GetxController{
         request =
         await _commonService.searchUsers(accessToken, substring, offset);
         if (request.isOk) {
-          return request.body!.map<User>((user) =>
+          return request.body!.map<UserDTO>((user) =>
             userFromJson(json.encode(user))).toList();
         }
       } else if (request.isOk) {
-        return request.body!.map<User>((user) =>
+        return request.body!.map<UserDTO>((user) =>
             userFromJson(json.encode(user))).toList();
       }
   }

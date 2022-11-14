@@ -5,6 +5,9 @@ InboxCreationDto inboxCreationDtoFromJson(String str) => InboxCreationDto.fromJs
 
 String inboxCreationDtoToJson(InboxCreationDto data) => json.encode(data.toJson());
 
+List<InboxCreationDto> inboxCreationListDtoFromJson(String str) => List<InboxCreationDto>.from(json.decode(str).map((x) => InboxCreationDto.fromJson(x)));
+String inboxCreationListDtoToJson(List<InboxCreationDto> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
 class InboxCreationDto {
   InboxCreationDto({
     required this.lastMessage,

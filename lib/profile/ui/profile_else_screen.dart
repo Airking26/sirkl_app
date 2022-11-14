@@ -106,7 +106,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                         ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
                           child: GestureDetector(onTap: (){},
                               child:_commonController.userClicked.value!.picture == null ?
-                              TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 140, circular: true, colourScheme: _commonController.userClicked.value!.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
+                              TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 140, circular: true, colourScheme: _commonController.userClicked.value!.wallet![_commonController.userClicked.value!.wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
                             CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture! , color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,))
                           ,),)
                   ),

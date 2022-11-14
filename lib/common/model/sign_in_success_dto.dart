@@ -1,11 +1,12 @@
 import 'dart:convert';
 
 import 'package:azlistview/azlistview.dart';
+import 'package:get/get.dart';
 
 SignInSuccessDto signInSuccessDtoFromJson(String str) => SignInSuccessDto.fromJson(json.decode(str));
 String signInSuccessDtoToJson(SignInSuccessDto data) => json.encode(data.toJson());
-User userFromJson(String str) => User.fromJson(json.decode(str));
-String userToJson(User user) => json.encode(user.toJson());
+UserDTO userFromJson(String str) => UserDTO.fromJson(json.decode(str));
+String userToJson(UserDTO user) => json.encode(user.toJson());
 
 class SignInSuccessDto {
   SignInSuccessDto({
@@ -14,12 +15,12 @@ class SignInSuccessDto {
     this.refreshToken,
   });
 
-  User? user;
+  UserDTO? user;
   String? accessToken;
   String? refreshToken;
 
   factory SignInSuccessDto.fromJson(Map<String, dynamic> json) => SignInSuccessDto(
-    user: json["user"] == null ? null : User.fromJson(json["user"]),
+    user: json["user"] == null ? null : UserDTO.fromJson(json["user"]),
     accessToken: json["accessToken"],
     refreshToken: json["refreshToken"],
   );
@@ -31,8 +32,8 @@ class SignInSuccessDto {
   };
 }
 
-class User extends ISuspensionBean{
-  User({
+class UserDTO extends ISuspensionBean{
+  UserDTO({
     this.id,
     this.userName,
     this.picture,
@@ -58,7 +59,7 @@ class User extends ISuspensionBean{
   int? following;
   bool? isInFollowing;
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
+  factory UserDTO.fromJson(Map<String, dynamic> json) => UserDTO(
     id: json["id"],
     userName: json["userName"],
     picture: json["picture"],
@@ -87,5 +88,5 @@ class User extends ISuspensionBean{
   };
 
   @override
-  String getSuspensionTag() => userName![0];
+  String getSuspensionTag() => userName.isNullOrBlank! ? wallet![0] : userName![0];
 }

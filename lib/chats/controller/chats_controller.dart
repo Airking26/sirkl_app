@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/chats/service/chats_service.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/inbox_dto.dart';
 import 'package:sirkl/common/model/inbox_modification_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:zego_zim/zego_zim.dart';
 
@@ -21,9 +24,10 @@ class ChatsController extends GetxController{
 
   var index = 0.obs;
   var searchIsActive = false.obs;
-  var chipsList = <User>[].obs;
+  var chipsList = <UserDTO>[].obs;
   var convList = <ZIMConversation>[].obs;
   var searchToRefresh = true.obs;
+  Rx<Channel?> channel = (null as Channel?).obs;
   Rx<ZIMMessage?> lastItem = (null as ZIMMessage?).obs;
   Rx<ZIMConversation?> lastConv = (null as ZIMConversation?).obs;
 
@@ -113,17 +117,17 @@ class ChatsController extends GetxController{
     }
   }
   
-  bulkPeerMessages(List<InboxCreationDto> inboxCreationDto) async{
+  bulkPeerMessages(List<InboxCreationDto> listInboxCreationDto) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    //var req = await _chatsService.bulkPeerMessage(accessToken, inboxCreationDtoToJson(inboxCreationDto));
+    var req = await _chatsService.bulkPeerMessage(accessToken, inboxCreationListDtoToJson(listInboxCreationDto));
     if(401 == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
       var refreshTokenDTO = refreshTokenDtoFromJson(
           json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      //req = await _chatsService.bulkPeerMessage(accessToken, inboxCreationDtoToJson(inboxCreationDto));
+      req = await _chatsService.bulkPeerMessage(accessToken, inboxCreationListDtoToJson(listInboxCreationDto));
     }
   }
 
@@ -162,6 +166,23 @@ class ChatsController extends GetxController{
         return list;
       }
     });
+  }
+
+  connectChannel(Channel? channel) async {
+    await channel!.watch();
+  }
+
+  checkOrCreateChannel(HomeController homeController, CommonController commonController, StreamChatClient client, String? id) async{
+      channel.value = client.channel(
+        'try',
+        extraData: {
+          'members': [
+            id,
+            commonController.userClicked.value!.id!,
+          ],
+        },
+      );
+      await channel.value!.watch();
   }
 
 }

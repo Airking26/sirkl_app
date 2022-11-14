@@ -9,7 +9,8 @@
    <application
         android:label="sirkl"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon"
+       android:roundIcon="@mipmap/app_icon_rounded">
         <activity
             android:name=".MainActivity"
             android:exported="true"

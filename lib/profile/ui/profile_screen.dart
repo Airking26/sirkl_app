@@ -125,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
                           child: GestureDetector(onTap: (){ if(_profileController.isEditingProfile.value) _profileController.getImage();},
                               child: _profileController.urlPicture.value.isEmpty ?
-                                   TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 140, circular: true, colourScheme: _homeController.userMe.value.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
+                                   TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 140, circular: true, colourScheme: _homeController.userMe.value.wallet![_homeController.userMe.value.wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
                               CachedNetworkImage(imageUrl: _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,)
 
                           )

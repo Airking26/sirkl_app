@@ -354,7 +354,7 @@ class _ChatsScreenState extends State<ChatsScreen> with TickerProviderStateMixin
             borderRadius: BorderRadius.circular(90.0),
             child:
             item.ownedBy!.first.picture == null ?
-            SizedBox(width: 60, height: 60, child: TinyAvatar(baseString: item.ownedBy!.first.wallet!, dimension: 56, circular: true, colourScheme: item.ownedBy!.first.wallet!.substring(0, 1).isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)) :
+            SizedBox(width: 60, height: 60, child: TinyAvatar(baseString: item.ownedBy!.first.wallet!, dimension: 56, circular: true, colourScheme: item.ownedBy!.first.wallet![item.ownedBy!.first.wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)) :
             CachedNetworkImage(
                 imageUrl: item.ownedBy!.first.picture!, height: 56, width: 56, fit: BoxFit.cover,),
           ),

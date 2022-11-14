@@ -66,7 +66,8 @@ class Language extends Translations{
       c.rulesRes : "• Rules",
       c.notificationsOffRes : "• Notifications OFF",
       c.contactOwnerRes: "• Contact owner",
-      c.claimOwnershipeRes: "• Claim ownership"
+      c.claimOwnershipeRes: "• Claim ownership",
+      c.messageSuccessfullySentRes: "Message successfully sent"
     }
   };
 

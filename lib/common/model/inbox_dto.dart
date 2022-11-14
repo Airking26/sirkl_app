@@ -26,7 +26,7 @@ class InboxDto {
   String? lastSender;
   int? unreadMessages;
   DateTime? updatedAt;
-  List<User>? ownedBy;
+  List<UserDTO>? ownedBy;
 
   factory InboxDto.fromJson(Map<String, dynamic> json) => InboxDto(
     id: json["id"],
@@ -34,7 +34,7 @@ class InboxDto {
     lastSender: json["lastSender"],
     unreadMessages: json["unreadMessages"],
     updatedAt: DateTime.parse(json["updatedAt"]),
-    ownedBy: List<User>.from(json["ownedBy"].map((x) => User.fromJson(x))),
+    ownedBy: List<UserDTO>.from(json["ownedBy"].map((x) => UserDTO.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {

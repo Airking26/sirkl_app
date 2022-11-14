@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,7 @@ import 'package:sirkl/common/model/sign_in_seed_phrase_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/sign_up_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -31,6 +33,8 @@ class HomeController extends GetxController{
   var id = "".obs;
   final box = GetStorage();
 
+  var streamChatClient = StreamChatClient("v2s6zx9zjd9b").obs;
+
   var isPasswordLongEnough = false.obs;
   var isPasswordIncludeNumber = false.obs;
   var isPasswordIncludeSpecialCharacter = false.obs;
@@ -42,7 +46,7 @@ class HomeController extends GetxController{
   var password = "".obs;
 
   var accessToken = "".obs;
-  var userMe = User().obs;
+  var userMe = UserDTO().obs;
   var progress = true.obs;
   var isLoading = false.obs;
   var isLoadingNfts = true.obs;
@@ -52,6 +56,7 @@ class HomeController extends GetxController{
   var nfts = <CollectionDbDto>[].obs;
   var tempSignInSuccess = SignInSuccessDto().obs;
   var tokenZegoCloud = "".obs;
+  var tokenStreamChat = "".obs;
 
   connectWallet() async {
     final connector = WalletConnect(
@@ -241,6 +246,24 @@ class HomeController extends GetxController{
       }}
     else if (request.isOk) {
       userMe.value = userFromJson(json.encode(request.body));
+    }
+  }
+
+  retrieveTokenStreamChat(StreamChatClient client) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.retrieveTokenStreamChat(accessToken);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _profileService.retrieveTokenStreamChat(accessToken);
+      if(request.isOk){
+        await client.connectUser(User(id: id.value), request.body!);
+      }
+    } else if(request.isOk){
+      await client.connectUser(User(id: id.value), request.body!);
     }
   }
 
