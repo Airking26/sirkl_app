@@ -9,7 +9,6 @@ import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/inbox_modification_dto.dart';
-import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';

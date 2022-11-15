@@ -92,11 +92,10 @@ class _StreamVideoThumbnailImageState extends State<StreamVideoThumbnailImage> {
           baseColor: _streamChatTheme.colorTheme.disabled,
           highlightColor: _streamChatTheme.colorTheme.inputBg,
           child: Image.asset(
-            'images/placeholder.png',
+            'assets/images/placeholder.png',
             fit: BoxFit.cover,
             height: widget.constraints?.maxHeight,
             width: widget.constraints?.maxWidth,
-            package: 'stream_chat_flutter',
           ),
         );
 

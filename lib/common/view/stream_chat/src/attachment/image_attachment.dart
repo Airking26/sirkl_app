@@ -72,8 +72,7 @@ class StreamImageAttachment extends StreamAttachmentWidget {
             width: constraints?.maxWidth,
             fit: BoxFit.cover,
             errorBuilder: (context, _, __) => Image.asset(
-              'images/placeholder.png',
-              package: 'stream_chat_flutter',
+              'assets/images/placeholder.png',
             ),
           ),
         );
@@ -102,9 +101,8 @@ class StreamImageAttachment extends StreamAttachmentWidget {
             fit: BoxFit.cover,
             placeholder: (context, __) {
               final image = Image.asset(
-                'images/placeholder.png',
+                'assets/images/placeholder.png',
                 fit: BoxFit.cover,
-                package: 'stream_chat_flutter',
               );
               final colorTheme = StreamChatTheme.of(context).colorTheme;
               return Shimmer.fromColors(
@@ -159,7 +157,7 @@ class StreamImageAttachment extends StreamAttachmentWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(0),
                   child: StreamAttachmentUploadStateBuilder(
                     message: message,
                     attachment: attachment,

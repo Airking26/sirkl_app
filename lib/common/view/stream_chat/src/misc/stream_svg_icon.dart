@@ -73,7 +73,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_love_reaction.svg',
-      color: color,
+      color: Color(0xFF00CB7D),
       width: size,
       height: size,
     );
@@ -86,7 +86,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_thumbs_up_reaction.svg',
-      color: color,
+      color: Color(0xFF00CB7D),
       width: size,
       height: size,
     );
@@ -99,7 +99,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_thumbs_down_reaction.svg',
-      color: color,
+      color: Color(0xFF00CB7D),
       width: size,
       height: size,
     );
@@ -112,7 +112,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_LOL_reaction.svg',
-      color: color,
+      color: Color(0xFF00CB7D),
       width: size,
       height: size,
     );
@@ -125,7 +125,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_wut_reaction.svg',
-      color: color,
+      color: Color(0xFF00CB7D),
       width: size,
       height: size,
     );
@@ -255,7 +255,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_check.svg',
-      color: color,
+      color: Color(0xFF00CB7D),
       width: size,
       height: size,
     );
@@ -268,7 +268,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_check_all.svg',
-      color: color,
+      color: Color(0xFF00CB7D),
       width: size,
       height: size,
     );
@@ -398,7 +398,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_empty_circle_left.svg',
-      color: color,
+      color: Colors.grey,
       width: size,
       height: size,
     );
@@ -1084,7 +1084,7 @@ class StreamSvgIcon extends StatelessWidget {
     final key = Key('StreamSvgIcon-$assetName');
     return SvgPicture.asset(
       'lib/svgs/$assetName',
-      package: 'stream_chat_flutter',
+      //package: 'sirkl',
       key: key,
       width: width,
       height: height,

@@ -83,8 +83,7 @@ class StreamPhotoGalleryTile extends StatelessWidget {
           child: FadeInImage(
             fadeInDuration: const Duration(milliseconds: 300),
             placeholder: const AssetImage(
-              'images/placeholder.png',
-              package: 'stream_chat_flutter',
+              'assets/images/placeholder.png',
             ),
             fit: BoxFit.cover,
             image: MediaThumbnailProvider(

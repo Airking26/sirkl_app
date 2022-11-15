@@ -142,7 +142,7 @@ class BottomRow extends StatelessWidget {
         WidgetSpan(
           child: Text(
             Jiffy(message.createdAt.toLocal()).jm,
-            style: messageTheme.createdAtStyle,
+            style: TextStyle(color: Color(0xFF828282), fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 10),
           ),
         ),
       if (showSendingIndicator)
@@ -209,9 +209,10 @@ class BottomRow extends StatelessWidget {
 
     return Text.rich(
       TextSpan(
+        style: TextStyle(color: Colors.black),
         children: [
           ...children,
-        ].insertBetween(const WidgetSpan(child: SizedBox(width: 8))),
+        ].insertBetween(const WidgetSpan(child: SizedBox(width: 2))),
       ),
       maxLines: 1,
       textAlign: reverse ? TextAlign.right : TextAlign.left,

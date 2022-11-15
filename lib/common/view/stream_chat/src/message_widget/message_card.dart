@@ -1,6 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'
+    hide GetStringUtils;
+import 'package:sirkl/common/view/stream_chat/src/message_widget/bottom_row.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/message_widget.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/parse_attachments.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/quoted_message.dart';
@@ -29,6 +32,20 @@ class MessageCard extends StatefulWidget {
     required this.attachmentPadding,
     required this.textPadding,
     required this.reverse,
+    required this.bottomRowPadding,
+    required this.isPinned,
+    required this.bottomRowBuilder,
+    required this.showPinHighlight,
+    required this.deletedBottomRowBuilder,
+    required this.usernameBuilder,
+    required this.onThreadTap,
+    required this.streamChatTheme,
+    required this.showInChannel,
+    required this.streamChat,
+    required this.showSendingIndicator,
+    required this.showThreadReplyIndicator,
+    required this.showTimeStamp,
+    required this.showUsername,
     this.shape,
     this.borderSide,
     this.borderRadiusGeometry,
@@ -37,6 +54,48 @@ class MessageCard extends StatefulWidget {
     this.onMentionTap,
     this.onQuotedMessageTap,
   });
+
+  /// {@macro deletedBottomRowBuilder}
+  final Widget Function(BuildContext, Message)? deletedBottomRowBuilder;
+
+  /// {@macro usernameBuilder}
+  final Widget Function(BuildContext, Message)? usernameBuilder;
+
+  /// {@macro onThreadTap}
+  final void Function(Message)? onThreadTap;
+
+  /// {@macro streamChatThemeData}
+  final StreamChatThemeData streamChatTheme;
+
+  /// {@macro showInChannelIndicator}
+  final bool showInChannel;
+
+  /// {@macro streamChat}
+  final StreamChatState streamChat;
+
+  /// {@macro showSendingIndicator}
+  final bool showSendingIndicator;
+
+  /// {@macro showThreadReplyIndicator}
+  final bool showThreadReplyIndicator;
+
+  /// {@macro showTimestamp}
+  final bool showTimeStamp;
+
+  /// {@macro showUsername}
+  final bool showUsername;
+
+  /// {@macro showPinHighlight}
+  final bool showPinHighlight;
+
+  /// {@macro bottomRowBuilder}
+  final Widget Function(BuildContext, Message)? bottomRowBuilder;
+
+  /// {@macro isPinned}
+  final bool isPinned;
+
+  /// The padding to use for this widget.
+  final double bottomRowPadding;
 
   /// {@macro isFailedState}
   final bool isFailedState;
@@ -133,61 +192,115 @@ class _MessageCardState extends State<MessageCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      margin: EdgeInsets.symmetric(
-        horizontal: (widget.isFailedState ? 15.0 : 0.0) +
-            (widget.showUserAvatar == DisplayWidget.gone ? 0 : 4.0),
-      ),
-      shape: widget.shape ??
-          RoundedRectangleBorder(
-            side: widget.borderSide ??
-                BorderSide(
-                  color: widget.messageTheme.messageBorderColor ?? Colors.grey,
-                ),
-            borderRadius: widget.borderRadiusGeometry ?? BorderRadius.zero,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10),
+            bottomLeft: widget.reverse ? Radius.circular(10)  : Radius.circular(0),
+            topRight: Radius.circular(10)),
+        gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              widget.reverse ? Color(0xFFFFFFFF) : Color(0xFF102437),
+              widget.reverse ? Color(0xFFFFFFFF) :Color(0xFF13171B)
+            ]),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey,
+            offset: Offset(
+                0.0, Get.isDarkMode ? 0 : 0.01), //(x,y)
+            blurRadius: Get.isDarkMode ? 0 : 0.25,
           ),
-      color: _getBackgroundColor(),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: widthLimit ?? double.infinity,
+        ],
+      ),
+      child: Card(
+        elevation: 0,
+        margin:
+        EdgeInsets.only(
+          //bottom:(widget.isFailedState ? 15.0 : 0.0) + (widget.showUserAvatar == DisplayWidget.gone ? 0 : 2.0),
+          top:(widget.isFailedState ? 15.0 : 0.0) + (widget.showUserAvatar == DisplayWidget.gone ? 0 : 2.0),
+          left: (widget.isFailedState ? 15.0 : 0.0) + (widget.showUserAvatar == DisplayWidget.gone ? 0 : 4.0),
+          right: (widget.isFailedState ? 15.0 : 0.0) + (widget.showUserAvatar == DisplayWidget.gone ? 0 : 4.0)
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (widget.hasQuotedMessage)
-              QuotedMessage(
-                reverse: widget.reverse,
-                message: widget.message,
-                hasNonUrlAttachments: widget.hasNonUrlAttachments,
-                onQuotedMessageTap: widget.onQuotedMessageTap,
-              ),
-            if (widget.hasNonUrlAttachments)
-              ParseAttachments(
-                key: attachmentsKey,
-                message: widget.message,
-                attachmentBuilders: widget.attachmentBuilders,
-                attachmentPadding: widget.attachmentPadding,
-              ),
-            if (!widget.isGiphy)
-              ConstrainedBox(
-                constraints: BoxConstraints.loose(const Size.fromWidth(500)),
-                child: TextBubble(
-                  messageTheme: widget.messageTheme,
+        color: Colors.transparent ,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: widthLimit ?? double.infinity,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.hasQuotedMessage)
+                QuotedMessage(
+                  reverse: widget.reverse,
                   message: widget.message,
-                  textPadding: widget.textPadding,
-                  textBuilder: widget.textBuilder,
-                  isOnlyEmoji: widget.isOnlyEmoji,
-                  hasQuotedMessage: widget.hasQuotedMessage,
-                  hasUrlAttachments: widget.hasUrlAttachments,
-                  onLinkTap: widget.onLinkTap,
-                  onMentionTap: widget.onMentionTap,
+                  hasNonUrlAttachments: widget.hasNonUrlAttachments,
+                  onQuotedMessageTap: widget.onQuotedMessageTap,
                 ),
-              ),
-            if (widget.hasUrlAttachments && !widget.hasQuotedMessage)
-              _buildUrlAttachment(),
-          ],
+              if (widget.hasNonUrlAttachments)
+                ParseAttachments(
+                  key: attachmentsKey,
+                  message: widget.message,
+                  attachmentBuilders: widget.attachmentBuilders,
+                  attachmentPadding: widget.attachmentPadding,
+                ),
+              if (!widget.isGiphy)
+                ConstrainedBox(
+                  constraints: BoxConstraints.loose(const Size.fromWidth(500)),
+                  child: TextBubble(
+                    messageTheme: widget.messageTheme,
+                    message: widget.message,
+                    reverse: widget.reverse,
+                    textPadding: widget.textPadding,
+                    textBuilder: widget.textBuilder,
+                    isOnlyEmoji: widget.isOnlyEmoji,
+                    hasQuotedMessage: widget.hasQuotedMessage,
+                    hasUrlAttachments: widget.hasUrlAttachments,
+                    onLinkTap: widget.onLinkTap,
+                    onMentionTap: widget.onMentionTap,
+                  ),
+                ),
+              if (widget.hasUrlAttachments && !widget.hasQuotedMessage)
+                _buildUrlAttachment(),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    right: 12,
+                    bottom: 12.0,
+                    top: 12
+                  ),
+                  child: widget.bottomRowBuilder?.call(
+                    context,
+                    widget.message,
+                  ) ??
+                      BottomRow(
+                        message: widget.message,
+                        reverse: widget.reverse,
+                        messageTheme: widget.messageTheme,
+                        hasUrlAttachments: widget.hasUrlAttachments,
+                        isOnlyEmoji: widget.isOnlyEmoji,
+                        isDeleted: widget.message.isDeleted,
+                        isGiphy: widget.isGiphy,
+                        showInChannel: widget.showInChannel,
+                        showSendingIndicator: widget.showSendingIndicator,
+                        showThreadReplyIndicator: widget.showThreadReplyIndicator,
+                        showTimeStamp: widget.showTimeStamp,
+                        showUsername: false,
+                        streamChatTheme: StreamChatThemeData(colorTheme: StreamColorTheme.dark(appBg: Colors.red)),
+                        onThreadTap: widget.onThreadTap,
+                        deletedBottomRowBuilder: widget.deletedBottomRowBuilder,
+                        streamChat: widget.streamChat,
+                        hasNonUrlAttachments: widget.hasNonUrlAttachments,
+                        usernameBuilder: widget.usernameBuilder,
+                      ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

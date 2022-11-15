@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/platform_widget_builder/src/platform_widget.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
@@ -90,7 +91,7 @@ Future<T?> showStreamAttachmentPickerModalBottomSheet<T>({
 
   return showModalBottomSheet<T>(
     context: context,
-    backgroundColor: color,
+    backgroundColor: Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
     elevation: elevation,
     shape: shape,
     clipBehavior: clipBehavior,

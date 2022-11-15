@@ -8,21 +8,21 @@ import 'package:cached_network_image/cached_network_image.dart'
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart'
+    hide debounce;
 import 'package:photo_manager/photo_manager.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sirkl/common/view/stream_chat/platform_widget_builder/src/platform_widget_builder.dart';
-import 'package:sirkl/common/view/stream_chat/src/autocomplete/stream_autocomplete.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/attachment_button.dart';
-import 'package:sirkl/common/view/stream_chat/src/message_input/attachment_picker/stream_attachment_picker.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/command_button.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/dm_checkbox.dart';
-import 'package:sirkl/common/view/stream_chat/src/message_input/enums.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/quoted_message_widget.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/quoting_message_top_area.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/simple_safe_area.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/tld.dart';
 import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+
 
 const _kCommandTrigger = '/';
 const _kMentionTrigger = '@';
@@ -84,7 +84,7 @@ class StreamMessageInput extends StatefulWidget {
     this.disableAttachments = false,
     this.messageInputController,
     this.actions = const [],
-    this.actionsLocation = ActionsLocation.left,
+    this.actionsLocation = ActionsLocation.rightInside,
     this.attachmentThumbnailBuilders,
     this.focusNode,
     this.sendButtonLocation = SendButtonLocation.outside,
@@ -476,8 +476,18 @@ class StreamMessageInputState extends State<StreamMessageInput>
                         _effectiveFocusNode.unfocus();
                       },
                     ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                  Container(
+                    decoration:  BoxDecoration(
+                      border: const Border(top: BorderSide(color: Colors.grey, width: 0.01)),
+                      gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+                            Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                          ]),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                     child: _buildTextField(context),
                   ),
                   if (_effectiveController.message.parentId != null &&
@@ -726,67 +736,73 @@ class StreamMessageInputState extends State<StreamMessageInput>
         onDragExited: (details) {
           setState(() => _draggingBorder = null);
         },
-        child: Container(
-          height: 90,
-          clipBehavior: Clip.hardEdge,
-          margin: margin,
-          decoration: BoxDecoration(
-            color: Color(0xFFF2F2F2),
-            borderRadius: BorderRadius.circular(15),
-            //gradient: _effectiveFocusNode.hasFocus ? _messageInputTheme.activeBorderGradient : _messageInputTheme.idleBorderGradient,
-            border: _draggingBorder,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(1.5),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildReplyToMessage(),
-                _buildAttachments(),
-                LimitedBox(
-                  maxHeight: widget.maxHeight,
-                  child: PlatformWidgetBuilder(
-                    web: (context, child) => KeyboardShortcutRunner(
-                      onEnterKeypress: sendMessage,
-                      onEscapeKeypress: () {
-                        if (_hasQuotedMessage &&
-                            _effectiveController.text.isEmpty) {
-                          widget.onQuotedMessageCleared?.call();
-                        }
-                      },
-                      child: child!,
-                    ),
-                    desktop: (context, child) => KeyboardShortcutRunner(
-                      onEnterKeypress: sendMessage,
-                      onEscapeKeypress: () {
-                        if (_hasQuotedMessage &&
-                            _effectiveController.text.isEmpty) {
-                          widget.onQuotedMessageCleared?.call();
-                        }
-                      },
-                      child: child!,
-                    ),
-                    mobile: (context, child) => child,
-                    child: StreamMessageTextField(
-                      key: const Key('messageInputText'),
-                      maxLines: widget.maxLines,
-                      minLines: widget.minLines,
-                      textInputAction: widget.textInputAction,
-                      onSubmitted: (_) => sendMessage(),
-                      keyboardType: widget.keyboardType,
-                      controller: _effectiveController,
-                      focusNode: _effectiveFocusNode,
-                      style: _messageInputTheme.inputTextStyle,
-                      autofocus: widget.autofocus,
-                      textAlignVertical: TextAlignVertical.center,
-                      decoration: _getInputDecoration(context),
-                      textCapitalization: widget.textCapitalization,
-                      autocorrect: widget.autoCorrect,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: 55),
+          child: Container(
+            //height: 55,
+            clipBehavior: Clip.hardEdge,
+            margin: margin,
+            decoration: BoxDecoration(
+              color: Get.isDarkMode
+                  ? const Color(0xFF2D465E)
+                  : const Color(0xFFF2F2F2),
+              borderRadius: BorderRadius.circular(20),
+              //gradient: _effectiveFocusNode.hasFocus ? _messageInputTheme.activeBorderGradient : _messageInputTheme.idleBorderGradient,
+              border: _draggingBorder,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(1.5),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildReplyToMessage(),
+                  _buildAttachments(),
+                  LimitedBox(
+                    maxHeight: widget.maxHeight,
+                    child: PlatformWidgetBuilder(
+                      web: (context, child) => KeyboardShortcutRunner(
+                        onEnterKeypress: sendMessage,
+                        onEscapeKeypress: () {
+                          if (_hasQuotedMessage &&
+                              _effectiveController.text.isEmpty) {
+                            widget.onQuotedMessageCleared?.call();
+                          }
+                        },
+                        child: child!,
+                      ),
+                      desktop: (context, child) => KeyboardShortcutRunner(
+                        onEnterKeypress: sendMessage,
+                        onEscapeKeypress: () {
+                          if (_hasQuotedMessage &&
+                              _effectiveController.text.isEmpty) {
+                            widget.onQuotedMessageCleared?.call();
+                          }
+                        },
+                        child: child!,
+                      ),
+                      mobile: (context, child) => child,
+                      child: StreamMessageTextField(
+                        key: const Key('messageInputText'),
+                        maxLines: widget.maxLines,
+                        minLines: widget.minLines,
+                        textInputAction: widget.textInputAction,
+                        onSubmitted: (_) => sendMessage(),
+                        keyboardType: widget.keyboardType,
+                        controller: _effectiveController,
+                        focusNode: _effectiveFocusNode,
+                        style: _messageInputTheme.inputTextStyle,
+                        autofocus: widget.autofocus,
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: _getInputDecoration(context),
+                        textCapitalization: widget.textCapitalization,
+                        autocorrect: widget.autoCorrect,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -799,9 +815,13 @@ class StreamMessageInputState extends State<StreamMessageInput>
     return InputDecoration(
       isDense: true,
       hintText: _getHint(context),
-      hintStyle: _messageInputTheme.inputTextStyle!.copyWith(
-        color: _streamChatTheme.colorTheme.textLowEmphasis,
-      ),
+      hintStyle: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+          fontFamily: "Gilroy",
+          color: Get.isDarkMode
+              ? const Color(0xff9BA0A5)
+              : const Color(0xFF828282)),
       border: const OutlineInputBorder(
         borderSide: BorderSide.none,
       ),
@@ -1150,8 +1170,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
                 attachment.file!.bytes!,
                 fit: BoxFit.cover,
                 errorBuilder: (context, _, __) => Image.asset(
-                  'images/placeholder.png',
-                  package: 'stream_chat_flutter',
+                  'assets/images/placeholder.png',
                 ),
               )
             : CachedNetworkImage(
@@ -1165,9 +1184,8 @@ class StreamMessageInputState extends State<StreamMessageInput>
                   baseColor: _streamChatTheme.colorTheme.disabled,
                   highlightColor: _streamChatTheme.colorTheme.inputBg,
                   child: Image.asset(
-                    'images/placeholder.png',
+                    'assets/images/placeholder.png',
                     fit: BoxFit.cover,
-                    package: 'stream_chat_flutter',
                   ),
                 ),
               );

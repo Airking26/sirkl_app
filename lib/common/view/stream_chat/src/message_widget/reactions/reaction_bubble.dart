@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 /// {@template streamReactionBubble}
@@ -59,7 +60,9 @@ class StreamReactionBubble extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
-              color: maskColor,
+              color: !Get.isDarkMode
+        ? const Color(0xFF102437)
+        : const Color.fromARGB(255, 247, 253, 255),
               borderRadius: const BorderRadius.all(Radius.circular(16)),
             ),
             child: Container(
@@ -69,9 +72,13 @@ class StreamReactionBubble extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: borderColor,
+                  color: !Get.isDarkMode
+                      ? const Color(0xFF102437)
+                      : const Color.fromARGB(255, 247, 253, 255),
                 ),
-                color: backgroundColor,
+                color: !Get.isDarkMode
+    ? const Color(0xFF102437)
+        : const Color.fromARGB(255, 247, 253, 255),
                 borderRadius: const BorderRadius.all(Radius.circular(14)),
               ),
               child: LayoutBuilder(
@@ -101,12 +108,6 @@ class StreamReactionBubble extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        Positioned(
-          bottom: 2,
-          left: reverse ? null : 13,
-          right: reverse ? 13 : null,
-          child: _buildReactionsTail(context),
         ),
       ],
     );

@@ -2,6 +2,7 @@ import 'package:contextmenu/contextmenu.dart';
 import 'package:flutter/material.dart' hide ButtonStyle;
 import 'package:flutter/services.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/conditional_parent_builder/conditional_parent_builder.dart';
 import 'package:sirkl/common/view/stream_chat/platform_widget_builder/src/platform_widget_builder.dart';
 import 'package:sirkl/common/view/stream_chat/src/attachment/file_attachment.dart';
@@ -106,11 +107,8 @@ class StreamMessageWidget extends StatefulWidget {
   }) : attachmentBuilders = {
           'image': (context, message, attachments) {
             final border = RoundedRectangleBorder(
-              side: attachmentBorderSide ??
-                  BorderSide(
-                    color: StreamChatTheme.of(context).colorTheme.borders,
-                  ),
-              borderRadius: attachmentBorderRadiusGeometry ?? BorderRadius.zero,
+              side: BorderSide.none,
+              borderRadius:  BorderRadius.circular(10),
             );
 
             final mediaQueryData = MediaQuery.of(context);
@@ -169,11 +167,8 @@ class StreamMessageWidget extends StatefulWidget {
           },
           'video': (context, message, attachments) {
             final border = RoundedRectangleBorder(
-              side: attachmentBorderSide ??
-                  BorderSide(
-                    color: StreamChatTheme.of(context).colorTheme.borders,
-                  ),
-              borderRadius: attachmentBorderRadiusGeometry ?? BorderRadius.zero,
+              side: BorderSide.none,
+              borderRadius:  BorderRadius.only(topRight: Radius.circular(10), topLeft: Radius.circular(10)),
             );
 
             return WrapAttachmentWidget(
@@ -204,11 +199,8 @@ class StreamMessageWidget extends StatefulWidget {
           },
           'giphy': (context, message, attachments) {
             final border = RoundedRectangleBorder(
-              side: attachmentBorderSide ??
-                  BorderSide(
-                    color: StreamChatTheme.of(context).colorTheme.borders,
-                  ),
-              borderRadius: attachmentBorderRadiusGeometry ?? BorderRadius.zero,
+              side: BorderSide.none,
+              borderRadius:  BorderRadius.only(topRight: Radius.circular(10), topLeft: Radius.circular(10)),
             );
 
             return WrapAttachmentWidget(
@@ -238,11 +230,8 @@ class StreamMessageWidget extends StatefulWidget {
           },
           'file': (context, message, attachments) {
             final border = RoundedRectangleBorder(
-              side: attachmentBorderSide ??
-                  BorderSide(
-                    color: StreamChatTheme.of(context).colorTheme.borders,
-                  ),
-              borderRadius: attachmentBorderRadiusGeometry ?? BorderRadius.zero,
+              side: BorderSide.none,
+              borderRadius:  BorderRadius.only(topRight: Radius.circular(10), topLeft: Radius.circular(10)),
             );
 
             return Column(
@@ -805,6 +794,8 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
         widget.showUserAvatar != DisplayWidget.gone ? avatarWidth + 8.5 : 0.5;
 
     final showReactions = shouldShowReactions;
+    var k = (widget.message.text.isNullOrBlank! || widget.message.attachments.isNotEmpty || widget.message.text!.length > 20) ?  widget.widthFactor : 0.5 ;
+    var t = widget.message.text;
 
     return ConditionalParentBuilder(
       builder: (context, child) {
@@ -844,7 +835,8 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
                   alignment: widget.reverse
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
-                  widthFactor: widget.widthFactor,
+                  widthFactor: (widget.message.text.isNullOrBlank! || widget.message.attachments.isNotEmpty || widget.message.text!.length > 20) ?  widget.widthFactor : widget.message.text!.length < 5 ? 0.35 : 0.5
+                ,
                   child: MessageWidgetContent(
                     streamChatTheme: _streamChatTheme,
                     showUsername: showUsername,

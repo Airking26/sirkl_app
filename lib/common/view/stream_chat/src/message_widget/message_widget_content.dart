@@ -206,7 +206,7 @@ class MessageWidgetContent extends StatelessWidget {
               ? AlignmentDirectional.bottomEnd
               : AlignmentDirectional.bottomStart,
           children: [
-            if (showBottomRow)
+            if (!showBottomRow)
               Padding(
                 padding: EdgeInsets.only(
                   left: !reverse ? bottomRowPadding : 0,
@@ -243,14 +243,10 @@ class MessageWidgetContent extends StatelessWidget {
                 bottom: isPinned && showPinHighlight ? 8.0 : 0.0,
               ),
               child: Column(
-                crossAxisAlignment:
-                    reverse ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment: reverse ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (message.pinned &&
-                      message.pinnedBy != null &&
-                      showPinHighlight)
-                    PinnedMessage(
+                  if (message.pinned && message.pinnedBy != null && showPinHighlight) PinnedMessage(
                       pinnedBy: message.pinnedBy!,
                       currentUser: streamChat.currentUser!,
                     ),
@@ -258,9 +254,7 @@ class MessageWidgetContent extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (!reverse &&
-                          showUserAvatar == DisplayWidget.show &&
-                          message.user != null) ...[
+                      if (!reverse && showUserAvatar == DisplayWidget.show && message.user != null) ...[
                         UserAvatarTransform(
                           onUserAvatarTap: onUserAvatarTap,
                           userAvatarBuilder: userAvatarBuilder,
@@ -268,10 +262,9 @@ class MessageWidgetContent extends StatelessWidget {
                           messageTheme: messageTheme,
                           message: message,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 8),
                       ],
-                      if (showUserAvatar == DisplayWidget.hide)
-                        SizedBox(width: avatarWidth + 4),
+                      if (showUserAvatar == DisplayWidget.hide) SizedBox(width: avatarWidth + 4),
                       Flexible(
                         child: PortalTarget(
                           visible: isMobileDevice && showReactions,
@@ -332,6 +325,16 @@ class MessageWidgetContent extends StatelessWidget {
                                       )
                                     : MessageCard(
                                         message: message,
+                                        deletedBottomRowBuilder: deletedBottomRowBuilder,
+                                        usernameBuilder: usernameBuilder,
+                                        onThreadTap: onThreadTap,
+                                        streamChat: streamChat,
+                                        showInChannel: showInChannel,
+                                        showSendingIndicator: showSendingIndicator,
+                                        showThreadReplyIndicator: showThreadReplyIndicator,
+                                        showTimeStamp: showTimeStamp,
+                                        showUsername: showUsername,
+                                        streamChatTheme: streamChatTheme,
                                         isFailedState: isFailedState,
                                         showUserAvatar: showUserAvatar,
                                         messageTheme: messageTheme,
@@ -339,6 +342,10 @@ class MessageWidgetContent extends StatelessWidget {
                                         hasUrlAttachments: hasUrlAttachments,
                                         hasNonUrlAttachments:
                                             hasNonUrlAttachments,
+                                        isPinned: isPinned,
+                                        bottomRowPadding: bottomRowPadding,
+                                        bottomRowBuilder: bottomRowBuilder,
+                                        showPinHighlight: showPinHighlight,
                                         isOnlyEmoji: isOnlyEmoji,
                                         isGiphy: isGiphy,
                                         attachmentBuilders: attachmentBuilders,
@@ -387,8 +394,7 @@ class MessageWidgetContent extends StatelessWidget {
                         SizedBox(width: avatarWidth + 4),
                     ],
                   ),
-                  if (isDesktopDeviceOrWeb && shouldShowReactions) ...[
-                    Padding(
+                  if (isDesktopDeviceOrWeb && shouldShowReactions) ...[Padding(
                       padding: showUserAvatar != DisplayWidget.gone
                           ? EdgeInsets.only(
                               left: avatarWidth + 4,
@@ -402,12 +408,11 @@ class MessageWidgetContent extends StatelessWidget {
                         borderSide: borderSide,
                         reverse: reverse,
                       ),
-                    ),
-                  ],
-                  if (showBottomRow)
-                    SizedBox(
+                    ),],
+                  if (showBottomRow) SizedBox(
                       height: context.textScaleFactor * 18.0,
                     ),
+
                 ],
               ),
             ),

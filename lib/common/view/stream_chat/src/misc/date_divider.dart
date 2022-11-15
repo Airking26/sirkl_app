@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 /// {@template streamDateDivider}
@@ -37,19 +38,33 @@ class StreamDateDivider extends StatelessWidget {
     if (uppercase) dayInfo = dayInfo.toUpperCase();
 
     final chatThemeData = StreamChatTheme.of(context);
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-        decoration: BoxDecoration(
-          color: chatThemeData.colorTheme.overlayDark,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          dayInfo,
-          style: chatThemeData.textTheme.footnote.copyWith(
-            color: chatThemeData.colorTheme.barsBg,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 14),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
+              child: Container(
+                color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0XFF828282),
+                height:  0.25,
+              )),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18.0),
+            child: Text(
+              dayInfo.toUpperCase(),
+              style:  TextStyle(
+                  color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0XFF828282),
+                  fontSize: 14,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w600),
+            ),
           ),
-        ),
+          Flexible(
+              child: Container(
+                color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0XFF828282),
+                height: 0.25,
+              )),
+        ],
       ),
     );
   }

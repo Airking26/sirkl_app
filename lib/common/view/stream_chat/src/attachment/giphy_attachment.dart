@@ -285,9 +285,8 @@ class StreamGiphyAttachment extends StreamAttachmentWidget {
             width: constraints?.maxWidth,
             placeholder: (_, __) {
               final image = Image.asset(
-                'images/placeholder.png',
+                'assets/images/placeholder.png',
                 fit: BoxFit.cover,
-                package: 'stream_chat_flutter',
               );
 
               final colorTheme = StreamChatTheme.of(context).colorTheme;

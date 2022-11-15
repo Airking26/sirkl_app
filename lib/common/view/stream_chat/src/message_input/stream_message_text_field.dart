@@ -8,6 +8,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 export 'package:flutter/services.dart'
@@ -714,10 +715,12 @@ class _StreamMessageTextFieldState extends State<StreamMessageTextField>
                 ? TextInputAction.newline
                 : TextInputAction.send),
         textCapitalization: widget.textCapitalization,
-        style: widget.style,
+        style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500,
+          fontSize: 16,
+          fontFamily: "Gilroy",),
         strutStyle: widget.strutStyle,
-        textAlign: widget.textAlign,
-        textAlignVertical: widget.textAlignVertical,
+        textAlign: TextAlign.start,
+        textAlignVertical: TextAlignVertical.center,
         textDirection: widget.textDirection,
         readOnly: widget.readOnly,
         toolbarOptions: widget.toolbarOptions,

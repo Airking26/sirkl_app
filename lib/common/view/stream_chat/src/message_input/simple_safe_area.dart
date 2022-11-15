@@ -18,7 +18,7 @@ class SimpleSafeArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SafeArea(
         left: enabled,
-        top: enabled,
+        top: false,
         right: enabled,
         bottom: enabled,
         child: child,

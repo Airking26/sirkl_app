@@ -67,6 +67,10 @@ dependencies:
   file_selector: ^0.9.0
 
 dev_dependencies:
+  dart_code_metrics: ^4.4.0
+  golden_toolkit: ^0.13.0
+  mocktail: ^0.3.0
+  path: ^1.8.0
   flutter_launcher_icons: "^0.10.0"
   flutter_test:
     sdk: flutter
@@ -79,9 +83,7 @@ flutter_icons:
   min_sdk_android: 21
 
 flutter:
-
   uses-material-design: true
-
   assets:
      - assets/images/chat_tab.png
      - assets/images/group-tab.png
@@ -121,7 +123,7 @@ flutter:
      - assets/images/placeholder.png
      - animations/
      - svgs/
-     - lib/common/view/stream_chat/svgs/
+     - lib/svgs/
 
   fonts:
     - family: Gilroy

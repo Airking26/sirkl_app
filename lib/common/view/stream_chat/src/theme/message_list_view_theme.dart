@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
 
 /// {@template messageListViewTheme}
@@ -81,7 +82,8 @@ class StreamMessageListViewThemeData with Diagnosticable {
     DecorationImage? backgroundImage,
   }) {
     return StreamMessageListViewThemeData(
-      backgroundColor: backgroundColor ?? this.backgroundColor,
+      backgroundColor: Get.isDarkMode ? const Color(0xFF102437)
+          : const Color.fromARGB(255, 247, 253, 255),
       backgroundImage: backgroundImage ?? this.backgroundImage,
     );
   }

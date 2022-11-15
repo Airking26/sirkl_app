@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/attachment_picker/options/stream_file_picker.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/attachment_picker/options/stream_gallery_picker.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/attachment_picker/options/stream_image_picker.dart';
@@ -661,7 +662,7 @@ class OptionDrawer extends StatelessWidget {
 
     return Card(
       elevation: elevation,
-      color: color ?? colorTheme.barsBg,
+      color: Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
       margin: margin,
       shape: shape,
       child: Column(

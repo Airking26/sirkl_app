@@ -1,7 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/src/utils/helpers.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:tiny_avatar/tiny_avatar.dart';
 
 /// {@template streamChannelHeader}
 /// ![screenshot](https://raw.githubusercontent.com/GetStream/stream-chat-flutter/master/packages/stream_chat_flutter/screenshots/channel_header.png)
@@ -162,7 +166,114 @@ class StreamChannelHeader extends StatelessWidget
         return StreamInfoTile(
           showMessage: showConnectionStateTile && showStatus,
           message: statusString,
-          child: AppBar(
+          child: Container(
+            height: 115,
+            margin: const EdgeInsets.only(bottom: 0.25),
+            decoration: BoxDecoration(
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.grey,
+                  offset: Offset(0.0, 0.01), //(x,y)
+                  blurRadius: 0.01,
+                ),
+              ],
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(35)),
+              gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
+                    Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                  ]),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 44.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 250,
+                      height: 50,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                Get.back();
+                              },
+                              icon: Image.asset(
+                                "assets/images/arrow_left.png",
+                                color: Get.isDarkMode ? Colors.white : Colors.black,
+                              )),
+                          InkWell(
+                            onTap: () {
+                              Get.to(() => const ProfileElseScreen());
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(90),
+                                  child:
+                                  channel.image == null ?
+                                  TinyAvatar(baseString: channel.name ?? "", dimension: 40, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
+                                  CachedNetworkImage(
+                                    imageUrl: channel.image!,
+                                    width: 40,
+                                    height: 40,
+                                    fit: BoxFit.cover,
+                                  )
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Get.to(() => const ProfileElseScreen());
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    channel.name.isNullOrBlank! ?
+                                        "No name":
+                                    //"${commonController!.userClicked.value!.wallet!.substring(0, 15)}..." :
+                                    channel.name!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: "Gilroy",
+                                        color: Get.isDarkMode
+                                            ? Colors.white
+                                            : Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          //dialogMenu = dialogPopMenu(context);
+                        },
+                        icon: Image.asset(
+                          "assets/images/more.png",
+                          color: Get.isDarkMode ? Colors.white : Colors.black,
+                        )),
+                  ],
+                ),
+              ),
+            ),
+          )
+          /*AppBar(
             toolbarTextStyle: theme.textTheme.bodyText2,
             titleTextStyle: theme.textTheme.headline6,
             systemOverlayStyle: theme.brightness == Brightness.dark
@@ -214,7 +325,7 @@ class StreamChannelHeader extends StatelessWidget
                 ),
               ),
             ),
-          ),
+          )*/,
         );
       },
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 /// {@template textBubble}
@@ -16,10 +17,13 @@ class TextBubble extends StatelessWidget {
     required this.messageTheme,
     required this.hasUrlAttachments,
     required this.hasQuotedMessage,
+    required this.reverse,
     this.textBuilder,
     this.onLinkTap,
     this.onMentionTap,
   });
+
+  final bool reverse;
 
   /// {@macro message}
   final Message message;
@@ -52,7 +56,7 @@ class TextBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     if (message.text?.trim().isEmpty ?? false) return const Offstage();
     return Padding(
-      padding: isOnlyEmoji ? EdgeInsets.zero : textPadding,
+      padding: isOnlyEmoji ? EdgeInsets.zero : EdgeInsets.only(left: 16, right: 16, top: 8),
       child: textBuilder != null
           ? textBuilder!(context, message)
           : StreamMessageText(
@@ -65,7 +69,7 @@ class TextBubble extends StatelessWidget {
                         fontSize: 42,
                       ),
                     )
-                  : messageTheme,
+                  : messageTheme.copyWith(messageTextStyle: TextStyle(color: reverse ? Colors.black : Colors.white , fontSize: 15, fontFamily: 'Gilroy', fontWeight: FontWeight.w500)),
             ),
     );
   }

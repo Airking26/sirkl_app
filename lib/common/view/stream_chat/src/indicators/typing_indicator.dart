@@ -60,7 +60,6 @@ class StreamTypingIndicator extends StatelessWidget {
                   children: [
                     Lottie.asset(
                       'animations/typing_dots.json',
-                      package: 'stream_chat_flutter',
                       height: 4,
                     ),
                     Text(

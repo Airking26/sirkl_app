@@ -10,8 +10,11 @@ import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/inbox_dto.dart';
 import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:tiny_avatar/tiny_avatar.dart';
 
 
 class ChatsScreenOther extends StatefulWidget {
@@ -24,7 +27,6 @@ class ChatsScreenOther extends StatefulWidget {
 class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProviderStateMixin {
 
   final _chatController = Get.put(ChatsController());
-  final _commonController = Get.put(CommonController());
   final _homeController = Get.put(HomeController());
 
   late final _listController = StreamChannelListController(
@@ -76,7 +78,6 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
             controller: tabController,
             children: [
               StreamChannelListView(controller: _listController, onChannelTap: (channel){
-                var l = _listController;
                 Get.to(() => StreamChannel(child: ChannelPage(), channel: channel));
               },),
               StreamChannelListView(controller: _listController, onChannelTap: (channel){
@@ -367,29 +368,3 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
 
 }
 
-
-class ChannelPage extends StatelessWidget {
-  const ChannelPage({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: StreamChannelHeader(),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: StreamMessageListView(),
-          ),
-          StreamMessageInput(
-            onMessageSent: (e) async{
-              // var k = await channel!.addMembers([homeController!.id.value, commonController!.userClicked.value!.id!]);
-              var t = "";
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}

@@ -226,8 +226,8 @@ class StreamChatThemeData {
         avatarTheme: StreamAvatarThemeData(
           borderRadius: BorderRadius.circular(20),
           constraints: const BoxConstraints.tightFor(
-            height: 32,
-            width: 32,
+            height: 40,
+            width: 40,
           ),
         ),
         linkBackgroundColor: colorTheme.linkBg,
