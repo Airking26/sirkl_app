@@ -10,40 +10,50 @@ class StreamTextTheme {
       fontSize: 22,
       fontWeight: FontWeight.bold,
       color: Colors.black,
+      fontFamily: "Gilroy"
     ),
     this.headlineBold = const TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.bold,
       color: Colors.black,
+        fontFamily: "Gilroy"
     ),
     this.headline = const TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w500,
       color: Colors.black,
+        fontFamily: "Gilroy"
+
     ),
     this.bodyBold = const TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.bold,
       color: Colors.black,
+        fontFamily: "Gilroy"
+
     ),
     this.body = const TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w500,
       color: Colors.black,
+        fontFamily: "Gilroy"
     ),
     this.footnoteBold = const TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w500,
       color: Colors.black,
+        fontFamily: "Gilroy"
     ),
     this.footnote = const TextStyle(
       fontSize: 12,
       color: Colors.black,
+        fontFamily: "Gilroy"
     ),
     this.captionBold = const TextStyle(
       fontSize: 10,
       fontWeight: FontWeight.bold,
       color: Colors.black,
+        fontFamily: "Gilroy"
     ),
   });
 
@@ -53,40 +63,48 @@ class StreamTextTheme {
       fontSize: 22,
       fontWeight: FontWeight.bold,
       color: Colors.white,
+        fontFamily: "Gilroy"
     ),
     this.headlineBold = const TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.bold,
       color: Colors.white,
+        fontFamily: "Gilroy"
     ),
     this.headline = const TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w500,
       color: Colors.white,
+        fontFamily: "Gilroy"
     ),
     this.bodyBold = const TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.bold,
       color: Colors.white,
+        fontFamily: "Gilroy"
     ),
     this.body = const TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w500,
       color: Colors.white,
+        fontFamily: "Gilroy"
     ),
     this.footnoteBold = const TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w500,
       color: Colors.white,
+        fontFamily: "Gilroy"
     ),
     this.footnote = const TextStyle(
       fontSize: 12,
       color: Colors.white,
+        fontFamily: "Gilroy"
     ),
     this.captionBold = const TextStyle(
       fontSize: 10,
       fontWeight: FontWeight.bold,
       color: Colors.white,
+        fontFamily: "Gilroy"
     ),
   });
 

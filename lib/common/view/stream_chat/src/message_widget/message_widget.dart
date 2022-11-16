@@ -835,7 +835,8 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
                   alignment: widget.reverse
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
-                  widthFactor: (widget.message.text.isNullOrBlank! || widget.message.attachments.isNotEmpty || widget.message.text!.length > 20) ?  widget.widthFactor : widget.message.text!.length < 5 ? 0.35 : 0.5
+                  widthFactor: widget.widthFactor
+                  //(widget.message.text.isNullOrBlank! || widget.message.attachments.isNotEmpty || widget.message.text!.length > 20) ?  widget.widthFactor : widget.message.text!.length < 5 ? 0.35 : 0.5
                 ,
                   child: MessageWidgetContent(
                     streamChatTheme: _streamChatTheme,

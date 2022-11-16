@@ -5,6 +5,7 @@ import 'package:sirkl/common/model/inbox_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/service/common_service.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/service/home_service.dart';
 
 import '../model/refresh_token_dto.dart';
@@ -158,5 +159,14 @@ class CommonController extends GetxController{
         return request.body!.map<UserDTO>((user) =>
             userFromJson(json.encode(user))).toList();
       }
+  }
+
+  defineUserFromChannel(String? userId, StreamChatClient streamChatClient) async {
+    if(userId != null) {
+      var users = await streamChatClient.queryUsers(
+          filter: Filter.in_("id", [userId]));
+      userClicked.value =
+          userFromJson(json.encode(users.users.first.extraData['userDTO']));
+    }
   }
 }

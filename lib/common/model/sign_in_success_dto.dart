@@ -68,7 +68,7 @@ class UserDTO extends ISuspensionBean{
     description: json["description"],
     fcmToken: json["fcmToken"],
     wallet: json["wallet"],
-    contractAddresses: json["createdAt"] == null ? null : List<String>.from(json["contractAddresses"].map((x) => x)),
+    contractAddresses: json["contractAddresses"] == null ? null : List<String>.from(json["contractAddresses"].map((x) => x)),
     following: json["following"],
     isInFollowing: json["isInFollowing"],
   );

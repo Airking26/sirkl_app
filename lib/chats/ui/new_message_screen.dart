@@ -351,7 +351,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(90.0), child:
             item.picture == null ?
-            SizedBox(width: 60, height: 60, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: item.wallet![item.wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,)) :
+            SizedBox(width: 60, height: 60, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
             CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,))),
         trailing: Checkbox(
           onChanged: (selected) {

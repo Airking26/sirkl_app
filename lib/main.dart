@@ -69,8 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     _homeController.retrieveAccessToken();
-    if(_homeController.accessToken.value.isNotEmpty) _homeController.putFCMToken();
-    _homeController.retrieveTokenStreamChat(widget.client);
+    if(_homeController.accessToken.value.isNotEmpty) _homeController.putFCMToken(widget.client);
     super.initState();
   }
 

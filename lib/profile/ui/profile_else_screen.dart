@@ -9,6 +9,7 @@ import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
+import 'package:sirkl/common/view/detailed_message/detailed_message_screen_second.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
@@ -81,7 +82,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                                 utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
                               }
                             } else {
-                              Get.to(() => const DetailedMessageScreenOther());
+                              Get.to(() => const DetailedMessageScreenOtherSecond());
                             }
                             }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: Get.isDarkMode ? Colors.white : Colors.black, height: 28, width: 28,)),
                           Padding(
@@ -106,7 +107,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                         ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
                           child: GestureDetector(onTap: (){},
                               child:_commonController.userClicked.value!.picture == null ?
-                              TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 140, circular: true, colourScheme: _commonController.userClicked.value!.wallet![_commonController.userClicked.value!.wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
+                              TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 140, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
                             CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture! , color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,))
                           ,),)
                   ),

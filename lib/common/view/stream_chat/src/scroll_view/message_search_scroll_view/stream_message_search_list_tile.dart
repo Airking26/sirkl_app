@@ -180,9 +180,7 @@ class MessageSearchListTileTitle extends StatelessWidget {
     return Row(
       children: [
         Text(
-          user.id == StreamChat.of(context).currentUser?.id
-              ? context.translations.youText
-              : user.name,
+          user.id == StreamChat.of(context).currentUser?.id ? context.translations.youText : user.name.length > 25 ? "${user.name.substring(0, 25)}..." : user.name,
           style: textStyle,
         ),
         if (channelName != null) ...[

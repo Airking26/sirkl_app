@@ -11,6 +11,7 @@ import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/inbox_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
+import 'package:sirkl/common/view/stream_chat/src/message_list_view/stream_message_search_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
@@ -31,13 +32,17 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
 
   late final _listController = StreamChannelListController(
     client: StreamChat.of(context).client,
-    filter: Filter.in_(
-      'members',
-      [StreamChat.of(context).currentUser!.id],
-    ),
+    filter: Filter.and([
+      Filter.in_('members', [StreamChat.of(context).currentUser!.id],)
+    ]),
     channelStateSort: const [SortOption('last_message_at')],
     limit: 20,
   );
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -48,7 +53,7 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
 
   @override
   Widget build(BuildContext context) {
-
+    var k = _listController;
     TabController tabController = TabController(length: 2, vsync: this);
     tabController.index = _chatController.index.value;
     tabController.addListener(() {
@@ -57,14 +62,14 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
       }
     });
 
-    return Scaffold(
+    return Obx( () =>Scaffold(
         backgroundColor: Get.isDarkMode
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Column(children: [
           buildAppbar(context, tabController),
           buildListConv(context, tabController)
-        ]));
+        ])));
   }
 
   MediaQuery buildListConv(BuildContext context, TabController tabController) {
@@ -77,11 +82,15 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
           child: TabBarView(
             controller: tabController,
             children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ?
+                StreamMessageSearchPage(client: StreamChat.of(context).client) :
+                StreamChannelListView(controller: _listController, onChannelTap: (channel){
+                  Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()));},),
+              ),
               StreamChannelListView(controller: _listController, onChannelTap: (channel){
-                Get.to(() => StreamChannel(child: ChannelPage(), channel: channel));
-              },),
-              StreamChannelListView(controller: _listController, onChannelTap: (channel){
-                StreamChannel(child: ChannelPage(), channel: channel);
+                StreamChannel(channel: channel, child: const ChannelPage());
               },)
             ],
           ),
@@ -331,7 +340,9 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async{
         if(query.isNotEmpty) {
-          var newItems = await _chatController.searchInInboxes(query);
+          _chatController.query.value = query;
+        }
+          /*var newItems = await _chatController.searchInInboxes(query);
           if (_chatController.index.value == 0) {
             List<InboxDto> newItemsFriends = newItems.where((owned) => owned.ownedBy!.firstWhere((element) => element.id != _homeController.userMe.value.id!).isInFollowing!).toList();
           } else {
@@ -341,7 +352,7 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
                 .toList();
           }
         } else {
-        }
+        }*/
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [

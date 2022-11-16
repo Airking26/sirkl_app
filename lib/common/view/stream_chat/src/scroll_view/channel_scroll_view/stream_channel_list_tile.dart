@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 /// A widget that displays a channel preview.
 ///
@@ -211,34 +212,6 @@ class StreamChannelListTile extends StatelessWidget {
                   child: subtitle,
                 ),
               ),
-              BetterStreamBuilder<List<Message>>(
-                stream: channelState.messagesStream,
-                initialData: channelState.messages,
-                comparator: const ListEquality().equals,
-                builder: (context, messages) {
-                  final lastMessage = messages.lastWhereOrNull(
-                    (m) => !m.shadowed && !m.isDeleted,
-                  );
-
-                  if (lastMessage == null ||
-                      (lastMessage.user?.id != currentUser.id)) {
-                    return const Offstage();
-                  }
-
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child:
-                        sendingIndicatorBuilder?.call(context, lastMessage) ??
-                            StreamSendingIndicator(
-                              message: lastMessage,
-                              size: channelPreviewTheme.indicatorIconSize,
-                              isMessageRead: channelState
-                                  .currentUserRead!.lastRead
-                                  .isAfter(lastMessage.createdAt),
-                            ),
-                  );
-                },
-              ),
               trailing,
             ],
           ),
@@ -277,6 +250,10 @@ class ChannelLastMessageDate extends StatelessWidget {
           final now = DateTime.now();
 
           final startOfDay = DateTime(now.year, now.month, now.day);
+          var nowMilli = DateTime.now().millisecondsSinceEpoch;
+          var lastMessageMilli = lastMessageAt.millisecondsSinceEpoch;
+          var diffMilli = nowMilli - lastMessageMilli;
+          var timeSince = DateTime.now().subtract(Duration(milliseconds: diffMilli));
 
           if (lastMessageAt.millisecondsSinceEpoch >=
               startOfDay.millisecondsSinceEpoch) {
@@ -293,8 +270,8 @@ class ChannelLastMessageDate extends StatelessWidget {
           }
 
           return Text(
-            stringDate,
-            style: textStyle,
+            timeago.format(timeSince),
+            style: textStyle!.copyWith(fontWeight: FontWeight.w600, fontSize: 12),
           );
         },
       );

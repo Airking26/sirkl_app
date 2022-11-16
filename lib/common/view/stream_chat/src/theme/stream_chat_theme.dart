@@ -150,12 +150,12 @@ class StreamChatThemeData {
       ),
     );
     final channelPreviewTheme = StreamChannelPreviewThemeData(
-      unreadCounterColor: colorTheme.accentError,
+      unreadCounterColor: colorTheme.accentPrimary,
       avatarTheme: StreamAvatarThemeData(
         borderRadius: BorderRadius.circular(20),
         constraints: const BoxConstraints.tightFor(
-          height: 40,
-          width: 40,
+          height: 60,
+          width: 60,
         ),
       ),
       titleStyle: textTheme.bodyBold,

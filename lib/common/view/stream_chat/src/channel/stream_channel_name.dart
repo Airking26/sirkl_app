@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 /// It shows the current [Channel] name using a [Text] widget.
@@ -48,15 +52,14 @@ class StreamChannelName extends StatelessWidget {
       LayoutBuilder(
         builder: (context, constraints) {
           var channelName = context.translations.noTitleText;
-          final otherMembers = members.where(
-            (member) => member.userId != currentUser.id,
-          );
+          final otherMembers = members.where((member) => member.userId != currentUser.id,);
 
           if (otherMembers.isNotEmpty) {
             if (otherMembers.length == 1) {
               final user = otherMembers.first.user;
               if (user != null) {
-                channelName = user.name;
+                var userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
+                channelName = userDTO.userName.isNullOrBlank! ? userDTO.wallet! : userDTO.userName!.capitalizeFirst!;
               }
             } else {
               final maxWidth = constraints.maxWidth;
@@ -82,7 +85,7 @@ class StreamChannelName extends StatelessWidget {
 
           return Text(
             channelName,
-            style: textStyle,
+            style: textStyle!.copyWith(fontSize: 18, fontWeight: FontWeight.w600),
             overflow: textOverflow,
           );
         },

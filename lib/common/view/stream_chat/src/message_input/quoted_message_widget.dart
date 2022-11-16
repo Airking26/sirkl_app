@@ -172,6 +172,9 @@ class _QuotedMessage extends StatelessWidget {
                 : messageTheme.copyWith(
                     messageTextStyle: messageTheme.messageTextStyle?.copyWith(
                       fontSize: 12,
+                      color: Colors.white,
+                      fontFamily: 'Gilroy',
+                      fontWeight: FontWeight.w500
                     ),
                   ),
           ),
@@ -180,20 +183,26 @@ class _QuotedMessage extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: _getBackgroundColor(context),
         border: showBorder
             ? Border.all(
                 color: StreamChatTheme.of(context).colorTheme.disabled,
               )
             : null,
         borderRadius: BorderRadius.only(
-          topRight: const Radius.circular(12),
-          topLeft: const Radius.circular(12),
-          bottomRight: reverse ? const Radius.circular(12) : Radius.zero,
-          bottomLeft: reverse ? Radius.zero : const Radius.circular(12),
+            topLeft: const Radius.circular(10),
+            bottomRight: const Radius.circular(10),
+            bottomLeft: reverse ? const Radius.circular(0)  : const Radius.circular(10),
+            topRight: const Radius.circular(10),
         ),
+        gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+               Color(0xFF102437),
+                Color(0xFF13171B)
+            ]),
       ),
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment:

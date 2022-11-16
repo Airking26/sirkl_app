@@ -466,6 +466,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
                       child: QuotingMessageTopArea(
                         hasQuotedMessage: _hasQuotedMessage,
                         onQuotedMessageCleared: widget.onQuotedMessageCleared,
+                        effectiveController: _effectiveController,
                       ),
                     )
                   else if (_effectiveController.ogAttachment != null)

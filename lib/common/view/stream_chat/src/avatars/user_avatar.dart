@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:tiny_avatar/tiny_avatar.dart';
 
 /// {@template streamUserAvatar}
 /// Displays a user's avatar.
@@ -70,6 +75,8 @@ class StreamUserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasImage = user.image != null && user.image!.isNotEmpty;
+    final userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
+    final hasPicture = userDTO.picture.isNullOrBlank!;
     final streamChatTheme = StreamChatTheme.of(context);
     final streamChatConfig = StreamChatConfiguration.of(context);
 
@@ -87,11 +94,11 @@ class StreamUserAvatar extends StatelessWidget {
       child: Container(
         constraints: constraints ??
             streamChatTheme.ownMessageTheme.avatarTheme?.constraints,
-        child: hasImage
+        child: !hasPicture
             ? CachedNetworkImage(
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.high,
-                imageUrl: user.image!,
+                imageUrl: userDTO.picture!,
                 errorWidget: (context, __, ___) => backupGradientAvatar,
                 placeholder: placeholder != null
                     ? (context, __) => placeholder(context, user)
@@ -108,7 +115,7 @@ class StreamUserAvatar extends StatelessWidget {
                   ),
                 ),
               )
-            : backupGradientAvatar,
+            : TinyAvatar(baseString: user.name, dimension: constraints!.minHeight, circular: true, colourScheme: TinyAvatarColourScheme.seascape,),
       ),
     );
 

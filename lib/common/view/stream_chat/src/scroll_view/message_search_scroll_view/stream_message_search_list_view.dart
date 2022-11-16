@@ -2,6 +2,7 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_error_widget.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_load_more_error.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_load_more_indicator.dart';
@@ -377,10 +378,10 @@ class StreamMessageSearchListSeparator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effect = StreamChatTheme.of(context).colorTheme.borderBottom;
     return Container(
-      height: 1,
-      color: effect.color!.withOpacity(effect.alpha ?? 1.0),
+      margin: EdgeInsets.only(right: 8, left: 60),
+      height: 0.25,
+      color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart' hide ButtonStyle;
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_actions_modal/copy_message_button.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_actions_modal/delete_message_button.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_actions_modal/edit_message_button.dart';
@@ -175,7 +176,7 @@ class _MessageActionsModalState extends State<MessageActionsModal> {
                 child: SizedBox(
                   width: mediaQueryData.size.width * 0.75,
                   child: Material(
-                    color: streamChatThemeData.colorTheme.appBg,
+                    color: Get.isDarkMode?  const Color(0xFF102437) : Colors.white,
                     clipBehavior: Clip.hardEdge,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),

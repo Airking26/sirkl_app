@@ -31,6 +31,8 @@ class ChatsController extends GetxController{
   Rx<ZIMMessage?> lastItem = (null as ZIMMessage?).obs;
   Rx<ZIMConversation?> lastConv = (null as ZIMConversation?).obs;
 
+  var query = "".obs;
+
   createInbox(InboxCreationDto inboxCreationDto) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);

@@ -11,6 +11,7 @@ import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
@@ -31,7 +32,7 @@ class ProfileController extends GetxController{
   var descriptionTextEditingController = TextEditingController().obs;
   var urlPicture = "".obs;
 
-  updateMe(UpdateMeDto updateMeDto) async {
+  updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
     await ZIM.getInstance()!.updateUserAvatarUrl(updateMeDto.picture ?? "");
     await ZIM.getInstance()!.updateUserName(updateMeDto.userName ?? _homeController.userMe.value.wallet!);
     isLoadingPicture.value = true;
@@ -46,6 +47,8 @@ class ProfileController extends GetxController{
       request = await _profileService.modifyUser(accessToken, updateMeDtoToJson(updateMeDto));
       if(request.isOk){
         _homeController.userMe.value = userFromJson(json.encode(request.body));
+        await streamChatClient.disconnectUser();
+        await _homeController.retrieveTokenStreamChat(streamChatClient);
         isEditingProfile.value = false;
         isLoadingPicture.value = false;
       } else {
@@ -53,8 +56,11 @@ class ProfileController extends GetxController{
       }
     } else if(request.isOk){
       _homeController.userMe.value = userFromJson(json.encode(request.body));
+      await streamChatClient.disconnectUser();
+      await _homeController.retrieveTokenStreamChat(streamChatClient);
       isEditingProfile.value = false;
       isLoadingPicture.value = false;
+      //var k = await streamChatClient.updateUser(User(id: _homeController.id.value, extraData: {"userDTO": _homeController.userMe.value}));
     } else {
       isLoadingPicture.value = false;
     }
@@ -68,7 +74,7 @@ class ProfileController extends GetxController{
       _homeController.accessToken.value = _homeController.tempSignInSuccess.value.accessToken!;
       box.write(con.REFRESH_TOKEN, _homeController.tempSignInSuccess.value.refreshToken!);
       box.write(con.USER, userToJson(_homeController.tempSignInSuccess.value.user!));
-      await _homeController.putFCMToken();
+      await _homeController.putFCMToken(null);
       Get.back();
     }
   }

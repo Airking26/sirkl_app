@@ -1,7 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 
 class ChannelPage extends StatefulWidget {
   const ChannelPage({Key? key}) : super(key: key);
@@ -14,7 +16,7 @@ class _ChannelPageState extends State<ChannelPage> {
 
   FocusNode? _focusNode;
   final StreamMessageInputController _messageInputController = StreamMessageInputController();
-
+  final _commonController = Get.put(CommonController());
 
   @override
   void initState() {
@@ -34,7 +36,7 @@ class _ChannelPageState extends State<ChannelPage> {
       backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
       body: Column(
         children: <Widget>[
-          const StreamChannelHeader(),
+          StreamChannelHeader(commonController: _commonController),
           Expanded(
             child: StreamMessageListView(
               onMessageSwiped: _reply,
@@ -48,7 +50,7 @@ class _ChannelPageState extends State<ChannelPage> {
               },
             ),
           ),
-          //StreamTypingIndicator(),
+          const StreamTypingIndicator(),
           StreamMessageInput(
             messageInputController: _messageInputController,
             focusNode: _focusNode,

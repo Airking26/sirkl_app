@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/moralis_metadata_dto.dart';
 import 'package:sirkl/common/model/moralis_nft_contract_addresse.dart';
@@ -58,6 +59,8 @@ class HomeController extends GetxController{
   var tokenZegoCloud = "".obs;
   var tokenStreamChat = "".obs;
 
+  final _commonController = Get.put(CommonController());
+
   connectWallet() async {
     final connector = WalletConnect(
       bridge: 'https://bridge.walletconnect.org',
@@ -107,7 +110,7 @@ class HomeController extends GetxController{
       accessToken.value = signSuccess.accessToken!;
       box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
       box.write(con.USER, userToJson(signSuccess.user!));
-      await putFCMToken();
+      await putFCMToken(null);
       Get.back();
       isLoading.value = false;
     } else {
@@ -133,7 +136,7 @@ class HomeController extends GetxController{
       accessToken.value = signSuccess.accessToken!;
       box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
       box.write(con.USER, userToJson(signSuccess.user!));
-      await putFCMToken();
+      await putFCMToken(null);
       isLoading.value = false;
     }
     else if(requestSignUp.bodyString != null && requestSignUp.bodyString!.contains("WALLET_ALREADY_USED")){
@@ -146,7 +149,7 @@ class HomeController extends GetxController{
     }
   }
 
-  putFCMToken() async {
+  putFCMToken(StreamChatClient? client) async {
     final firebaseMessaging = await FirebaseMessaging.instance.getToken();
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
@@ -160,11 +163,14 @@ class HomeController extends GetxController{
       request = await _homeService.uploadFCMToken(accessToken, fcm);
     }
     userMe.value = userFromJson(json.encode(request.body));
+    retrieveAccessToken();
+    _commonController.showSirklUsers(id.value);
+    if(client != null) await retrieveTokenStreamChat(client);
     await retrieveTokenZegoCloud();
     await getNFTsContractAddresses();
   }
 
-  retrieveAccessToken() async{
+  retrieveAccessToken(){
     var accessTok = box.read(con.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
     id.value = userFromJson(box.read(con.USER) ?? "").id ?? "";
@@ -260,10 +266,10 @@ class HomeController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _profileService.retrieveTokenStreamChat(accessToken);
       if(request.isOk){
-        await client.connectUser(User(id: id.value), request.body!);
+        await client.connectUser(User(id: id.value, name: userMe.value.wallet, extraData: {"userDTO": userMe.value}), request.body!);
       }
     } else if(request.isOk){
-      await client.connectUser(User(id: id.value), request.body!);
+      await client.connectUser(User(id: id.value, name: userMe.value.wallet, extraData: {"userDTO": userMe.value}), request.body!);
     }
   }
 

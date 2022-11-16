@@ -1,5 +1,6 @@
 import 'package:ezanimation/ezanimation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 /// {@template streamReactionPicker}
@@ -50,7 +51,7 @@ class _StreamReactionPickerState extends State<StreamReactionPicker>
 
     final child = Material(
       borderRadius: BorderRadius.circular(24),
-      color: chatThemeData.colorTheme.barsBg,
+      color: Get.isDarkMode ?  const Color(0xFF102437) : Colors.white,
       clipBehavior: Clip.hardEdge,
       child: Padding(
         padding: const EdgeInsets.symmetric(

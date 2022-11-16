@@ -33,7 +33,7 @@ class EditMessageButton extends StatelessWidget {
             const SizedBox(width: 16),
             Text(
               context.translations.editMessageLabel,
-              style: streamChatThemeData.textTheme.body,
+              style: streamChatThemeData.textTheme.body.copyWith(fontFamily: "Gilroy"),
             ),
           ],
         ),

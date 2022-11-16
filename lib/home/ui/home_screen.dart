@@ -37,13 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
   YYDialog dialogMenu = YYDialog();
   final utils = Utils();
 
-
-  @override
-  void initState() {
-    _commonController.showSirklUsers(_homeController.id.value);
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -407,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         baseString: _commonController.users[index].wallet!,
                         dimension: 56,
                         circular: true,
-                        colourScheme: _commonController.users[index].wallet![_commonController.users[index].wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,
+                        colourScheme:TinyAvatarColourScheme.seascape ,
                       ))
                   : ClipRRect(
                       borderRadius: BorderRadius.circular(90.0),

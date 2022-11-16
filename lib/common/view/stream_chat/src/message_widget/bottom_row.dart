@@ -209,13 +209,12 @@ class BottomRow extends StatelessWidget {
 
     return Text.rich(
       TextSpan(
-        style: TextStyle(color: Colors.black),
+        style: const TextStyle(color: Colors.black),
         children: [
           ...children,
         ].insertBetween(const WidgetSpan(child: SizedBox(width: 2))),
       ),
       maxLines: 1,
-      textAlign: reverse ? TextAlign.right : TextAlign.left,
     );
   }
 }

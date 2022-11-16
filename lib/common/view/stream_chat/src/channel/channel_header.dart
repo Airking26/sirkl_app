@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/view/stream_chat/src/utils/helpers.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
@@ -73,7 +74,10 @@ class StreamChannelHeader extends StatelessWidget
     this.actions,
     this.backgroundColor,
     this.elevation = 1,
+    required this.commonController,
   }) : preferredSize = const Size.fromHeight(kToolbarHeight);
+
+  final CommonController commonController;
 
   /// Whether to show the leading back button
   ///
@@ -209,7 +213,8 @@ class StreamChannelHeader extends StatelessWidget
                                 color: Get.isDarkMode ? Colors.white : Colors.black,
                               )),
                           InkWell(
-                            onTap: () {
+                            onTap: () async {
+                              await commonController.defineUserFromChannel(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.userId, StreamChat.of(context).client);
                               Get.to(() => const ProfileElseScreen());
                             },
                             child: Padding(
@@ -218,7 +223,8 @@ class StreamChannelHeader extends StatelessWidget
                                   borderRadius: BorderRadius.circular(90),
                                   child:
                                   channel.image == null ?
-                                  TinyAvatar(baseString: channel.name ?? "", dimension: 40, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
+                                  TinyAvatar(baseString: channel.name ?? "", dimension: 40, circular: true,
+                                      colourScheme: TinyAvatarColourScheme.seascape) :
                                   CachedNetworkImage(
                                     imageUrl: channel.image!,
                                     width: 40,
@@ -229,7 +235,8 @@ class StreamChannelHeader extends StatelessWidget
                             ),
                           ),
                           InkWell(
-                            onTap: () {
+                            onTap: () async{
+                              await commonController.defineUserFromChannel(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.userId, StreamChat.of(context).client);
                               Get.to(() => const ProfileElseScreen());
                             },
                             child: Padding(

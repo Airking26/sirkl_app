@@ -7,6 +7,7 @@ import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
@@ -83,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               userName: _profileController.usernameTextEditingController.value.text.isEmpty ? _homeController.userMe.value.wallet! : _profileController.usernameTextEditingController.value.text,
                               description: _profileController.descriptionTextEditingController.value.text.isEmpty ? "" : _profileController.descriptionTextEditingController.value.text,
                               picture: _profileController.urlPicture.value
-                            )):
+                            ), StreamChat.of(context).client):
                             Get.to(() => const NotificationScreen());
                             }, icon: Image.asset(_profileController.isEditingProfile.value ? "assets/images/edit.png" : "assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
                           Padding(
@@ -125,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
                           child: GestureDetector(onTap: (){ if(_profileController.isEditingProfile.value) _profileController.getImage();},
                               child: _profileController.urlPicture.value.isEmpty ?
-                                   TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 140, circular: true, colourScheme: _homeController.userMe.value.wallet![_homeController.userMe.value.wallet!.length - 1].isAz() ? TinyAvatarColourScheme.seascape : TinyAvatarColourScheme.heated,) :
+                                   TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 140, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
                               CachedNetworkImage(imageUrl: _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,)
 
                           )

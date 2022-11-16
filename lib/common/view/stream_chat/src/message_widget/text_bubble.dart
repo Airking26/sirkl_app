@@ -66,7 +66,7 @@ class TextBubble extends StatelessWidget {
               messageTheme: isOnlyEmoji
                   ? messageTheme.copyWith(
                       messageTextStyle: messageTheme.messageTextStyle!.copyWith(
-                        fontSize: 42,
+                        fontSize: 42
                       ),
                     )
                   : messageTheme.copyWith(messageTextStyle: TextStyle(color: reverse ? Colors.black : Colors.white , fontSize: 15, fontFamily: 'Gilroy', fontWeight: FontWeight.w500)),

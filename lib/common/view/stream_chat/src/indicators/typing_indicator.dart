@@ -58,14 +58,12 @@ class StreamTypingIndicator extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Lottie.asset(
-                      'animations/typing_dots.json',
-                      height: 4,
-                    ),
-                    Text(
-                      context.translations.userTypingText(users),
-                      maxLines: 1,
-                      style: style,
+                    Container(
+                      margin: EdgeInsets.only(bottom: 24),
+                      child: Lottie.asset(
+                        'animations/typing_dots.json',
+                        height: 4,
+                      ),
                     ),
                   ],
                 ),

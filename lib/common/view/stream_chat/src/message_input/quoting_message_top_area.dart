@@ -1,9 +1,11 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
 import 'package:flutter/material.dart';
+import 'package:sirkl/common/view/stream_chat/src/message_input/stream_message_input.dart';
 import 'package:sirkl/common/view/stream_chat/src/misc/stream_svg_icon.dart';
 import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
 import 'package:sirkl/common/view/stream_chat/src/utils/utils.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 /// {@template quotingMessageTopArea}
 /// The area that appears above [MessageInput] when the user is quoting a
@@ -17,10 +19,13 @@ class QuotingMessageTopArea extends StatelessWidget {
     super.key,
     required this.hasQuotedMessage,
     this.onQuotedMessageCleared,
+    required this.effectiveController
   });
 
   ///
   final bool hasQuotedMessage;
+
+  final StreamMessageInputController effectiveController;
 
   /// The callback to perform when the "close" button is tapped.
   ///
@@ -44,12 +49,14 @@ class QuotingMessageTopArea extends StatelessWidget {
             ),
             Text(
               context.translations.replyToMessageLabel,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.w500, fontFamily: "Gilroy"),
             ),
             IconButton(
               visualDensity: VisualDensity.compact,
               icon: StreamSvgIcon.closeSmall(),
-              onPressed: onQuotedMessageCleared?.call,
+              onPressed: (){
+                effectiveController.clear();
+              },
             ),
           ],
         ),
