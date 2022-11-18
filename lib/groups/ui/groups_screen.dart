@@ -1,14 +1,13 @@
 import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
-
-import '../../common/utils.dart';
+import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/groups/controller/groups_controller.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
 class GroupsScreen extends StatefulWidget {
@@ -21,6 +20,41 @@ class GroupsScreen extends StatefulWidget {
 class _GroupsScreenState extends State<GroupsScreen> {
 
   YYDialog dialogMenu = YYDialog();
+  final _groupController = Get.put(GroupsController());
+  final _homeController = Get.put(HomeController());
+  StreamChannelListController? streamChannelListControllerGroups;
+
+  StreamChannelListController buildStreamChannelListController(){
+    return StreamChannelListController(
+      client: StreamChat.of(context).client,
+      filter:
+      _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ?
+      Filter.and([
+        Filter.autoComplete('member.user.name', _groupController.query.value),
+        Filter.in_("members", [_homeController.id.value]),
+        Filter.greater("member_count", 2)
+      ]) :
+      Filter.and([
+        Filter.in_("members", [_homeController.id.value]),
+        Filter.greater("member_count", 2)
+      ]),
+      channelStateSort: const [SortOption('last_message_at')],
+      limit: 20,
+    );
+  }
+
+  @override
+  void initState() {
+    streamChannelListControllerGroups = buildStreamChannelListController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    streamChannelListControllerGroups?.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -38,19 +72,25 @@ class _GroupsScreenState extends State<GroupsScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(top:24.0),
                 child: SafeArea(
-                  child: ListView.separated(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    itemCount: 50,
-                      itemBuilder: groupTile,
-                    separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
-                  ),
+                  child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Obx(() =>StreamChannelListView(
+                        emptyBuilder: (context){
+                          return noGroupUI();
+                        },
+                        controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController() : streamChannelListControllerGroups!, onChannelTap: (channel){
+                        Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value) {
+                          streamChannelListControllerGroups!.refresh();
+                        });
+                      },
+                      ),
+                      )),
                 ),
               ),
             ),
           )
         ]));
   }
-
 
   Stack buildAppBar(BuildContext context) {
     return Stack(
@@ -165,11 +205,11 @@ class _GroupsScreenState extends State<GroupsScreen> {
       ..show();
   }
 
-  Widget groupTile(BuildContext context, int index){
+  /*Widget groupTile(BuildContext context, int index){
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
-        onTap: (){Get.to(() => const DetailedMessageScreenOther());},
+        onTap: (){Get.to(() => const DetailedChatScreen());},
         leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", height: 60, width: 60, fit: BoxFit.cover,),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -183,9 +223,54 @@ class _GroupsScreenState extends State<GroupsScreen> {
 
       ),
     );
-  }
+  }*/
 
   Column noGroupUI() {
+    return Column(
+          children: [
+            const SizedBox(
+              height: 100,
+            ),
+            Image.asset(
+              "assets/images/people.png",
+              width: 150,
+              height: 150,
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 54.0),
+              child: Text(
+                con.noGroupYetRes.tr,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Get.isDarkMode ? Colors.white : Colors.black,
+                    fontSize: 25,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w700),
+              ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 54.0),
+              child: Text(
+                con.errorGroupCollection.tr,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    color: Color(0xFF9BA0A5),
+                    fontSize: 16,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        );
+  }
+
+  Column noGroupFoundUI() {
     return Column(
           children: [
             const SizedBox(
@@ -259,7 +344,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
       hint: 'Search here...',
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
-      transitionDuration: const Duration(milliseconds: 800),
+      transitionDuration: const Duration(milliseconds: 0),
       transitionCurve: Curves.easeInOut,
       physics: const BouncingScrollPhysics(),
       axisAlignment: 0.0,
@@ -281,9 +366,12 @@ class _GroupsScreenState extends State<GroupsScreen> {
       borderRadius: BorderRadius.circular(10),
       backgroundColor:
           Get.isDarkMode ? Color(0xFF2D465E).withOpacity(1) : Colors.white,
-      debounceDelay: const Duration(milliseconds: 500),
+      debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) {
-        // Call your model, bloc, controller here.
+        if(query.isNotEmpty){
+          _groupController.query.value = query;
+          _groupController.searchIsActive.value = true;
+        }
       },
       // Specify a custom transition to be used for
       // animating between opened and closed stated.

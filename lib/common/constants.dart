@@ -19,6 +19,7 @@ const String connectYourWalletRes = "connect_your_wallet";
 const String talkWithRes = "talk_with";
 const String getStartedRes = "get_started";
 const String noFriendsRes = "no_friends";
+const String noFriendsSentenceRes = "no_friends_sentence";
 const String addUsersToSirklRes = "add_users_to_sirkl";
 const String rulesRes = "rules";
 
@@ -32,6 +33,7 @@ const String noDescYetRes = "no_description_yet";
 /// Group page ///
 const String noGroupYetRes = "no_group_yet";
 const String errorFindingCollection = "error_finding_collection";
+const String errorGroupCollection = "error_group_collection";
 const String addGroupRes = "add_group";
 const String notificationsOffRes = "notifications_off";
 const String contactOwnerRes = "contact_owner";

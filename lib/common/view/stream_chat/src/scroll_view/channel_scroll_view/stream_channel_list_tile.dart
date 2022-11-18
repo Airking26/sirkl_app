@@ -309,12 +309,15 @@ class ChannelListTileSubtitle extends StatelessWidget {
         ],
       );
     }
-    return StreamTypingIndicator(
-      channel: channel,
-      style: textStyle,
-      alternativeWidget: ChannelLastMessageText(
+    return Transform.translate(
+      offset: Offset(2, 0),
+      child: StreamTypingIndicator(
         channel: channel,
-        textStyle: textStyle,
+        style: textStyle,
+        alternativeWidget: ChannelLastMessageText(
+          channel: channel,
+          textStyle: textStyle,
+        ),
       ),
     );
   }

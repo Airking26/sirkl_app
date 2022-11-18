@@ -1,20 +1,18 @@
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
-import 'package:zego_zim/zego_zim.dart';
 
 import '../../common/view/dialog/custom_dial.dart';
 import '../controller/chats_controller.dart';
@@ -34,11 +32,13 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   YYDialog dialogMenu = YYDialog();
   static var _pageKey = 0;
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
-  final _textMessageController = TextEditingController();
   final utils = Utils();
+  FocusNode? _focusNode;
+  final StreamMessageInputController _messageInputController = StreamMessageInputController();
 
   @override
   void initState() {
+    _focusNode = FocusNode();
     _chatController.searchToRefresh.value = true;
     pagingController.addPageRequestListener((pageKey) {
       if(_commonController.query.value.isNotEmpty) {
@@ -172,7 +172,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   ],
                 )),
           ),
-          buildBottomBar()
+          buildBottomBar(),
         ])));
   }
 
@@ -189,24 +189,15 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
             ]),
       ),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Flexible(
             flex: 3,
             child: TextField(
-              controller: _textMessageController,
+              controller: _messageInputController.textFieldController,
               decoration: InputDecoration(
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.add,
-                    color: Get.isDarkMode
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                  ),
-                  onPressed: () {},
-                ),
                 hintText: con.writeHereRes.tr,
                 hintStyle: TextStyle(
                     fontWeight: FontWeight.w500,
@@ -226,8 +217,20 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           ),
           Flexible(
             child: InkWell(
-              onTap: () async {
-                await _chatController.bulkPeerMessages(_chatController.chipsList.value.map((e) => InboxCreationDto(lastMessage: _textMessageController.text, updatedAt: DateTime.now(), lastSender: _homeController.id.value, unreadMessages: 1, ownedBy: [_homeController.id.value, e.id!])).toList());
+              onTap: () {
+                _chatController.chipsList.map((element) => element.id).forEachIndexed((index, id) async {
+                  var channel = StreamChat.of(context).client.channel("try", extraData: {"members": [id, _homeController.id.value,]});
+                  await channel.watch();
+                  await channel.sendMessage(_messageInputController.message);
+                  channel.dispose();
+                  if(index == _chatController.chipsList.length - 1) {
+                    _messageInputController.clear();
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    _chatController.chipsList.clear();
+                    utils.showToast(context, con.messageSuccessfullySentRes.tr);
+                  }
+                  });
+                /*await _chatController.bulkPeerMessages(_chatController.chipsList.value.map((e) => InboxCreationDto(lastMessage: _textMessageController.text, updatedAt: DateTime.now(), lastSender: _homeController.id.value, unreadMessages: 1, ownedBy: [_homeController.id.value, e.id!])).toList());
                 ZIMTextMessage textMessage = ZIMTextMessage(message: _textMessageController.text);
                 ZIMMessageSendConfig sendConfig = ZIMMessageSendConfig();
                 _chatController.chipsList.map((element) => element.id).forEach((id) async{
@@ -243,31 +246,25 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                       default:
                     }
                   });
-                });
-                _textMessageController.clear();
-                FocusManager.instance.primaryFocus?.unfocus();
-                _chatController.chipsList.clear();
-                utils.showToast(context, con.messageSuccessfullySentRes.tr);
+                });*/
 
               },
-              child: Flexible(
-                child: Container(
-                  width: 55,
-                  height: 55,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      gradient: const LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [Color(0xFF1DE99B), Color(0xFF0063FB)])),
-                  child: Align(
-                      alignment: Alignment.center,
-                      child: Image.asset(
-                        "assets/images/send.png",
-                        height: 32,
-                        width: 32,
-                      )),
-                ),
+              child: Container(
+                width: 55,
+                height: 55,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [Color(0xFF1DE99B), Color(0xFF0063FB)])),
+                child: Align(
+                    alignment: Alignment.center,
+                    child: Image.asset(
+                      "assets/images/send.png",
+                      height: 32,
+                      width: 32,
+                    )),
               ),
             ),
           )
@@ -275,6 +272,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       ),
     );
   }
+
+
 
   Container buildAppBar() {
     return Container(
@@ -488,6 +487,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
 
   @override
   void dispose() {
+    _focusNode!.dispose();
     _chatController.searchToRefresh.value = true;
     _chatController.chipsList.clear();
     pagingController.dispose();

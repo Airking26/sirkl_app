@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/chats/ui/chats_screen_other.dart';
+import 'package:sirkl/chats/ui/chat_screen.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import '../../calls/ui/calls_screen.dart';
 import '../../common/view/navbar/floating_navbar.dart';
@@ -26,7 +26,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     const HomeScreen(),
     const CallsScreen(),
     const GroupsScreen(),
-    const ChatsScreenOther(),
+    const ChatScreen(),
     const ProfileScreen()
   ];
 

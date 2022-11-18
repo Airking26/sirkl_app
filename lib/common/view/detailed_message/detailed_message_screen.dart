@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+/*import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -9,6 +9,7 @@ import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/inbox_modification_dto.dart';
+import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -781,7 +782,7 @@ class _DetailedMessageScreenOtherState
           dialogMenu.dismiss();
           if (_commonController.userClickedFollowStatus.value) {
             if (await _commonController
-                .removeUserToSirkl(_commonController.userClicked.value!.id!)) {
+                .removeUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client)) {
               utils.showToast(
                   context,
                   con.userRemovedofSirklRes.trParams({
@@ -791,7 +792,7 @@ class _DetailedMessageScreenOtherState
             }
           } else {
             if (await _commonController
-                .addUserToSirkl(_commonController.userClicked.value!.id!)) {
+                .addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client)) {
               utils.showToast(
                   context,
                   con.userAddedToSirklRes.trParams({
@@ -868,3 +869,4 @@ class _DetailedMessageScreenOtherState
     super.dispose();
   }
 }
+*/

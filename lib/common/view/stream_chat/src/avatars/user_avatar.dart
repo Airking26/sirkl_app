@@ -115,7 +115,7 @@ class StreamUserAvatar extends StatelessWidget {
                   ),
                 ),
               )
-            : TinyAvatar(baseString: user.name, dimension: constraints!.minHeight, circular: true, colourScheme: TinyAvatarColourScheme.seascape,),
+            : TinyAvatar(baseString: userFromJson(json.encode(user.extraData["userDTO"])).wallet!, dimension: constraints!.minHeight, circular: true, colourScheme: TinyAvatarColourScheme.seascape,),
       ),
     );
 

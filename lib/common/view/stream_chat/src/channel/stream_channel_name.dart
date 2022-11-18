@@ -59,7 +59,7 @@ class StreamChannelName extends StatelessWidget {
               final user = otherMembers.first.user;
               if (user != null) {
                 var userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
-                channelName = userDTO.userName.isNullOrBlank! ? userDTO.wallet! : userDTO.userName!.capitalizeFirst!;
+                channelName = userDTO.userName.isNullOrBlank! ? userDTO.wallet! : userDTO.userName!;
               }
             } else {
               final maxWidth = constraints.maxWidth;
@@ -85,7 +85,7 @@ class StreamChannelName extends StatelessWidget {
 
           return Text(
             channelName,
-            style: textStyle!.copyWith(fontSize: 18, fontWeight: FontWeight.w600),
+            style: textStyle!.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
             overflow: textOverflow,
           );
         },

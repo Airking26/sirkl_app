@@ -208,10 +208,9 @@ class _MessageCardState extends State<MessageCard> {
             ]),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey,
-            offset: Offset(
-                0.25, Get.isDarkMode ? 0 : 0.25), //(x,y)
-            blurRadius: Get.isDarkMode ? 0 : 0.25,
+            color: Get.isDarkMode ? Color(0xFF2D465E) : Colors.grey ,
+            offset: Offset(0.35, Get.isDarkMode ? 0.25 : 0.25), //(x,y)
+            blurRadius: Get.isDarkMode ? 0.1 : 0.25,
           ),
         ],
       ),

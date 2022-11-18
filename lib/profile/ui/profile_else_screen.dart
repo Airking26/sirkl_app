@@ -9,7 +9,8 @@ import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
-import 'package:sirkl/common/view/detailed_message/detailed_message_screen_second.dart';
+import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
@@ -78,11 +79,11 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                         children: [
                           IconButton(onPressed: () async{
                             if(!_commonController.userClickedFollowStatus.value) {
-                              if( await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!)){
+                              if( await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)){
                                 utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
                               }
                             } else {
-                              Get.to(() => const DetailedMessageScreenOtherSecond());
+                              Get.to(() => const DetailedChatScreen());
                             }
                             }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: Get.isDarkMode ? Colors.white : Colors.black, height: 28, width: 28,)),
                           Padding(
@@ -189,11 +190,11 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
         onTap: () async{
           dialogMenu.dismiss();
           if(_commonController.userClickedFollowStatus.value) {
-            if(await _commonController.removeUserToSirkl(_commonController.userClicked.value!.id!)) {
+            if(await _commonController.removeUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)) {
               utils.showToast(context, con.userRemovedofSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
             }
           } else {
-            if(await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!)){
+            if(await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)){
               utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
             }
           }
@@ -204,7 +205,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){
-          Get.to(() => const DetailedMessageScreenOther());
+          Get.to(() => const DetailedChatScreen());
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.sendAMessageRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),

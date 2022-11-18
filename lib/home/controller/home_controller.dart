@@ -173,7 +173,8 @@ class HomeController extends GetxController{
   retrieveAccessToken(){
     var accessTok = box.read(con.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
-    id.value = userFromJson(box.read(con.USER) ?? "").id ?? "";
+    var d = box.read(con.USER);
+    id.value = d != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
   }
 
   getNFTsContractAddresses() async{
@@ -266,10 +267,10 @@ class HomeController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _profileService.retrieveTokenStreamChat(accessToken);
       if(request.isOk){
-        await client.connectUser(User(id: id.value, name: userMe.value.wallet, extraData: {"userDTO": userMe.value}), request.body!);
+        await client.connectUser(User(id: id.value, name: userMe.value.userName ?? userMe.value.wallet, extraData: {"userDTO": userMe.value}), request.body!);
       }
     } else if(request.isOk){
-      await client.connectUser(User(id: id.value, name: userMe.value.wallet, extraData: {"userDTO": userMe.value}), request.body!);
+      await client.connectUser(User(id: id.value, name: userMe.value.userName ?? userMe.value.wallet, extraData: {"userDTO": userMe.value}), request.body!);
     }
   }
 

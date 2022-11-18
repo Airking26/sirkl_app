@@ -6,6 +6,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/service/common_service.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
 
 import '../model/refresh_token_dto.dart';
@@ -26,7 +27,9 @@ class CommonController extends GetxController{
   var queryHasChanged = false.obs;
   var inboxClicked = InboxDto().obs;
 
-  Future<bool> addUserToSirkl(String id) async{
+  Future<bool> addUserToSirkl(String id, StreamChatClient streamChatClient, String value) async{
+    var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, value]});
+    await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"isInFollowing": true});
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _commonService.addUserToSirkl(accessToken, id);
@@ -56,7 +59,9 @@ class CommonController extends GetxController{
     }
   }
 
-  Future<bool> removeUserToSirkl(String id) async{
+  Future<bool> removeUserToSirkl(String id, StreamChatClient streamChatClient, String value) async{
+    var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, value]});
+    await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"isInFollowing": false});
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _commonService.removeUserToSirkl(accessToken, id);

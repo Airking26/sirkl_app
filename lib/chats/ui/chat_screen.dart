@@ -1,59 +1,66 @@
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/new_message_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/model/inbox_dto.dart';
-import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
-import 'package:sirkl/common/view/stream_chat/src/message_list_view/stream_message_search_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
-import 'package:tiny_avatar/tiny_avatar.dart';
 
 
-class ChatsScreenOther extends StatefulWidget {
-  const ChatsScreenOther({Key? key}) : super(key: key);
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({Key? key}) : super(key: key);
 
   @override
-  State<ChatsScreenOther> createState() => _ChatsScreenOtherState();
+  State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProviderStateMixin {
+class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   final _chatController = Get.put(ChatsController());
   final _homeController = Get.put(HomeController());
-
-  late final _listController = StreamChannelListController(
-    client: StreamChat.of(context).client,
-    filter: Filter.and([
-      Filter.in_('members', [StreamChat.of(context).currentUser!.id],)
-    ]),
-    channelStateSort: const [SortOption('last_message_at')],
-    limit: 20,
-  );
+  StreamChannelListController? streamChannelListControllerFriends;
+  StreamChannelListController? streamChannelListControllerOthers;
 
   @override
   void initState() {
+    streamChannelListControllerFriends = buildStreamChannelListController(true);
+    streamChannelListControllerOthers = buildStreamChannelListController(false);
     super.initState();
   }
 
   @override
   void dispose() {
-    _listController.dispose();
+    streamChannelListControllerFriends?.dispose();
+    streamChannelListControllerOthers?.dispose();
     super.dispose();
   }
 
+  StreamChannelListController buildStreamChannelListController(bool searchFriends){
+    return StreamChannelListController(
+      client: StreamChat.of(context).client,
+      filter:
+      _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ?
+      Filter.and([
+        Filter.autoComplete('member.user.name', _chatController.query.value),
+        Filter.in_("members", [_homeController.id.value]),
+        Filter.equal("isInFollowing", searchFriends),
+        Filter.equal("member_count", 2)
+      ]) :
+          Filter.and([
+            Filter.in_("members", [_homeController.id.value]),
+            Filter.equal("isInFollowing", searchFriends),
+            Filter.equal("member_count", 2)
+          ]),
+      channelStateSort: const [SortOption('last_message_at')],
+      limit: 20,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    var k = _listController;
     TabController tabController = TabController(length: 2, vsync: this);
     tabController.index = _chatController.index.value;
     tabController.addListener(() {
@@ -62,14 +69,14 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
       }
     });
 
-    return Obx( () =>Scaffold(
+    return Scaffold(
         backgroundColor: Get.isDarkMode
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Column(children: [
           buildAppbar(context, tabController),
           buildListConv(context, tabController)
-        ])));
+        ]));
   }
 
   MediaQuery buildListConv(BuildContext context, TabController tabController) {
@@ -84,18 +91,80 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ?
-                StreamMessageSearchPage(client: StreamChat.of(context).client) :
-                StreamChannelListView(controller: _listController, onChannelTap: (channel){
-                  Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()));},),
-              ),
-              StreamChannelListView(controller: _listController, onChannelTap: (channel){
-                StreamChannel(channel: channel, child: const ChannelPage());
-              },)
+                child: Obx(() =>StreamChannelListView(
+                  emptyBuilder: (context){
+                    return noGroupUI();
+                  },
+                  controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel){
+                  Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value) {
+                    streamChannelListControllerFriends!.refresh();
+                    streamChannelListControllerOthers!.refresh();
+                  });
+                  },
+                ),
+              )),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Obx(() =>StreamChannelListView(
+                  emptyBuilder: (context){
+                    return noGroupUI();
+                  },
+                  controller:_chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerOthers!, onChannelTap: (channel){
+                  Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value){
+                    streamChannelListControllerOthers!.refresh();
+                    streamChannelListControllerFriends!.refresh();
+                  });
+                },),
+              ))
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Column noGroupUI() {
+    return Column(
+      children: [
+        const SizedBox(
+          height: 100,
+        ),
+        Image.asset(
+          "assets/images/people.png",
+          width: 150,
+          height: 150,
+        ),
+        const SizedBox(
+          height: 30,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 54.0),
+          child: Text(
+            con.noFriendsRes.tr,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Get.isDarkMode ? Colors.white : Colors.black,
+                fontSize: 25,
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w700),
+          ),
+        ),
+        const SizedBox(
+          height: 15,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 54.0),
+          child: Text(
+            con.noFriendsSentenceRes.tr,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                color: Color(0xFF9BA0A5),
+                fontSize: 16,
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w500),
+          ),
+        ),
+      ],
     );
   }
 
@@ -138,8 +207,6 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
                       Obx(()=>IconButton(
                           onPressed: () {
                             _chatController.searchIsActive.value = !_chatController.searchIsActive.value;
-                            if(!_chatController.searchIsActive.value){
-                            }
                           },
                           icon: Image.asset(
                             _chatController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
@@ -148,7 +215,8 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
                           ))),
                       Padding(
                         padding: const EdgeInsets.only(top: 12.0),
-                        child: Text(
+                        child: Obx(() =>Text(
+                          _chatController.searchIsActive.value ? _chatController.index.value == 0 ? "Friends" : "Others" :
                           con.chatsTabRes.tr,
                           style: TextStyle(
                               color: Get.isDarkMode
@@ -157,12 +225,13 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
                               fontWeight: FontWeight.w600,
                               fontFamily: "Gilroy",
                               fontSize: 20),
-                        ),
+                        )),
                       ),
                       IconButton(
                           onPressed: () {
                             Get.to(() => const NewMessageScreen())!.then((value) {
-                              _chatController.lastConv.value = null;
+                              streamChannelListControllerFriends!.refresh();
+                              streamChannelListControllerOthers!.refresh();
                             });
                           },
                           icon: Image.asset(
@@ -339,20 +408,7 @@ class _ChatsScreenOtherState extends State<ChatsScreenOther> with TickerProvider
           : Colors.white,
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async{
-        if(query.isNotEmpty) {
-          _chatController.query.value = query;
-        }
-          /*var newItems = await _chatController.searchInInboxes(query);
-          if (_chatController.index.value == 0) {
-            List<InboxDto> newItemsFriends = newItems.where((owned) => owned.ownedBy!.firstWhere((element) => element.id != _homeController.userMe.value.id!).isInFollowing!).toList();
-          } else {
-            List<InboxDto> newItemsOthers = newItems.where((owned) =>
-            !owned.ownedBy!.firstWhere((element) =>
-            element.id != _homeController.userMe.value.id!).isInFollowing!)
-                .toList();
-          }
-        } else {
-        }*/
+        if(query.isNotEmpty) _chatController.query.value = query;
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [

@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
-import 'package:sirkl/common/view/detailed_message/detailed_message_screen_second.dart';
+import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:bip39/bip39.dart' as bip39;
@@ -433,7 +433,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             _commonController.userClicked.value =
                                 _commonController.users[index];
-                            Get.to(() => const DetailedMessageScreenOtherSecond());
+                            Get.to(() => const DetailedChatScreen());
                           },
                           child: Image.asset(
                             "assets/images/chat_tab.png",

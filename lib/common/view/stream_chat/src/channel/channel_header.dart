@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/utils/helpers.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
@@ -214,7 +217,7 @@ class StreamChannelHeader extends StatelessWidget
                               )),
                           InkWell(
                             onTap: () async {
-                              await commonController.defineUserFromChannel(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.userId, StreamChat.of(context).client);
+                              commonController.userClicked.value = userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"]));
                               Get.to(() => const ProfileElseScreen());
                             },
                             child: Padding(
@@ -222,11 +225,11 @@ class StreamChannelHeader extends StatelessWidget
                               child: ClipRRect(
                                   borderRadius: BorderRadius.circular(90),
                                   child:
-                                  channel.image == null ?
-                                  TinyAvatar(baseString: channel.name ?? "", dimension: 40, circular: true,
+                                  userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).picture == null ?
+                                  TinyAvatar(baseString: userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!, dimension: 40, circular: true,
                                       colourScheme: TinyAvatarColourScheme.seascape) :
                                   CachedNetworkImage(
-                                    imageUrl: channel.image!,
+                                    imageUrl: userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).picture!,
                                     width: 40,
                                     height: 40,
                                     fit: BoxFit.cover,
@@ -236,7 +239,7 @@ class StreamChannelHeader extends StatelessWidget
                           ),
                           InkWell(
                             onTap: () async{
-                              await commonController.defineUserFromChannel(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.userId, StreamChat.of(context).client);
+                              commonController.userClicked.value = userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"]));
                               Get.to(() => const ProfileElseScreen());
                             },
                             child: Padding(
@@ -246,10 +249,8 @@ class StreamChannelHeader extends StatelessWidget
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    channel.name.isNullOrBlank! ?
-                                        "No name":
-                                    //"${commonController!.userClicked.value!.wallet!.substring(0, 15)}..." :
-                                    channel.name!,
+                                    userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName ??
+                                        userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
