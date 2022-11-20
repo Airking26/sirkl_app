@@ -80,12 +80,7 @@ class ProfileController extends GetxController{
   }
 
   getImage() async{
-    List<Media>? res = await ImagesPicker.pick(count: 1, pickType: PickType.image, language: Language.English,
-      cropOpt: CropOption(
-      aspectRatio: CropAspectRatio.custom,
-      cropType: CropType.circle, // currently for android
-    ), maxSize: 500, quality: 0.8);
-    //await ImagesPicker.saveImageToAlbum(File(res!.first.path), albumName: "Pictures");
+    List<Media>? res = await ImagesPicker.pick(count: 1, pickType: PickType.image, language: Language.English, cropOpt: CropOption(aspectRatio: CropAspectRatio.custom, cropType: CropType.circle,), maxSize: 500, quality: 0.8);
     if(res != null) isLoadingPicture.value = true;
     urlPicture.value = await SimpleS3().uploadFile(File(res!.first.path), "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
     isLoadingPicture.value = false;

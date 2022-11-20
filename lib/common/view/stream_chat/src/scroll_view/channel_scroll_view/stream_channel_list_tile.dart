@@ -179,13 +179,11 @@ class StreamChannelListTile extends StatelessWidget {
         child: ListTile(
           onTap: onTap,
           onLongPress: onLongPress,
-          visualDensity: visualDensity,
           contentPadding: contentPadding,
           leading: leading,
           tileColor: tileColor,
           selected: selected,
-          selectedTileColor: selectedTileColor ??
-              StreamChatTheme.of(context).colorTheme.borders,
+          selectedTileColor: selectedTileColor ?? StreamChatTheme.of(context).colorTheme.borders,
           title: Row(
             children: [
               Expanded(child: title),
@@ -361,12 +359,15 @@ class _ChannelLastMessageTextState extends State<ChannelLastMessageText> {
             _lastMessage = lastMessage;
           }
 
-          if (_lastMessage == null) return const Offstage();
+          //if (_lastMessage == null) return const Offstage();
 
-          return StreamMessagePreviewText(
-            message: _lastMessage!,
-            textStyle: widget.textStyle,
-            language: widget.channel.client.state.currentUser?.language,
+          return Transform.translate(
+            offset: Offset(-2, 0),
+            child: StreamMessagePreviewText(
+              message: _lastMessage ?? Message(text: "No message yet"),
+              textStyle: widget.textStyle,
+              language: widget.channel.client.state.currentUser?.language,
+            ),
           );
         },
       );

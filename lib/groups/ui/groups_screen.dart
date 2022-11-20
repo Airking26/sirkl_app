@@ -35,8 +35,8 @@ class _GroupsScreenState extends State<GroupsScreen> {
         Filter.greater("member_count", 2)
       ]) :
       Filter.and([
-        Filter.in_("members", [_homeController.id.value]),
-        Filter.greater("member_count", 2)
+        Filter.in_("contractAdress", _homeController.userMe.value.contractAddresses!),
+        Filter.greaterOrEqual("member_count", 0)
       ]),
       channelStateSort: const [SortOption('last_message_at')],
       limit: 20,
@@ -45,6 +45,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
 
   @override
   void initState() {
+    //_groupController.retrieveGroups(StreamChat.of(context).client);
     streamChannelListControllerGroups = buildStreamChannelListController();
     super.initState();
   }

@@ -202,7 +202,7 @@ class StreamChannelHeader extends StatelessWidget
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
-                      width: 250,
+                      width: 300,
                       height: 50,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -217,14 +217,27 @@ class StreamChannelHeader extends StatelessWidget
                               )),
                           InkWell(
                             onTap: () async {
-                              commonController.userClicked.value = userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"]));
-                              Get.to(() => const ProfileElseScreen());
+                              if(channel.memberCount == 2) {
+                                commonController.userClicked.value =
+                                    userFromJson(
+                                        json.encode(channel.state?.members
+                                            .where((element) =>
+                                        element.userId != StreamChat
+                                            .of(context)
+                                            .currentUser!
+                                            .id)
+                                            .first
+                                            .user!
+                                            .extraData["userDTO"]));
+                                Get.to(() => const ProfileElseScreen());
+                              }
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: ClipRRect(
                                   borderRadius: BorderRadius.circular(90),
                                   child:
+                                  channel.memberCount != null && channel.memberCount! <= 2 ?
                                   userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).picture == null ?
                                   TinyAvatar(baseString: userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!, dimension: 40, circular: true,
                                       colourScheme: TinyAvatarColourScheme.seascape) :
@@ -233,14 +246,37 @@ class StreamChannelHeader extends StatelessWidget
                                     width: 40,
                                     height: 40,
                                     fit: BoxFit.cover,
+                                  ) :
+                                      channel.image == null ?
+                                      TinyAvatar(baseString: channel.name!, dimension: 40, circular: true,
+                                          colourScheme: TinyAvatarColourScheme.seascape)
+                                          :
+                                  CachedNetworkImage(
+                                    imageUrl: channel.image!,
+                                    width: 40,
+                                    height: 40,
+                                    fit: BoxFit.cover,
                                   )
-                              ),
+                              )
+                              ,
                             ),
                           ),
                           InkWell(
                             onTap: () async{
-                              commonController.userClicked.value = userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"]));
-                              Get.to(() => const ProfileElseScreen());
+                              if(channel.memberCount == 2) {
+                                commonController.userClicked.value =
+                                    userFromJson(
+                                        json.encode(channel.state?.members
+                                            .where((element) =>
+                                        element.userId != StreamChat
+                                            .of(context)
+                                            .currentUser!
+                                            .id)
+                                            .first
+                                            .user!
+                                            .extraData["userDTO"]));
+                                Get.to(() => const ProfileElseScreen());
+                              }
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(left: 8.0),
@@ -249,6 +285,8 @@ class StreamChannelHeader extends StatelessWidget
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
+                                    channel.memberCount != null && channel.memberCount! > 2 ?
+                                        channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
                                     userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName ??
                                         userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!,
                                     maxLines: 1,
@@ -261,6 +299,18 @@ class StreamChannelHeader extends StatelessWidget
                                             ? Colors.white
                                             : Colors.black),
                                   ),
+                                  channel.memberCount != null && channel.memberCount! > 2 ? Text(
+                                    "${channel.memberCount!} participants",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: "Gilroy",
+                                        color: Get.isDarkMode
+                                            ? Colors.white
+                                            : Colors.black),
+                                  ) : Container(),
                                 ],
                               ),
                             ),

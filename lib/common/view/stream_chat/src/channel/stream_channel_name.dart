@@ -36,7 +36,7 @@ class StreamChannelName extends StatelessWidget {
         initialData: channel.name,
         builder: (context, channelName) => Text(
           channelName,
-          style: textStyle,
+          style: textStyle!.copyWith(fontSize: 16),
           overflow: textOverflow,
         ),
         noDataBuilder: (context) => _generateName(
