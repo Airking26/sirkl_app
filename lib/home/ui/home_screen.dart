@@ -14,6 +14,7 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:slider_button/slider_button.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../common/utils.dart';
@@ -43,10 +44,55 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Get.isDarkMode
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
-        body: Obx(() => _homeController.accessToken.isNotEmpty
-                ?
-                //SingleChildScrollView(
-                //child:
+        body: Obx(() =>
+        //_homeController.accessToken.isNotEmpty ?
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            buildAppbar(context),
+            _homeController.accessToken.value.isNotEmpty
+                ? _commonController.gettingStoryAndContacts.value
+                ? Container()
+                : _commonController.users.isNotEmpty
+                ? buildStoryList()
+                : Container()
+                : _homeController.address.value.isEmpty
+                ? buildConnectWalletUI()
+                : buildSignWalletUI(),
+            _homeController.accessToken.value.isNotEmpty ? _commonController.gettingStoryAndContacts.value ? Container(
+                margin: const EdgeInsets.only(top: 150),
+                child: const CircularProgressIndicator())
+                : _commonController.users.isNotEmpty
+                ? buildRepertoireList(context)
+                : buildEmptyFriends()
+                : Container(),
+          ],
+        )
+          /*
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            buildAppbar(context),
+            _homeController.accessToken.value.isNotEmpty
+                ? _commonController.gettingStoryAndContacts.value
+                ? Container()
+                : _commonController.users.isNotEmpty
+                ? buildStoryList()
+                : Container()
+                : _homeController.address.value.isEmpty
+                ? buildConnectWalletUI()
+                : _homeController.signPage.value
+                ? buildSignWalletUI() : _homeController.accessToken.value.isNotEmpty
+                ? _commonController.gettingStoryAndContacts.value
+                ? Container(
+                margin: const EdgeInsets.only(top: 150),
+                child: const CircularProgressIndicator())
+                : _commonController.users.isNotEmpty
+                ? buildRepertoireList(context)
+                : buildEmptyFriends()
+                : Container()
+          ],
+        )
                 Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -112,8 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             : Container(),
                       ],
                     ),
-                  )
-            //),
+                  )*/
             ));
   }
 
@@ -377,8 +422,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget buildSirklTile(
-      BuildContext context, int index, bool isShowSuspension) {
+  Widget buildSirklTile(BuildContext context, int index, bool isShowSuspension) {
     return Padding(
       padding: const EdgeInsets.only(right: 36.0),
       child: Column(
@@ -496,6 +540,67 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Column buildSignWalletUI() {
+    return Column(
+      children: [
+        const SizedBox(
+          height: 100,
+        ),
+        Image.asset(
+          "assets/images/wallet.png",
+          width: 150,
+          height: 150,
+        ),
+        const SizedBox(
+          height: 30,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Text(
+            con.walletConnectedRes.tr,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Get.isDarkMode ? Colors.white : Colors.black,
+                fontSize: 25,
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w700),
+          ),
+        ),
+        const SizedBox(
+          height: 15,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Text(
+            con.bySigningRes.tr,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Get.isDarkMode
+                    ? const Color(0xFF9BA0A5)
+                    : const Color(0xFF828282),
+                fontSize: 16,
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w500),
+          ),
+        ),
+        const SizedBox(
+          height: 50,
+        ),
+        SliderButton(
+          backgroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
+          baseColor: Get.isDarkMode ? const Color(0xFF102437)  : Colors.black,
+          highlightedColor: Colors.white,
+          alignLabel: Alignment(0.3, 0),
+          action: () async{
+          await _homeController.signMessageWithMetamask(context);
+        },
+          label: Text("Slide to sign", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),),
+          icon: Center(child: Image.asset("assets/images/app_icon_rounded.png", width: 48,),),
+        ),
+      ],
+    );
+  }
+
   Column buildConnectWalletUI() {
     return Column(
       children: [
@@ -551,7 +656,7 @@ class _HomeScreenState extends State<HomeScreen> {
             endColor: const Color(0xff0063FB),
             gradientOrientation: GradientOrientation.Horizontal,
             onTap: (finish) async {
-              await _homeController.connectWallet();
+              await _homeController.connectWallet(context);
             },
             child: Text(
               con.getStartedRes.tr,

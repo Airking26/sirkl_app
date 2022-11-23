@@ -8,6 +8,8 @@ import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:walletconnect_dart/walletconnect_dart.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
 class GroupsScreen extends StatefulWidget {
@@ -32,11 +34,14 @@ class _GroupsScreenState extends State<GroupsScreen> {
       Filter.and([
         Filter.autoComplete('member.user.name', _groupController.query.value),
         Filter.in_("members", [_homeController.id.value]),
+        Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList()),
         Filter.greater("member_count", 2)
       ]) :
       Filter.and([
-        Filter.in_("contractAdress", _homeController.userMe.value.contractAddresses!),
-        Filter.greaterOrEqual("member_count", 0)
+        Filter.equal('type', "try"),
+        Filter.in_("members", [_homeController.id.value]),
+        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList()),
+        Filter.greater("member_count", 2)
       ]),
       channelStateSort: const [SortOption('last_message_at')],
       limit: 20,
@@ -45,7 +50,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
 
   @override
   void initState() {
-    //_groupController.retrieveGroups(StreamChat.of(context).client);
+   //_groupController.retrieveGroups(StreamChat.of(context).client);
     streamChannelListControllerGroups = buildStreamChannelListController();
     super.initState();
   }
@@ -129,7 +134,9 @@ class _GroupsScreenState extends State<GroupsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+
+                          },
                           icon: Image.asset(
                             "assets/images/arrow_left.png",
                             color:
@@ -171,6 +178,8 @@ class _GroupsScreenState extends State<GroupsScreen> {
           ],
         );
   }
+
+
 
   YYDialog dialogPopMenu(BuildContext context) {
     return YYDialog().build(context)

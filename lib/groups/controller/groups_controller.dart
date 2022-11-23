@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import 'package:image_downloader/image_downloader.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:simple_s3/simple_s3.dart';
 import 'package:sirkl/common/model/group_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -15,9 +17,9 @@ class GroupsController extends GetxController{
   final _groupService = GroupService();
 
   createChannel(StreamChatClient streamChatClient, GroupDto groupDto, String pic) async{
-    await streamChatClient.channel("try", id: groupDto.contractAddress, extraData: {
-      "members": [],
-      "contractAdress" : groupDto.contractAddress,
+    await streamChatClient.channel("try", id: groupDto.contractAddress.toLowerCase(), extraData: {
+      "members": ["bot_one_06e2b40d-5161-4d2f-88e4-09bd6cfac4db", "bot_two_b0b2f93b-92d4-40d7-9a99-c9765bbeca64", "bot_three_58b30baa-4198-4679-9fdf-ea888ecab388"],
+      "contractAddress" : groupDto.contractAddress.toLowerCase(),
       "image": pic,
       "name": groupDto.name
     }).watch();
@@ -26,14 +28,30 @@ class GroupsController extends GetxController{
   retrieveGroups(StreamChatClient streamChatClient) async{
     var req = await _groupService.retrieveGroups();
     if(req.isOk){
-      var groups = groupDtoFromJson(json.encode(req.body));
+      var groups = groupDtoFromJson(json.encode(req.body)).sublist(1980);
       for (var element in groups) {
-        var downloadImage = await ImageDownloader.downloadImage(element.image);
-        var pathImage = await ImageDownloader.findPath(downloadImage!);
-        var pic = await SimpleS3().uploadFile(File(pathImage!), "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
-        await createChannel(streamChatClient, element, pic);
+        if(!element.image.contains("token-image-placeholder.svg") && !element.image.contains("data:image")) {
+          await Future.delayed(Duration(seconds: 1));
+          var resp = await Dio().get(element.image,
+              options: Options(responseType: ResponseType.bytes));
+          final result = await ImageGallerySaver.saveImage(
+              Uint8List.fromList(resp.data), quality: 100);
+          var pic = await SimpleS3().uploadFile(
+              File(result["filePath"].replaceAll("file://", "")),
+              "sirkl-bucket",
+              "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92",
+              AWSRegions.euCentral1, debugLog: true);
+          await createChannel(streamChatClient, element, pic);
+        }
       }
     }
+  }
+
+  void addMember(StreamChatClient client) async{
+    var t = client.channel("try", id: "0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911");
+        await t.watch();
+        await t.addMembers([client.state.currentUser!.id]);
+        t.dispose();
   }
 
 }

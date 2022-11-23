@@ -16,7 +16,9 @@ const String profileTabRes = "profile";
 
 /// Home page ///
 const String connectYourWalletRes = "connect_your_wallet";
+const String walletConnectedRes = "wallet_connected";
 const String talkWithRes = "talk_with";
+const String bySigningRes = "by_signing";
 const String getStartedRes = "get_started";
 const String noFriendsRes = "no_friends";
 const String noFriendsSentenceRes = "no_friends_sentence";

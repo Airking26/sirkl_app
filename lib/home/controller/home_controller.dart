@@ -15,12 +15,15 @@ import 'package:sirkl/common/model/sign_in_seed_phrase_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/sign_up_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
+import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:web3dart/crypto.dart';
 import 'package:zego_zim/zego_zim.dart';
 
 import '../../common/model/refresh_token_dto.dart';
@@ -58,32 +61,36 @@ class HomeController extends GetxController{
   var tempSignInSuccess = SignInSuccessDto().obs;
   var tokenZegoCloud = "".obs;
   var tokenStreamChat = "".obs;
+  var signPage = false.obs;
 
   final _commonController = Get.put(CommonController());
 
-  connectWallet() async {
-    final connector = WalletConnect(
-      bridge: 'https://bridge.walletconnect.org',
-      clientMeta: const PeerMeta(
-        name: 'SIRKL',
-        description: 'SIRKL Login',
-        url: 'https://walletconnect.org',
-        icons: [
-          'https://gblobscdn.gitbook.com/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media'
-        ],
-      ),
-    );
+  var _uri;
 
-    // Subscribe to events
+  final connector = WalletConnect(
+    bridge: 'https://bridge.walletconnect.org',
+    clientMeta: const PeerMeta(
+      name: 'SIRKL',
+      description: 'SIRKL Login',
+      url: 'https://walletconnect.org',
+      icons: [
+        'https://gblobscdn.gitbook.com/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media'
+      ],
+    ),
+  );
+
+  connectWallet(BuildContext context) async {
+
     connector.on('connect', (session) async{
+      //await signMessageWithMetamask(context, generateSessionMessage(sessionStatus?.accounts[0]));
       address.value = sessionStatus?.accounts[0];
-      progress.value = false;
-      var isUserExistsBool = await _homeService.isUserExists(address.value);
+      signPage.value = true;
+      /*var isUserExistsBool = await _homeService.isUserExists(address.value);
       if(isUserExistsBool.body == "false") {
         isUserExists.value = true;
       } else {
         isUserExists.value = false;
-      }
+      }*/
     });
 
     connector.on('session_request', (payload) {});
@@ -95,9 +102,52 @@ class HomeController extends GetxController{
       sessionStatus = await connector.createSession(
         chainId: 4160,
         onDisplayUri: (uri) async {
-          await launchUrl(Uri.parse(uri));
+          _uri = uri;
+          await launchUrl(Uri.parse(uri), mode: LaunchMode.externalApplication);
         },
       );
+    }
+  }
+
+  String generateSessionMessage(String accountAddress) {
+    String message =
+        'Hello $accountAddress, welcome to our app. By signing this message you agree to learn and have fun with blockchain';
+    print(message);
+
+    var hash = keccakUtf8(message);
+    final hashString = '0x${bytesToHex(hash).toString()}';
+
+    return hashString;
+  }
+
+  signMessageWithMetamask(BuildContext context) async {
+    if (connector.connected) {
+      try {
+        var message = generateSessionMessage(address.value);
+        EthereumWalletConnectProvider provider =
+        EthereumWalletConnectProvider(connector);
+        launchUrlString(_uri, mode: LaunchMode.externalApplication);
+        var signature = await provider.personalSign(message: message, address: address.value, password: "");
+        await loginWithWallet(address.value, message, signature);
+      } catch (exp) {
+        print("Error while signing transaction");
+        print(exp);
+      }
+    }
+  }
+
+  loginWithWallet(String wallet, String message, String signature) async{
+    var request = await _homeService.verifySignature(walletConnectDtoToJson(WalletConnectDto(wallet: wallet, message: message, signature: signature)));
+    if(request.isOk){
+      var signSuccess = signInSuccessDtoFromJson(json.encode(request.body));
+      userMe.value = signSuccess.user!;
+      box.write(con.ACCESS_TOKEN, signSuccess.accessToken!);
+      accessToken.value = signSuccess.accessToken!;
+      box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
+      box.write(con.USER, userToJson(signSuccess.user!));
+      await putFCMToken(null);
+      //Get.back();
+      isLoading.value = false;
     }
   }
 
