@@ -92,8 +92,7 @@ class StreamUserAvatar extends StatelessWidget {
     Widget avatar = FittedBox(
       fit: BoxFit.cover,
       child: Container(
-        constraints: constraints ??
-            streamChatTheme.ownMessageTheme.avatarTheme?.constraints,
+        constraints: BoxConstraints(minWidth: 56, maxHeight: 56, maxWidth: 56, minHeight: 56),
         child: !hasPicture
             ? CachedNetworkImage(
                 fit: BoxFit.cover,
@@ -115,7 +114,7 @@ class StreamUserAvatar extends StatelessWidget {
                   ),
                 ),
               )
-            : TinyAvatar(baseString: userFromJson(json.encode(user.extraData["userDTO"])).wallet!, dimension: constraints!.minHeight, circular: true, colourScheme: TinyAvatarColourScheme.seascape,),
+            : TinyAvatar(baseString: userFromJson(json.encode(user.extraData["userDTO"])).wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,),
       ),
     );
 

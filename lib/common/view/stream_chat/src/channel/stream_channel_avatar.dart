@@ -95,6 +95,7 @@ class StreamChannelAvatar extends StatelessWidget {
         Widget child = ClipRRect(
           borderRadius: BorderRadius.circular(90),
           child: Container(
+            constraints: BoxConstraints(minWidth: 56, maxHeight: 56, maxWidth: 56, minHeight: 56),
             decoration: BoxDecoration(color: colorTheme.accentPrimary),
             child: InkWell(
               onTap: onTap,

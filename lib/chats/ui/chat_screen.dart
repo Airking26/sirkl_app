@@ -52,7 +52,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           Filter.and([
             Filter.in_("members", [_homeController.id.value]),
             Filter.equal("isInFollowing", searchFriends),
-            Filter.equal("member_count", 2)
+            Filter.equal("member_count", 2),
+            Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z")
           ]),
       channelStateSort: const [SortOption('last_message_at')],
       limit: 20,

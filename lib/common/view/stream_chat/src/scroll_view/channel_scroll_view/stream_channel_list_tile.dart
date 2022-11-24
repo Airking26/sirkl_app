@@ -192,8 +192,7 @@ class StreamChannelListTile extends StatelessWidget {
                 initialData: channelState.members,
                 comparator: const ListEquality().equals,
                 builder: (context, members) {
-                  if (members.isEmpty ||
-                      !members.any((it) => it.user!.id == currentUser.id)) {
+                  if (members.isEmpty || !members.any((it) => it.user!.id == currentUser.id)) {
                     return const Offstage();
                   }
                   return unreadIndicatorBuilder?.call(context) ??
@@ -244,7 +243,6 @@ class ChannelLastMessageDate extends StatelessWidget {
         builder: (context, data) {
           final lastMessageAt = data.toLocal();
 
-          String stringDate;
           final now = DateTime.now();
 
           final startOfDay = DateTime(now.year, now.month, now.day);
@@ -255,16 +253,12 @@ class ChannelLastMessageDate extends StatelessWidget {
 
           if (lastMessageAt.millisecondsSinceEpoch >=
               startOfDay.millisecondsSinceEpoch) {
-            stringDate = Jiffy(lastMessageAt.toLocal()).jm;
           } else if (lastMessageAt.millisecondsSinceEpoch >=
               startOfDay
                   .subtract(const Duration(days: 1))
                   .millisecondsSinceEpoch) {
-            stringDate = context.translations.yesterdayLabel;
           } else if (startOfDay.difference(lastMessageAt).inDays < 7) {
-            stringDate = Jiffy(lastMessageAt.toLocal()).EEEE;
           } else {
-            stringDate = Jiffy(lastMessageAt.toLocal()).yMd;
           }
 
           return Text(
@@ -308,7 +302,7 @@ class ChannelListTileSubtitle extends StatelessWidget {
       );
     }
     return Transform.translate(
-      offset: Offset(2, 0),
+      offset: const Offset(1, 0),
       child: StreamTypingIndicator(
         channel: channel,
         style: textStyle,
@@ -361,13 +355,10 @@ class _ChannelLastMessageTextState extends State<ChannelLastMessageText> {
 
           //if (_lastMessage == null) return const Offstage();
 
-          return Transform.translate(
-            offset: Offset(-2, 0),
-            child: StreamMessagePreviewText(
-              message: _lastMessage ?? Message(text: "No message yet"),
-              textStyle: widget.textStyle,
-              language: widget.channel.client.state.currentUser?.language,
-            ),
+          return StreamMessagePreviewText(
+            message: _lastMessage ?? Message(text: "No Message Yet"),
+            textStyle: widget.textStyle,
+            language: widget.channel.client.state.currentUser?.language,
           );
         },
       );

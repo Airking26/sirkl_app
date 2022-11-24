@@ -88,5 +88,5 @@ class UserDTO extends ISuspensionBean{
   };
 
   @override
-  String getSuspensionTag() => userName.isNullOrBlank! ? wallet![0] : userName![0];
+  String getSuspensionTag() => userName.isNullOrBlank! ? wallet![0] : userName![0].toUpperCase();
 }

@@ -47,11 +47,8 @@ class GroupsController extends GetxController{
     }
   }
 
-  void addMember(StreamChatClient client) async{
-    var t = client.channel("try", id: "0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911");
-        await t.watch();
-        await t.addMembers([client.state.currentUser!.id]);
-        t.dispose();
+  Future<void> addMember(Channel channel, String value) async{
+    await channel.addMembers([value]);
   }
 
 }

@@ -62,9 +62,7 @@ class HomeController extends GetxController{
   var tokenZegoCloud = "".obs;
   var tokenStreamChat = "".obs;
   var signPage = false.obs;
-
   final _commonController = Get.put(CommonController());
-
   var _uri;
 
   final connector = WalletConnect(

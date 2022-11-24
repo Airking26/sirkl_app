@@ -8,8 +8,7 @@ import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:walletconnect_dart/walletconnect_dart.dart';
+import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
 class GroupsScreen extends StatefulWidget {
@@ -39,7 +38,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
       ]) :
       Filter.and([
         Filter.equal('type', "try"),
-        Filter.in_("members", [_homeController.id.value]),
+        //Filter.in_("members", [_homeController.id.value]),
         if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList()),
         Filter.greater("member_count", 2)
       ]),
@@ -50,7 +49,6 @@ class _GroupsScreenState extends State<GroupsScreen> {
 
   @override
   void initState() {
-   //_groupController.retrieveGroups(StreamChat.of(context).client);
     streamChannelListControllerGroups = buildStreamChannelListController();
     super.initState();
   }
@@ -60,7 +58,6 @@ class _GroupsScreenState extends State<GroupsScreen> {
     streamChannelListControllerGroups?.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +81,12 @@ class _GroupsScreenState extends State<GroupsScreen> {
                         emptyBuilder: (context){
                           return noGroupUI();
                         },
-                        controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController() : streamChannelListControllerGroups!, onChannelTap: (channel){
-                        Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value) {
-                          streamChannelListControllerGroups!.refresh();
-                        });
+                        controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController() : streamChannelListControllerGroups!,
+                        onChannelTap: (channel) async{
+                          var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
+                          if(isMember.members.isEmpty) await _groupController.addMember(channel, _homeController.id.value);
+                          Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())
+                        )!.then((value) {streamChannelListControllerGroups!.refresh();});
                       },
                       ),
                       )),
@@ -171,7 +170,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
             ),
             Positioned(
                 top: Platform.isAndroid ? 80 : 60,
-                child: Container(
+                child: SizedBox(
                     height: 110,
                     width: MediaQuery.of(context).size.width,
                     child: buildFloatingSearchBar()))
@@ -179,15 +178,13 @@ class _GroupsScreenState extends State<GroupsScreen> {
         );
   }
 
-
-
   YYDialog dialogPopMenu(BuildContext context) {
     return YYDialog().build(context)
       ..width = 180
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
       ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = Get.isDarkMode ? Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: (){},
@@ -214,26 +211,6 @@ class _GroupsScreenState extends State<GroupsScreen> {
       ))
       ..show();
   }
-
-  /*Widget groupTile(BuildContext context, int index){
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: ListTile(
-        onTap: (){Get.to(() => const DetailedChatScreen());},
-        leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", height: 60, width: 60, fit: BoxFit.cover,),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text("2 Days", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),
-            Container(height: 24, width: 24, decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: Color(0xFF00CB7D)), child: Padding(padding: EdgeInsets.all(0), child: Align(alignment: Alignment.center, child: Text(textAlign: TextAlign.center,"2", style: TextStyle(color: Get.isDarkMode ? Color(0xFF232323) : Colors.white, fontFamily: 'Gilroy', fontSize: 12, fontWeight: FontWeight.w600),)),),)
-          ],
-        ),
-        title: Transform.translate(offset: Offset(-8, 0), child: Text("Bored Ape Yacht Club", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
-        subtitle: Transform.translate(offset: Offset(-8, 0),child: Text("Lorem Ipsum is simply...", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282)))),
-
-      ),
-    );
-  }*/
 
   Column noGroupUI() {
     return Column(
@@ -350,7 +327,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
     return FloatingSearchBar(
       clearQueryOnClose: false,
       closeOnBackdropTap: false,
-      padding: EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       hint: 'Search here...',
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
@@ -365,7 +342,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
       hintStyle: TextStyle(
-          color: Get.isDarkMode ? Color(0xff9BA0A5) : Color(0xFF828282),
+          color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
           fontSize: 15,
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
@@ -375,7 +352,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
       accentColor: Get.isDarkMode ? Colors.white : Colors.black,
       borderRadius: BorderRadius.circular(10),
       backgroundColor:
-          Get.isDarkMode ? Color(0xFF2D465E).withOpacity(1) : Colors.white,
+          Get.isDarkMode ? const Color(0xFF2D465E).withOpacity(1) : Colors.white,
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) {
         if(query.isNotEmpty){
@@ -398,9 +375,9 @@ class _GroupsScreenState extends State<GroupsScreen> {
           onTap: () {},
         ),
       ],
-      actions: [],
+      actions: const [],
       builder: (context, transition) {
-        return SizedBox(
+        return const SizedBox(
           height: 0,
         );
       },

@@ -397,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   _commonController.users[index].userName.isNullOrBlank! ?
-                  _commonController.users[index].wallet![0] : _commonController.users[index].userName![0],
+                  _commonController.users[index].wallet![0] : _commonController.users[index].userName![0].toUpperCase(),
                   softWrap: false,
                   style: TextStyle(
                       fontFamily: "Gilroy",
@@ -438,8 +438,8 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               child: _commonController.users[index].picture == null
                   ? SizedBox(
-                      width: 60,
-                      height: 60,
+                      width: 56,
+                      height: 56,
                       child: TinyAvatar(
                         baseString: _commonController.users[index].wallet!,
                         dimension: 56,
