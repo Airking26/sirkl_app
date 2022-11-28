@@ -160,7 +160,7 @@ class ChatsController extends GetxController{
     });
   }*/
 
-  checkOrCreateChannel(HomeController homeController, CommonController commonController, StreamChatClient client, String? id) async{
+  checkOrCreateChannel(CommonController commonController, StreamChatClient client, String? id) async{
       channel.value = client.channel(
         'try',
         extraData: {

@@ -477,7 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             _commonController.userClicked.value =
                                 _commonController.users[index];
-                            Get.to(() => const DetailedChatScreen());
+                            Get.to(() => const DetailedChatScreen(create:true));
                           },
                           child: Image.asset(
                             "assets/images/chat_tab.png",

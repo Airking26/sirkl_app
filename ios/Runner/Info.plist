@@ -4,6 +4,10 @@
 <dict>
     <key>NSCameraUsageDescription</key>
     <string>Example usage description</string>
+    <key>NSCameraUsageDescription</key>
+    <string>We require camera access to connect to a call</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We require microphone access to connect to a call</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Example usage description</string>
     <key>NSPhotoLibraryUsageDescription</key>

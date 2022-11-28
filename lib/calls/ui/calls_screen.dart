@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
-import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'dart:io';
 
@@ -115,10 +114,10 @@ class _CallsScreenState extends State<CallsScreen> {
           removeTop: true,
           child: Expanded(
             child: Padding(
-              padding: EdgeInsets.only(top: 24),
+              padding: const EdgeInsets.only(top: 24),
               child: SafeArea(
                 child: ListView.separated(
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   itemCount: 50,
                   itemBuilder: callTile,
                   separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
@@ -147,7 +146,8 @@ class _CallsScreenState extends State<CallsScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                Image.asset("assets/images/call_tab.png", color: const Color(0xFF00CB7D), width: 20, height: 20,),
+                InkWell(onTap:(){
+                  } ,child: Image.asset("assets/images/call_tab.png", color: const Color(0xFF00CB7D), width: 20, height: 20,)),
                 const SizedBox(width: 8,),
                 Image.asset("assets/images/chat_tab.png", width: 20, height: 20, color: const Color(0xFF9BA0A5),),
                   const SizedBox(width: 4,),
@@ -156,10 +156,10 @@ class _CallsScreenState extends State<CallsScreen> {
             )
           ],
         ),
-        title: Transform.translate(offset: Offset(-8, 0),child: Text("Bored Ape Yacht", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+        title: Transform.translate(offset: const Offset(-8, 0),child: Text("Bored Ape Yacht", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
         subtitle:
             Transform.translate(
-              offset: Offset(-8, 0),
+              offset: const Offset(-8, 0),
               child: Row(children: [
                 Image.asset("assets/images/outgoing.png", width: 10, height: 10,),
                 Text( "  Outgoing  - 12:15PM", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))

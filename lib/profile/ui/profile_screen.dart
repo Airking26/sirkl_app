@@ -78,7 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _profileController.isLoadingPicture.value ?
-                          Container(padding: EdgeInsets.all(8), width: 48, height: 48, child: CircularProgressIndicator(color: Color(0xFF00CB7D),))
+                          Container(padding: const EdgeInsets.all(8), width: 48, height: 48, child: const CircularProgressIndicator(color: Color(0xFF00CB7D),))
                               : IconButton(onPressed: (){
                             _profileController.isEditingProfile.value ? _profileController.updateMe(UpdateMeDto(
                               userName: _profileController.usernameTextEditingController.value.text.isEmpty ? _homeController.userMe.value.wallet! : _profileController.usernameTextEditingController.value.text,
@@ -168,7 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 controller: _profileController.descriptionTextEditingController.value,
                 maxLength: 120,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282)),
+                style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)),
                 decoration: const InputDecoration(
                     border: InputBorder.none,
                     isCollapsed: true,
@@ -198,18 +198,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: SafeArea(
-                    child: ListView.builder(
-                        cacheExtent: 1000,
-                        itemCount: _homeController.nfts.value.length,
-                        itemBuilder: (context, index){
-                          return CardNFT(_homeController.nfts.value[index], _profileController, index);
-                        },
+                    child: RefreshIndicator(
+                      color: const Color(0xFF00CB7D),
+                      onRefresh: () async{
+                        _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
+                      },
+                      child: ListView.builder(
+                          cacheExtent: 1000,
+                          itemCount: _homeController.nfts.value.length,
+                          itemBuilder: (context, index){
+                            return CardNFT(_homeController.nfts.value[index], _profileController, index);
+                          },
+                      ),
                     ),
                   ),
                 ),
               ),
             ) : Container(
-              margin: EdgeInsets.only(top: 24, left: 48, right: 48),
+              margin: const EdgeInsets.only(top: 24, left: 48, right: 48),
               child: Text(con.dontHaveNftRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600),),
             )
           ],
@@ -281,16 +287,14 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             ],
           ),
           child: ExpansionTile(
-            leading: CircleAvatar(backgroundImage: CachedNetworkImageProvider(widget.collectionDbDTO.collectionImages[0]), radius: 25, onBackgroundImageError: (_,__){
-
-            },),
+            leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const CircularProgressIndicator(), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             trailing: Obx(() => Image.asset(
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
               "assets/images/arrow_up_rev.png" :
               "assets/images/arrow_down_rev.png",
               color: Get.isDarkMode ? Colors.white : Colors.black, height: 20, width: 20,),),
-            title: Transform.translate(offset: const Offset(-8, 0),child: Text(widget.collectionDbDTO.collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
-            subtitle: Transform.translate(offset: const Offset(-8, 0), child: Text("${widget.collectionDbDTO.collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
+            title: Text(widget.collectionDbDTO.collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
+            subtitle: Text("${widget.collectionDbDTO.collectionImages.length} available", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
             onExpansionChanged: (expanded){
               if(expanded) {
                 widget.profileController.isCardExpandedList.value.assign(widget.index);
@@ -308,26 +312,22 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
                   cacheExtent: 1000,
                   itemCount: widget.collectionDbDTO.collectionImages.length,
                   itemBuilder: (context, i){
-                    return buildCard(i, widget.collectionDbDTO);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: InkWell(
+                        onTap: (){
+                          if(widget.profileController.isEditingProfile.value) widget.profileController.urlPicture.value = widget.collectionDbDTO.collectionImages[i];
+                        },
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: SizedBox.fromSize(
+                                child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: widget.collectionDbDTO.collectionImages[i], width: 80, height: 70,))),
+                      ),
+                    );
                   }, scrollDirection: Axis.horizontal,)),
               )
             ],
           ),
-        ),
-      );
-    }
-
-    Padding buildCard(int i, CollectionDbDto collectionDbDTO) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: InkWell(
-          onTap: (){
-            if(widget.profileController.isEditingProfile.value) widget.profileController.urlPicture.value = collectionDbDTO.collectionImages[i];
-            },
-          child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: SizedBox.fromSize(
-                  child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: collectionDbDTO.collectionImages[i], width: 80, height: 70,))),
         ),
       );
     }

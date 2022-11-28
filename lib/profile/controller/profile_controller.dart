@@ -15,7 +15,6 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
-import 'package:zego_zim/zego_zim.dart';
 
 class ProfileController extends GetxController{
 
@@ -33,8 +32,8 @@ class ProfileController extends GetxController{
   var urlPicture = "".obs;
 
   updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
-    await ZIM.getInstance()!.updateUserAvatarUrl(updateMeDto.picture ?? "");
-    await ZIM.getInstance()!.updateUserName(updateMeDto.userName ?? _homeController.userMe.value.wallet!);
+    //await ZIM.getInstance()!.updateUserAvatarUrl(updateMeDto.picture ?? "");
+    //await ZIM.getInstance()!.updateUserName(updateMeDto.userName ?? _homeController.userMe.value.wallet!);
     isLoadingPicture.value = true;
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);

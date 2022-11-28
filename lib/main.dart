@@ -9,7 +9,6 @@ import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/firebase_options.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:zego_zim/zego_zim.dart';
 //import 'package:zego_zim/zego_zim.dart';
 
 import 'common/interface/ZIMEventHandlerManager.dart';
@@ -21,10 +20,10 @@ void main() async{
     logLevel: Level.ALL,
   );
   WidgetsFlutterBinding.ensureInitialized();
-  ZIMAppConfig appConfig = ZIMAppConfig();
-  appConfig.appID = 1074087595;
-  appConfig.appSign = "339b2b0fe94af6345a8e28edf5295c713dcb5f7626b72d40681d752cf9d13f68";
-  ZIM.create(appConfig);
+  //ZIMAppConfig appConfig = ZIMAppConfig();
+  //appConfig.appID = 1074087595;
+  //appConfig.appSign = "339b2b0fe94af6345a8e28edf5295c713dcb5f7626b72d40681d752cf9d13f68";
+  //ZIM.create(appConfig);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GetStorage.init();
   runApp(MyApp(client: client));

@@ -1,14 +1,15 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
+import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
 class GroupsScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
   YYDialog dialogMenu = YYDialog();
   final _groupController = Get.put(GroupsController());
   final _homeController = Get.put(HomeController());
+  final _floatingSearchBarController = FloatingSearchBarController();
   StreamChannelListController? streamChannelListControllerGroups;
 
   StreamChannelListController buildStreamChannelListController(){
@@ -31,9 +33,9 @@ class _GroupsScreenState extends State<GroupsScreen> {
       filter:
       _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ?
       Filter.and([
-        Filter.autoComplete('member.user.name', _groupController.query.value),
-        Filter.in_("members", [_homeController.id.value]),
-        Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList()),
+        Filter.autoComplete('name', _groupController.query.value),
+        //Filter.in_("members", [_homeController.id.value]),
+        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList()),
         Filter.greater("member_count", 2)
       ]) :
       Filter.and([
@@ -50,6 +52,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
   @override
   void initState() {
     streamChannelListControllerGroups = buildStreamChannelListController();
+    _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
     super.initState();
   }
 
@@ -66,9 +69,9 @@ class _GroupsScreenState extends State<GroupsScreen> {
         backgroundColor: Get.isDarkMode
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
-        body: Column(children: [
+        body: Obx(() => Column(children: [
           buildAppBar(context),
-          MediaQuery.removePadding(
+          _groupController.addAGroup.value ? buildSelectNFT() : MediaQuery.removePadding(
             context: context,
             removeTop: true,
             child: Expanded(
@@ -77,24 +80,24 @@ class _GroupsScreenState extends State<GroupsScreen> {
                 child: SafeArea(
                   child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Obx(() =>StreamChannelListView(
+                      child: StreamChannelListView(
                         emptyBuilder: (context){
-                          return noGroupUI();
+                          return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
                         },
                         controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController() : streamChannelListControllerGroups!,
                         onChannelTap: (channel) async{
                           var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
-                          if(isMember.members.isEmpty) await _groupController.addMember(channel, _homeController.id.value);
+                          if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
                           Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())
                         )!.then((value) {streamChannelListControllerGroups!.refresh();});
                       },
                       ),
-                      )),
+                      ),
                 ),
               ),
             ),
           )
-        ]));
+        ])));
   }
 
   Stack buildAppBar(BuildContext context) {
@@ -104,7 +107,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
           fit: StackFit.loose,
           children: [
             Container(
-              height: 140,
+              height: _groupController.addAGroup.value ? 115 : 140,
               margin: const EdgeInsets.only(bottom: 0.25),
               decoration: BoxDecoration(
                 boxShadow: const [
@@ -134,19 +137,21 @@ class _GroupsScreenState extends State<GroupsScreen> {
                     children: [
                       IconButton(
                           onPressed: () {
-
+                            _groupController.addAGroup.value = false;
+                            _groupController.query.value = "";
+                            _groupController.searchIsActive.value = false;
                           },
                           icon: Image.asset(
                             "assets/images/arrow_left.png",
                             color:
-                                Get.isDarkMode ? Colors.transparent : Colors.transparent,
+                                _groupController.addAGroup.value ? Get.isDarkMode ? Colors.white : Colors.black : Colors.transparent,
                           )),
                       Padding(
                         padding: const EdgeInsets.only(top: 12.0),
                         child: Text(
                           con.groupsTabRes.tr,
                           style: TextStyle(
-                              color: Get.isDarkMode
+                              color:  Get.isDarkMode
                                   ? Colors.white
                                   : Colors.black,
                               fontWeight: FontWeight.w600,
@@ -161,14 +166,14 @@ class _GroupsScreenState extends State<GroupsScreen> {
                           icon: Image.asset(
                             "assets/images/more.png",
                             color:
-                                Get.isDarkMode ? Colors.white : Colors.black,
+                            _groupController.addAGroup.value ? Colors.transparent : Get.isDarkMode ? Colors.white : Colors.black,
                           )),
                     ],
                   ),
                 ),
               ),
             ),
-            Positioned(
+            _groupController.addAGroup.value ? Container() : Positioned(
                 top: Platform.isAndroid ? 80 : 60,
                 child: SizedBox(
                     height: 110,
@@ -305,12 +310,14 @@ class _GroupsScreenState extends State<GroupsScreen> {
                 stretch: false,
                 width: 350,
                 borderThickness: 5,
-                progress: true,
+                progress: false,
                 borderColor: const Color(0xff0063FB).withOpacity(0.5),
                 startColor: const Color(0xff1DE99B),
                 endColor: const Color(0xff0063FB),
                 gradientOrientation: GradientOrientation.Horizontal,
-                onTap: (finish) {},
+                onTap: (finish) {
+                  _groupController.addAGroup.value = true;
+                },
                 child: Text(
                   con.addGroupRes.tr,
                   style: const TextStyle(
@@ -323,9 +330,63 @@ class _GroupsScreenState extends State<GroupsScreen> {
         );
   }
 
+  Widget buildSelectNFT(){
+    _groupController.retrieveGroups(_homeController.nfts.value);
+    return _groupController.isLoadingAvailableNFT.value ?
+         const Padding(
+           padding: EdgeInsets.only(top: 54.0),
+           child: CircularProgressIndicator(),
+         ) :
+     MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      child: Expanded(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 4.0),
+          child: SafeArea(
+            child: ListView.builder(
+              cacheExtent: 1000,
+              itemCount: _groupController.nftsAvailable.value.length,
+              itemBuilder: (context, index){
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 6),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Get.isDarkMode ? const Color(0xFF1A2E40) : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.grey,
+                          offset: Offset(0.0, 0.01), //(x,y)
+                          blurRadius: 0.01,
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      onTap: ()async{
+                        await _groupController.createGroup(StreamChat.of(context).client, _groupController.nftsAvailable.value[index].collectionName, _groupController.nftsAvailable.value[index].collectionImages[0], _groupController.nftsAvailable.value[index].contractAddress);
+                        Get.to(() => const DetailedChatScreen(create:false));
+                      },
+                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftsAvailable[index].collectionImages[0], width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) => const CircularProgressIndicator(), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
+
+                      title: Text(_groupController.nftsAvailable.value[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
+                      //subtitle: Transform.translate(offset: const Offset(-8, 0), child: Text("${_homeController.nfts.value[index].collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
+                    ),
+                  ),
+                );;
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget buildFloatingSearchBar() {
     return FloatingSearchBar(
       clearQueryOnClose: false,
+      controller: _floatingSearchBarController,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       hint: 'Search here...',
@@ -362,17 +423,21 @@ class _GroupsScreenState extends State<GroupsScreen> {
       },
       // Specify a custom transition to be used for
       // animating between opened and closed stated.
-      transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
         FloatingSearchBarAction.icon(
           icon: Image.asset(
-            "assets/images/search.png",
-            width: 24,
-            height: 24,
-          ),
+            _groupController.searchIsActive.value ? "assets/images/close.png" : "assets/images/search.png",
+            width: 24, height: 24, color: Colors.grey,),
           showIfClosed: true,
           showIfOpened: true,
-          onTap: () {},
+          onTap: () {
+            if(_groupController.searchIsActive.value){
+              _floatingSearchBarController.clear();
+              _floatingSearchBarController.close();
+              _groupController.query.value = "";
+              _groupController.searchIsActive.value = false;
+            }
+          },
         ),
       ],
       actions: const [],

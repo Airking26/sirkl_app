@@ -23,6 +23,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final _homeController = Get.put(HomeController());
   StreamChannelListController? streamChannelListControllerFriends;
   StreamChannelListController? streamChannelListControllerOthers;
+  final _floatingSearchBarController = FloatingSearchBarController();
 
   @override
   void initState() {
@@ -208,6 +209,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       Obx(()=>IconButton(
                           onPressed: () {
                             _chatController.searchIsActive.value = !_chatController.searchIsActive.value;
+                            if(_chatController.searchIsActive.value) {
+                              _chatController.query.value = "";
+                              _floatingSearchBarController.clear();
+                              _floatingSearchBarController.close();
+                            }
                           },
                           icon: Image.asset(
                             _chatController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
@@ -380,6 +386,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       hint: 'Search here...',
+      controller: _floatingSearchBarController,
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 0),

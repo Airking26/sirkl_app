@@ -1,5 +1,5 @@
 
-import 'dart:developer';
+/*import 'dart:developer';
 
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -18,4 +18,4 @@ class ZIMEventHandlerManager{
       pagingController.refresh();
     };
   }
-}
+}*/

@@ -83,7 +83,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                                 utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
                               }
                             } else {
-                              Get.to(() => const DetailedChatScreen());
+                              Get.to(() => const DetailedChatScreen(create: true));
                             }
                             }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: Get.isDarkMode ? Colors.white : Colors.black, height: 28, width: 28,)),
                           Padding(
@@ -205,7 +205,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){
-          Get.to(() => const DetailedChatScreen());
+          Get.to(() => const DetailedChatScreen(create: true));
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.sendAMessageRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
@@ -253,16 +253,14 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             ],
           ),
           child: ExpansionTile(
-            leading: CircleAvatar(backgroundImage: CachedNetworkImageProvider(widget.collectionDbDTO.collectionImages[0]), radius: 25, onBackgroundImageError: (_,__){
-
-            },),
+              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => CircularProgressIndicator(), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             trailing: Obx(() => Image.asset(
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
               "assets/images/arrow_up_rev.png" :
               "assets/images/arrow_down_rev.png",
               color: Get.isDarkMode ? Colors.white : Colors.black, height: 20, width: 20,),),
-            title: Transform.translate(offset: const Offset(-8, 0),child: Text(widget.collectionDbDTO.collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
-            subtitle: Transform.translate(offset: const Offset(-8, 0), child: Text("${widget.collectionDbDTO.collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
+            title: Text(widget.collectionDbDTO.collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
+            subtitle: Text("${widget.collectionDbDTO.collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
             onExpansionChanged: (expanded){
               if(expanded) {
                 widget.profileController.isCardExpandedList.value.assign(widget.index);

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,7 +25,6 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:web3dart/crypto.dart';
-import 'package:zego_zim/zego_zim.dart';
 
 import '../../common/model/refresh_token_dto.dart';
 import '../../common/model/sign_in_dto.dart';
@@ -214,8 +214,9 @@ class HomeController extends GetxController{
     retrieveAccessToken();
     _commonController.showSirklUsers(id.value);
     if(client != null) await retrieveTokenStreamChat(client);
-    await retrieveTokenZegoCloud();
-    await getNFTsContractAddresses();
+    //await retrieveTokenZegoCloud();
+    await getNFTsContractAddresses(client);
+    //await getNFTsTemporary(userMe.value.wallet!);
   }
 
   retrieveAccessToken(){
@@ -225,7 +226,7 @@ class HomeController extends GetxController{
     id.value = d != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
   }
 
-  getNFTsContractAddresses() async{
+  getNFTsContractAddresses(StreamChatClient? client) async{
     var req = await _homeService.getNFTsContractAddresses(userMe.value.wallet!);
     if(req.body != null){
     var initialArray = moralisNftContractAdressesFromJson(json.encode(req.body)).result!;
@@ -244,37 +245,46 @@ class HomeController extends GetxController{
     }
 
       List<String> contractAddresses = [];
-      for (var element in initialArray) {
-        contractAddresses.add(element.tokenAddress!);
+      for (var element in initialArray) {contractAddresses.add(element.tokenAddress!);}
+
+      var addressesAbsent = userMe.value.contractAddresses!.toSet().difference(contractAddresses.toSet()).toList();
+      if(client != null && addressesAbsent.isNotEmpty) {
+        for (var absentAddress in addressesAbsent) {
+          await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
+        }
       }
-      updateMe(UpdateMeDto(contractAddresses: contractAddresses));
+      await updateMe(UpdateMeDto(contractAddresses: contractAddresses));
     }
+
   }
 
   getNFTsTemporary(String wallet) async{
     isLoadingNfts.value = true;
     nfts.value.clear();
-    var req = await _homeService.getNFTs(wallet);
+    var req = await _homeService.getNFTs("0xdd0D1B8aD874A15d020E7b2AF83e213f1f25F066");
     var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
     var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
     while(cursor != null){
-      var newReq = await _homeService.getNextNFTs(wallet, cursor);
+      var newReq = await _homeService.getNextNFTs("0xdd0D1B8aD874A15d020E7b2AF83e213f1f25F066", cursor);
       mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
       cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
     }
 
-    var groupedCollection = mainCollection.groupBy((p0) => p0!.name);
+    mainCollection.removeWhere((element) => element?.metadata == null || element?.name == null);
+    var groupedCollection = mainCollection.groupBy((p0) => p0!.tokenAddress);
 
     groupedCollection.forEach((key, value) async{
-      nfts.value.add(CollectionDbDto(collectionName: key ?? "", collectionImages: value.map((e) {
-        if(moralisMetadataDtoFromJson(e!.metadata!).image!.startsWith("ipfs://")) {
-          return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
-        } else if(moralisMetadataDtoFromJson(e.metadata!).image!.contains("/ipfs/")){
-          return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
-        }
-        else {
-          return moralisMetadataDtoFromJson(e.metadata!).image!;
-        }
+      nfts.value.add(CollectionDbDto(collectionName: value.first!.name!, contractAddress: value.first!.tokenAddress!, collectionImages: value.map((e) {
+          if(e!.metadata != null )debugPrint(moralisMetadataDtoFromJson(e.metadata!).image!);
+          if (moralisMetadataDtoFromJson(e.metadata!).image!.startsWith("ipfs://")) {
+            return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
+          }
+          else if (moralisMetadataDtoFromJson(e.metadata!).image!.contains("/ipfs/")) {
+            return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
+          }
+          else {
+            return moralisMetadataDtoFromJson(e.metadata!).image!;
+          }
       }
       ).toList()));
       nfts.refresh();
@@ -322,7 +332,7 @@ class HomeController extends GetxController{
     }
   }
 
-  retrieveTokenZegoCloud() async{
+  /*retrieveTokenZegoCloud() async{
     ZIMUserInfo userInfo = ZIMUserInfo();
     userInfo.userID = userMe.value.id!;
     userInfo.userName = userMe.value.userName!;
@@ -357,7 +367,7 @@ class HomeController extends GetxController{
         }
       });
     }
-  }
+  }*/
 
 }
 

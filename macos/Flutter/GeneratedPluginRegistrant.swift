@@ -20,7 +20,6 @@ import url_launcher_macos
 import video_player_macos
 import wakelock_macos
 import window_manager
-import zego_zim
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   ConnectivityPlugin.register(with: registry.registrar(forPlugin: "ConnectivityPlugin"))
@@ -38,5 +37,4 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FLTVideoPlayerPlugin.register(with: registry.registrar(forPlugin: "FLTVideoPlayerPlugin"))
   WakelockMacosPlugin.register(with: registry.registrar(forPlugin: "WakelockMacosPlugin"))
   WindowManagerPlugin.register(with: registry.registrar(forPlugin: "WindowManagerPlugin"))
-  ZegoZimPlugin.register(with: registry.registrar(forPlugin: "ZegoZimPlugin"))
 }
