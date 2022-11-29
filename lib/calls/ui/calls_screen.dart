@@ -91,7 +91,7 @@ class _CallsScreenState extends State<CallsScreen> {
                       icon: Image.asset(
                         "assets/images/more.png",
                         color:
-                        Get.isDarkMode ? Colors.white : Colors.black,
+                        Get.isDarkMode ? Colors.transparent : Colors.transparent,
                       )),
                 ],
               ),

@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
-import 'package:sirkl/common/view/stream_chat/src/utils/helpers.dart';
+import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
+import 'package:sirkl/common/constants.dart' as con;
 
 /// {@template streamChannelHeader}
 /// ![screenshot](https://raw.githubusercontent.com/GetStream/stream-chat-flutter/master/packages/stream_chat_flutter/screenshots/channel_header.png)
@@ -62,7 +62,7 @@ import 'package:tiny_avatar/tiny_avatar.dart';
 class StreamChannelHeader extends StatelessWidget
     implements PreferredSizeWidget {
   /// {@macro streamChannelHeader}
-  const StreamChannelHeader({
+  StreamChannelHeader({
     super.key,
     this.showBackButton = true,
     this.onBackPressed,
@@ -131,6 +131,8 @@ class StreamChannelHeader extends StatelessWidget
 
   @override
   final Size preferredSize;
+
+  YYDialog dialogMenu = YYDialog();
 
   @override
   Widget build(BuildContext context) {
@@ -320,7 +322,7 @@ class StreamChannelHeader extends StatelessWidget
                     ),
                     IconButton(
                         onPressed: () {
-                          //dialogMenu = dialogPopMenu(context);
+                          dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) :dialogPopMenuGroup(context);
                         },
                         icon: Image.asset(
                           "assets/images/more.png",
@@ -331,61 +333,92 @@ class StreamChannelHeader extends StatelessWidget
               ),
             ),
           )
-          /*AppBar(
-            toolbarTextStyle: theme.textTheme.bodyText2,
-            titleTextStyle: theme.textTheme.headline6,
-            systemOverlayStyle: theme.brightness == Brightness.dark
-                ? SystemUiOverlayStyle.light
-                : SystemUiOverlayStyle.dark,
-            elevation: elevation,
-            leading: leadingWidget,
-            backgroundColor: backgroundColor ?? channelHeaderTheme.color,
-            actions: actions ??
-                <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: Center(
-                      child: StreamChannelAvatar(
-                        channel: channel,
-                        borderRadius:
-                            channelHeaderTheme.avatarTheme?.borderRadius,
-                        constraints:
-                            channelHeaderTheme.avatarTheme?.constraints,
-                        onTap: onImageTap,
-                      ),
-                    ),
-                  ),
-                ],
-            centerTitle: centerTitle,
-            title: InkWell(
-              onTap: onTitleTap,
-              child: SizedBox(
-                height: preferredSize.height,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: effectiveCenterTitle
-                      ? CrossAxisAlignment.center
-                      : CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    title ??
-                        StreamChannelName(
-                          channel: channel,
-                          textStyle: channelHeaderTheme.titleStyle,
-                        ),
-                    const SizedBox(height: 2),
-                    subtitle ??
-                        StreamChannelInfo(
-                          showTypingIndicator: showTypingIndicator,
-                          channel: channel,
-                          textStyle: channelHeaderTheme.subtitleStyle,
-                        ),
-                  ],
-                ),
-              ),
-            ),
-          )*/,
         );
       },
     );
   }
+
+  YYDialog dialogPopMenuGroup(BuildContext context) {
+    return YYDialog().build(context)
+      ..width = 180
+      ..borderRadius = 10.0
+      ..gravity = Gravity.rightTop
+      ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..margin = const EdgeInsets.only(top: 90, right: 20)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.notificationsOffRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.claimOwnershipeRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..show();
+  }
+
+  YYDialog dialogPopMenuConv(BuildContext context, Channel channel) {
+    return YYDialog().build(context)
+      ..width = 180
+      ..borderRadius = 10.0
+      ..gravity = Gravity.rightTop
+      ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..margin = const EdgeInsets.only(top: 90, right: 20)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(userFromJson(
+              json.encode(channel.state?.members
+                  .where((element) =>
+              element.userId != StreamChat
+                  .of(context)
+                  .currentUser!
+                  .id)
+                  .first
+                  .user!
+                  .extraData["userDTO"])).isInFollowing! ? con.addToMySirklRes.tr : con.removeOfMySirklRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){
+          commonController.userClicked.value = userFromJson(
+              json.encode(channel.state?.members
+                  .where((element) =>
+              element.userId != StreamChat
+                  .of(context)
+                  .currentUser!
+                  .id)
+                  .first
+                  .user!
+                  .extraData["userDTO"]));
+          Get.to(() => const ProfileElseScreen());
+        },
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.profileMenuTabRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..show();
+  }
+
 }

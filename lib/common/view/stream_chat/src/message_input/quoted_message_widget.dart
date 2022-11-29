@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/platform_widget_builder/src/platform_widget_builder.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/clear_input_item_button.dart';
 import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.dart';
@@ -172,7 +173,7 @@ class _QuotedMessage extends StatelessWidget {
                 : messageTheme.copyWith(
                     messageTextStyle: messageTheme.messageTextStyle?.copyWith(
                       fontSize: 12,
-                      color: Colors.white,
+                      color: reverse ? Get.isDarkMode ? Colors.black : Colors.white : Colors.black,
                       fontFamily: 'Gilroy',
                       fontWeight: FontWeight.w500
                     ),
@@ -194,12 +195,12 @@ class _QuotedMessage extends StatelessWidget {
             bottomLeft: reverse ? const Radius.circular(0)  : const Radius.circular(10),
             topRight: const Radius.circular(10),
         ),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-               Color(0xFF102437),
-                Color(0xFF13171B)
+               !Get.isDarkMode ? reverse ? Color(0xFF102437) : Colors.white : reverse ? Colors.white : Colors.white,
+                !Get.isDarkMode ? reverse ? Color(0xFF13171B) : Colors.white : reverse ? Colors.white : Colors.white
             ]),
       ),
       padding: const EdgeInsets.all(12),

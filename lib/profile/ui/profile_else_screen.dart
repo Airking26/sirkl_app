@@ -31,8 +31,9 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
   @override
   void initState(){
+    _commonController.checkUserIsInFollowing();
     _homeController.getNFTsTemporary(_commonController.userClicked.value!.wallet!);
-    _commonController.userClickedFollowStatus.value = _commonController.userClicked.value!.isInFollowing!;
+    //_commonController.userClickedFollowStatus.value = _commonController.userClicked.value!.isInFollowing!;
     super.initState();
   }
 
@@ -128,8 +129,8 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("Wallet: ${_commonController.userClicked.value!.wallet!.substring(0,20)}...",overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF00CB7D), fontSize: 15),),
-                    SizedBox(width: 4,),
-                    Image.asset("assets/images/copy.png", height: 18, width: 18, color: Color(0xFF00CB7D),)
+                    const SizedBox(width: 4,),
+                    Image.asset("assets/images/copy.png", height: 18, width: 18, color: const Color(0xFF00CB7D),)
                   ],
                 ),
               ),
@@ -171,7 +172,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                 ),
               ),
             ) :  Container(
-              margin: EdgeInsets.only(top: 24, left: 48, right: 48),
+              margin: const EdgeInsets.only(top: 24, left: 48, right: 48),
               child: Text(con.dontHaveNftRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600),),
             )
           ],
@@ -184,7 +185,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
       ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = Get.isDarkMode ? Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: () async{
@@ -253,14 +254,14 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             ],
           ),
           child: ExpansionTile(
-              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => CircularProgressIndicator(), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
+              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const CircularProgressIndicator(), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             trailing: Obx(() => Image.asset(
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
               "assets/images/arrow_up_rev.png" :
               "assets/images/arrow_down_rev.png",
               color: Get.isDarkMode ? Colors.white : Colors.black, height: 20, width: 20,),),
             title: Text(widget.collectionDbDTO.collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
-            subtitle: Text("${widget.collectionDbDTO.collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
+            subtitle: Text("${widget.collectionDbDTO.collectionImages.length} available", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
             onExpansionChanged: (expanded){
               if(expanded) {
                 widget.profileController.isCardExpandedList.value.assign(widget.index);

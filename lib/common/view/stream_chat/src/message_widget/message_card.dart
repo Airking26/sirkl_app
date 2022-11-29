@@ -192,113 +192,114 @@ class _MessageCardState extends State<MessageCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10),
-            bottomLeft: widget.reverse ? Radius.circular(10)  : Radius.circular(0),
-            topRight: Radius.circular(10)),
-        gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              widget.reverse ? Color(0xFFFFFFFF) : Color(0xFF102437),
-              widget.reverse ? Color(0xFFFFFFFF) :Color(0xFF13171B)
-            ]),
-        boxShadow: [
-          BoxShadow(
-            color: Get.isDarkMode ? Color(0xFF2D465E) : Colors.grey ,
-            offset: Offset(0.35, Get.isDarkMode ? 0.25 : 0.25), //(x,y)
-            blurRadius: Get.isDarkMode ? 0.1 : 0.25,
-          ),
-        ],
-      ),
-      child: Card(
-        elevation: 0,
-        margin:
-        EdgeInsets.only(
-          top:(widget.isFailedState ? 15.0 : 0.0) + (widget.showUserAvatar == DisplayWidget.gone ? 0 : 2.0),
-          left: (widget.isFailedState ? 15.0 : 0.0) + (widget.showUserAvatar == DisplayWidget.gone ? 0 : 4.0),
-          right: (widget.isFailedState ? 15.0 : 0.0) + (widget.showUserAvatar == DisplayWidget.gone ? 0 : 4.0)
-        ),
-        color: Colors.transparent ,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: widthLimit ?? double.infinity,
-          ),
-          child: IntrinsicWidth(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (widget.hasQuotedMessage) QuotedMessage(
-                    reverse: widget.reverse,
-                    message: widget.message,
-                    hasNonUrlAttachments: widget.hasNonUrlAttachments,
-                    onQuotedMessageTap: widget.onQuotedMessageTap,
-                  ),
-                if (widget.hasNonUrlAttachments) ParseAttachments(
-                    key: attachmentsKey,
-                    message: widget.message,
-                    attachmentBuilders: widget.attachmentBuilders,
-                    attachmentPadding: widget.attachmentPadding,
-                  ),
-                if (!widget.isGiphy) ConstrainedBox(
-                    constraints: BoxConstraints.loose(const Size.fromWidth(500)),
-                    child: TextBubble(
-                      messageTheme: widget.messageTheme,
-                      message: widget.message,
-                      reverse: widget.reverse,
-                      textPadding: widget.textPadding,
-                      textBuilder: widget.textBuilder,
-                      isOnlyEmoji: widget.isOnlyEmoji,
-                      hasQuotedMessage: widget.hasQuotedMessage,
-                      hasUrlAttachments: widget.hasUrlAttachments,
-                      onLinkTap: widget.onLinkTap,
-                      onMentionTap: widget.onMentionTap,
-                    ),
-                  ),
-                if (widget.hasUrlAttachments && !widget.hasQuotedMessage) _buildUrlAttachment(),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: SizedBox(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 12,
-                          right: 12,
-                          bottom: 12.0,
-                          top: 12
-                      ),
-                      child: widget.bottomRowBuilder?.call(
-                        context,
-                        widget.message,
-                      ) ??
-                          BottomRow(
-                            message: widget.message,
-                            reverse: widget.reverse,
-                            messageTheme: widget.messageTheme,
-                            hasUrlAttachments: widget.hasUrlAttachments,
-                            isOnlyEmoji: widget.isOnlyEmoji,
-                            isDeleted: widget.message.isDeleted,
-                            isGiphy: widget.isGiphy,
-                            showInChannel: widget.showInChannel,
-                            showSendingIndicator: widget.showSendingIndicator,
-                            showThreadReplyIndicator: widget.showThreadReplyIndicator,
-                            showTimeStamp: widget.showTimeStamp,
-                            showUsername: false,
-                            streamChatTheme: StreamChatThemeData(colorTheme: StreamColorTheme.dark(appBg: Colors.red)),
-                            onThreadTap: widget.onThreadTap,
-                            deletedBottomRowBuilder: widget.deletedBottomRowBuilder,
-                            streamChat: widget.streamChat,
-                            hasNonUrlAttachments: widget.hasNonUrlAttachments,
-                            usernameBuilder: widget.usernameBuilder,
-                          ),
-                    ),
-                  ),
-                )
+    return Material(
+      elevation: 1,
+      shadowColor: Get.isDarkMode ? Colors.transparent: Colors.transparent,
+      borderRadius: BorderRadius.circular(10),
+      color: Colors.transparent,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(width: widget.reverse ? Get.isDarkMode ? 0 : 0.75 :1.5 , color: widget.reverse ? Get.isDarkMode ? Colors.transparent : Colors.grey.withOpacity(0.25) : Colors.grey.withOpacity(0.35)),
+          borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(10),
+              bottomRight: const Radius.circular(10),
+              bottomLeft: widget.reverse ? const Radius.circular(10)  : widget.showTimeStamp ? const Radius.circular(0) : const Radius.circular(10),
+              topRight: const Radius.circular(10)),
+          gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                widget.reverse ? Get.isDarkMode ?  Colors.white.withOpacity(0.1) : const Color(0xFFFFFFFF) : Get.isDarkMode ? Colors.transparent : const Color(0xFF102437),
+                widget.reverse ? Get.isDarkMode ? Colors.white.withOpacity(0.05) : const Color(0xFFFFFFFF)  : Get.isDarkMode ? Colors.transparent : const Color(0xFF13171B)
+              ]),
 
-              ],
+        ),
+        child: Card(
+          elevation: 0,
+          margin:
+          EdgeInsets.only(
+            top:(widget.isFailedState ? 15.0 : 0.0) + (widget.showUserAvatar == DisplayWidget.gone ? 0 : 2.0),
+            left: (widget.isFailedState ? 15.0 : 0.0) + (widget.showUserAvatar == DisplayWidget.gone ? 0 : 4.0),
+            right: (widget.isFailedState ? 15.0 : 0.0) + (widget.showUserAvatar == DisplayWidget.gone ? 0 : 4.0)
+          ),
+          color: Colors.transparent ,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: widthLimit ?? double.infinity,
+            ),
+            child: IntrinsicWidth(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.hasQuotedMessage) QuotedMessage(
+                      reverse: widget.reverse,
+                      message: widget.message,
+                      hasNonUrlAttachments: widget.hasNonUrlAttachments,
+                      onQuotedMessageTap: widget.onQuotedMessageTap,
+                    ),
+                  if (widget.hasNonUrlAttachments) ParseAttachments(
+                      key: attachmentsKey,
+                      message: widget.message,
+                      attachmentBuilders: widget.attachmentBuilders,
+                      attachmentPadding: widget.attachmentPadding,
+                    ),
+                  if (!widget.isGiphy) ConstrainedBox(
+                      constraints: BoxConstraints.loose(const Size.fromWidth(500)),
+                      child: TextBubble(
+                        messageTheme: widget.messageTheme,
+                        message: widget.message,
+                        reverse: widget.reverse,
+                        textPadding: widget.textPadding,
+                        textBuilder: widget.textBuilder,
+                        isOnlyEmoji: widget.isOnlyEmoji,
+                        hasQuotedMessage: widget.hasQuotedMessage,
+                        hasUrlAttachments: widget.hasUrlAttachments,
+                        onLinkTap: widget.onLinkTap,
+                        onMentionTap: widget.onMentionTap,
+                      ),
+                    ),
+                  if (widget.hasUrlAttachments && !widget.hasQuotedMessage) _buildUrlAttachment(),
+                  widget.showTimeStamp ? Align(
+                    alignment: Alignment.bottomRight,
+                    child: SizedBox(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 12,
+                            right: 12,
+                            bottom: 12.0,
+                            top: 12
+                        ),
+                        child: widget.bottomRowBuilder?.call(
+                          context,
+                          widget.message,
+                        ) ??
+                            BottomRow(
+                              message: widget.message,
+                              reverse: widget.reverse,
+                              messageTheme: widget.messageTheme,
+                              hasUrlAttachments: widget.hasUrlAttachments,
+                              isOnlyEmoji: widget.isOnlyEmoji,
+                              isDeleted: widget.message.isDeleted,
+                              isGiphy: widget.isGiphy,
+                              showInChannel: widget.showInChannel,
+                              showSendingIndicator: widget.showSendingIndicator,
+                              showThreadReplyIndicator: widget.showThreadReplyIndicator,
+                              showTimeStamp: widget.showTimeStamp,
+                              showUsername: false,
+                              streamChatTheme: StreamChatThemeData(colorTheme: StreamColorTheme.dark(appBg: Colors.red)),
+                              onThreadTap: widget.onThreadTap,
+                              deletedBottomRowBuilder: widget.deletedBottomRowBuilder,
+                              streamChat: widget.streamChat,
+                              hasNonUrlAttachments: widget.hasNonUrlAttachments,
+                              usernameBuilder: widget.usernameBuilder,
+                            ),
+                      ),
+                    ),
+                  ) : const SizedBox(height: 12,)
+
+                ],
+              ),
             ),
           ),
         ),

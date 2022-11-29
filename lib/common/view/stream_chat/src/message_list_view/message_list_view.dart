@@ -277,7 +277,7 @@ class StreamMessageListView extends StatefulWidget {
     if (!spacingTypes.contains(SpacingType.defaultSpacing)) {
       return const SizedBox(height: 8);
     }
-    return const SizedBox(height: 2);
+    return const SizedBox(height: 4);
   }
 
   @override

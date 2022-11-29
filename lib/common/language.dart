@@ -71,7 +71,8 @@ class Language extends Translations{
       c.notificationsOffRes : "• Notifications OFF",
       c.contactOwnerRes: "• Contact owner",
       c.claimOwnershipeRes: "• Claim ownership",
-      c.messageSuccessfullySentRes: "Message successfully sent"
+      c.messageSuccessfullySentRes: "Message successfully sent",
+      c.profileMenuTabRes: "• Profile"
     }
   };
 

@@ -34,14 +34,12 @@ class _GroupsScreenState extends State<GroupsScreen> {
       _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ?
       Filter.and([
         Filter.autoComplete('name', _groupController.query.value),
-        //Filter.in_("members", [_homeController.id.value]),
         if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList()),
         Filter.greater("member_count", 2)
       ]) :
       Filter.and([
-        Filter.equal('type', "try"),
-        //Filter.in_("members", [_homeController.id.value]),
-        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList()),
+        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
+        else Filter.equal("contractAddress", ""),
         Filter.greater("member_count", 2)
       ]),
       channelStateSort: const [SortOption('last_message_at')],
@@ -166,7 +164,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
                           icon: Image.asset(
                             "assets/images/more.png",
                             color:
-                            _groupController.addAGroup.value ? Colors.transparent : Get.isDarkMode ? Colors.white : Colors.black,
+                            _groupController.addAGroup.value ? Colors.transparent : Get.isDarkMode ? Colors.transparent : Colors.transparent,
                           )),
                     ],
                   ),

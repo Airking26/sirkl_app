@@ -325,10 +325,10 @@ class HomeController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _profileService.retrieveTokenStreamChat(accessToken);
       if(request.isOk){
-        await client.connectUser(User(id: id.value, name: userMe.value.userName ?? userMe.value.wallet, extraData: {"userDTO": userMe.value}), request.body!);
+        await client.connectUser(User(id: id.value, name:  userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
       }
     } else if(request.isOk){
-      await client.connectUser(User(id: id.value, name: userMe.value.userName ?? userMe.value.wallet, extraData: {"userDTO": userMe.value}), request.body!);
+      await client.connectUser(User(id: id.value, name: userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
     }
   }
 

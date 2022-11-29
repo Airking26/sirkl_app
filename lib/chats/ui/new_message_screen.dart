@@ -217,37 +217,19 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           ),
           Flexible(
             child: InkWell(
-              onTap: () {
-                _chatController.chipsList.map((element) => element.id).forEachIndexed((index, id) async {
-                  var channel = StreamChat.of(context).client.channel("try", extraData: {"members": [id, _homeController.id.value,]});
-                  await channel.watch();
-                  await channel.sendMessage(_messageInputController.message);
-                  channel.dispose();
-                  if(index == _chatController.chipsList.length - 1) {
-                    _messageInputController.clear();
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    _chatController.chipsList.clear();
-                    utils.showToast(context, con.messageSuccessfullySentRes.tr);
-                  }
-                  });
-                /*await _chatController.bulkPeerMessages(_chatController.chipsList.value.map((e) => InboxCreationDto(lastMessage: _textMessageController.text, updatedAt: DateTime.now(), lastSender: _homeController.id.value, unreadMessages: 1, ownedBy: [_homeController.id.value, e.id!])).toList());
-                ZIMTextMessage textMessage = ZIMTextMessage(message: _textMessageController.text);
-                ZIMMessageSendConfig sendConfig = ZIMMessageSendConfig();
-                _chatController.chipsList.map((element) => element.id).forEach((id) async{
-                  await ZIM
-                      .getInstance()!
-                      .sendPeerMessage(textMessage, id!, sendConfig).then((value) {
-                        var f = value;
-                  })
-                      .catchError((onError) {
-                    switch (onError.runtimeType) {
-                      case PlatformException:
-                        break;
-                      default:
+              onTap: () async {
+                  for(UserDTO element in _chatController.chipsList) {
+                    var channel = StreamChat.of(context).client.channel("try", extraData: {"members": [element.id, _homeController.id.value,], 'isInFollowing' : _commonController.userClicked.value!.isInFollowing});
+                    await channel.watch();
+                    await channel.sendMessage(Message(text: _messageInputController.text, id: DateTime.now().millisecondsSinceEpoch.toString()));
+                    channel.dispose();
+                    if(_chatController.chipsList.value.indexOf(element) == _chatController.chipsList.length - 1) {
+                      _messageInputController.clear();
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      _chatController.chipsList.clear();
+                      utils.showToast(context, con.messageSuccessfullySentRes.tr);
                     }
-                  });
-                });*/
-
+                  }
               },
               child: Container(
                 width: 55,

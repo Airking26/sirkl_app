@@ -91,4 +91,5 @@ const String walletCopiedRes = "wallet_copied";
 
 /// New Message Screen ///
 const String messageSuccessfullySentRes = "message_successfully_sent";
+const String profileMenuTabRes = "profile_menu";
 

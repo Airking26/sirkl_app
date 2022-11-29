@@ -104,9 +104,7 @@ class StreamUserAvatar extends StatelessWidget {
                     : null,
                 imageBuilder: (context, imageProvider) => DecoratedBox(
                   decoration: BoxDecoration(
-                    borderRadius: borderRadius ??
-                        streamChatTheme
-                            .ownMessageTheme.avatarTheme?.borderRadius,
+                    borderRadius: BorderRadius.circular(90),
                     image: DecorationImage(
                       image: imageProvider,
                       fit: BoxFit.cover,

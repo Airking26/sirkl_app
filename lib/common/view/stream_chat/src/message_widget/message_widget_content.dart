@@ -264,7 +264,7 @@ class MessageWidgetContent extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                       ],
-                      if (showUserAvatar == DisplayWidget.hide) SizedBox(width: avatarWidth + 4),
+                      if (showUserAvatar == DisplayWidget.hide) SizedBox(width: avatarWidth + 24),
                       Flexible(
                         child: PortalTarget(
                           visible: isMobileDevice && showReactions,

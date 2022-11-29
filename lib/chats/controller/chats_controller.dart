@@ -12,9 +12,6 @@ import 'package:sirkl/home/service/home_service.dart';
 class ChatsController extends GetxController{
 
   final box = GetStorage();
-  final _chatsService = ChatsService();
-  final _homeService = HomeService();
-
   var index = 0.obs;
   var searchIsActive = false.obs;
   var chipsList = <UserDTO>[].obs;
@@ -168,7 +165,6 @@ class ChatsController extends GetxController{
             id,
             commonController.userClicked.value!.id!,
           ],
-          'isInFollowing' : commonController.userClicked.value!.isInFollowing
         },
       );
       await channel.value!.watch();

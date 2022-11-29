@@ -29,7 +29,11 @@ class CommonController extends GetxController{
 
   Future<bool> addUserToSirkl(String id, StreamChatClient streamChatClient, String value) async{
     var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, value]});
-    await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"isInFollowing": true});
+    var followers = channel.channel?.extraData["isInFollowing"] as List<dynamic>?;
+    var followCount = channel.channel?.extraData["followCount"] as dynamic;
+    if(followers != null && !followers.contains(id)) followers.add(id);
+    if(followCount != null) followCount++;
+    await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"isInFollowing": followers ?? [id], "followCount": followCount ?? 1});
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _commonService.addUserToSirkl(accessToken, id);
@@ -61,7 +65,13 @@ class CommonController extends GetxController{
 
   Future<bool> removeUserToSirkl(String id, StreamChatClient streamChatClient, String value) async{
     var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, value]});
-    await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"isInFollowing": false});
+    var followers = channel.channel?.extraData["isInFollowing"] as List<dynamic>?;
+    var followCount = channel.channel?.extraData["followCount"] as dynamic;
+    if(followers != null && followers.contains(id)){
+      followers.remove(id);
+      if(followCount != null && followCount != 0) followCount--;
+    }
+    await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"isInFollowing": followers ?? [], "followCount": followCount ?? 0});
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _commonService.removeUserToSirkl(accessToken, id);
@@ -126,6 +136,22 @@ class CommonController extends GetxController{
     }
 
     gettingStoryAndContacts.value = false;
+  }
+
+  checkUserIsInFollowing() async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _commonService.checkUserIsInFollowing(accessToken, userClicked.value!.id!);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken!);
+      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDto.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _commonService.checkUserIsInFollowing(accessToken, userClicked.value!.id!);
+      userClickedFollowStatus.value = request.body == "false" ? false : true;
+    } else if(request.isOk){
+      userClickedFollowStatus.value = request.body == "false" ? false : true;
+    }
   }
 
   searchInSirklUsers(String substring, String offset) async{
