@@ -15,6 +15,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class ProfileController extends GetxController{
 
@@ -24,6 +25,7 @@ class ProfileController extends GetxController{
   final _homeController = Get.put(HomeController());
 
   var isCardExpanded = false.obs;
+  Rx<Uint8List?> videoThumbnail = Uint8List(0).obs;
   var isCardExpandedList = <int>[].obs;
   var isEditingProfile = false.obs;
   var isLoadingPicture = false.obs;
@@ -83,6 +85,16 @@ class ProfileController extends GetxController{
     if(res != null) isLoadingPicture.value = true;
     urlPicture.value = await SimpleS3().uploadFile(File(res!.first.path), "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
     isLoadingPicture.value = false;
+  }
+
+  void getThumbnail(String collectionImag) async{
+    videoThumbnail.value = await VideoThumbnail.thumbnailData(
+      video: collectionImag,
+      imageFormat: ImageFormat.JPEG,
+      maxWidth: 112, // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
+      quality: 100,
+    );
+    var d = '';
   }
 
 }

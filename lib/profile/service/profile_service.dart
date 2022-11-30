@@ -7,6 +7,8 @@ class ProfileService extends GetConnect{
   Future<Response<Map<String, dynamic>>> modifyPassword(String accessToken, String wallet, String password) => patch('${con.URL_SERVER}user/modifyPassword/$wallet/$password', "", headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<String>> retrieveTokenZegoCloud(String accessToken) => get('${con.URL_SERVER}user/me/tokenZegoCloud', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<String>> retrieveTokenStreamChat(String accessToken) => get('${con.URL_SERVER}user/me/tokenStreamChat', headers: {'Authorization':'Bearer $accessToken'});
+  Future<Response<String>> retrieveTokenAgoraRTC(String accessToken, String channel, String role, String tokenType, String id) => get('${con.URL_SERVER}user/me/tokenAgoraRTC/$channel/$role/$tokenType/$id', headers: {'Authorization':'Bearer $accessToken'});
+  Future<Response<String>> retrieveTokenAgoraRTM(String accessToken, String id) => get('${con.URL_SERVER}user/me/tokenAgoraRTM/$id', headers: {'Authorization':'Bearer $accessToken'});
 
 
 }

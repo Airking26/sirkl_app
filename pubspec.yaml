@@ -67,6 +67,10 @@ dependencies:
   image_downloader: ^0.31.0
   web3dart: ^2.4.1
   slider_button: ^2.0.0
+  agora_rtc_engine: ^6.0.0
+  permission_handler: ^9.2.0
+  agora_rtm: ^1.5.0
+  callkeep: ^0.3.2
 
 dev_dependencies:
   dart_code_metrics: ^4.4.0

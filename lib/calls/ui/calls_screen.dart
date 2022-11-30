@@ -2,7 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/home/controller/home_controller.dart';
 import 'dart:io';
 
 import '../../common/utils.dart';
@@ -15,6 +17,18 @@ class CallsScreen extends StatefulWidget {
 }
 
 class _CallsScreenState extends State<CallsScreen> {
+
+  final _callController = Get.put(CallsController());
+  final _homeController = Get.put(HomeController());
+
+  @override
+  void initState() {
+    _homeController.retrieveTokenAgoraRTM();
+    //_callController.createClient(_homeController.id.value, _homeController.tokenAgoraRTM.value);
+    _callController.createCallKeep(context);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,10 +160,16 @@ class _CallsScreenState extends State<CallsScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                InkWell(onTap:(){
+                InkWell(onTap:()async{
+                  //await _callController.createClient(_homeController.id.value, _homeController.tokenAgoraRTM.value);
+                  _callController.inviteCall("6384d97bcb4bd6001e75b31e", "knflknzfr");
                   } ,child: Image.asset("assets/images/call_tab.png", color: const Color(0xFF00CB7D), width: 20, height: 20,)),
                 const SizedBox(width: 8,),
-                Image.asset("assets/images/chat_tab.png", width: 20, height: 20, color: const Color(0xFF9BA0A5),),
+                InkWell(
+                  onTap: () async{
+                    //await _callController.inviteCall('dd', "exampleShan");
+                  },
+                    child: Image.asset("assets/images/chat_tab.png", width: 20, height: 20, color: const Color(0xFF9BA0A5),)),
                   const SizedBox(width: 4,),
                   Image.asset("assets/images/more.png", width: 20, height: 20,color: const Color(0xFF9BA0A5))
               ],),

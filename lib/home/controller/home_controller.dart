@@ -22,6 +22,7 @@ import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:web3dart/crypto.dart';
@@ -49,6 +50,8 @@ class HomeController extends GetxController{
   var recoverPassword = false.obs;
   var password = "".obs;
 
+  var tokenAgoraRTM = "".obs;
+  var tokenAgoraRTC = "".obs;
   var accessToken = "".obs;
   var userMe = UserDTO().obs;
   var progress = true.obs;
@@ -210,6 +213,8 @@ class HomeController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _homeService.uploadFCMToken(accessToken, fcm);
     }
+    debugPrint(request.statusText);
+    debugPrint(request.bodyString);
     userMe.value = userFromJson(json.encode(request.body));
     retrieveAccessToken();
     _commonController.showSirklUsers(id.value);
@@ -270,12 +275,12 @@ class HomeController extends GetxController{
       cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
     }
 
-    mainCollection.removeWhere((element) => element?.metadata == null || element?.name == null);
+    mainCollection.removeWhere((element) => element?.metadata == null || element?.name == null || element?.metadata != null && moralisMetadataDtoFromJson(element!.metadata!).image != null && moralisMetadataDtoFromJson(element!.metadata!).image!.contains(".mp4"));
     var groupedCollection = mainCollection.groupBy((p0) => p0!.tokenAddress);
 
     groupedCollection.forEach((key, value) async{
       nfts.value.add(CollectionDbDto(collectionName: value.first!.name!, contractAddress: value.first!.tokenAddress!, collectionImages: value.map((e) {
-          if(e!.metadata != null )debugPrint(moralisMetadataDtoFromJson(e.metadata!).image!);
+          if(e!.metadata != null )debugPrint("${value.first!.name!} : ${moralisMetadataDtoFromJson(e.metadata!).image!}");
           if (moralisMetadataDtoFromJson(e.metadata!).image!.startsWith("ipfs://")) {
             return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
           }
@@ -329,6 +334,38 @@ class HomeController extends GetxController{
       }
     } else if(request.isOk){
       await client.connectUser(User(id: id.value, name: userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
+    }
+  }
+
+  retrieveTokenAgoraRTC(String channel, String role, String tokenType) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.retrieveTokenAgoraRTC(accessToken, channel, role, tokenType, id.value);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _profileService.retrieveTokenAgoraRTC(accessToken, channel, role, tokenType, id.value);
+      if(request.isOk) tokenAgoraRTC.value = request.body!;
+    } else if(request.isOk) {
+      tokenAgoraRTC.value = request.body!;
+    }
+  }
+
+  retrieveTokenAgoraRTM() async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.retrieveTokenAgoraRTM(accessToken, id.value);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _profileService.retrieveTokenAgoraRTM(accessToken, id.value);
+      if(request.isOk) tokenAgoraRTM.value = request.bodyString!;
+    } else if(request.isOk) {
+      tokenAgoraRTM.value = request.bodyString!;
     }
   }
 

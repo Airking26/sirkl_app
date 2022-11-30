@@ -271,6 +271,12 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
     bool get wantKeepAlive => true;
 
     @override
+  void initState() {
+      widget.profileController.getThumbnail(widget.collectionDbDTO.collectionImages[0]);
+    super.initState();
+  }
+
+    @override
     Widget build(BuildContext context) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 6),
@@ -287,7 +293,10 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             ],
           ),
           child: ExpansionTile(
-            leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const CircularProgressIndicator(), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
+            leading: ClipRRect(borderRadius: BorderRadius.circular(90), child:
+            widget.collectionDbDTO.collectionImages[0].contains(".mp4") ?
+                Obx(() => SizedBox(width: 56, height: 56, child: Image.memory(widget.profileController.videoThumbnail.value!,))) :
+            CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const CircularProgressIndicator(), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             trailing: Obx(() => Image.asset(
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
               "assets/images/arrow_up_rev.png" :
