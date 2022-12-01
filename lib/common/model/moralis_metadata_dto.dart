@@ -43,7 +43,7 @@ class Attribute {
   });
 
   String? traitType;
-  String? value;
+  dynamic value;
 
   factory Attribute.fromJson(Map<String, dynamic> json) => Attribute(
     traitType: json["trait_type"],

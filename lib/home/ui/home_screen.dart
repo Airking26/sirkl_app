@@ -717,7 +717,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Column buildSignIn() {
+  /*Column buildSignIn() {
     return Column(
       children: [
         const SizedBox(
@@ -1346,5 +1346,5 @@ class _HomeScreenState extends State<HomeScreen> {
             )),
       ],
     );
-  }
+  }*/
 }

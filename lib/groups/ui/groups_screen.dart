@@ -34,7 +34,8 @@ class _GroupsScreenState extends State<GroupsScreen> {
       _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ?
       Filter.and([
         Filter.autoComplete('name', _groupController.query.value),
-        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList()),
+        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
+        else Filter.equal("contractAddress", ""),
         Filter.greater("member_count", 2)
       ]) :
       Filter.and([
@@ -50,7 +51,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
   @override
   void initState() {
     streamChannelListControllerGroups = buildStreamChannelListController();
-    _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
+    _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
     super.initState();
   }
 

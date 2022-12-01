@@ -25,7 +25,6 @@ class _CallsScreenState extends State<CallsScreen> {
   void initState() {
     _homeController.retrieveTokenAgoraRTM();
     //_callController.createClient(_homeController.id.value, _homeController.tokenAgoraRTM.value);
-    _callController.createCallKeep(context);
     super.initState();
   }
 

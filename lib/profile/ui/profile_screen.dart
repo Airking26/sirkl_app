@@ -29,7 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState(){
-    _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
+    _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
     _profileController.usernameTextEditingController.value.text = _homeController.userMe.value.userName!.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _homeController.userMe.value.userName!;
     _profileController.descriptionTextEditingController.value.text = _homeController.userMe.value.description == "" ? "" : _homeController.userMe.value.description!;
     _profileController.urlPicture.value = _homeController.userMe.value.picture == null ? "" : _homeController.userMe.value.picture!;
@@ -201,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: RefreshIndicator(
                       color: const Color(0xFF00CB7D),
                       onRefresh: () async{
-                        _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
+                        _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
                       },
                       child: ListView.builder(
                           cacheExtent: 1000,
@@ -272,7 +272,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
 
     @override
   void initState() {
-      widget.profileController.getThumbnail(widget.collectionDbDTO.collectionImages[0]);
+      //widget.profileController.getThumbnail(widget.collectionDbDTO.collectionImages[0]);
     super.initState();
   }
 
@@ -294,9 +294,10 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
           ),
           child: ExpansionTile(
             leading: ClipRRect(borderRadius: BorderRadius.circular(90), child:
-            widget.collectionDbDTO.collectionImages[0].contains(".mp4") ?
-                Obx(() => SizedBox(width: 56, height: 56, child: Image.memory(widget.profileController.videoThumbnail.value!,))) :
-            CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const CircularProgressIndicator(), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
+            //widget.collectionDbDTO.collectionImages[0].contains(".mp4") ?
+              //  Obx(() => SizedBox(width: 56, height: 56, child: Image.memory(widget.profileController.videoThumbnail.value!,))) :
+            CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             trailing: Obx(() => Image.asset(
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
               "assets/images/arrow_up_rev.png" :
@@ -330,7 +331,9 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
                         child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: SizedBox.fromSize(
-                                child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: widget.collectionDbDTO.collectionImages[i], width: 80, height: 70,))),
+                                child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: widget.collectionDbDTO.collectionImages[i], width: 80, height: 70,
+                                    placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                                    errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
                       ),
                     );
                   }, scrollDirection: Axis.horizontal,)),

@@ -32,7 +32,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
   @override
   void initState(){
     _commonController.checkUserIsInFollowing();
-    _homeController.getNFTsTemporary(_commonController.userClicked.value!.wallet!);
+    _homeController.getNFTsTemporary(_commonController.userClicked.value!.wallet!, context);
     //_commonController.userClickedFollowStatus.value = _commonController.userClicked.value!.isInFollowing!;
     super.initState();
   }
@@ -298,7 +298,8 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
           child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: SizedBox.fromSize(
-                  child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: collectionDbDTO.collectionImages[i], width: 80, height: 70,))),
+                  child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: collectionDbDTO.collectionImages[i], width: 80, height: 70,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                      errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         ),
       );
     }

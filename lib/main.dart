@@ -1,21 +1,16 @@
 import 'dart:async';
-import 'dart:io';
-
-import 'package:callkeep/callkeep.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/language.dart';
-import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/firebase_options.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-//import 'package:zego_zim/zego_zim.dart';
-
-import 'common/interface/ZIMEventHandlerManager.dart';
+import 'package:sirkl/profile/ui/profile_screen.dart';
 import 'navigation/ui/navigation_screen.dart';
 
 void main() async{
@@ -24,7 +19,6 @@ void main() async{
     logLevel: Level.ALL,
   );
   WidgetsFlutterBinding.ensureInitialized();
-  FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GetStorage.init();
   runApp(MyApp(client: client));
@@ -32,83 +26,12 @@ void main() async{
 
 }
 
-Future<void> myBackgroundMessageHandler(RemoteMessage message) async {
-  final callKeep = FlutterCallkeep();
-  print('backgroundMessage: message => ${message.toString()}');
-  var payload = message.data;
-  var callerId = payload['caller_id'] as String;
-  var callerNmae = payload['caller_name'] as String;
-  var uuid = payload['uuid'] as String;
-  var hasVideo = payload['has_video'] == "true";
-
-  final callUUID = uuid;
-  callKeep.on(CallKeepPerformAnswerCallAction(),
-          (CallKeepPerformAnswerCallAction event) {
-        print(
-            'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
-        Timer(const Duration(seconds: 1), () {
-          print(
-              '[setCurrentCallActive] $callUUID, callerId: $callerId, callerName: $callerNmae');
-          callKeep.setCurrentCallActive(callUUID);
-        });
-        //_callKeep.endCall(event.callUUID);
-      });
-
-  callKeep.on(CallKeepPerformEndCallAction(),
-          (CallKeepPerformEndCallAction event) {
-        print('backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
-      });
-  callKeep.setup(
-      null,
-      <String, dynamic>{
-        'ios': {
-          'appName': 'CallKeepDemo',
-        },
-        'android': {
-          'alertTitle': 'Permissions required',
-          'alertDescription':
-          'This application needs to access your phone accounts',
-          'cancelButton': 'Cancel',
-          'okButton': 'ok',
-          'foregroundService': {
-            'channelId': 'com.company.my',
-            'channelName': 'Foreground service for my app',
-            'notificationTitle': 'My app is running on background',
-            'notificationIcon':
-            'Path to the resource icon of the notification',
-          },
-        },
-      },
-      backgroundMode: true);
-
-  print('backgroundMessage: displayIncomingCall ($callerId)');
-  callKeep.displayIncomingCall(callUUID, callerId,
-      localizedCallerName: callerNmae, hasVideo: hasVideo);
-  callKeep.backToForeground();
-  /*
-
-  if (message.containsKey('data')) {
-    // Handle data message
-    final dynamic data = message['data'];
-  }
-
-  if (message.containsKey('notification')) {
-    // Handle notification message
-    final dynamic notification = message['notification'];
-    print('notification => ${notification.toString()}');
-  }
-
-  // Or do other work.
-  */
-  await "";
-}
-
-
 class MyApp extends StatelessWidget {
 
   const MyApp({Key? key, required this.client}) : super(key: key);
 
   final StreamChatClient client;
+
 
   @override
   Widget build(BuildContext context) {
@@ -136,76 +59,143 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
 
   final _homeController = Get.put(HomeController());
   final _callController = Get.put(CallsController());
+  late final FirebaseMessaging _firebaseMessaging;
 
   @override
   void initState() {
-    _homeController.retrieveAccessToken();
-    if(_homeController.accessToken.value.isNotEmpty) _homeController.putFCMToken(widget.client);
-    _callController.callKeep.on(CallKeepDidDisplayIncomingCall(), _callController.didDisplayIncomingCall);
-    _callController.callKeep.on(CallKeepPerformAnswerCallAction(), _callController.answerCall);
-    _callController.callKeep.on(CallKeepDidPerformDTMFAction(), _callController.didPerformDTMFAction);
-    _callController.callKeep.on(
-        CallKeepDidReceiveStartCallAction(), _callController.didReceiveStartCallAction);
-    _callController.callKeep.on(CallKeepDidToggleHoldAction(), _callController.didToggleHoldCallAction);
-    _callController.callKeep.on(
-        CallKeepDidPerformSetMutedCallAction(), _callController.didPerformSetMutedCallAction);
-    _callController.callKeep.on(CallKeepPerformEndCallAction(), _callController.endCall);
-    _callController.callKeep.on(CallKeepPushKitToken(), _callController.onPushKitToken);
-
-    _callController.callKeep.setup(context, <String, dynamic>{
-      'ios': {
-        'appName': 'CallKeepDemo',
-      },
-      'android': {
-        'alertTitle': 'Permissions required',
-        'alertDescription':
-        'This application needs to access your phone accounts',
-        'cancelButton': 'Cancel',
-        'okButton': 'ok',
-        'foregroundService': {
-          'channelId': 'com.company.my',
-          'channelName': 'Foreground service for my app',
-          'notificationTitle': 'My app is running on background',
-          'notificationIcon': 'Path to the resource icon of the notification',
-        },
-      },
-    });
-
-    if (Platform.isAndroid) {
-      //if (isIOS) iOS_Permission();
-      //  _firebaseMessaging.requestNotificationPermissions();
-
-      _callController.firebaseMessaging.getToken().then((token) {
-        print('[FCM] token => ' + token!);
-      });
-
-      FirebaseMessaging.onMessage.listen((event) {
-        print('onMessage: $event');
-        if (event.contentAvailable) {
-          // Handle data message
-          var payload = event.data;
-          var callerId = payload['caller_id'] as String;
-          var callerName = payload['caller_name'] as String;
-          var uuid = payload['uuid'] as String;
-          var hasVideo = payload['has_video'] == "true";
-          final callUUID = uuid ?? Uuid().v4();
-          setState(() {
-            _callController.calls[callUUID] = Call(callerId);
-          });
-          _callController.callKeep.displayIncomingCall(callUUID, callerId,
-              localizedCallerName: callerName, hasVideo: hasVideo);
-        }
-      });
-    }
+    initFirebase();
+    _homeController.putFCMToken(widget.client);
     super.initState();
+  }
+
+  initFirebase() async {
+    await Firebase.initializeApp();
+    _firebaseMessaging = FirebaseMessaging.instance;
+    listen();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      showCallkitIncoming(message.data['uuid'] as String);
+    });
+  }
+
+  listen(){
+    FlutterCallkitIncoming.onEvent.listen((event) {
+      switch (event!.name) {
+        case CallEvent.ACTION_CALL_INCOMING:
+          print('Device Token FCM: $event');
+          break;
+        case CallEvent.ACTION_CALL_START:
+          print('Device Token FCM: $event');
+          break;
+        case CallEvent.ACTION_CALL_ACCEPT:
+          checkAndNavigationCallingPage();
+          break;
+        case CallEvent.ACTION_CALL_DECLINE:
+          print('Device Token FCM: $event');
+          break;
+        case CallEvent.ACTION_CALL_ENDED:
+          print('Device Token FCM: $event');
+          break;
+        case CallEvent.ACTION_CALL_TIMEOUT:
+          print('Device Token FCM: $event');
+          break;
+        case CallEvent.ACTION_CALL_CALLBACK:
+          print('Device Token FCM: $event');
+          break;
+        case CallEvent.ACTION_CALL_TOGGLE_HOLD:
+          print('Device Token FCM: $event');
+          break;
+        case CallEvent.ACTION_CALL_TOGGLE_MUTE:
+          print('Device Token FCM: $event');
+          break;
+        case CallEvent.ACTION_CALL_TOGGLE_DMTF:
+          print('Device Token FCM: $event');
+          break;
+        case CallEvent.ACTION_CALL_TOGGLE_GROUP:
+          print('Device Token FCM: $event');
+          break;
+        case CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+          print('Device Token FCM: $event');
+          break;
+        case CallEvent.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+          print('Device Token FCM: $event');
+          break;
+      }
+    });
+  }
+
+  getCurrentCall() async {
+    var calls = await FlutterCallkitIncoming.activeCalls();
+    if (calls is List) {
+      if (calls.isNotEmpty) {
+        return calls[0];
+      } else {
+        return null;
+      }
+    }
+  }
+
+  checkAndNavigationCallingPage() async {
+    var currentCall = await getCurrentCall();
+    if (currentCall != null) {
+      Get.to(() => const ProfileScreen());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return const NavigationScreen();
   }
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  showCallkitIncoming(message.data['uuid'] as String);
+}
+
+Future<void> showCallkitIncoming(String uuid) async {
+  var params = <String, dynamic>{
+    'id': uuid,
+    'nameCaller': 'Hien Nguyen',
+    'appName': 'Callkit',
+    'avatar': 'https://i.pravatar.cc/100',
+    'handle': '0123456789',
+    'type': 0,
+    'duration': 30000,
+    'textAccept': 'Accept',
+    'textDecline': 'Decline',
+    'textMissedCall': 'Missed call',
+    'textCallback': 'Call back',
+    'extra': <String, dynamic>{'userId': '1a2b3c4d'},
+    'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
+    'android': <String, dynamic>{
+      'isCustomNotification': true,
+      'isShowLogo': false,
+      'isShowCallback': false,
+      'ringtonePath': 'system_ringtone_default',
+      'backgroundColor': '#0955fa',
+      'backgroundUrl': 'https://i.pravatar.cc/500',
+      'actionColor': '#4CAF50'
+    },
+    'ios': <String, dynamic>{
+      'iconName': 'CallKitLogo',
+      'handleType': '',
+      'supportsVideo': true,
+      'maximumCallGroups': 2,
+      'maximumCallsPerCallGroup': 1,
+      'audioSessionMode': 'default',
+      'audioSessionActive': true,
+      'audioSessionPreferredSampleRate': 44100.0,
+      'audioSessionPreferredIOBufferDuration': 0.005,
+      'supportsDTMF': true,
+      'supportsHolding': true,
+      'supportsGrouping': false,
+      'supportsUngrouping': false,
+      'ringtonePath': 'system_ringtone_default'
+    }
+  };
+  await FlutterCallkitIncoming.showCallkitIncoming(params);
 }

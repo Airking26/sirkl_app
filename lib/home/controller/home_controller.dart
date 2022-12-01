@@ -4,9 +4,9 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/moralis_metadata_dto.dart';
@@ -53,7 +53,9 @@ class HomeController extends GetxController{
   var tokenAgoraRTM = "".obs;
   var tokenAgoraRTC = "".obs;
   var accessToken = "".obs;
-  var userMe = UserDTO().obs;
+  var userMe =
+      //UserDTO(id: '6384d97bcb4bd6001e75b31e', userName: "First", picture: "https://clonex-assets.rtfkt.com/images/4767.png", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "fpUelDWhQBuzHfnJDjrpI_:APA91bGmBS4CzNLiVlByHTxriLZyOcexFM5K7RqwD8itm7TgrQV3mVgknTqKsRk1FjrpPHH_UFs1vGgNrdcDHL8BYbdvrScMPC8aH29-a0IFns1QljDi3x2myypnKmQenQkPm_k0UHev", wallet: "0x8e5e2dfd6401a04a9b65e8e390b1a1d8ccf7f9a1", contractAddresses: [], following: 1, isInFollowing: false)
+      UserDTO().obs;
   var progress = true.obs;
   var isLoading = false.obs;
   var isLoadingNfts = true.obs;
@@ -146,82 +148,52 @@ class HomeController extends GetxController{
       accessToken.value = signSuccess.accessToken!;
       box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
       box.write(con.USER, userToJson(signSuccess.user!));
-      await putFCMToken(null);
+      await putFCMToken(StreamChatClient(
+        'v2s6zx9zjd9b',
+        logLevel: Level.ALL,
+      ));
       //Get.back();
       isLoading.value = false;
     }
   }
 
-  signIn(String wallet, String password) async{
-    var requestSignIn = await _homeService.signIn(signInDtoToJson(SignInDto(wallet: wallet, password: password)));
-    if(requestSignIn.isOk){
-      var signSuccess = signInSuccessDtoFromJson(json.encode(requestSignIn.body));
-      userMe.value = signSuccess.user!;
-      box.write(con.ACCESS_TOKEN, signSuccess.accessToken!);
-      accessToken.value = signSuccess.accessToken!;
-      box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
-      box.write(con.USER, userToJson(signSuccess.user!));
-      await putFCMToken(null);
-      Get.back();
-      isLoading.value = false;
-    } else {
-      isLoading.value = false;
-      //Get.snackbar(con.error.tr, requestSignIn.statusText ?? "");
+  putFCMToken(StreamChatClient client) async {
+    await retrieveAccessToken();
+    if(accessToken.value.isNotEmpty) {
+      final firebaseMessaging = await FirebaseMessaging.instance.getToken();
+      var accessToken = box.read(con.ACCESS_TOKEN); //?? this.accessToken.value;
+      var refreshToken = box.read(con.REFRESH_TOKEN);
+      var fcm = defaultTargetPlatform == TargetPlatform.android
+          ? updateFcmdtoToJson(
+          UpdateFcmdto(token: firebaseMessaging, platform: 'android'))
+          : updateFcmdtoToJson(
+          UpdateFcmdto(token: firebaseMessaging, platform: 'iOS'));
+      var request = await _homeService.uploadFCMToken(accessToken!, fcm);
+      if (request.statusCode == 401) {
+        var requestToken = await _homeService.refreshToken(refreshToken!);
+        var refreshTokenDto = refreshTokenDtoFromJson(
+            json.encode(requestToken.body));
+        accessToken = refreshTokenDto.accessToken!;
+        box.write(con.ACCESS_TOKEN, accessToken);
+        request = await _homeService.uploadFCMToken(accessToken, fcm);
+        if(request.isOk){
+          userMe.value = userFromJson(json.encode(request.body));
+          retrieveAccessToken();
+          _commonController.showSirklUsers(id.value);
+          await retrieveTokenStreamChat(client);
+          await getNFTsContractAddresses(client);
+        }
+      } else if(request.isOk){
+        userMe.value = userFromJson(json.encode(request.body));
+        retrieveAccessToken();
+        _commonController.showSirklUsers(id.value);
+        await retrieveTokenStreamChat(client);
+        await getNFTsContractAddresses(client);
+      } else {
+        debugPrint(request.statusText);
+        debugPrint(request.bodyString);
+      }
     }
-  }
-
-  signInSeedPhrase(String seedPhrase) async{
-    var requestSignIn = await _homeService.signInSeedPhrase(signInSeedPhraseDtoToJson(SignInSeedPhraseDto(wallet: address.value, seedPhrase: seedPhrase)));
-    if(requestSignIn.isOk){
-      tempSignInSuccess.value = signInSuccessDtoFromJson(json.encode(requestSignIn.body));
-      recoverPassword.value = true;
-    }
-  }
-
-  signUp(String wallet, String password, String recoverySentence) async{
-    var requestSignUp = await _homeService.signUp(signUpDtoToJson(SignUpDto(wallet: wallet, password: password, recoverySentence: recoverySentence)));
-    if(requestSignUp.isOk){
-      var signSuccess = signInSuccessDtoFromJson(json.encode(requestSignUp.body));
-      userMe.value = signSuccess.user!;
-      box.write(con.ACCESS_TOKEN, signSuccess.accessToken!);
-      accessToken.value = signSuccess.accessToken!;
-      box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
-      box.write(con.USER, userToJson(signSuccess.user!));
-      await putFCMToken(null);
-      isLoading.value = false;
-    }
-    else if(requestSignUp.bodyString != null && requestSignUp.bodyString!.contains("WALLET_ALREADY_USED")){
-      isLoading.value = false;
-      Get.snackbar(con.errorRes.tr, con.errorWalletAlreadyUsedRes.tr);
-    }
-    else {
-      isLoading.value = false;
-      Get.snackbar(con.errorRes.tr, requestSignUp.statusText ?? "");
-    }
-  }
-
-  putFCMToken(StreamChatClient? client) async {
-    final firebaseMessaging = await FirebaseMessaging.instance.getToken();
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var fcm = defaultTargetPlatform == TargetPlatform.android ? updateFcmdtoToJson(UpdateFcmdto(token: firebaseMessaging, platform: 'android')) : updateFcmdtoToJson(UpdateFcmdto(token: firebaseMessaging, platform: 'iOS'));
-    var request = await _homeService.uploadFCMToken(accessToken!, fcm);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _homeService.uploadFCMToken(accessToken, fcm);
-    }
-    debugPrint(request.statusText);
-    debugPrint(request.bodyString);
-    userMe.value = userFromJson(json.encode(request.body));
-    retrieveAccessToken();
-    _commonController.showSirklUsers(id.value);
-    if(client != null) await retrieveTokenStreamChat(client);
-    //await retrieveTokenZegoCloud();
-    await getNFTsContractAddresses(client);
-    //await getNFTsTemporary(userMe.value.wallet!);
   }
 
   retrieveAccessToken(){
@@ -263,7 +235,7 @@ class HomeController extends GetxController{
 
   }
 
-  getNFTsTemporary(String wallet) async{
+  getNFTsTemporary(String wallet, BuildContext context) async{
     isLoadingNfts.value = true;
     nfts.value.clear();
     var req = await _homeService.getNFTs("0xdd0D1B8aD874A15d020E7b2AF83e213f1f25F066");
@@ -275,19 +247,25 @@ class HomeController extends GetxController{
       cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
     }
 
-    mainCollection.removeWhere((element) => element?.metadata == null || element?.name == null || element?.metadata != null && moralisMetadataDtoFromJson(element!.metadata!).image != null && moralisMetadataDtoFromJson(element!.metadata!).image!.contains(".mp4"));
+    mainCollection.removeWhere((element) => element?.metadata == null || element?.name == null || element?.metadata != null && moralisMetadataDtoFromJson(element!.metadata!).image != null && moralisMetadataDtoFromJson(element.metadata!).image!.contains(".mp4"));
     var groupedCollection = mainCollection.groupBy((p0) => p0!.tokenAddress);
 
     groupedCollection.forEach((key, value) async{
       nfts.value.add(CollectionDbDto(collectionName: value.first!.name!, contractAddress: value.first!.tokenAddress!, collectionImages: value.map((e) {
           if(e!.metadata != null )debugPrint("${value.first!.name!} : ${moralisMetadataDtoFromJson(e.metadata!).image!}");
           if (moralisMetadataDtoFromJson(e.metadata!).image!.startsWith("ipfs://")) {
+            //var image = "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
+            //precacheImage(NetworkImage(image), context);
             return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
           }
           else if (moralisMetadataDtoFromJson(e.metadata!).image!.contains("/ipfs/")) {
+            //var image = "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
+            //precacheImage(NetworkImage(image), context);
             return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
           }
           else {
+            //var image = moralisMetadataDtoFromJson(e.metadata!).image!;
+            //precacheImage(NetworkImage(image), context);
             return moralisMetadataDtoFromJson(e.metadata!).image!;
           }
       }
@@ -299,7 +277,7 @@ class HomeController extends GetxController{
   }
 
   updateMe(UpdateMeDto updateMeDto) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
+    var accessToken = box.read(con.ACCESS_TOKEN);// ?? this.accessToken.value;
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _profileService.modifyUser(
         accessToken, updateMeDtoToJson(updateMeDto));
@@ -320,7 +298,7 @@ class HomeController extends GetxController{
   }
 
   retrieveTokenStreamChat(StreamChatClient client) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
+    var accessToken = box.read(con.ACCESS_TOKEN);// ?? this.accessToken.value;
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _profileService.retrieveTokenStreamChat(accessToken);
     if(request.statusCode == 401){
@@ -369,6 +347,17 @@ class HomeController extends GetxController{
     }
   }
 
+  requirePermissions() async{
+    await [
+      Permission.microphone,
+      Permission.phone,
+      Permission.contacts,
+      Permission.speech,
+      Permission.notification,
+      Permission.audio,
+    ].request();
+  }
+
   /*retrieveTokenZegoCloud() async{
     ZIMUserInfo userInfo = ZIMUserInfo();
     userInfo.userID = userMe.value.id!;
@@ -404,7 +393,56 @@ class HomeController extends GetxController{
         }
       });
     }
-  }*/
+  }
+
+    signIn(String wallet, String password) async{
+    var requestSignIn = await _homeService.signIn(signInDtoToJson(SignInDto(wallet: wallet, password: password)));
+    if(requestSignIn.isOk){
+      var signSuccess = signInSuccessDtoFromJson(json.encode(requestSignIn.body));
+      userMe.value = signSuccess.user!;
+      box.write(con.ACCESS_TOKEN, signSuccess.accessToken!);
+      accessToken.value = signSuccess.accessToken!;
+      box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
+      box.write(con.USER, userToJson(signSuccess.user!));
+      //await putFCMToken(null);
+      Get.back();
+      isLoading.value = false;
+    } else {
+      isLoading.value = false;
+      //Get.snackbar(con.error.tr, requestSignIn.statusText ?? "");
+    }
+  }
+
+  signInSeedPhrase(String seedPhrase) async{
+    var requestSignIn = await _homeService.signInSeedPhrase(signInSeedPhraseDtoToJson(SignInSeedPhraseDto(wallet: address.value, seedPhrase: seedPhrase)));
+    if(requestSignIn.isOk){
+      tempSignInSuccess.value = signInSuccessDtoFromJson(json.encode(requestSignIn.body));
+      recoverPassword.value = true;
+    }
+  }
+
+  signUp(String wallet, String password, String recoverySentence) async{
+    var requestSignUp = await _homeService.signUp(signUpDtoToJson(SignUpDto(wallet: wallet, password: password, recoverySentence: recoverySentence)));
+    if(requestSignUp.isOk){
+      var signSuccess = signInSuccessDtoFromJson(json.encode(requestSignUp.body));
+      userMe.value = signSuccess.user!;
+      box.write(con.ACCESS_TOKEN, signSuccess.accessToken!);
+      accessToken.value = signSuccess.accessToken!;
+      box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
+      box.write(con.USER, userToJson(signSuccess.user!));
+      //await putFCMToken(null);
+      isLoading.value = false;
+    }
+    else if(requestSignUp.bodyString != null && requestSignUp.bodyString!.contains("WALLET_ALREADY_USED")){
+      isLoading.value = false;
+      Get.snackbar(con.errorRes.tr, con.errorWalletAlreadyUsedRes.tr);
+    }
+    else {
+      isLoading.value = false;
+      Get.snackbar(con.errorRes.tr, requestSignUp.statusText ?? "");
+    }
+  }
+   */
 
 }
 
