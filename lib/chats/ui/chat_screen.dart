@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/new_message_screen.dart';
@@ -27,6 +28,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client);
     streamChannelListControllerFriends = buildStreamChannelListController(true);
     streamChannelListControllerOthers = buildStreamChannelListController(false);
     super.initState();
@@ -69,31 +71,28 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           ]),
       ]) :
           Filter.and([
-            Filter.in_("members", [_homeController.id.value]),
             //Filter.equal("member_count", 2),
             Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
-            if(searchFriends) 
-              Filter.or([
-                Filter.greaterOrEqual("followCount", 2),
-                Filter.and([
-                  Filter.equal("followCount", 1),
-                  Filter.notIn("isInFollowing", [_homeController.id.value])
-                ])
-              ]) 
+            if(searchFriends)
+              Filter.and([
+                Filter.in_("members", [_homeController.id.value]),
+                Filter.notIn("else", [_homeController.id.value])
+                /*Filter.or([
+                  Filter.equal("follow_one", _homeController.id.value),
+                  Filter.equal("follow_two", _homeController.id.value),
+                ])*/
+              ])
             else
-              Filter.or([
-                Filter.notExists("isInFollowing"),
-                Filter.equal("isInFollowing", []),
-                Filter.notExists('followCount'),
-                Filter.equal("followCount", 0),
-                Filter.and([
-                  Filter.equal("followCount", 1),
-                  Filter.in_("isInFollowing", [_homeController.id.value])
-                ])
-              ]),
+              Filter.and([
+                Filter.or([
+                  Filter.equal("created_by_id", _homeController.id.value),
+                  Filter.in_("members", [_homeController.id.value]),
+                ]),
+                //Filter.in_("else", [_homeController.id.value])
+              ])
           ]),
       channelStateSort: const [SortOption('last_message_at')],
-      limit: 20,
+      limit: 10,
     );
   }
 

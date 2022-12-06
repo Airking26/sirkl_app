@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 /// {@template streamUserAvatar}
@@ -12,7 +13,7 @@ import 'package:tiny_avatar/tiny_avatar.dart';
 /// {@endtemplate}
 class StreamUserAvatar extends StatelessWidget {
   /// {@macro streamUserAvatar}
-  const StreamUserAvatar({
+  StreamUserAvatar({
     super.key,
     required this.user,
     this.constraints,
@@ -27,6 +28,8 @@ class StreamUserAvatar extends StatelessWidget {
     this.selectionThickness = 4,
     this.placeholder,
   });
+
+  final _homeController = Get.put(HomeController());
 
   /// User whose avatar is to be displayed
   final User user;
@@ -74,9 +77,9 @@ class StreamUserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasImage = user.image != null && user.image!.isNotEmpty;
     final userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
     final hasPicture = userDTO.picture.isNullOrBlank!;
+    final notYetUser = userDTO.id == _homeController.id.value;
     final streamChatTheme = StreamChatTheme.of(context);
     final streamChatConfig = StreamChatConfiguration.of(context);
 
@@ -92,8 +95,8 @@ class StreamUserAvatar extends StatelessWidget {
     Widget avatar = FittedBox(
       fit: BoxFit.cover,
       child: Container(
-        constraints: BoxConstraints(minWidth: 56, maxHeight: 56, maxWidth: 56, minHeight: 56),
-        child: !hasPicture
+        constraints: const BoxConstraints(minWidth: 56, maxHeight: 56, maxWidth: 56, minHeight: 56),
+        child: notYetUser? Image.asset("assets/images/app_icon_rounded.png", width: 56, height: 56, fit: BoxFit.cover,) : !hasPicture
             ? CachedNetworkImage(
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.high,
@@ -112,7 +115,7 @@ class StreamUserAvatar extends StatelessWidget {
                   ),
                 ),
               )
-            : TinyAvatar(baseString: userFromJson(json.encode(user.extraData["userDTO"])).wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,),
+            : TinyAvatar(baseString: userFromJson(json.encode(user.extraData["userDTO"])).wallet!, dimension: 52, circular: true, colourScheme: TinyAvatarColourScheme.seascape,),
       ),
     );
 
@@ -139,7 +142,7 @@ class StreamUserAvatar extends StatelessWidget {
       child: Stack(
         children: <Widget>[
           avatar,
-          if (showOnlineStatus && user.online)
+          if (false && user.online)
             Positioned.fill(
               child: Align(
                 alignment: onlineIndicatorAlignment,

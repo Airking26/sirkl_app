@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>208005039506-v8hdtf1gq1hkbs58l6hsiui8kfbprqfv.apps.googleusercontent.com</string>
+	<string>208005039506-f61prbe155nhun4b7ghe8dcakmdmf93b.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.208005039506-v8hdtf1gq1hkbs58l6hsiui8kfbprqfv</string>
+	<string>com.googleusercontent.apps.208005039506-f61prbe155nhun4b7ghe8dcakmdmf93b</string>
 	<key>API_KEY</key>
 	<string>AIzaSyBWNceyM6Znr3FxQmXpRE1r_ac00SlTbs8</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.sirkl</string>
+	<string>com.airking.sirkl</string>
 	<key>PROJECT_ID</key>
 	<string>sirkl-e138d</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:208005039506:ios:8b152ba0215b7dcd892d4b</string>
+	<string>1:208005039506:ios:5b0d982efb3633d7892d4b</string>
 </dict>
 </plist>

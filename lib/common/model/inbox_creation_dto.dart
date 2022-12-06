@@ -10,32 +10,32 @@ String inboxCreationListDtoToJson(List<InboxCreationDto> data) => json.encode(Li
 
 class InboxCreationDto {
   InboxCreationDto({
-    required this.lastMessage,
-    required this.updatedAt,
-    required this.lastSender,
-    required this.unreadMessages,
-    required this.ownedBy,
+    required this.createdBy,
+    required this.wallets,
+    required this.idChannel,
+    required this.message,
+    this.members
   });
 
-  String lastMessage;
-  DateTime updatedAt;
-  String lastSender;
-  int unreadMessages;
-  List<String> ownedBy;
+  String createdBy;
+  String idChannel;
+  String message;
+  List<String>? members;
+  List<String> wallets;
 
   factory InboxCreationDto.fromJson(Map<String, dynamic> json) => InboxCreationDto(
-    lastMessage: json["lastMessage"],
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    lastSender: json["lastSender"],
-    unreadMessages: json["unreadMessages"],
-    ownedBy: List<String>.from(json["ownedBy"].map((x) => x)),
+    createdBy: json["createdBy"],
+    idChannel: json["idChannel"],
+    message: json["message"],
+    members: json["members"] == null ? null : List<String>.from(json["members"].map((x) => x)),
+    wallets: List<String>.from(json["wallets"].map((x) => x)),
   );
 
   Map<String, dynamic> toJson() => {
-    "lastMessage": lastMessage,
-    "updatedAt": updatedAt.toIso8601String(),
-    "lastSender": lastSender,
-    "unreadMessages": unreadMessages,
-    "ownedBy": List<dynamic>.from(ownedBy.map((x) => x)),
+    "createdBy": createdBy,
+    "idChannel": idChannel,
+    "message": message,
+    "wallets": List<dynamic>.from(wallets.map((x) => x)),
+    "members": members == null ? null : List<dynamic>.from(members!.map((x) => x)),
   };
 }

@@ -10,21 +10,21 @@ class MoralisMetadataDto {
     this.description,
     this.image,
     this.externalUrl,
-    this.attributes,
+    //this.attributes,
   });
 
   String? name;
   String? description;
   String? image;
   String? externalUrl;
-  List<Attribute>? attributes;
+  //List<dynamic>? attributes;
 
   factory MoralisMetadataDto.fromJson(Map<String, dynamic> json) => MoralisMetadataDto(
     name: json["name"],
     description: json["description"],
     image: json["image"],
     externalUrl: json["external_url"],
-    attributes: json["attributes"] == null ? null : List<Attribute>.from(json["attributes"].map((x) => Attribute.fromJson(x))),
+   // attributes: json["attributes"] == null ? null : List<Attribute>.from(json["attributes"].map((x) => Attribute.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -32,7 +32,7 @@ class MoralisMetadataDto {
     "description": description,
     "image": image,
     "external_url": externalUrl,
-    "attributes": attributes == null ? null : List<dynamic>.from(attributes!.map((x) => x.toJson())),
+    //"attributes": attributes == null ? null : List<dynamic>.from(attributes!.map((x) => x?.toJson())),
   };
 }
 

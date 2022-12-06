@@ -16,7 +16,8 @@ import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
 class ProfileElseScreen extends StatefulWidget {
-  const ProfileElseScreen({Key? key}) : super(key: key);
+  const ProfileElseScreen({Key? key, required this.fromConversation}) : super(key: key);
+  final bool fromConversation;
 
   @override
   State<ProfileElseScreen> createState() => _ProfileElseScreenState();
@@ -84,7 +85,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                                 utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
                               }
                             } else {
-                              Get.to(() => const DetailedChatScreen(create: true));
+                              widget.fromConversation ? Get.back(): Get.to(() => const DetailedChatScreen(create: true));
                             }
                             }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: Get.isDarkMode ? Colors.white : Colors.black, height: 28, width: 28,)),
                           Padding(
@@ -110,7 +111,8 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                           child: GestureDetector(onTap: (){},
                               child:_commonController.userClicked.value!.picture == null ?
                               TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 140, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
-                            CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture! , color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,))
+                            CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture! , color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                                errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))
                           ,),)
                   ),
                 ),
@@ -254,7 +256,8 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             ],
           ),
           child: ExpansionTile(
-              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const CircularProgressIndicator(), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
+              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             trailing: Obx(() => Image.asset(
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
               "assets/images/arrow_up_rev.png" :

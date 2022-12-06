@@ -81,6 +81,8 @@ class StreamChannelName extends StatelessWidget {
                   '${currentMembers.map((e) => e.user?.name).join(', ')} '
                   '${exceedingMembers > 0 ? '+ $exceedingMembers' : ''}';
             }
+          } else {
+            channelName = channel.extraData['wallet'] as String;
           }
 
           return Text(

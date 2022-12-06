@@ -99,26 +99,24 @@ class StreamMessageSendButton extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(8),
-        child: Flexible(
-          child: InkWell(
-            onTap: onSendMessage,
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: const LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [Color(0xFF1DE99B), Color(0xFF0063FB)])),
-              child: Align(
-                  alignment: Alignment.center,
-                  child: Image.asset(
-                    "assets/images/send.png",
-                    height: 32,
-                    width: 32,
-                  )),
-            ),
+        child: InkWell(
+          onTap: onSendMessage,
+          child: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                gradient: const LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [Color(0xFF1DE99B), Color(0xFF0063FB)])),
+            child: Align(
+                alignment: Alignment.center,
+                child: Image.asset(
+                  "assets/images/send.png",
+                  height: 32,
+                  width: 32,
+                )),
           ),
         )
 

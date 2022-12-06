@@ -124,10 +124,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(90)),
                     child:
                         ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
-                          child: GestureDetector(onTap: (){ if(_profileController.isEditingProfile.value) _profileController.getImage();},
+                          child: GestureDetector(onTap: ()async{
+                            if(_profileController.isEditingProfile.value) {
+                              await _profileController.getImage();
+                            }
+                            },
                               child: _profileController.urlPicture.value.isEmpty ?
                                    TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 140, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
-                              CachedNetworkImage(imageUrl: _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,)
+                              CachedNetworkImage(imageUrl: _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                                  errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))
 
                           )
                           ,),)
@@ -204,7 +209,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
                       },
                       child: ListView.builder(
-                          cacheExtent: 1000,
                           itemCount: _homeController.nfts.value.length,
                           itemBuilder: (context, index){
                             return CardNFT(_homeController.nfts.value[index], _profileController, index);
@@ -243,6 +247,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.contactUsRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.rulesRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
@@ -319,7 +330,6 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
                 padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
                 child: SizedBox(height: 80,
                     child: ListView.builder(
-                  cacheExtent: 1000,
                   itemCount: widget.collectionDbDTO.collectionImages.length,
                   itemBuilder: (context, i){
                     return Padding(

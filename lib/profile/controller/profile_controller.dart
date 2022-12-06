@@ -24,6 +24,7 @@ class ProfileController extends GetxController{
   final _homeService = HomeService();
   final _homeController = Get.put(HomeController());
 
+  Rx<UserDTO?> isUserExists = (null as UserDTO?).obs;
   var isCardExpanded = false.obs;
   Rx<Uint8List?> videoThumbnail = Uint8List(0).obs;
   var isCardExpandedList = <int>[].obs;
@@ -34,8 +35,6 @@ class ProfileController extends GetxController{
   var urlPicture = "".obs;
 
   updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
-    //await ZIM.getInstance()!.updateUserAvatarUrl(updateMeDto.picture ?? "");
-    //await ZIM.getInstance()!.updateUserName(updateMeDto.userName ?? _homeController.userMe.value.wallet!);
     isLoadingPicture.value = true;
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
@@ -67,6 +66,30 @@ class ProfileController extends GetxController{
     }
   }
 
+  Future<UserDTO?> getUserByWallet(String wallet) async{
+    var user;
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.getUserByWallet(accessToken, wallet);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _profileService.getUserByWallet(accessToken, wallet);
+      if(request.isOk && request.body != null){
+        user = userFromJson(json.encode(request.body));
+      } else {
+        user = null;
+      }
+    } else if(request.isOk && request.body != null) {
+      user = userFromJson(json.encode(request.body));
+    } else {
+      user = null;
+    }
+    return user;
+  }
+
   /*modifyPassword(String password) async{
     var request = await _profileService.modifyPassword(_homeController.tempSignInSuccess.value.accessToken!, _homeController.tempSignInSuccess.value.user!.wallet!, password);
     if(request.isOk){
@@ -85,16 +108,6 @@ class ProfileController extends GetxController{
     if(res != null) isLoadingPicture.value = true;
     urlPicture.value = await SimpleS3().uploadFile(File(res!.first.path), "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
     isLoadingPicture.value = false;
-  }
-
-  void getThumbnail(String collectionImag) async{
-    videoThumbnail.value = await VideoThumbnail.thumbnailData(
-      video: collectionImag,
-      imageFormat: ImageFormat.JPEG,
-      maxWidth: 112, // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
-      quality: 100,
-    );
-    var d = '';
   }
 
 }

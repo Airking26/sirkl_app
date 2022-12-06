@@ -32,6 +32,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
     if(widget.create) _chatController.checkOrCreateChannel(_commonController, StreamChat.of(context).client, StreamChat.of(context).currentUser!.id);
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +103,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: () {
-          Get.to(() => const ProfileElseScreen());
+          Get.to(() => const ProfileElseScreen(fromConversation: true));
         },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),

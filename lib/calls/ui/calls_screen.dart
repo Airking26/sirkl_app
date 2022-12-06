@@ -22,13 +22,6 @@ class _CallsScreenState extends State<CallsScreen> {
   final _homeController = Get.put(HomeController());
 
   @override
-  void initState() {
-    _homeController.retrieveTokenAgoraRTM();
-    //_callController.createClient(_homeController.id.value, _homeController.tokenAgoraRTM.value);
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
@@ -145,7 +138,8 @@ class _CallsScreenState extends State<CallsScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
-        leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
+        leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+            errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -160,8 +154,7 @@ class _CallsScreenState extends State<CallsScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                 InkWell(onTap:()async{
-                  //await _callController.createClient(_homeController.id.value, _homeController.tokenAgoraRTM.value);
-                  _callController.inviteCall("6384d97bcb4bd6001e75b31e", "knflknzfr");
+                  await _callController.inviteCall(_homeController.agoraClient.value!, "638db80a0753b1001e10b21d", "knflknzzdzdzjjfr");
                   } ,child: Image.asset("assets/images/call_tab.png", color: const Color(0xFF00CB7D), width: 20, height: 20,)),
                 const SizedBox(width: 8,),
                 InkWell(

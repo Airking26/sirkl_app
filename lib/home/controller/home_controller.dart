@@ -1,20 +1,18 @@
 import 'dart:convert';
-import 'dart:developer';
-
+import 'package:agora_rtm/agora_rtm.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/moralis_metadata_dto.dart';
 import 'package:sirkl/common/model/moralis_nft_contract_addresse.dart';
 import 'package:sirkl/common/model/moralis_root_dto.dart';
-import 'package:sirkl/common/model/sign_in_seed_phrase_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
-import 'package:sirkl/common/model/sign_up_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -22,24 +20,24 @@ import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:web3dart/crypto.dart';
 
 import '../../common/model/refresh_token_dto.dart';
-import '../../common/model/sign_in_dto.dart';
 import '../../common/model/update_fcm_dto.dart';
 
 class HomeController extends GetxController{
 
   final HomeService _homeService = HomeService();
   final ProfileService _profileService = ProfileService();
+  final _callController = Get.put(CallsController());
   var id = "".obs;
   final box = GetStorage();
 
   var streamChatClient = StreamChatClient("v2s6zx9zjd9b").obs;
 
+  Rx<AgoraRtmClient?> agoraClient = (null as AgoraRtmClient?).obs;
   var isPasswordLongEnough = false.obs;
   var isPasswordIncludeNumber = false.obs;
   var isPasswordIncludeSpecialCharacter = false.obs;
@@ -85,15 +83,8 @@ class HomeController extends GetxController{
   connectWallet(BuildContext context) async {
 
     connector.on('connect', (session) async{
-      //await signMessageWithMetamask(context, generateSessionMessage(sessionStatus?.accounts[0]));
       address.value = sessionStatus?.accounts[0];
       signPage.value = true;
-      /*var isUserExistsBool = await _homeService.isUserExists(address.value);
-      if(isUserExistsBool.body == "false") {
-        isUserExists.value = true;
-      } else {
-        isUserExists.value = false;
-      }*/
     });
 
     connector.on('session_request', (payload) {});
@@ -115,8 +106,6 @@ class HomeController extends GetxController{
   String generateSessionMessage(String accountAddress) {
     String message =
         'Hello $accountAddress, welcome to our app. By signing this message you agree to learn and have fun with blockchain';
-    print(message);
-
     var hash = keccakUtf8(message);
     final hashString = '0x${bytesToHex(hash).toString()}';
 
@@ -131,7 +120,7 @@ class HomeController extends GetxController{
         EthereumWalletConnectProvider(connector);
         launchUrlString(_uri, mode: LaunchMode.externalApplication);
         var signature = await provider.personalSign(message: message, address: address.value, password: "");
-        await loginWithWallet(address.value, message, signature);
+        await loginWithWallet(context, address.value, message, signature);
       } catch (exp) {
         print("Error while signing transaction");
         print(exp);
@@ -139,7 +128,7 @@ class HomeController extends GetxController{
     }
   }
 
-  loginWithWallet(String wallet, String message, String signature) async{
+  loginWithWallet(BuildContext context, String wallet, String message, String signature) async{
     var request = await _homeService.verifySignature(walletConnectDtoToJson(WalletConnectDto(wallet: wallet, message: message, signature: signature)));
     if(request.isOk){
       var signSuccess = signInSuccessDtoFromJson(json.encode(request.body));
@@ -148,16 +137,13 @@ class HomeController extends GetxController{
       accessToken.value = signSuccess.accessToken!;
       box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
       box.write(con.USER, userToJson(signSuccess.user!));
-      await putFCMToken(StreamChatClient(
-        'v2s6zx9zjd9b',
-        logLevel: Level.ALL,
-      ));
+      await putFCMToken(context, StreamChat.of(context).client);
       //Get.back();
       isLoading.value = false;
     }
   }
 
-  putFCMToken(StreamChatClient client) async {
+  putFCMToken(BuildContext context, StreamChatClient client) async {
     await retrieveAccessToken();
     if(accessToken.value.isNotEmpty) {
       final firebaseMessaging = await FirebaseMessaging.instance.getToken();
@@ -181,6 +167,7 @@ class HomeController extends GetxController{
           retrieveAccessToken();
           _commonController.showSirklUsers(id.value);
           await retrieveTokenStreamChat(client);
+          await retrieveTokenAgoraRTM(id.value);
           await getNFTsContractAddresses(client);
         }
       } else if(request.isOk){
@@ -188,6 +175,7 @@ class HomeController extends GetxController{
         retrieveAccessToken();
         _commonController.showSirklUsers(id.value);
         await retrieveTokenStreamChat(client);
+        await retrieveTokenAgoraRTM(id.value);
         await getNFTsContractAddresses(client);
       } else {
         debugPrint(request.statusText);
@@ -202,6 +190,8 @@ class HomeController extends GetxController{
     var d = box.read(con.USER);
     id.value = d != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
   }
+
+
 
   getNFTsContractAddresses(StreamChatClient? client) async{
     var req = await _homeService.getNFTsContractAddresses(userMe.value.wallet!);
@@ -238,42 +228,76 @@ class HomeController extends GetxController{
   getNFTsTemporary(String wallet, BuildContext context) async{
     isLoadingNfts.value = true;
     nfts.value.clear();
-    var req = await _homeService.getNFTs("0xdd0D1B8aD874A15d020E7b2AF83e213f1f25F066");
+    var req = await _homeService.getNFTs("0x8A3fECD0348da48d5fe4dC05b2897d2758942abf");
     var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
     var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
     while(cursor != null){
-      var newReq = await _homeService.getNextNFTs("0xdd0D1B8aD874A15d020E7b2AF83e213f1f25F066", cursor);
+      var newReq = await _homeService.getNextNFTs("0x8A3fECD0348da48d5fe4dC05b2897d2758942abf", cursor);
       mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
       cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
     }
 
-    mainCollection.removeWhere((element) => element?.metadata == null || element?.name == null || element?.metadata != null && moralisMetadataDtoFromJson(element!.metadata!).image != null && moralisMetadataDtoFromJson(element.metadata!).image!.contains(".mp4"));
+    mainCollection.removeWhere((element) => element?.metadata == null || element?.name == null || moralisMetadataDtoFromJson(element!.metadata!).image == null || element.metadata != null && moralisMetadataDtoFromJson(element!.metadata!).image != null && moralisMetadataDtoFromJson(element.metadata!).image!.contains(".mp4"));
     var groupedCollection = mainCollection.groupBy((p0) => p0!.tokenAddress);
 
-    groupedCollection.forEach((key, value) async{
-      nfts.value.add(CollectionDbDto(collectionName: value.first!.name!, contractAddress: value.first!.tokenAddress!, collectionImages: value.map((e) {
+    groupedCollection.forEach((key, value) {
+      nfts.add(CollectionDbDto(collectionName: value.first!.name!, contractAddress: value.first!.tokenAddress!, collectionImages: value.map((e) {
+        String image;
           if(e!.metadata != null )debugPrint("${value.first!.name!} : ${moralisMetadataDtoFromJson(e.metadata!).image!}");
           if (moralisMetadataDtoFromJson(e.metadata!).image!.startsWith("ipfs://")) {
-            //var image = "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
-            //precacheImage(NetworkImage(image), context);
-            return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
+            image = "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
           }
           else if (moralisMetadataDtoFromJson(e.metadata!).image!.contains("/ipfs/")) {
-            //var image = "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
-            //precacheImage(NetworkImage(image), context);
-            return "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
+            image =  "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
           }
           else {
-            //var image = moralisMetadataDtoFromJson(e.metadata!).image!;
-            //precacheImage(NetworkImage(image), context);
-            return moralisMetadataDtoFromJson(e.metadata!).image!;
+            image = moralisMetadataDtoFromJson(e.metadata!).image!;
           }
+          return image;
       }
       ).toList()));
-      nfts.refresh();
+    });
+    nfts.refresh();
+    isLoadingNfts.value = false;
+  }
+
+  configureForFirstTime(String wallet, BuildContext context) async{
+    var req = await _homeService.getNFTs("0x8A3fECD0348da48d5fe4dC05b2897d2758942abf");
+    var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
+    var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
+    while(cursor != null){
+      var newReq = await _homeService.getNextNFTs("0x8A3fECD0348da48d5fe4dC05b2897d2758942abf", cursor);
+      mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
+      cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
+    }
+
+    mainCollection.removeWhere((element) => element?.metadata == null || element?.name == null || moralisMetadataDtoFromJson(element!.metadata!).image == null || element.metadata != null && moralisMetadataDtoFromJson(element!.metadata!).image != null && moralisMetadataDtoFromJson(element.metadata!).image!.contains(".mp4"));
+    var groupedCollection = mainCollection.groupBy((p0) => p0!.tokenAddress);
+
+    groupedCollection.forEach((key, value) {
+      nfts.add(CollectionDbDto(collectionName: value.first!.name!, contractAddress: value.first!.tokenAddress!, collectionImages: value.map((e) {
+        String image;
+        if(e!.metadata != null )debugPrint("${value.first!.name!} : ${moralisMetadataDtoFromJson(e.metadata!).image!}");
+        if (moralisMetadataDtoFromJson(e.metadata!).image!.startsWith("ipfs://")) {
+          image = "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
+        }
+        else if (moralisMetadataDtoFromJson(e.metadata!).image!.contains("/ipfs/")) {
+          image =  "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
+        }
+        else {
+          image = moralisMetadataDtoFromJson(e.metadata!).image!;
+        }
+        return image;
+      }
+      ).toList()));
     });
 
-    isLoadingNfts.value = false;
+    for (var element in nfts.value.sublist(0, 24)) {
+      for (var element in element.collectionImages) {
+        await precacheImage(CachedNetworkImageProvider(element), context);
+      }}
+
+    nfts.refresh();
   }
 
   updateMe(UpdateMeDto updateMeDto) async {
@@ -298,7 +322,7 @@ class HomeController extends GetxController{
   }
 
   retrieveTokenStreamChat(StreamChatClient client) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);// ?? this.accessToken.value;
+    var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _profileService.retrieveTokenStreamChat(accessToken);
     if(request.statusCode == 401){
@@ -315,50 +339,52 @@ class HomeController extends GetxController{
     }
   }
 
-  retrieveTokenAgoraRTC(String channel, String role, String tokenType) async{
+  retrieveTokenAgoraRTC(String channel, String role, String tokenType, String id) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.retrieveTokenAgoraRTC(accessToken, channel, role, tokenType, id.value);
+    var request = await _profileService.retrieveTokenAgoraRTC(accessToken, channel, role, tokenType, id);
     if(request.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken);
       var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.retrieveTokenAgoraRTC(accessToken, channel, role, tokenType, id.value);
+      request = await _profileService.retrieveTokenAgoraRTC(accessToken, channel, role, tokenType, id);
       if(request.isOk) tokenAgoraRTC.value = request.body!;
     } else if(request.isOk) {
       tokenAgoraRTC.value = request.body!;
     }
   }
 
-  retrieveTokenAgoraRTM() async{
+  retrieveTokenAgoraRTM(String id) async{
+    agoraClient.value = await _callController.initClient();
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.retrieveTokenAgoraRTM(accessToken, id.value);
+    var request = await _profileService.retrieveTokenAgoraRTM(accessToken, id);
     if(request.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken);
       var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.retrieveTokenAgoraRTM(accessToken, id.value);
-      if(request.isOk) tokenAgoraRTM.value = request.bodyString!;
+      request = await _profileService.retrieveTokenAgoraRTM(accessToken, id);
+      if(request.isOk) {
+        tokenAgoraRTM.value = request.bodyString!;
+        await agoraClient.value?.login(tokenAgoraRTM.value, id);
+        await _callController.createClient(agoraClient.value!);
+      }
     } else if(request.isOk) {
       tokenAgoraRTM.value = request.bodyString!;
+      await agoraClient.value?.login(tokenAgoraRTM.value, id);
+      await _callController.createClient(agoraClient.value!);
     }
   }
 
-  requirePermissions() async{
-    await [
-      Permission.microphone,
-      Permission.phone,
-      Permission.contacts,
-      Permission.speech,
-      Permission.notification,
-      Permission.audio,
-    ].request();
+  checkIfUserExists(String wallet) async{
+    var request = await _homeService.isUserExists(wallet);
+    return request.body! == "false" ? true : false;
   }
 
-  /*retrieveTokenZegoCloud() async{
+
+/*retrieveTokenZegoCloud() async{
     ZIMUserInfo userInfo = ZIMUserInfo();
     userInfo.userID = userMe.value.id!;
     userInfo.userName = userMe.value.userName!;

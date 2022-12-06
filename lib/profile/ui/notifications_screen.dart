@@ -76,7 +76,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
         onTap: (){},
-        leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,),
+        leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+            errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),
         title: Transform.translate(
           offset: Offset(-8, 0),
           child: RichText(

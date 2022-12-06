@@ -4,10 +4,14 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/chats/service/chats_service.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/inbox_creation_dto.dart';
+import 'package:sirkl/common/model/inbox_dto.dart';
+import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
+import 'package:sirkl/common/constants.dart' as con;
 
 class ChatsController extends GetxController{
 
@@ -17,26 +21,58 @@ class ChatsController extends GetxController{
   var chipsList = <UserDTO>[].obs;
   var searchToRefresh = true.obs;
   var query = "".obs;
+  final _chatService = ChatsService();
+  final _homeService = HomeService();
 
   Rx<Channel?> channel = (null as Channel?).obs;
 
-  /*createInbox(InboxCreationDto inboxCreationDto) async{
+  createInbox(InboxCreationDto inboxCreationDto) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var req = await _chatsService.createInbox(accessToken, inboxCreationDtoToJson(inboxCreationDto));
+    var req = await _chatService.createInbox(accessToken, inboxCreationDtoToJson(inboxCreationDto));
     if(req.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken);
       var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      req = await _chatsService.createInbox(accessToken, inboxCreationDtoToJson(inboxCreationDto));
-      if(req.isOk) return inboxDtoFromJson(json.encode(req.body));
-    } else if(req.isOk){
-      return inboxDtoFromJson(json.encode(req.body));
+      req = await _chatService.createInbox(accessToken, inboxCreationDtoToJson(inboxCreationDto));
     }
   }
 
-  clearUnreadMessages(String id) async{
+  checkOrCreateChannel(CommonController commonController, StreamChatClient client, String? id) async{
+    channel.value = client.channel(
+      'try',
+      extraData: {
+        'members': [
+          id,
+          commonController.userClicked.value!.id!,
+        ],
+      },
+    );
+    await channel.value!.watch();
+  }
+
+  Future<String?> getEthFromEns(String ens) async{
+    String? eth = "";
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _chatService.ethFromEns(accessToken, ens);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _chatService.ethFromEns(accessToken, ens);
+      if(request.isOk){
+        eth = request.body;
+      }
+    } else if(request.isOk){
+      eth = request.body;
+    }
+    return eth;
+  }
+
+  /*clearUnreadMessages(String id) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var req = await _chatsService.clearUnreadMessages(accessToken, id);
@@ -157,17 +193,5 @@ class ChatsController extends GetxController{
     });
   }*/
 
-  checkOrCreateChannel(CommonController commonController, StreamChatClient client, String? id) async{
-      channel.value = client.channel(
-        'try',
-        extraData: {
-          'members': [
-            id,
-            commonController.userClicked.value!.id!,
-          ],
-        },
-      );
-      await channel.value!.watch();
-  }
 
 }

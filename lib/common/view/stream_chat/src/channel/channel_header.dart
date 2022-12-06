@@ -231,7 +231,7 @@ class StreamChannelHeader extends StatelessWidget
                                             .first
                                             .user!
                                             .extraData["userDTO"]));
-                                Get.to(() => const ProfileElseScreen());
+                                Get.to(() => const ProfileElseScreen(fromConversation: true,));
                               }
                             },
                             child: Padding(
@@ -239,7 +239,9 @@ class StreamChannelHeader extends StatelessWidget
                               child: ClipRRect(
                                   borderRadius: BorderRadius.circular(90),
                                   child:
-                                  channel.memberCount != null && channel.memberCount! <= 2 ?
+                                  channel.memberCount == null || channel.memberCount == 0 ?
+                                      Image.asset("assets/images/app_icon_rounded.png") :
+                                  channel.memberCount != null && channel.memberCount! == 2 ?
                                   userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).picture == null ?
                                   TinyAvatar(baseString: userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!, dimension: 40, circular: true,
                                       colourScheme: TinyAvatarColourScheme.seascape) :
@@ -248,16 +250,19 @@ class StreamChannelHeader extends StatelessWidget
                                     width: 40,
                                     height: 40,
                                     fit: BoxFit.cover,
+                                      placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                                      errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                                   ) :
                                       channel.image == null ?
                                       TinyAvatar(baseString: channel.name!, dimension: 40, circular: true,
-                                          colourScheme: TinyAvatarColourScheme.seascape)
-                                          :
+                                          colourScheme: TinyAvatarColourScheme.seascape) :
                                   CachedNetworkImage(
                                     imageUrl: channel.image!,
                                     width: 40,
                                     height: 40,
                                     fit: BoxFit.cover,
+                                      placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                                      errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                                   )
                               )
                               ,
@@ -277,7 +282,7 @@ class StreamChannelHeader extends StatelessWidget
                                             .first
                                             .user!
                                             .extraData["userDTO"]));
-                                Get.to(() => const ProfileElseScreen());
+                                Get.to(() => const ProfileElseScreen(fromConversation: true,));
                               }
                             },
                             child: Padding(
@@ -287,6 +292,8 @@ class StreamChannelHeader extends StatelessWidget
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
+                                    channel.memberCount == null || channel.memberCount == 0 ?
+                                  "${(channel.extraData["wallet"] as String).substring(0, 20)}..." :
                                     channel.memberCount != null && channel.memberCount! > 2 ?
                                         channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
                                     userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName ??
@@ -407,7 +414,7 @@ class StreamChannelHeader extends StatelessWidget
                   .first
                   .user!
                   .extraData["userDTO"]));
-          Get.to(() => const ProfileElseScreen());
+          Get.to(() => const ProfileElseScreen(fromConversation: true,));
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.profileMenuTabRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),

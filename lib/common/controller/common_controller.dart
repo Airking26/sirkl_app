@@ -27,13 +27,16 @@ class CommonController extends GetxController{
   var queryHasChanged = false.obs;
   var inboxClicked = InboxDto().obs;
 
-  Future<bool> addUserToSirkl(String id, StreamChatClient streamChatClient, String value) async{
-    var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, value]});
-    var followers = channel.channel?.extraData["isInFollowing"] as List<dynamic>?;
-    var followCount = channel.channel?.extraData["followCount"] as dynamic;
-    if(followers != null && !followers.contains(id)) followers.add(id);
-    if(followCount != null) followCount++;
-    await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"isInFollowing": followers ?? [id], "followCount": followCount ?? 1});
+  Future<bool> addUserToSirkl(String id, StreamChatClient streamChatClient, String myId) async{
+    var channel = await streamChatClient.queryChannel("try", channelId: "1670326940094");
+    var follow_one = channel.channel?.extraData["follow_one"] as dynamic;
+    var follow_two = channel.channel?.extraData["follow_two"] as dynamic;
+    if(follow_one == null || (follow_one != null && follow_one != id)) {
+      follow_one = myId;
+    } else {
+      follow_two = myId;
+    }
+    var k = await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"follow_one": follow_one ?? "", "follow_two" : follow_two ?? "", "else": [id, myId]});
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _commonService.addUserToSirkl(accessToken, id);
@@ -64,14 +67,13 @@ class CommonController extends GetxController{
   }
 
   Future<bool> removeUserToSirkl(String id, StreamChatClient streamChatClient, String value) async{
-    var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, value]});
-    var followers = channel.channel?.extraData["isInFollowing"] as List<dynamic>?;
-    var followCount = channel.channel?.extraData["followCount"] as dynamic;
-    if(followers != null && followers.contains(id)){
-      followers.remove(id);
-      if(followCount != null && followCount != 0) followCount--;
-    }
-    await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"isInFollowing": followers ?? [], "followCount": followCount ?? 0});
+    //var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, value]});
+    var channel = await streamChatClient.queryChannel("try", channelId: "1670326940094");
+    var follow_one = channel.channel?.extraData["follow_one"] as dynamic;
+    var follow_two = channel.channel?.extraData["follow_two"] as dynamic;
+    if(follow_one != null && follow_one == value) follow_one = null;
+    else follow_two = null;
+    await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"follow_one": follow_one ?? "", "follow_two" : follow_two?? "", "else": []});
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _commonService.removeUserToSirkl(accessToken, id);

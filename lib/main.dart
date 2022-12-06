@@ -1,16 +1,17 @@
 import 'dart:async';
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/language.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/firebase_options.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/profile/ui/profile_screen.dart';
 import 'navigation/ui/navigation_screen.dart';
 
 void main() async{
@@ -19,11 +20,35 @@ void main() async{
     logLevel: Level.ALL,
   );
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp();
   await GetStorage.init();
   runApp(MyApp(client: client));
 
 
+}
+
+Future<void> setupVoiceSDKEngine() async {
+  // retrieve or request microphone permission
+  await [Permission.microphone].request();
+
+  //create an instance of the Agora engine
+  var agoraEngine = await RtcEngine.create("appId");
+  await agoraEngine.initialize(RtcEngineContext("appId"));
+
+  // Register the event handler
+  agoraEngine.setEventHandler(
+    RtcEngineEventHandler(
+      joinChannelSuccess: (String x, int y, int elapsed) {
+        var t = x;
+        var tr = y;
+        var trr = elapsed;
+      },
+      userJoined: (int remoteUid, int elapsed) {
+      },
+      userOffline: (int remoteUid, UserOfflineReason reason) {
+      },
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -63,93 +88,28 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
 
   final _homeController = Get.put(HomeController());
   final _callController = Get.put(CallsController());
-  late final FirebaseMessaging _firebaseMessaging;
 
   @override
   void initState() {
     initFirebase();
-    _homeController.putFCMToken(widget.client);
+    _homeController.putFCMToken(context, widget.client);
     super.initState();
   }
 
   initFirebase() async {
-    await Firebase.initializeApp();
-    _firebaseMessaging = FirebaseMessaging.instance;
-    listen();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       showCallkitIncoming(message.data['uuid'] as String);
     });
+    _callController.listenCall();
   }
 
-  listen(){
-    FlutterCallkitIncoming.onEvent.listen((event) {
-      switch (event!.name) {
-        case CallEvent.ACTION_CALL_INCOMING:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_CALL_START:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_CALL_ACCEPT:
-          checkAndNavigationCallingPage();
-          break;
-        case CallEvent.ACTION_CALL_DECLINE:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_CALL_ENDED:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_CALL_TIMEOUT:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_CALL_CALLBACK:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_CALL_TOGGLE_HOLD:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_CALL_TOGGLE_MUTE:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_CALL_TOGGLE_DMTF:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_CALL_TOGGLE_GROUP:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
-          print('Device Token FCM: $event');
-          break;
-      }
-    });
-  }
-
-  getCurrentCall() async {
-    var calls = await FlutterCallkitIncoming.activeCalls();
-    if (calls is List) {
-      if (calls.isNotEmpty) {
-        return calls[0];
-      } else {
-        return null;
-      }
-    }
-  }
-
-  checkAndNavigationCallingPage() async {
-    var currentCall = await getCurrentCall();
-    if (currentCall != null) {
-      Get.to(() => const ProfileScreen());
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return const NavigationScreen();
   }
+
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -172,6 +132,7 @@ Future<void> showCallkitIncoming(String uuid) async {
     'extra': <String, dynamic>{'userId': '1a2b3c4d'},
     'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
     'android': <String, dynamic>{
+      'priority': 'high',
       'isCustomNotification': true,
       'isShowLogo': false,
       'isShowCallback': false,

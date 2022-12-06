@@ -51,10 +51,7 @@ class _ChannelPageState extends State<ChannelPage> {
             ),
           ),
           const StreamTypingIndicator(),
-          StreamMessageInput(
-            messageInputController: _messageInputController,
-            focusNode: _focusNode,
-          ),
+          StreamMessageInput(messageInputController: _messageInputController, focusNode: _focusNode,),
         ],
       ),
     );

@@ -200,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         : Colors.transparent,
                   )),
               Padding(
-                padding: const EdgeInsets.only(top: 12.0),
+                padding: const EdgeInsets.only(top: 18.0),
                 child: Image.asset(
                   "assets/images/logo.png",
                   height: 20,
@@ -215,8 +215,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: _homeController.accessToken.value.isEmpty
                         ? Colors.transparent
                         : Get.isDarkMode
-                            ? Colors.white
-                            : Colors.black,
+                            ? Colors.transparent
+                            : Colors.transparent,
                   )),
             ],
           ),
@@ -434,7 +434,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 _commonController.userClicked.value =
                     _commonController.users[index];
-                Get.to(() => const ProfileElseScreen());
+                Get.to(() => const ProfileElseScreen(fromConversation: false));
               },
               child: _commonController.users[index].picture == null
                   ? SizedBox(
@@ -452,7 +452,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         imageUrl: _commonController.users[index].picture!,
                         width: 56,
                         height: 56,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                          errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                       )),
             ),
             trailing: Column(
@@ -499,7 +500,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   _commonController.userClicked.value =
                       _commonController.users[index];
-                  Get.to(() => const ProfileElseScreen());
+                  Get.to(() => const ProfileElseScreen(fromConversation: false));
                 },
                 child: Transform.translate(
                     offset: const Offset(-8, 0),
@@ -519,7 +520,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   _commonController.userClicked.value =
                       _commonController.users[index];
-                  Get.to(() => const ProfileElseScreen());
+                  Get.to(() => const ProfileElseScreen(fromConversation:false));
                 },
                 child: Transform.translate(
                     offset: const Offset(-8, 0),

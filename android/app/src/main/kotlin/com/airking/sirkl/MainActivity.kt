@@ -1,4 +1,4 @@
-package com.example.sirkl
+package com.airking.sirkl
 
 import io.flutter.embedding.android.FlutterActivity
 

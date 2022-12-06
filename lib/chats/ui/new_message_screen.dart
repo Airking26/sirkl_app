@@ -1,16 +1,20 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
+import 'package:ethereum_addresses/ethereum_addresses.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
@@ -28,6 +32,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
 
   final _chatController = Get.put(ChatsController());
   final _homeController = Get.put(HomeController());
+  final _profileController = Get.put(ProfileController());
   final _commonController = Get.put(CommonController());
   YYDialog dialogMenu = YYDialog();
   static var _pageKey = 0;
@@ -219,10 +224,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             child: InkWell(
               onTap: () async {
                   for(UserDTO element in _chatController.chipsList) {
-                    var channel = StreamChat.of(context).client.channel("try", extraData: {"members": [element.id, _homeController.id.value,], 'isInFollowing' : _commonController.userClicked.value!.isInFollowing});
-                    await channel.watch();
-                    await channel.sendMessage(Message(text: _messageInputController.text, id: DateTime.now().millisecondsSinceEpoch.toString()));
-                    channel.dispose();
+                    if(element.id.isNullOrBlank!) {
+                      await _chatController.createInbox(InboxCreationDto(createdBy: _homeController.id.value, wallets: [_homeController.userMe.value.wallet!, element.wallet!], idChannel: DateTime.now().millisecondsSinceEpoch.toString(), message: _messageInputController.text));
+                    } else {
+                      await _chatController.createInbox(InboxCreationDto(createdBy: _homeController.id.value, wallets: [_homeController.userMe.value.wallet!, element.wallet!], idChannel: DateTime.now().millisecondsSinceEpoch.toString(), message: _messageInputController.text, members: [_homeController.userMe.value.wallet!, element.wallet!]));
+                    }
                     if(_chatController.chipsList.value.indexOf(element) == _chatController.chipsList.length - 1) {
                       _messageInputController.clear();
                       FocusManager.instance.primaryFocus?.unfocus();
@@ -254,8 +260,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       ),
     );
   }
-
-
 
   Container buildAppBar() {
     return Container(
@@ -326,14 +330,17 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     return ListTile(
         leading: InkWell(
             onTap: (){
-              _commonController.userClicked.value = item;
-              Get.to(() => const ProfileElseScreen());
+              if(_profileController.isUserExists.value != null) {
+                _commonController.userClicked.value = item;
+                Get.to(() => const ProfileElseScreen(fromConversation: false));
+              }
             },
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(90.0), child:
             item.picture == null ?
-            SizedBox(width: 60, height: 60, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
-            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,))),
+            SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
+            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         trailing: Checkbox(
           onChanged: (selected) {
             if(selected!) {
@@ -409,7 +416,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       clearQueryOnClose: false,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      hint: 'Search here...',
+      hint: 'Paste a wallet address',
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 0),
@@ -437,13 +444,35 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       backgroundColor: Get.isDarkMode
           ? const Color(0xFF2D465E).withOpacity(1)
           : Colors.white,
-      debounceDelay: const Duration(milliseconds: 500),
-      onQueryChanged: (query) {
-        _chatController.searchToRefresh.value = true;
-        _commonController.query.value = query;
-        _pageKey = 0;
-        if(query.isNotEmpty) fetchPage(_commonController.query.value, _pageKey);
-        else pagingController.refresh();
+      debounceDelay: const Duration(milliseconds: 0),
+      onQueryChanged: (query) async{
+        if(query.isNotEmpty && query.contains('.eth')){
+          var ethFromEns = await _chatController.getEthFromEns(query);
+          _profileController.isUserExists.value = await _profileController.getUserByWallet(ethFromEns!);
+          if(_profileController.isUserExists.value == null && ethFromEns != "0") {
+            pagingController.itemList = [UserDTO(id: '', userName: query, picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: ethFromEns, contractAddresses: [], following: 0, isInFollowing: false)];
+          } else if(_profileController.isUserExists.value != null){
+            pagingController.itemList = [_profileController.isUserExists.value!];
+          }
+          else {
+            pagingController.refresh();
+          }
+        }
+        else if(query.isNotEmpty && isValidEthereumAddress(query)){
+          _profileController.isUserExists.value = await _profileController.getUserByWallet(query);
+          if(_profileController.isUserExists.value == null) {
+            pagingController.itemList = [UserDTO(id: '', userName: "", picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: query, contractAddresses: [], following: 0, isInFollowing: false)];
+          } else {
+            pagingController.itemList = [_profileController.isUserExists.value!];
+          }
+        } else {
+          pagingController.refresh();
+        }
+        //_chatController.searchToRefresh.value = true;
+        //_commonController.query.value = query;
+        //_pageKey = 0;
+        //if(query.isNotEmpty) fetchPage(_commonController.query.value, _pageKey);
+        //else pagingController.refresh();
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
