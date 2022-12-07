@@ -23,8 +23,6 @@ void main() async{
   await Firebase.initializeApp();
   await GetStorage.init();
   runApp(MyApp(client: client));
-
-
 }
 
 Future<void> setupVoiceSDKEngine() async {

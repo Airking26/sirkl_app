@@ -40,6 +40,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   final utils = Utils();
   FocusNode? _focusNode;
   final StreamMessageInputController _messageInputController = StreamMessageInputController();
+  final _searchController = FloatingSearchBarController();
 
   @override
   void initState() {
@@ -231,6 +232,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                     }
                     if(_chatController.chipsList.value.indexOf(element) == _chatController.chipsList.length - 1) {
                       _messageInputController.clear();
+                      _searchController.clear();
                       FocusManager.instance.primaryFocus?.unfocus();
                       _chatController.chipsList.clear();
                       utils.showToast(context, con.messageSuccessfullySentRes.tr);
@@ -330,9 +332,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     return ListTile(
         leading: InkWell(
             onTap: (){
+              _commonController.userClicked.value = item;
+              Get.to(() => const ProfileElseScreen(fromConversation: false));
+
               if(_profileController.isUserExists.value != null) {
                 _commonController.userClicked.value = item;
-                Get.to(() => const ProfileElseScreen(fromConversation: false));
               }
             },
             child: ClipRRect(
@@ -414,9 +418,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     return FloatingSearchBar(
       automaticallyImplyBackButton: false,
       clearQueryOnClose: false,
+      controller: _searchController,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      hint: 'Paste a wallet address',
+      hint: 'Paste a wallet address or an ENS',
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 0),
@@ -444,12 +449,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       backgroundColor: Get.isDarkMode
           ? const Color(0xFF2D465E).withOpacity(1)
           : Colors.white,
-      debounceDelay: const Duration(milliseconds: 0),
+      debounceDelay: Duration.zero,
       onQueryChanged: (query) async{
         if(query.isNotEmpty && query.contains('.eth')){
-          var ethFromEns = await _chatController.getEthFromEns(query);
-          _profileController.isUserExists.value = await _profileController.getUserByWallet(ethFromEns!);
-          if(_profileController.isUserExists.value == null && ethFromEns != "0") {
+          String? ethFromEns = await _chatController.getEthFromEns(query);
+          if(_profileController.isUserExists.value == null && ethFromEns != "" && ethFromEns != "0") {
             pagingController.itemList = [UserDTO(id: '', userName: query, picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: ethFromEns, contractAddresses: [], following: 0, isInFollowing: false)];
           } else if(_profileController.isUserExists.value != null){
             pagingController.itemList = [_profileController.isUserExists.value!];
@@ -457,22 +461,21 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           else {
             pagingController.refresh();
           }
-        }
-        else if(query.isNotEmpty && isValidEthereumAddress(query)){
-          _profileController.isUserExists.value = await _profileController.getUserByWallet(query);
+        } else if(query.isNotEmpty && isValidEthereumAddress(query.toLowerCase())){
+          _profileController.isUserExists.value = await _profileController.getUserByWallet(query.toLowerCase());
           if(_profileController.isUserExists.value == null) {
-            pagingController.itemList = [UserDTO(id: '', userName: "", picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: query, contractAddresses: [], following: 0, isInFollowing: false)];
+            pagingController.itemList = [UserDTO(id: '', userName: "", picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: query.toLowerCase(), contractAddresses: [], following: 0, isInFollowing: false)];
           } else {
             pagingController.itemList = [_profileController.isUserExists.value!];
           }
         } else {
           pagingController.refresh();
         }
-        //_chatController.searchToRefresh.value = true;
-        //_commonController.query.value = query;
-        //_pageKey = 0;
-        //if(query.isNotEmpty) fetchPage(_commonController.query.value, _pageKey);
-        //else pagingController.refresh();
+        /*_chatController.searchToRefresh.value = true;
+        _commonController.query.value = query;
+        _pageKey = 0;
+        if(query.isNotEmpty) fetchPage(_commonController.query.value, _pageKey);
+        else pagingController.refresh();*/
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [

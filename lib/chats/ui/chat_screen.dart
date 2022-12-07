@@ -25,6 +25,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   StreamChannelListController? streamChannelListControllerFriends;
   StreamChannelListController? streamChannelListControllerOthers;
   final _floatingSearchBarController = FloatingSearchBarController();
+  late TabController tabController;
 
   @override
   void initState() {
@@ -36,8 +37,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    streamChannelListControllerFriends?.dispose();
-    streamChannelListControllerOthers?.dispose();
+    _chatController.index.value = 0;
+    //streamChannelListControllerFriends?.dispose();
+    //streamChannelListControllerOthers?.dispose();
     super.dispose();
   }
 
@@ -49,7 +51,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       Filter.and([
         Filter.autoComplete('member.user.name', _chatController.query.value),
         Filter.in_("members", [_homeController.id.value]),
-        //Filter.equal("member_count", 2),
         if(searchFriends)
           Filter.or([
             Filter.greaterOrEqual("followCount", 2),
@@ -61,7 +62,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         else
           Filter.or([
             Filter.notExists("isInFollowing"),
-            Filter.equal("isInFollowing", []),
+            Filter.equal("isInFollowing", const []),
             Filter.notExists('followCount'),
             Filter.equal("followCount", 0),
             Filter.and([
@@ -71,16 +72,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           ]),
       ]) :
           Filter.and([
-            //Filter.equal("member_count", 2),
             Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
             if(searchFriends)
               Filter.and([
                 Filter.in_("members", [_homeController.id.value]),
-                Filter.notIn("else", [_homeController.id.value])
-                /*Filter.or([
-                  Filter.equal("follow_one", _homeController.id.value),
-                  Filter.equal("follow_two", _homeController.id.value),
-                ])*/
+                Filter.exists("${_homeController.id.value}_follow_channel"),
+                Filter.equal("${_homeController.id.value}_follow_channel", true)
               ])
             else
               Filter.and([
@@ -88,7 +85,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   Filter.equal("created_by_id", _homeController.id.value),
                   Filter.in_("members", [_homeController.id.value]),
                 ]),
-                //Filter.in_("else", [_homeController.id.value])
+                Filter.or([
+                  Filter.notExists("${_homeController.id.value}_follow_channel"),
+                  Filter.equal("${_homeController.id.value}_follow_channel", false)
+                ])
               ])
           ]),
       channelStateSort: const [SortOption('last_message_at')],
@@ -98,7 +98,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    TabController tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(length: 2, vsync: this);
     tabController.index = _chatController.index.value;
     tabController.addListener(() {
       if (tabController.indexIsChanging) {
@@ -205,7 +205,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-
   Stack buildAppbar(BuildContext context, TabController tabController) {
     return Stack(
           clipBehavior: Clip.none,
@@ -271,9 +270,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       ),
                       IconButton(
                           onPressed: () {
+                            _chatController.index.value = 0;
+                            tabController.index = _chatController.index.value;
                             Get.to(() => const NewMessageScreen())!.then((value) {
-                              streamChannelListControllerFriends!.refresh();
-                              streamChannelListControllerOthers!.refresh();
+                              //streamChannelListControllerFriends!.refresh();
+                              //streamChannelListControllerOthers!.refresh();
                             });
                           },
                           icon: Image.asset(

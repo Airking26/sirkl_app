@@ -12,6 +12,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/profile/controller/profile_controller.dart';
 
 class ChatsController extends GetxController{
 
@@ -23,6 +24,7 @@ class ChatsController extends GetxController{
   var query = "".obs;
   final _chatService = ChatsService();
   final _homeService = HomeService();
+  final _profileController = Get.put(ProfileController());
 
   Rx<Channel?> channel = (null as Channel?).obs;
 
@@ -39,13 +41,13 @@ class ChatsController extends GetxController{
     }
   }
 
-  checkOrCreateChannel(CommonController commonController, StreamChatClient client, String? id) async{
+  checkOrCreateChannel(String himId, StreamChatClient client, String? id, String myId) async{
     channel.value = client.channel(
       'try',
       extraData: {
         'members': [
-          id,
-          commonController.userClicked.value!.id!,
+          myId,
+          himId,
         ],
       },
     );
@@ -65,9 +67,15 @@ class ChatsController extends GetxController{
       request = await _chatService.ethFromEns(accessToken, ens);
       if(request.isOk){
         eth = request.body;
+        if(request.body != '0' && request.body != ""){
+          _profileController.isUserExists.value = await _profileController.getUserByWallet(request.body!);
+        }
       }
     } else if(request.isOk){
       eth = request.body;
+      if(request.body != '0' && request.body != ""){
+        _profileController.isUserExists.value = await _profileController.getUserByWallet(request.body!);
+      }
     }
     return eth;
   }

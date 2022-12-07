@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/chats/service/chats_service.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/moralis_metadata_dto.dart';
@@ -31,41 +32,27 @@ class HomeController extends GetxController{
 
   final HomeService _homeService = HomeService();
   final ProfileService _profileService = ProfileService();
-  final _callController = Get.put(CallsController());
-  var id = "".obs;
-  final box = GetStorage();
+  final ChatsService _chatService = ChatsService();
 
-  var streamChatClient = StreamChatClient("v2s6zx9zjd9b").obs;
+  final _callController = Get.put(CallsController());
+  final _commonController = Get.put(CommonController());
 
   Rx<AgoraRtmClient?> agoraClient = (null as AgoraRtmClient?).obs;
-  var isPasswordLongEnough = false.obs;
-  var isPasswordIncludeNumber = false.obs;
-  var isPasswordIncludeSpecialCharacter = false.obs;
-  var arePasswordIdentical = true.obs;
-  var seedPhraseCopied = false.obs;
-  var signUpSeedPhrase = false.obs;
-  var forgotPassword = false.obs;
-  var recoverPassword = false.obs;
-  var password = "".obs;
+  final box = GetStorage();
 
+  var id = "".obs;
+  var isConfiguring = false.obs;
   var tokenAgoraRTM = "".obs;
   var tokenAgoraRTC = "".obs;
   var accessToken = "".obs;
-  var userMe =
-      //UserDTO(id: '6384d97bcb4bd6001e75b31e', userName: "First", picture: "https://clonex-assets.rtfkt.com/images/4767.png", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "fpUelDWhQBuzHfnJDjrpI_:APA91bGmBS4CzNLiVlByHTxriLZyOcexFM5K7RqwD8itm7TgrQV3mVgknTqKsRk1FjrpPHH_UFs1vGgNrdcDHL8BYbdvrScMPC8aH29-a0IFns1QljDi3x2myypnKmQenQkPm_k0UHev", wallet: "0x8e5e2dfd6401a04a9b65e8e390b1a1d8ccf7f9a1", contractAddresses: [], following: 1, isInFollowing: false)
-      UserDTO().obs;
-  var progress = true.obs;
-  var isLoading = false.obs;
+  var userMe = UserDTO().obs;
   var isLoadingNfts = true.obs;
   var address = "".obs;
   var isUserExists = false.obs;
-  var sessionStatus;
   var nfts = <CollectionDbDto>[].obs;
-  var tempSignInSuccess = SignInSuccessDto().obs;
-  var tokenZegoCloud = "".obs;
-  var tokenStreamChat = "".obs;
   var signPage = false.obs;
-  final _commonController = Get.put(CommonController());
+
+  var sessionStatus;
   var _uri;
 
   final connector = WalletConnect(
@@ -122,11 +109,13 @@ class HomeController extends GetxController{
         var signature = await provider.personalSign(message: message, address: address.value, password: "");
         await loginWithWallet(context, address.value, message, signature);
       } catch (exp) {
-        print("Error while signing transaction");
-        print(exp);
+        if (kDebugMode) {
+          print(exp);
+        }
       }
     }
   }
+
 
   loginWithWallet(BuildContext context, String wallet, String message, String signature) async{
     var request = await _homeService.verifySignature(walletConnectDtoToJson(WalletConnectDto(wallet: wallet, message: message, signature: signature)));
@@ -137,9 +126,9 @@ class HomeController extends GetxController{
       accessToken.value = signSuccess.accessToken!;
       box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
       box.write(con.USER, userToJson(signSuccess.user!));
+      isConfiguring.value = true;
       await putFCMToken(context, StreamChat.of(context).client);
-      //Get.back();
-      isLoading.value = false;
+      await retrieveInboxes();
     }
   }
 
@@ -190,8 +179,6 @@ class HomeController extends GetxController{
     var d = box.read(con.USER);
     id.value = d != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
   }
-
-
 
   getNFTsContractAddresses(StreamChatClient? client) async{
     var req = await _homeService.getNFTsContractAddresses(userMe.value.wallet!);
@@ -261,43 +248,18 @@ class HomeController extends GetxController{
     isLoadingNfts.value = false;
   }
 
-  configureForFirstTime(String wallet, BuildContext context) async{
-    var req = await _homeService.getNFTs("0x8A3fECD0348da48d5fe4dC05b2897d2758942abf");
-    var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
-    var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
-    while(cursor != null){
-      var newReq = await _homeService.getNextNFTs("0x8A3fECD0348da48d5fe4dC05b2897d2758942abf", cursor);
-      mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
-      cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
-    }
-
-    mainCollection.removeWhere((element) => element?.metadata == null || element?.name == null || moralisMetadataDtoFromJson(element!.metadata!).image == null || element.metadata != null && moralisMetadataDtoFromJson(element!.metadata!).image != null && moralisMetadataDtoFromJson(element.metadata!).image!.contains(".mp4"));
-    var groupedCollection = mainCollection.groupBy((p0) => p0!.tokenAddress);
-
-    groupedCollection.forEach((key, value) {
-      nfts.add(CollectionDbDto(collectionName: value.first!.name!, contractAddress: value.first!.tokenAddress!, collectionImages: value.map((e) {
-        String image;
-        if(e!.metadata != null )debugPrint("${value.first!.name!} : ${moralisMetadataDtoFromJson(e.metadata!).image!}");
-        if (moralisMetadataDtoFromJson(e.metadata!).image!.startsWith("ipfs://")) {
-          image = "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
-        }
-        else if (moralisMetadataDtoFromJson(e.metadata!).image!.contains("/ipfs/")) {
-          image =  "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
-        }
-        else {
-          image = moralisMetadataDtoFromJson(e.metadata!).image!;
-        }
-        return image;
-      }
-      ).toList()));
-    });
-
-    for (var element in nfts.value.sublist(0, 24)) {
-      for (var element in element.collectionImages) {
-        await precacheImage(CachedNetworkImageProvider(element), context);
-      }}
-
-    nfts.refresh();
+  retrieveInboxes() async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var req = await _chatService.walletsToMessages(accessToken);
+    if(req.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      req = await _chatService.walletsToMessages(accessToken);
+      if(req.isOk) isConfiguring.value = false;
+    } else if(req.isOk) isConfiguring.value = false;
   }
 
   updateMe(UpdateMeDto updateMeDto) async {
@@ -335,7 +297,7 @@ class HomeController extends GetxController{
         await client.connectUser(User(id: id.value, name:  userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
       }
     } else if(request.isOk){
-      await client.connectUser(User(id: id.value, name: userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
+      await client.connectUser(User(id: id.value, name:  userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
     }
   }
 
@@ -382,93 +344,6 @@ class HomeController extends GetxController{
     var request = await _homeService.isUserExists(wallet);
     return request.body! == "false" ? true : false;
   }
-
-
-/*retrieveTokenZegoCloud() async{
-    ZIMUserInfo userInfo = ZIMUserInfo();
-    userInfo.userID = userMe.value.id!;
-    userInfo.userName = userMe.value.userName!;
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.retrieveTokenZegoCloud(accessToken);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.retrieveTokenZegoCloud(accessToken);
-      if(request.isOk) {
-        tokenZegoCloud.value = request.body!;
-        ZIM.getInstance()?.login(userInfo, tokenZegoCloud.value).then((value){
-        }).catchError((onError){
-          switch (onError.runtimeType) {
-            case PlatformException:
-              break;
-            default:
-          }
-        });
-      }
-    } else if (request.isOk) {
-      tokenZegoCloud.value = json.decode(request.body!);
-      ZIM.getInstance()?.login(userInfo, tokenZegoCloud.value).then((value){
-      }).catchError((onError){
-        switch (onError.runtimeType) {
-          case PlatformException:
-            break;
-          default:
-        }
-      });
-    }
-  }
-
-    signIn(String wallet, String password) async{
-    var requestSignIn = await _homeService.signIn(signInDtoToJson(SignInDto(wallet: wallet, password: password)));
-    if(requestSignIn.isOk){
-      var signSuccess = signInSuccessDtoFromJson(json.encode(requestSignIn.body));
-      userMe.value = signSuccess.user!;
-      box.write(con.ACCESS_TOKEN, signSuccess.accessToken!);
-      accessToken.value = signSuccess.accessToken!;
-      box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
-      box.write(con.USER, userToJson(signSuccess.user!));
-      //await putFCMToken(null);
-      Get.back();
-      isLoading.value = false;
-    } else {
-      isLoading.value = false;
-      //Get.snackbar(con.error.tr, requestSignIn.statusText ?? "");
-    }
-  }
-
-  signInSeedPhrase(String seedPhrase) async{
-    var requestSignIn = await _homeService.signInSeedPhrase(signInSeedPhraseDtoToJson(SignInSeedPhraseDto(wallet: address.value, seedPhrase: seedPhrase)));
-    if(requestSignIn.isOk){
-      tempSignInSuccess.value = signInSuccessDtoFromJson(json.encode(requestSignIn.body));
-      recoverPassword.value = true;
-    }
-  }
-
-  signUp(String wallet, String password, String recoverySentence) async{
-    var requestSignUp = await _homeService.signUp(signUpDtoToJson(SignUpDto(wallet: wallet, password: password, recoverySentence: recoverySentence)));
-    if(requestSignUp.isOk){
-      var signSuccess = signInSuccessDtoFromJson(json.encode(requestSignUp.body));
-      userMe.value = signSuccess.user!;
-      box.write(con.ACCESS_TOKEN, signSuccess.accessToken!);
-      accessToken.value = signSuccess.accessToken!;
-      box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
-      box.write(con.USER, userToJson(signSuccess.user!));
-      //await putFCMToken(null);
-      isLoading.value = false;
-    }
-    else if(requestSignUp.bodyString != null && requestSignUp.bodyString!.contains("WALLET_ALREADY_USED")){
-      isLoading.value = false;
-      Get.snackbar(con.errorRes.tr, con.errorWalletAlreadyUsedRes.tr);
-    }
-    else {
-      isLoading.value = false;
-      Get.snackbar(con.errorRes.tr, requestSignUp.statusText ?? "");
-    }
-  }
-   */
 
 }
 

@@ -35,7 +35,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
     return Scaffold(
       extendBody: true,
       bottomNavigationBar: FloatingNavbar(
-
         margin: EdgeInsets.zero,
         borderRadius: 0,
         elevation: 10,

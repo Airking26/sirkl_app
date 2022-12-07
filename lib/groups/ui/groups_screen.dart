@@ -57,12 +57,6 @@ class _GroupsScreenState extends State<GroupsScreen> {
   }
 
   @override
-  void dispose() {
-    streamChannelListControllerGroups?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,

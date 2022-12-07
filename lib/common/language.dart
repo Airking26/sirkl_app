@@ -65,6 +65,8 @@ class Language extends Translations{
       c.seedPhraseCopiedRes: "Seed phrase is now copied in your clipboard",
       c.walletCopiedRes: "Wallet is now copied in your clipboard",
       c.noFriendsRes: "No Friends Yet",
+      c.configurationRes: "Just a moment...",
+      c.configurationSentenceRes: "We are configuring your account.",
       c.noFriendsSentenceRes: "You don't have any conversation, start to connect with people",
       c.addUsersToSirklRes: "Add users to your sirkl to start following them",
       c.rulesRes : "• Rules",

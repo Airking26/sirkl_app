@@ -72,6 +72,7 @@ dependencies:
   agora_rtm: ^1.5.0
   flutter_callkit_incoming: ^1.0.2+2
   ethereum_addresses: ^1.0.2
+  widget_circular_animator: ^1.0.0
 
 dev_dependencies:
   dart_code_metrics: ^4.4.0
