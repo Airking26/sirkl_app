@@ -49,25 +49,24 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       filter:
       _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ?
       Filter.and([
+        Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
         Filter.autoComplete('member.user.name', _chatController.query.value),
         Filter.in_("members", [_homeController.id.value]),
         if(searchFriends)
-          Filter.or([
-            Filter.greaterOrEqual("followCount", 2),
-            Filter.and([
-              Filter.equal("followCount", 1),
-              Filter.notIn("isInFollowing", [_homeController.id.value])
-            ])
+          Filter.and([
+            Filter.in_("members", [_homeController.id.value]),
+            Filter.exists("${_homeController.id.value}_follow_channel"),
+            Filter.equal("${_homeController.id.value}_follow_channel", true)
           ])
         else
-          Filter.or([
-            Filter.notExists("isInFollowing"),
-            Filter.equal("isInFollowing", const []),
-            Filter.notExists('followCount'),
-            Filter.equal("followCount", 0),
-            Filter.and([
-              Filter.equal("followCount", 1),
-              Filter.in_("isInFollowing", [_homeController.id.value])
+          Filter.and([
+            Filter.or([
+              Filter.equal("created_by_id", _homeController.id.value),
+              Filter.in_("members", [_homeController.id.value]),
+            ]),
+            Filter.or([
+              Filter.notExists("${_homeController.id.value}_follow_channel"),
+              Filter.equal("${_homeController.id.value}_follow_channel", false)
             ])
           ]),
       ]) :

@@ -215,11 +215,11 @@ class HomeController extends GetxController{
   getNFTsTemporary(String wallet, BuildContext context) async{
     isLoadingNfts.value = true;
     nfts.value.clear();
-    var req = await _homeService.getNFTs("0x8A3fECD0348da48d5fe4dC05b2897d2758942abf");
+    var req = await _homeService.getNFTs(wallet);
     var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
     var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
     while(cursor != null){
-      var newReq = await _homeService.getNextNFTs("0x8A3fECD0348da48d5fe4dC05b2897d2758942abf", cursor);
+      var newReq = await _homeService.getNextNFTs(wallet, cursor);
       mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
       cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
     }

@@ -41,7 +41,7 @@ class ChatsController extends GetxController{
     }
   }
 
-  checkOrCreateChannel(String himId, StreamChatClient client, String? id, String myId) async{
+  checkOrCreateChannel(String himId, StreamChatClient client, String myId) async{
     channel.value = client.channel(
       'try',
       extraData: {

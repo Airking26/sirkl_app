@@ -29,7 +29,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
 
   @override
   void initState() {
-    if(widget.create) _chatController.checkOrCreateChannel(_commonController.userClicked.value!.wallet!, StreamChat.of(context).client, StreamChat.of(context).currentUser!.id, _homeController.userMe.value.wallet!);
+    if(widget.create) _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value);
     super.initState();
   }
 

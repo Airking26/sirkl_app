@@ -332,11 +332,9 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     return ListTile(
         leading: InkWell(
             onTap: (){
-              _commonController.userClicked.value = item;
-              Get.to(() => const ProfileElseScreen(fromConversation: false));
-
               if(_profileController.isUserExists.value != null) {
                 _commonController.userClicked.value = item;
+                Get.to(() => const ProfileElseScreen(fromConversation: false));
               }
             },
             child: ClipRRect(
@@ -469,7 +467,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             pagingController.itemList = [_profileController.isUserExists.value!];
           }
         } else {
-          pagingController.refresh();
+          if(query.isNotEmpty) pagingController.itemList = [];
+          else pagingController.refresh();
         }
         /*_chatController.searchToRefresh.value = true;
         _commonController.query.value = query;
