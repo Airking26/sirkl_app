@@ -138,7 +138,7 @@ class _CallsScreenState extends State<CallsScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
-        leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+        leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
             errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

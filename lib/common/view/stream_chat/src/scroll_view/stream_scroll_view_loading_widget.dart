@@ -19,6 +19,6 @@ class StreamScrollViewLoadingWidget extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(
         height: height,
         width: width,
-        child: const CircularProgressIndicator.adaptive(),
+        child: const CircularProgressIndicator.adaptive(valueColor: AlwaysStoppedAnimation(Color(0xff00CB7D)),),
       );
 }

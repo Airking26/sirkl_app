@@ -102,7 +102,7 @@ class StreamUserAvatar extends StatelessWidget {
                 filterQuality: FilterQuality.high,
                 imageUrl: userDTO.picture!,
                 errorWidget: (context, __, ___) => backupGradientAvatar,
-                placeholder:(context, _) => const Center(child: CircularProgressIndicator()),
+                placeholder:(context, _) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                 imageBuilder: (context, imageProvider) => DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(90),

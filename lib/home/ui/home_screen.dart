@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 : buildSignWalletUI(),
             _homeController.accessToken.value.isNotEmpty ? _commonController.gettingStoryAndContacts.value ? Container(
                 margin: const EdgeInsets.only(top: 150),
-                child: const CircularProgressIndicator())
+                child: const CircularProgressIndicator(color: Color(0xff00CB7D)))
                 : _commonController.users.isNotEmpty
                 ? buildRepertoireList(context)
                 : buildEmptyFriends()
@@ -449,7 +449,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         imageUrl: _commonController.users[index].picture!,
                         width: 56,
                         height: 56,
-                        fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                        fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
                           errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                       )),
             ),

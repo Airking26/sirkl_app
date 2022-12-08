@@ -50,7 +50,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
 
   @override
   void initState() {
-    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client);
+    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
     streamChannelListControllerGroups = buildStreamChannelListController();
     _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
     super.initState();
@@ -329,7 +329,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
     return _groupController.isLoadingAvailableNFT.value ?
          const Padding(
            padding: EdgeInsets.only(top: 54.0),
-           child: CircularProgressIndicator(),
+           child: CircularProgressIndicator(color: Color(0xff00CB7D)),
          ) :
      MediaQuery.removePadding(
       context: context,
@@ -362,7 +362,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
                         await _groupController.createGroup(StreamChat.of(context).client, _groupController.nftsAvailable.value[index].collectionName, _groupController.nftsAvailable.value[index].collectionImages[0], _groupController.nftsAvailable.value[index].contractAddress);
                         Get.to(() => const DetailedChatScreen(create:false));
                       },
-                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftsAvailable[index].collectionImages[0], width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) => Center(child: const CircularProgressIndicator()), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
+                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftsAvailable[index].collectionImages[0], width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
 
                       title: Text(_groupController.nftsAvailable.value[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
                       //subtitle: Transform.translate(offset: const Offset(-8, 0), child: Text("${_homeController.nfts.value[index].collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),

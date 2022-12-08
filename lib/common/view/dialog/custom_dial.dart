@@ -243,9 +243,10 @@ class YYDialog {
     return this.widget(Padding(
       padding: padding,
       child: CircularProgressIndicator(
+        color: Color(0xff00CB7D),
         strokeWidth: strokeWidth ?? 4.0,
         backgroundColor: backgroundColor,
-        valueColor: AlwaysStoppedAnimation<Color>(valueColor),
+        //valueColor: AlwaysStoppedAnimation<Color>(valueColor),
       ),
     ));
   }

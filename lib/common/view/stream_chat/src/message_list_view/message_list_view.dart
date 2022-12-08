@@ -419,7 +419,7 @@ class _StreamMessageListViewState extends State<StreamMessageListView> {
         messageFilter: widget.messageFilter,
         loadingBuilder: widget.loadingBuilder ??
             (context) => const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(color: Color(0xff00CB7D)),
                 ),
         emptyBuilder: widget.emptyBuilder ??
             (context) => Center(
@@ -894,11 +894,9 @@ class _StreamMessageListViewState extends State<StreamMessageListView> {
       showSendingIndicator: false,
       borderRadiusGeometry: BorderRadius.only(
         topLeft: const Radius.circular(16),
-        bottomLeft:
-            isMyMessage ? const Radius.circular(16) : const Radius.circular(2),
+        bottomLeft: isMyMessage ? const Radius.circular(16) : const Radius.circular(2),
         topRight: const Radius.circular(16),
-        bottomRight:
-            isMyMessage ? const Radius.circular(2) : const Radius.circular(16),
+        bottomRight: isMyMessage ? const Radius.circular(2) : const Radius.circular(16),
       ),
       textPadding: EdgeInsets.symmetric(
         vertical: 8,

@@ -25,6 +25,8 @@ class ChatsController extends GetxController{
   final _chatService = ChatsService();
   final _homeService = HomeService();
   final _profileController = Get.put(ProfileController());
+  var messageHasBeenSent = false.obs;
+  var messageSending = false.obs;
 
   Rx<Channel?> channel = (null as Channel?).obs;
 
@@ -41,6 +43,7 @@ class ChatsController extends GetxController{
     }
   }
 
+
   checkOrCreateChannel(String himId, StreamChatClient client, String myId) async{
     channel.value = client.channel(
       'try',
@@ -49,7 +52,16 @@ class ChatsController extends GetxController{
           myId,
           himId,
         ],
+        "isConv" : true
       },
+    );
+    await channel.value!.watch();
+  }
+
+  checkOrCreateChannelWithId(StreamChatClient client, String channelId) async{
+    channel.value = client.channel(
+      'try',
+      id: channelId,
     );
     await channel.value!.watch();
   }

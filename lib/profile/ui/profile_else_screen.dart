@@ -111,7 +111,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                           child: GestureDetector(onTap: (){},
                               child:_commonController.userClicked.value!.picture == null ?
                               TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 140, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
-                            CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture! , color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                            CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture! , color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
                                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))
                           ,),)
                   ),
@@ -154,7 +154,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
             ),
             _homeController.isLoadingNfts.value ? const Padding(
               padding: EdgeInsets.only(top: 32.0),
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(color: Color(0xff00CB7D)),
             ) :
             _homeController.nfts.value.isNotEmpty ? MediaQuery.removePadding(
               context:  context,
@@ -256,7 +256,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             ],
           ),
           child: ExpansionTile(
-              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
                   errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             trailing: Obx(() => Image.asset(
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
@@ -301,7 +301,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
           child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: SizedBox.fromSize(
-                  child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: collectionDbDTO.collectionImages[i], width: 80, height: 70,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                  child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: collectionDbDTO.collectionImages[i], width: 80, height: 70,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         ),
       );

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/new_message_screen.dart';
@@ -29,18 +28,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client);
+    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
     streamChannelListControllerFriends = buildStreamChannelListController(true);
     streamChannelListControllerOthers = buildStreamChannelListController(false);
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _chatController.index.value = 0;
-    //streamChannelListControllerFriends?.dispose();
-    //streamChannelListControllerOthers?.dispose();
-    super.dispose();
   }
 
   StreamChannelListController buildStreamChannelListController(bool searchFriends){
@@ -52,6 +43,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
         Filter.autoComplete('member.user.name', _chatController.query.value),
         Filter.in_("members", [_homeController.id.value]),
+        Filter.equal('isConv', true),
         if(searchFriends)
           Filter.and([
             Filter.in_("members", [_homeController.id.value]),
@@ -71,6 +63,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           ]),
       ]) :
           Filter.and([
+            Filter.equal('isConv', true),
             Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
             if(searchFriends)
               Filter.and([
@@ -133,8 +126,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   },
                   controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel){
                   Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value) {
-                    streamChannelListControllerFriends!.refresh();
-                    streamChannelListControllerOthers!.refresh();
+                    //streamChannelListControllerFriends!.refresh();
+                    //streamChannelListControllerOthers!.refresh();
                   });
                   },
                 ),
@@ -147,8 +140,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   },
                   controller:_chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerOthers!, onChannelTap: (channel){
                   Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value){
-                    streamChannelListControllerOthers!.refresh();
-                    streamChannelListControllerFriends!.refresh();
+                    //streamChannelListControllerOthers!.refresh();
+                    //streamChannelListControllerFriends!.refresh();
                   });
                 },),
               ))
@@ -269,11 +262,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       ),
                       IconButton(
                           onPressed: () {
-                            _chatController.index.value = 0;
-                            tabController.index = _chatController.index.value;
                             Get.to(() => const NewMessageScreen())!.then((value) {
-                              //streamChannelListControllerFriends!.refresh();
-                              //streamChannelListControllerOthers!.refresh();
+                              if(_chatController.messageHasBeenSent.value) {
+                                _chatController.index.value = 1;
+                                tabController.index = 1;
+                                _chatController.messageHasBeenSent.value = false;
+                              }
+                              streamChannelListControllerFriends!.refresh();
+                              streamChannelListControllerOthers!.refresh();
                             });
                           },
                           icon: Image.asset(
@@ -474,6 +470,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _chatController.index.value = 0;
+    super.dispose();
   }
 
 }

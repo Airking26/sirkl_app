@@ -12,8 +12,9 @@ import 'package:sirkl/profile/ui/profile_else_screen.dart';
 
 class DetailedChatScreen extends StatefulWidget {
 
-  const DetailedChatScreen({Key? key, required this.create}) : super(key: key);
+  const DetailedChatScreen({Key? key, required this.create, this.channelId}) : super(key: key);
   final bool create;
+  final String? channelId;
 
   @override
   State<DetailedChatScreen> createState() =>
@@ -29,7 +30,11 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
 
   @override
   void initState() {
-    if(widget.create) _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value);
+    if(widget.create) {
+      _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value);
+    } else if(widget.channelId != null) {
+      _chatController.checkOrCreateChannelWithId(StreamChat.of(context).client, widget.channelId!);
+    }
     super.initState();
   }
 

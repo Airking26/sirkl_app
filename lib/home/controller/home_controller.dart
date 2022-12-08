@@ -155,7 +155,7 @@ class HomeController extends GetxController{
           userMe.value = userFromJson(json.encode(request.body));
           retrieveAccessToken();
           _commonController.showSirklUsers(id.value);
-          await retrieveTokenStreamChat(client);
+          await retrieveTokenStreamChat(client, firebaseMessaging!);
           await retrieveTokenAgoraRTM(id.value);
           await getNFTsContractAddresses(client);
         }
@@ -163,7 +163,7 @@ class HomeController extends GetxController{
         userMe.value = userFromJson(json.encode(request.body));
         retrieveAccessToken();
         _commonController.showSirklUsers(id.value);
-        await retrieveTokenStreamChat(client);
+        await retrieveTokenStreamChat(client, firebaseMessaging!);
         await retrieveTokenAgoraRTM(id.value);
         await getNFTsContractAddresses(client);
       } else {
@@ -283,7 +283,7 @@ class HomeController extends GetxController{
     }
   }
 
-  retrieveTokenStreamChat(StreamChatClient client) async{
+  retrieveTokenStreamChat(StreamChatClient client, String? firebaseMessaging) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _profileService.retrieveTokenStreamChat(accessToken);
@@ -295,9 +295,11 @@ class HomeController extends GetxController{
       request = await _profileService.retrieveTokenStreamChat(accessToken);
       if(request.isOk){
         await client.connectUser(User(id: id.value, name:  userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
+        if(firebaseMessaging != null) await client.addDevice(firebaseMessaging, PushProvider.firebase, pushProviderName: "Firebase_Config");
       }
     } else if(request.isOk){
       await client.connectUser(User(id: id.value, name:  userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
+      if(firebaseMessaging != null) await client.addDevice(firebaseMessaging, PushProvider.firebase, pushProviderName: "Firebase_Config");
     }
   }
 

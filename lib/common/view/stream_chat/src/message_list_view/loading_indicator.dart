@@ -53,7 +53,7 @@ class LoadingIndicator extends StatelessWidget {
             const Center(
               child: Padding(
                 padding: EdgeInsets.all(8),
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(color: Color(0xff00CB7D)),
               ),
             );
       },

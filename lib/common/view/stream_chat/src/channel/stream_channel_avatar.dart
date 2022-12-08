@@ -101,7 +101,7 @@ class StreamChannelAvatar extends StatelessWidget {
               onTap: onTap,
               child: CachedNetworkImage(
                 imageUrl: channelImage,
-                placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"),
                 fit: BoxFit.cover,
               ),

@@ -48,7 +48,7 @@ class ProfileController extends GetxController{
       if(request.isOk){
         _homeController.userMe.value = userFromJson(json.encode(request.body));
         await streamChatClient.disconnectUser();
-        await _homeController.retrieveTokenStreamChat(streamChatClient);
+        await _homeController.retrieveTokenStreamChat(streamChatClient, null);
         isEditingProfile.value = false;
         isLoadingPicture.value = false;
       } else {
@@ -57,7 +57,7 @@ class ProfileController extends GetxController{
     } else if(request.isOk){
       _homeController.userMe.value = userFromJson(json.encode(request.body));
       await streamChatClient.disconnectUser();
-      await _homeController.retrieveTokenStreamChat(streamChatClient);
+      await _homeController.retrieveTokenStreamChat(streamChatClient, null);
       isEditingProfile.value = false;
       isLoadingPicture.value = false;
       //var k = await streamChatClient.updateUser(User(id: _homeController.id.value, extraData: {"userDTO": _homeController.userMe.value}));

@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:collection/collection.dart';
 import 'package:ethereum_addresses/ethereum_addresses.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:sirkl/chats/ui/chat_screen.dart';
+import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
@@ -14,6 +14,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -34,6 +35,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   final _homeController = Get.put(HomeController());
   final _profileController = Get.put(ProfileController());
   final _commonController = Get.put(CommonController());
+  final _navigationController = Get.put(NavigationController());
   YYDialog dialogMenu = YYDialog();
   static var _pageKey = 0;
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
@@ -182,87 +184,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         ])));
   }
 
-  Container buildBottomBar() {
-    return Container(
-      height: 110,
-      decoration: BoxDecoration(
-        border: const Border(top: BorderSide(color: Colors.grey, width: 0.01)),
-        gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
-              Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
-            ]),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Flexible(
-            flex: 3,
-            child: TextField(
-              controller: _messageInputController.textFieldController,
-              decoration: InputDecoration(
-                hintText: con.writeHereRes.tr,
-                hintStyle: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                    fontFamily: "Gilroy",
-                    color: Get.isDarkMode
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282)),
-                filled: true,
-                fillColor:
-                    Get.isDarkMode ? const Color(0xFF2D465E) : const Color(0xFFF2F2F2),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide.none),
-              ),
-            ),
-          ),
-          Flexible(
-            child: InkWell(
-              onTap: () async {
-                  for(UserDTO element in _chatController.chipsList) {
-                    if(element.id.isNullOrBlank!) {
-                      await _chatController.createInbox(InboxCreationDto(createdBy: _homeController.id.value, wallets: [_homeController.userMe.value.wallet!, element.wallet!], idChannel: DateTime.now().millisecondsSinceEpoch.toString(), message: _messageInputController.text));
-                    } else {
-                      await _chatController.createInbox(InboxCreationDto(createdBy: _homeController.id.value, wallets: [_homeController.userMe.value.wallet!, element.wallet!], idChannel: DateTime.now().millisecondsSinceEpoch.toString(), message: _messageInputController.text, members: [_homeController.userMe.value.wallet!, element.wallet!]));
-                    }
-                    if(_chatController.chipsList.value.indexOf(element) == _chatController.chipsList.length - 1) {
-                      _messageInputController.clear();
-                      _searchController.clear();
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      _chatController.chipsList.clear();
-                      utils.showToast(context, con.messageSuccessfullySentRes.tr);
-                    }
-                  }
-              },
-              child: Container(
-                width: 55,
-                height: 55,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: const LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [Color(0xFF1DE99B), Color(0xFF0063FB)])),
-                child: Align(
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/images/send.png",
-                      height: 32,
-                      width: 32,
-                    )),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
   Container buildAppBar() {
     return Container(
       height: 140,
@@ -325,90 +246,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget buildNewMessageTile(BuildContext context, int index, UserDTO item) {
-    return ListTile(
-        leading: InkWell(
-            onTap: (){
-              if(_profileController.isUserExists.value != null) {
-                _commonController.userClicked.value = item;
-                Get.to(() => const ProfileElseScreen(fromConversation: false));
-              }
-            },
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(90.0), child:
-            item.picture == null ?
-            SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
-            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
-                errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
-        trailing: Checkbox(
-          onChanged: (selected) {
-            if(selected!) {
-              _chatController.chipsList.add(item);
-            } else {
-              _chatController.chipsList.removeWhere((element) => element.wallet == item.wallet);
-            }
-            _chatController.chipsList.refresh();
-          },
-          value: _chatController.chipsList.map((element) => element.wallet).contains(item.wallet),
-          checkColor: const Color(0xFF00CB7D),
-          fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
-          side: MaterialStateBorderSide.resolveWith(
-            (states) => const BorderSide(width: 1.0, color: Color(0xFF00CB7D)),
-          ),
-        ),
-        title: Transform.translate(
-          offset: const Offset(-8, 0),
-          child: Text(item.userName.isNullOrBlank! ? item.wallet! : item.userName!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontSize: 18,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w600,
-                  color: Get.isDarkMode ? Colors.white : Colors.black)),
-        ),
-        subtitle: !item.userName.isNullOrBlank! ? Transform.translate(
-          offset: const Offset(-8, 0),
-          child: Text(item.wallet!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontSize: 15,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w500,
-                  color: Get.isDarkMode
-                      ? const Color(0xFF9BA0A5)
-                      : const Color(0xFF828282))),
-        ) : null
-    );
-  }
-
-  Widget buildToSendChip(BuildContext context, int index) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: InputChip(
-          deleteIconColor: Colors.white,
-          deleteIcon: Image.asset(
-            'assets/images/close.png',
-            color: Colors.white,
-          ),
-          padding: const EdgeInsets.all(12),
-          onDeleted: () {
-            _chatController.chipsList.removeAt(index);
-            _chatController.chipsList.refresh();
-          },
-          backgroundColor: const Color(0xFF00CB7D),
-          label: Text(
-            _chatController.chipsList[index].userName.isNullOrBlank! ? "${_chatController.chipsList[index].wallet!.substring(0, 10)}..." : _chatController.chipsList[index].userName!,
-            style: const TextStyle(
-                fontFamily: "Gilroy",
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.white),
-          )),
     );
   }
 
@@ -497,6 +334,191 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       },
     );
   }
+
+  Widget buildNewMessageTile(BuildContext context, int index, UserDTO item) {
+    return ListTile(
+        leading: InkWell(
+            onTap: (){
+              if(_profileController.isUserExists.value != null) {
+                _commonController.userClicked.value = item;
+                Get.to(() => const ProfileElseScreen(fromConversation: false));
+              }
+            },
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(90.0), child:
+            item.picture == null ?
+            SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
+            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+                errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
+        trailing: Checkbox(
+          onChanged: (selected) {
+            if (_chatController.chipsList.value.length == 3) {
+              utils.showToast(context, con.maxUserSelectedRes.tr);
+            }
+            else {
+              if (selected!) {
+                _chatController.chipsList.add(item);
+              } else {
+                _chatController.chipsList.removeWhere((element) =>
+                element.wallet == item.wallet);
+              }
+              _chatController.chipsList.refresh();
+            }
+          },
+          value: _chatController.chipsList.map((element) => element.wallet).contains(item.wallet),
+          checkColor: const Color(0xFF00CB7D),
+          fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
+          side: MaterialStateBorderSide.resolveWith(
+            (states) => const BorderSide(width: 1.0, color: Color(0xFF00CB7D)),
+          ),
+        ),
+        title: Transform.translate(
+          offset: const Offset(-8, 0),
+          child: Text(item.userName.isNullOrBlank! ? item.wallet! : item.userName!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w600,
+                  color: Get.isDarkMode ? Colors.white : Colors.black)),
+        ),
+        subtitle: !item.userName.isNullOrBlank! ? Transform.translate(
+          offset: const Offset(-8, 0),
+          child: Text(item.wallet!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontSize: 15,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w500,
+                  color: Get.isDarkMode
+                      ? const Color(0xFF9BA0A5)
+                      : const Color(0xFF828282))),
+        ) : null
+    );
+  }
+
+  Widget buildToSendChip(BuildContext context, int index) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: InputChip(
+          deleteIconColor: Colors.white,
+          deleteIcon: Image.asset(
+            'assets/images/close.png',
+            color: Colors.white,
+          ),
+          padding: const EdgeInsets.all(12),
+          onDeleted: () {
+            _chatController.chipsList.removeAt(index);
+            _chatController.chipsList.refresh();
+          },
+          backgroundColor: const Color(0xFF00CB7D),
+          label: Text(
+            _chatController.chipsList[index].userName.isNullOrBlank! ? "${_chatController.chipsList[index].wallet!.substring(0, 10)}..." : _chatController.chipsList[index].userName!,
+            style: const TextStyle(
+                fontFamily: "Gilroy",
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.white),
+          )),
+    );
+  }
+
+  Container buildBottomBar() {
+    return Container(
+      height: 110,
+      decoration: BoxDecoration(
+        border: const Border(top: BorderSide(color: Colors.grey, width: 0.01)),
+        gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+              Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+            ]),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Flexible(
+            flex: 3,
+            child: TextField(
+              controller: _messageInputController.textFieldController,
+              decoration: InputDecoration(
+                hintText: con.writeHereRes.tr,
+                hintStyle: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    fontFamily: "Gilroy",
+                    color: Get.isDarkMode
+                        ? const Color(0xff9BA0A5)
+                        : const Color(0xFF828282)),
+                filled: true,
+                fillColor:
+                Get.isDarkMode ? const Color(0xFF2D465E) : const Color(0xFFF2F2F2),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none),
+              ),
+            ),
+          ),
+          Flexible(
+            child: InkWell(
+              onTap: () async {
+                _chatController.messageSending.value = true;
+                for(UserDTO element in _chatController.chipsList) {
+                  var idChannel = DateTime.now().millisecondsSinceEpoch.toString();
+                  if(element.id.isNullOrBlank!) {
+                    await _chatController.createInbox(InboxCreationDto(createdBy: _homeController.id.value, wallets: [_homeController.userMe.value.wallet!, element.wallet!], idChannel: idChannel, message: _messageInputController.text));
+                  } else {
+                    await _chatController.createInbox(InboxCreationDto(createdBy: _homeController.id.value, wallets: [_homeController.userMe.value.wallet!, element.wallet!], idChannel: idChannel, message: _messageInputController.text, members: [_homeController.id.value, element.id!]));
+                  }
+                  if(_chatController.chipsList.value.indexOf(element) == _chatController.chipsList.length - 1) {
+                    _messageInputController.clear();
+                    _searchController.clear();
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    _chatController.messageSending.value = false;
+                    if(_chatController.chipsList.value.length == 1){
+                      _chatController.chipsList.clear();
+                      Get.back();
+                      Get.to(() => DetailedChatScreen(create: false, channelId: idChannel));
+                    } else {
+                      _chatController.chipsList.clear();
+                      _chatController.messageHasBeenSent.value = true;
+                      Get.back();
+                    }
+                  }
+                }
+              },
+              child:
+                  _chatController.messageSending.value ?
+                      Container(width: 55, height: 55, child: const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D),),)) :
+              Container(
+                width: 55,
+                height: 55,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [Color(0xFF1DE99B), Color(0xFF0063FB)])),
+                child: Align(
+                    alignment: Alignment.center,
+                    child: Image.asset(
+                      "assets/images/send.png",
+                      height: 32,
+                      width: 32,
+                    )),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
 
   @override
   void dispose() {

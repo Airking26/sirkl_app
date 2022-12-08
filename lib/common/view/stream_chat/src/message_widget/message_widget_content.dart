@@ -251,18 +251,21 @@ class MessageWidgetContent extends StatelessWidget {
                       currentUser: streamChat.currentUser!,
                     ),
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (!reverse && showUserAvatar == DisplayWidget.show && message.user != null) ...[
-                        UserAvatarTransform(
-                          onUserAvatarTap: onUserAvatarTap,
-                          userAvatarBuilder: userAvatarBuilder,
-                          translateUserAvatar: translateUserAvatar,
-                          messageTheme: messageTheme,
-                          message: message,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2.0),
+                          child: UserAvatarTransform(
+                            onUserAvatarTap: onUserAvatarTap,
+                            userAvatarBuilder: userAvatarBuilder,
+                            translateUserAvatar: translateUserAvatar,
+                            messageTheme: messageTheme,
+                            message: message,
+                          ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 9),
                       ],
                       if (showUserAvatar == DisplayWidget.hide) SizedBox(width: avatarWidth + 24),
                       Flexible(

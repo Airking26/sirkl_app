@@ -346,7 +346,7 @@ class AttachmentActionsModal extends StatelessWidget {
                                   children: [
                                     CircularProgressIndicator(
                                       strokeWidth: 8,
-                                      color: theme.colorTheme.accentPrimary,
+                                        color: Color(0xff00CB7D)
                                     ),
                                     Center(
                                       child: Text(

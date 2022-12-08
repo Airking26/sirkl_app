@@ -250,7 +250,7 @@ class StreamChannelHeader extends StatelessWidget
                                     width: 40,
                                     height: 40,
                                     fit: BoxFit.cover,
-                                      placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                                      placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
                                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                                   ) :
                                       channel.image == null ?
@@ -261,7 +261,7 @@ class StreamChannelHeader extends StatelessWidget
                                     width: 40,
                                     height: 40,
                                     fit: BoxFit.cover,
-                                      placeholder: (context, url) => Center(child: const CircularProgressIndicator()),
+                                      placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
                                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                                   )
                               )

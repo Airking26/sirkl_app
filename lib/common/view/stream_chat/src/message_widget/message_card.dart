@@ -201,9 +201,9 @@ class _MessageCardState extends State<MessageCard> {
         decoration: BoxDecoration(
           border: Border.all(width: widget.reverse ? Get.isDarkMode ? 0 : 0.75 :1.5 , color: widget.reverse ? Get.isDarkMode ? Colors.transparent : Colors.grey.withOpacity(0.25) : Colors.grey.withOpacity(0.35)),
           borderRadius: BorderRadius.only(
-              topLeft: const Radius.circular(10),
-              bottomRight: const Radius.circular(10),
-              bottomLeft: widget.reverse ? const Radius.circular(10)  : widget.showTimeStamp ? const Radius.circular(0) : const Radius.circular(10),
+              bottomLeft: const Radius.circular(10),
+              bottomRight: widget.reverse && widget.showTimeStamp ? const Radius.circular(0) : const Radius.circular(10),
+              topLeft: widget.reverse ? const Radius.circular(10)  : widget.showTimeStamp ? const Radius.circular(0) : const Radius.circular(10),
               topRight: const Radius.circular(10)),
           gradient: LinearGradient(
               begin: Alignment.topCenter,
