@@ -1,8 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/model/notification_dto.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/utils.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import '../controller/profile_controller.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key}) : super(key: key);
@@ -12,6 +18,35 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+
+  final _profileController = Get.put(ProfileController());
+  final _homeController = Get.put(HomeController());
+  final PagingController<int, NotificationDto> pagingController = PagingController(firstPageKey: 0);
+  static var pageKey = 0;
+
+  @override
+  void initState() {
+    pagingController.addPageRequestListener((pageKey) {
+      fetchPageNotifications();
+    });
+    super.initState();
+  }
+
+  Future<void> fetchPageNotifications() async {
+    try {
+      List<NotificationDto> newItems = await _profileController.retrieveNotifications(_homeController.id.value, pageKey);
+      final isLastPage = newItems.length < 9;
+      if (isLastPage) {
+        pagingController.appendLastPage(newItems);
+      } else {
+        final nextPageKey = pageKey++;
+        pagingController.appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      pagingController.error = error;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,39 +95,85 @@ class _NotificationScreenState extends State<NotificationScreen> {
             MediaQuery.removePadding(
               context: context,
               removeTop: true,
-              child: Expanded(child: ListView.separated(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                itemCount: 20,
-                  separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 20,);},
-                  itemBuilder: buildNotificationTile)
+              child: Expanded(child:
+              SafeArea(
+                minimum: const EdgeInsets.only(top: 16),
+                child: PagedListView.separated(
+                  pagingController: pagingController,
+                  builderDelegate: PagedChildBuilderDelegate<NotificationDto>(itemBuilder: (context, item, index) => buildNotificationTile(context, item, index),),
+                    separatorBuilder: (context, index){return Divider(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 20,);},
+                ),
+              )
               ),
             )
           ],
         ));
   }
 
-  Widget buildNotificationTile(BuildContext context, int index){
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: ListTile(
-        onTap: (){},
-        leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
-            errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),
-        title: Transform.translate(
-          offset: Offset(-8, 0),
-          child: RichText(
-            text: TextSpan(
-              style: TextStyle(),
-              children: [
-                TextSpan(text: "You have added", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w400, color: Get.isDarkMode ? Colors.white : Colors.black)),
-                TextSpan(text: " Grodongoner.eth ", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Color(0xff00CB7D))),
-                TextSpan(text: "in your SIRKL - 2hrs ago", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w400, color: Get.isDarkMode ? Colors.white : Colors.black)),
-              ]
-            ),
+  Widget buildNotificationTile(BuildContext context, NotificationDto item, int index){
+    return Container(
+      color: item.hasBeenRead ? Colors.transparent : Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282).withOpacity(0.1),
+      child: Padding(
+        padding: const EdgeInsets.only(right: 8.0, top: 8, bottom: 8),
+        child: ListTile(
+          onTap: (){},
+          leading:
+              item.type != 0 && item.type != 1 ?
+                  Container(
+                    width: 50, height: 50,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xff00CB7D),
+                      ),
+                  child: Align(alignment: Alignment.center, child: Image.asset('assets/images/stories.png', width: 24, height: 24,),),) :
+          item.picture.isNullOrBlank! ?
+          SizedBox(height: 50, width: 50, child: TinyAvatar(baseString: item.wallet?? "", dimension: 50, circular: true,)) :
+          CachedNetworkImage(imageUrl: item.picture!, width: 50, height: 50, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+              errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", width: 50, height: 50, fit: BoxFit.cover)),
+          title: Transform.translate(
+            offset: Offset(item.picture.isNullOrBlank! ? 0 : -8, 0),
+            child: buildTextNotif(item),
           ),
+          //subtitle: Text("Lorem Ipsum is simply...", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),
         ),
-        //subtitle: Text("Lorem Ipsum is simply...", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),
       ),
     );
+  }
+
+  Widget buildTextNotif(NotificationDto item){
+    var nowMilli = DateTime.now().millisecondsSinceEpoch;
+    var updatedAtMilli =  DateTime.parse(item.createdAt.toIso8601String()).millisecondsSinceEpoch;
+    var diffMilli = nowMilli - updatedAtMilli;
+    var timeSince = DateTime.now().subtract(Duration(milliseconds: diffMilli));
+    if(item.type == 0){
+      return RichText(
+        text: TextSpan(
+            style: const TextStyle(),
+            children: [
+              TextSpan(text: item.username ?? item.wallet , style: const TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Color(0xff00CB7D))),
+              TextSpan(text: " added you in his SIRKL - ${timeago.format(timeSince)}", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Colors.white : Colors.black.withOpacity(0.6))),
+            ]
+        ),
+      );
+    } else if(item.type == 1){
+      return RichText(
+        text: TextSpan(
+            style: const TextStyle(),
+            children: [
+              TextSpan(text: "You have added ", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Colors.white : Colors.black.withOpacity(0.6))),
+              TextSpan(text: item.username ?? item.wallet , style: const TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Color(0xff00CB7D))),
+              TextSpan(text: " in your SIRKL - ${timeago.format(timeSince)}", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Colors.white : Colors.black.withOpacity(0.6))),
+            ]
+        ),
+      );
+    } else {
+      return Container();
+    }
+  }
+
+  @override
+  void dispose() {
+    pagingController.dispose();
+    super.dispose();
   }
 }

@@ -62,6 +62,9 @@ class ChatsController extends GetxController{
     channel.value = client.channel(
       'try',
       id: channelId,
+      extraData: {
+        "isConv" : true
+      }
     );
     await channel.value!.watch();
   }

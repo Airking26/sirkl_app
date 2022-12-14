@@ -8,6 +8,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:simple_s3/simple_s3.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/model/notification_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
@@ -33,6 +34,7 @@ class ProfileController extends GetxController{
   var usernameTextEditingController = TextEditingController().obs;
   var descriptionTextEditingController = TextEditingController().obs;
   var urlPicture = "".obs;
+  var hasUnreadNotif = false.obs;
 
   updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
     isLoadingPicture.value = true;
@@ -90,24 +92,46 @@ class ProfileController extends GetxController{
     return user;
   }
 
-  /*modifyPassword(String password) async{
-    var request = await _profileService.modifyPassword(_homeController.tempSignInSuccess.value.accessToken!, _homeController.tempSignInSuccess.value.user!.wallet!, password);
-    if(request.isOk){
-      _homeController.userMe.value = _homeController.tempSignInSuccess.value.user!;
-      box.write(con.ACCESS_TOKEN, _homeController.tempSignInSuccess.value.accessToken!);
-      _homeController.accessToken.value = _homeController.tempSignInSuccess.value.accessToken!;
-      box.write(con.REFRESH_TOKEN, _homeController.tempSignInSuccess.value.refreshToken!);
-      box.write(con.USER, userToJson(_homeController.tempSignInSuccess.value.user!));
-      await _homeController.putFCMToken(null);
-      Get.back();
-    }
-  }*/
-
   getImage() async{
     List<Media>? res = await ImagesPicker.pick(count: 1, pickType: PickType.image, language: Language.English, cropOpt: CropOption(aspectRatio: CropAspectRatio.custom, cropType: CropType.circle,), maxSize: 500, quality: 0.8);
     if(res != null) isLoadingPicture.value = true;
     urlPicture.value = await SimpleS3().uploadFile(File(res!.first.path), "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
     isLoadingPicture.value = false;
+  }
+
+  checkIfHasUnreadNotif(String id) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.retrieveHasUnreadNotif(accessToken, id);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _profileService.retrieveHasUnreadNotif(accessToken, id);
+      if(request.isOk){
+        if(request.body! == 'false') hasUnreadNotif.value = false;
+        else hasUnreadNotif.value = true;
+      }
+    } else if(request.isOk){
+      if(request.body! == 'false') hasUnreadNotif.value = false;
+      else hasUnreadNotif.value = true;
+    }
+  }
+
+  retrieveNotifications(String id, int offset) async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.retrieveNotifications(accessToken, id, offset.toString());
+    if(request.statusCode == 401) {
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request =  await _profileService.retrieveNotifications(accessToken, id, offset.toString());
+      if(request.isOk) return notificationDtoFromJson(json.encode(request.body));
+    } else if(request.isOk) return notificationDtoFromJson(json.encode(request.body));
   }
 
 }

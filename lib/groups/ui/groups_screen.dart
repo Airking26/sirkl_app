@@ -50,7 +50,6 @@ class _GroupsScreenState extends State<GroupsScreen> {
 
   @override
   void initState() {
-    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
     streamChannelListControllerGroups = buildStreamChannelListController();
     _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
     super.initState();

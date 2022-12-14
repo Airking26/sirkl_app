@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_badged/flutter_badge.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/collection_dto.dart';
@@ -29,6 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState(){
+    _profileController.checkIfHasUnreadNotif(_homeController.id.value);
     _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
     _profileController.usernameTextEditingController.value.text = _homeController.userMe.value.userName!.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _homeController.userMe.value.userName!;
     _profileController.descriptionTextEditingController.value.text = _homeController.userMe.value.description == "" ? "" : _homeController.userMe.value.description!;
@@ -86,7 +88,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               picture: _profileController.urlPicture.value
                             ), StreamChat.of(context).client):
                             Get.to(() => const NotificationScreen());
-                            }, icon: Image.asset(_profileController.isEditingProfile.value ? "assets/images/edit.png" : "assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                            }, icon:
+                          _profileController.isEditingProfile.value ?
+                          Image.asset( "assets/images/edit.png", color: Get.isDarkMode ? Colors.white : Colors.black,):
+                              FlutterBadge(icon: Image.asset("assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,), itemCount: _profileController.hasUnreadNotif.value ? 1 : 0, hideZeroCount: true, badgeColor: Color(0xff00CB7D), badgeTextColor: Color(0xff00CB7D), contentPadding: EdgeInsets.only(top: 0.1,right: 16, left: 12),)
+                          ),
+                          //Image.asset("assets/images/bell.png",  color: Get.isDarkMode ? Colors.white : Colors.black,)),
                           Padding(
                             padding: const EdgeInsets.only(top: 12.0),
                             child:

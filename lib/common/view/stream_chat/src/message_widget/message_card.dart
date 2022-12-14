@@ -199,7 +199,7 @@ class _MessageCardState extends State<MessageCard> {
       color: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(width: widget.reverse ? Get.isDarkMode ? 0 : 0.75 :1.5 , color: widget.reverse ? Get.isDarkMode ? Colors.transparent : Colors.grey.withOpacity(0.25) : Colors.grey.withOpacity(0.35)),
+          border: Border.all(width: widget.reverse ? Get.isDarkMode ? 0 : 1 : 0.1 , color: widget.reverse ? Get.isDarkMode ? Colors.transparent : Color(0xFF00CB7D).withOpacity(0.2) : Colors.grey.withOpacity(0.35)),
           borderRadius: BorderRadius.only(
               bottomLeft: const Radius.circular(10),
               bottomRight: widget.reverse && widget.showTimeStamp ? const Radius.circular(0) : const Radius.circular(10),
@@ -209,8 +209,8 @@ class _MessageCardState extends State<MessageCard> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                widget.reverse ? Get.isDarkMode ?  Colors.white.withOpacity(0.1) : const Color(0xFFFFFFFF) : Get.isDarkMode ? Colors.transparent : const Color(0xFF102437),
-                widget.reverse ? Get.isDarkMode ? Colors.white.withOpacity(0.05) : const Color(0xFFFFFFFF)  : Get.isDarkMode ? Colors.transparent : const Color(0xFF13171B)
+                widget.reverse ? Get.isDarkMode ?  Colors.white.withOpacity(0.1) : const Color(0xFF00CB7D).withOpacity(0.05) : Get.isDarkMode ? Colors.transparent : Colors.white,
+                widget.reverse ? Get.isDarkMode ? Colors.white.withOpacity(0.05) : const Color(0xFF00CB7D).withOpacity(0.05)  : Get.isDarkMode ? Colors.transparent : Colors.white
               ]),
 
         ),

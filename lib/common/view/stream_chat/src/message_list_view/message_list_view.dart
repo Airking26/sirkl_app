@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/scrollable_positioned_list/src/indexed_key.dart';
 import 'package:sirkl/common/view/stream_chat/scrollable_positioned_list/src/item_positions_listener.dart';
 import 'package:sirkl/common/view/stream_chat/scrollable_positioned_list/src/scrollable_positioned_list.dart';
@@ -795,7 +796,7 @@ class _StreamMessageListViewState extends State<StreamMessageListView> {
     if (backgroundColor != null || backgroundImage != null) {
       return DecoratedBox(
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: Get.isDarkMode ? const Color(0xFF102437) :const Color.fromARGB(255, 247, 253, 255) ,
           image: backgroundImage,
         ),
         child: child,

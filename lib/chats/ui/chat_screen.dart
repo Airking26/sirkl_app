@@ -28,7 +28,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
     streamChannelListControllerFriends = buildStreamChannelListController(true);
     streamChannelListControllerOthers = buildStreamChannelListController(false);
     super.initState();
@@ -169,7 +168,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
-            con.noFriendsRes.tr,
+            con.noChatsRes.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: Get.isDarkMode ? Colors.white : Colors.black,

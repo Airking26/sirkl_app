@@ -483,7 +483,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                     if(_chatController.chipsList.value.length == 1){
                       _chatController.chipsList.clear();
                       Get.back();
-                      Get.to(() => DetailedChatScreen(create: false, channelId: idChannel));
+                      if(element.id.isNullOrBlank!) {
+                        Get.to(() => DetailedChatScreen(create: false, channelId: idChannel));
+                      } else {
+                        Get.to(() => const DetailedChatScreen(create: true));
+                      }
                     } else {
                       _chatController.chipsList.clear();
                       _chatController.messageHasBeenSent.value = true;

@@ -33,7 +33,7 @@ class _ChannelPageState extends State<ChannelPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
+      backgroundColor: Get.isDarkMode ? Get.isDarkMode ? const Color(0xFF102437) :const Color.fromARGB(255, 247, 253, 255) : Get.isDarkMode ?  const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
       body: Column(
         children: <Widget>[
           StreamChannelHeader(commonController: _commonController),

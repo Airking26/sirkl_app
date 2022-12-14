@@ -30,7 +30,8 @@ class _CallsScreenState extends State<CallsScreen> {
             : const Color.fromARGB(255, 247, 253, 255),
         body: Column(children: [
           buildAppbar(context),
-          buildListCall(context)
+          noGroupUI()
+          //buildListCall(context)
         ]));
   }
 
@@ -114,6 +115,64 @@ class _CallsScreenState extends State<CallsScreen> {
     );
   }
 
+  Widget buildFloatingSearchBar() {
+    return FloatingSearchBar(
+      clearQueryOnClose: false,
+      closeOnBackdropTap: false,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      hint: 'Search here...',
+      backdropColor: Colors.transparent,
+      scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+      transitionDuration: const Duration(milliseconds: 800),
+      transitionCurve: Curves.easeInOut,
+      physics: const BouncingScrollPhysics(),
+      axisAlignment: 0.0,
+      openAxisAlignment: 0.0,
+      queryStyle: TextStyle(
+          color: Get.isDarkMode ? Colors.white : Colors.black,
+          fontSize: 15,
+          fontFamily: "Gilroy",
+          fontWeight: FontWeight.w500),
+      hintStyle: TextStyle(
+          color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
+          fontSize: 15,
+          fontFamily: "Gilroy",
+          fontWeight: FontWeight.w500),
+      elevation: 5,
+      showCursor: true,
+      width: 350,
+      accentColor: Get.isDarkMode ? Colors.white : Colors.black,
+      borderRadius: BorderRadius.circular(10),
+      backgroundColor:
+      Get.isDarkMode ? const Color(0xFF2D465E).withOpacity(1) : Colors.white,
+      debounceDelay: const Duration(milliseconds: 500),
+      onQueryChanged: (query) {
+        // Call your model, bloc, controller here.
+      },
+      // Specify a custom transition to be used for
+      // animating between opened and closed stated.
+      transition: CircularFloatingSearchBarTransition(),
+      leadingActions: [
+        FloatingSearchBarAction.icon(
+          icon: Image.asset(
+            "assets/images/search.png",
+            width: 24,
+            height: 24,
+          ),
+          showIfClosed: true,
+          showIfOpened: true,
+          onTap: () {},
+        ),
+      ],
+      actions: const [],
+      builder: (context, transition) {
+        return const SizedBox(
+          height: 0,
+        );
+      },
+    );
+  }
+
   MediaQuery buildListCall(BuildContext context) {
     return MediaQuery.removePadding(
           context: context,
@@ -181,61 +240,50 @@ class _CallsScreenState extends State<CallsScreen> {
     );
   }
 
-  Widget buildFloatingSearchBar() {
-    return FloatingSearchBar(
-      clearQueryOnClose: false,
-      closeOnBackdropTap: false,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      hint: 'Search here...',
-      backdropColor: Colors.transparent,
-      scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
-      transitionDuration: const Duration(milliseconds: 800),
-      transitionCurve: Curves.easeInOut,
-      physics: const BouncingScrollPhysics(),
-      axisAlignment: 0.0,
-      openAxisAlignment: 0.0,
-      queryStyle: TextStyle(
-          color: Get.isDarkMode ? Colors.white : Colors.black,
-          fontSize: 15,
-          fontFamily: "Gilroy",
-          fontWeight: FontWeight.w500),
-      hintStyle: TextStyle(
-          color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
-          fontSize: 15,
-          fontFamily: "Gilroy",
-          fontWeight: FontWeight.w500),
-      elevation: 5,
-      showCursor: true,
-      width: 350,
-      accentColor: Get.isDarkMode ? Colors.white : Colors.black,
-      borderRadius: BorderRadius.circular(10),
-      backgroundColor:
-      Get.isDarkMode ? const Color(0xFF2D465E).withOpacity(1) : Colors.white,
-      debounceDelay: const Duration(milliseconds: 500),
-      onQueryChanged: (query) {
-        // Call your model, bloc, controller here.
-      },
-      // Specify a custom transition to be used for
-      // animating between opened and closed stated.
-      transition: CircularFloatingSearchBarTransition(),
-      leadingActions: [
-        FloatingSearchBarAction.icon(
-          icon: Image.asset(
-            "assets/images/search.png",
-            width: 24,
-            height: 24,
+  Column noGroupUI() {
+    return Column(
+      children: [
+        const SizedBox(
+          height: 100,
+        ),
+        Image.asset(
+          "assets/images/people.png",
+          width: 150,
+          height: 150,
+        ),
+        const SizedBox(
+          height: 30,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 54.0),
+          child: Text(
+            con.noCallsRes.tr,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Get.isDarkMode ? Colors.white : Colors.black,
+                fontSize: 25,
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w700),
           ),
-          showIfClosed: true,
-          showIfOpened: true,
-          onTap: () {},
+        ),
+        const SizedBox(
+          height: 15,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 54.0),
+          child: Text(
+            con.noCallsSentenceRes.tr,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                color: Color(0xFF9BA0A5),
+                fontSize: 16,
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w500),
+          ),
         ),
       ],
-      actions: const [],
-      builder: (context, transition) {
-        return const SizedBox(
-          height: 0,
-        );
-      },
     );
   }
+
+
 }

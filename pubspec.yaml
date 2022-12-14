@@ -73,6 +73,8 @@ dependencies:
   flutter_callkit_incoming: ^1.0.2+2
   ethereum_addresses: ^1.0.2
   widget_circular_animator: ^1.0.0
+  flutter_badged: ^2.0.3
+
 
 dev_dependencies:
   dart_code_metrics: ^4.4.0
@@ -130,6 +132,9 @@ flutter:
      - assets/images/giphy_icon.png
      - assets/images/placeholder.png
      - assets/images/app_icon_rounded.png
+     - assets/images/stories.png
+     - assets/images/chat_missed.png
+     - assets/images/group_chat_missed.png
      - animations/
      - svgs/
      - lib/svgs/

@@ -21,9 +21,12 @@ const String talkWithRes = "talk_with";
 const String bySigningRes = "by_signing";
 const String getStartedRes = "get_started";
 const String noFriendsRes = "no_friends";
+const String noCallsRes = "no_calls";
+const String noChatsRes = "no_chats";
 const String configurationRes = "configuration";
 const String configurationSentenceRes = "configuration_sentence";
 const String noFriendsSentenceRes = "no_friends_sentence";
+const String noCallsSentenceRes = "no_calls_sentence";
 const String addUsersToSirklRes = "add_users_to_sirkl";
 const String rulesRes = "rules";
 

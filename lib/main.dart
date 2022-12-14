@@ -15,10 +15,8 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'navigation/ui/navigation_screen.dart';
 
 void main() async{
-  final client = StreamChatClient(
-    'v2s6zx9zjd9b',
-    logLevel: Level.ALL,
-  );
+  final client = StreamChatClient("mhgk84t9jfnt");
+  //StreamChatClient('v2s6zx9zjd9b', logLevel: Level.ALL);
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await GetStorage.init();
@@ -97,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   initFirebase() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      showCallkitIncoming(message.data['uuid'] as String);
+      //showCallkitIncoming(message.data['uuid'] as String);
     });
     _callController.listenCall();
   }

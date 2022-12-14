@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 /// {@template sendingIndicatorWrapper}
@@ -68,7 +69,8 @@ class SendingIndicatorWrapper extends StatelessWidget {
             it.user.id != streamChat.currentUser?.id &&
             (it.lastRead.isAfter(message.createdAt) ||
                 it.lastRead.isAtSameMomentAs(message.createdAt)));
-        final isMessageRead = readList.length >= (channel.memberCount ?? 0) - 1;
+        //TODO: Try to see with only one sent marked
+        final isMessageRead = (readList.length >= (channel.memberCount ?? 0) - 1) && !channel.memberCount.isNullOrBlank! && channel.memberCount! > 1;
         Widget child = StreamSendingIndicator(
           message: message,
           isMessageRead: isMessageRead,
