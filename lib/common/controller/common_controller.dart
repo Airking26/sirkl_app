@@ -8,6 +8,7 @@ import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
+import 'package:sirkl/profile/service/profile_service.dart';
 
 import '../model/refresh_token_dto.dart';
 
@@ -15,6 +16,7 @@ class CommonController extends GetxController{
 
   final HomeService _homeService = HomeService();
   final CommonService _commonService = CommonService();
+  final ProfileService _profileService = ProfileService();
   final box = GetStorage();
 
   Rx<UserDTO?> userClicked = (null as UserDTO?).obs;
@@ -28,7 +30,7 @@ class CommonController extends GetxController{
   var inboxClicked = InboxDto().obs;
 
   Future<bool> addUserToSirkl(String id, StreamChatClient streamChatClient, String myId) async{
-    var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, myId]});
+    var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, myId], "isConv": true});
     var meFollow = channel.channel?.extraData["${myId}_follow_channel"] as dynamic;
     if(meFollow == null || (meFollow != null && meFollow == false)) {
       meFollow = true;
@@ -198,5 +200,20 @@ class CommonController extends GetxController{
       userClicked.value =
           userFromJson(json.encode(users.users.first.extraData['userDTO']));
     }
+  }
+
+  getUserById(String id) async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.getUserByID(accessToken, id);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken!);
+      var refreshTokenDto = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDto.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _profileService.getUserByID(accessToken, id);
+      if(request.isOk) userClicked.value = userFromJson(json.encode(request.body));
+    } else if(request.isOk) userClicked.value = userFromJson(json.encode(request.body));
   }
 }

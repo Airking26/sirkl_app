@@ -64,7 +64,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     blurRadius: 0.01,
                   ),
                 ],
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(35)),
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(5)),
                 gradient:  LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -97,11 +97,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
               removeTop: true,
               child: Expanded(child:
               SafeArea(
-                minimum: const EdgeInsets.only(top: 16),
+                //minimum: const EdgeInsets.only(top: 16),
                 child: PagedListView.separated(
                   pagingController: pagingController,
                   builderDelegate: PagedChildBuilderDelegate<NotificationDto>(itemBuilder: (context, item, index) => buildNotificationTile(context, item, index),),
-                    separatorBuilder: (context, index){return Divider(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 20,);},
+                    separatorBuilder: (context, index){return Divider(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 20, height: 0,);},
                 ),
               )
               ),
@@ -116,7 +116,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
       child: Padding(
         padding: const EdgeInsets.only(right: 8.0, top: 8, bottom: 8),
         child: ListTile(
-          onTap: (){},
+          onTap: (){
+
+          },
           leading:
               item.type != 0 && item.type != 1 ?
                   Container(

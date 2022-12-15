@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
@@ -17,6 +18,7 @@ class _ChannelPageState extends State<ChannelPage> {
   FocusNode? _focusNode;
   final StreamMessageInputController _messageInputController = StreamMessageInputController();
   final _commonController = Get.put(CommonController());
+  final _chatController = Get.put(ChatsController());
 
   @override
   void initState() {
@@ -26,6 +28,7 @@ class _ChannelPageState extends State<ChannelPage> {
 
   @override
   void dispose() {
+    _chatController.channel.value = null;
     _focusNode!.dispose();
     super.dispose();
   }

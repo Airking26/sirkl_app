@@ -74,6 +74,7 @@ dependencies:
   ethereum_addresses: ^1.0.2
   widget_circular_animator: ^1.0.0
   flutter_badged: ^2.0.3
+  flutter_local_notifications: ^12.0.4
 
 
 dev_dependencies:

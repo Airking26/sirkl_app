@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
+import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
@@ -24,6 +25,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
   YYDialog dialogMenu = YYDialog();
   final _groupController = Get.put(GroupsController());
   final _homeController = Get.put(HomeController());
+  final _chatController = Get.put(ChatsController());
   final _floatingSearchBarController = FloatingSearchBarController();
   StreamChannelListController? streamChannelListControllerGroups;
 
@@ -79,6 +81,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
                         },
                         controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController() : streamChannelListControllerGroups!,
                         onChannelTap: (channel) async{
+                          _chatController.channel.value = channel;
                           var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
                           if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
                           Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())

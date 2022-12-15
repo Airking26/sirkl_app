@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
@@ -133,6 +134,8 @@ class StreamChannelHeader extends StatelessWidget
   final Size preferredSize;
 
   YYDialog dialogMenu = YYDialog();
+  final _chatController = Get.put(ChatsController());
+
 
   @override
   Widget build(BuildContext context) {
@@ -209,6 +212,7 @@ class StreamChannelHeader extends StatelessWidget
                         children: [
                           IconButton(
                               onPressed: () {
+                                _chatController.channel.value = null;
                                 Get.back();
                               },
                               icon: Image.asset(

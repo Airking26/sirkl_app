@@ -1,24 +1,36 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/language.dart';
+import 'package:sirkl/common/local_notification_initialize.dart';
+import 'package:sirkl/common/model/refresh_token_dto.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/firebase_options.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/home/service/home_service.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/profile/service/profile_service.dart';
 import 'navigation/ui/navigation_screen.dart';
+import 'package:sirkl/common/constants.dart' as con;
 
 void main() async{
   final client = StreamChatClient("mhgk84t9jfnt");
   //StreamChatClient('v2s6zx9zjd9b', logLevel: Level.ALL);
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await GetStorage.init();
   runApp(MyApp(client: client));
 }
@@ -53,7 +65,6 @@ class MyApp extends StatelessWidget {
 
   final StreamChatClient client;
 
-
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -84,6 +95,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
 
   final _homeController = Get.put(HomeController());
   final _callController = Get.put(CallsController());
+  final _chatController = Get.put(ChatsController());
+  final _commonController = Get.put(CommonController());
+  final _navigationController = Get.put(NavigationController());
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
@@ -93,9 +109,23 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   }
 
   initFirebase() async {
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    await LocalNotificationInitialize().initialize(flutterLocalNotificationsPlugin);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      //showCallkitIncoming(message.data['uuid'] as String);
+      if(message.data["type"] == "0" || message.data["type"] == "1"){
+        LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+      } else if(message.data['type'] == "message.new" && message.data['channel_id'] != _chatController.channel.value?.id){
+        final response = await StreamChat.of(context).client.getMessage(message.data['id']);
+        LocalNotificationInitialize.showBigTextNotification(title: "New message from ${response.message.user?.name}", body: response.message.text!, flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+      }
+      else {
+        showCallkitIncoming(message.data['uuid'] as String);
+      }
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((event) async{
+      _navigationController.changeCurrentPage(3);
+      _navigationController.pageController.value.jumpToPage(3);
+      await _commonController.getUserById("6399c4bbf7d2390029566622");
+      Get.to(() => const DetailedChatScreen(create: true,));
     });
     _callController.listenCall();
   }
@@ -109,7 +139,27 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  showCallkitIncoming(message.data['uuid'] as String);
+  await Firebase.initializeApp();
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  await LocalNotificationInitialize().initialize(flutterLocalNotificationsPlugin);
+  if(message.data["type"] == "0" || message.data["type"] == "1"){
+    LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+  } else if(message.data['type'] == "message.new"){
+    /*final client = StreamChatClient("mhgk84t9jfnt");
+    final box = GetStorage();
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var requestToken = await HomeService().refreshToken(refreshToken);
+    var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+    var accessToken = refreshTokenDTO.accessToken!;
+    var request = await ProfileService().retrieveTokenStreamChat(accessToken);
+    var id = userFromJson(box.read(con.USER)).id;
+    await client.connectUser(User(id: id!,), request.body!, connectWebSocket: false);
+    final response = await client.getMessage(message.data['id']);
+    LocalNotificationInitialize.showBigTextNotification(title: "New message", body: "${response.message.user?.name} : ${response.message.text}", flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);*/
+  }
+  else {
+    showCallkitIncoming(message.data['uuid'] as String);
+  }
 }
 
 Future<void> showCallkitIncoming(String uuid) async {

@@ -124,6 +124,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     return noGroupUI();
                   },
                   controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel){
+                    _chatController.channel.value = channel;
                   Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value) {
                     //streamChannelListControllerFriends!.refresh();
                     //streamChannelListControllerOthers!.refresh();
@@ -138,6 +139,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     return noGroupUI();
                   },
                   controller:_chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerOthers!, onChannelTap: (channel){
+                  _chatController.channel.value = channel;
                   Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value){
                     //streamChannelListControllerOthers!.refresh();
                     //streamChannelListControllerFriends!.refresh();
