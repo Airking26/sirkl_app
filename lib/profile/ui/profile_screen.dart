@@ -8,7 +8,9 @@ import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/common/view/story_creator/stories_editor.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
@@ -26,6 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
+  final _groupController = Get.put(GroupsController());
   YYDialog dialogMenu = YYDialog();
 
   @override
@@ -87,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               description: _profileController.descriptionTextEditingController.value.text.isEmpty ? "" : _profileController.descriptionTextEditingController.value.text,
                               picture: _profileController.urlPicture.value
                             ), StreamChat.of(context).client):
-                            Get.to(() => const NotificationScreen());
+                            Get.to(() => const NotificationScreen())!.then((value) => _profileController.checkIfHasUnreadNotif(_homeController.id.value));
                             }, icon:
                           _profileController.isEditingProfile.value ?
                           Image.asset( "assets/images/edit.png", color: Get.isDarkMode ? Colors.white : Colors.black,):
@@ -116,8 +119,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                )
                              : Text(_homeController.userMe.value.userName!.isEmpty || _homeController.userMe.value.userName == _homeController.userMe.value.wallet ? "${_homeController.userMe.value.wallet!.substring(0, 20)}..." : _homeController.userMe.value.userName!, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
                           ),
-                          IconButton(onPressed: (){
-                            dialogMenu = dialogPopMenu(context);
+                          IconButton(onPressed: ()async{
+                            _groupController.retrieveGroupsToCreate(StreamChat.of(context).client);
+                            //dialogMenu = dialogPopMenu(context);
                             }, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
                         ],),
                     ),
@@ -149,17 +153,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   top: Platform.isAndroid ? 210 : 190,
                     right: MediaQuery.of(context).size.width / 3.25,
                     child:
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: [Color(0xFF1DE99B), Color(0xFF0063FB)]),
-                          borderRadius: BorderRadius.circular(90),
-                          border: Border.all(color: Get.isDarkMode ? const Color(0xFF122034) : Colors.white, width: 2)
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Image.asset('assets/images/plus.png', width: 20, height: 20,),
+                    InkWell(
+                      onTap: (){
+                        Get.to(() => StoriesEditor(giphyKey: "", onDone: (uri){},));
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            gradient: const LinearGradient(colors: [Color(0xFF1DE99B), Color(0xFF0063FB)]),
+                            borderRadius: BorderRadius.circular(90),
+                            border: Border.all(color: Get.isDarkMode ? const Color(0xFF122034) : Colors.white, width: 2)
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Image.asset('assets/images/plus.png', width: 20, height: 20,),
+                        ),
                       ),
                     )
                 )

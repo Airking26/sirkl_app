@@ -35,7 +35,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Future<void> fetchPageNotifications() async {
     try {
       List<NotificationDto> newItems = await _profileController.retrieveNotifications(_homeController.id.value, pageKey);
-      final isLastPage = newItems.length < 9;
+      final isLastPage = newItems.length < 12;
       if (isLastPage) {
         pagingController.appendLastPage(newItems);
       } else {

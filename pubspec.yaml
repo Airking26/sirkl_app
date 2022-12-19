@@ -75,7 +75,13 @@ dependencies:
   widget_circular_animator: ^1.0.0
   flutter_badged: ^2.0.3
   flutter_local_notifications: ^12.0.4
-
+  modal_gif_picker: ^0.0.2
+  perfect_freehand: ^1.0.4
+  align_positioned: ^3.0.0
+  fluttertoast: ^8.1.1
+  animated_text_kit: ^4.2.2
+  flutter_screenutil: ^5.6.0
+  gallery_media_picker: ^0.0.82
 
 dev_dependencies:
   dart_code_metrics: ^4.4.0
@@ -136,6 +142,29 @@ flutter:
      - assets/images/stories.png
      - assets/images/chat_missed.png
      - assets/images/group_chat_missed.png
+     - assets/images/align_center.png
+     - assets/images/align_left.png
+     - assets/images/align_rigth.png
+     - assets/images/arrow.png
+     - assets/images/brush.png
+     - assets/images/check.png
+     - assets/images/circular_gradient.png
+     - assets/images/colorpalette.png
+     - assets/images/download.png
+     - assets/images/draft.png
+     - assets/images/draw.png
+     - assets/images/font_backGround.png
+     - assets/images/marker.png
+     - assets/images/neon.png
+     - assets/images/pen.png
+     - assets/images/pickColor.png
+     - assets/images/return.png
+     - assets/images/stickers.png
+     - assets/images/text.png
+     - assets/images/trash.png
+     - assets/images/photo_filter.png
+     - assets/images/video_trim.png
+     - assets/images/instagram_logo.png
      - animations/
      - svgs/
      - lib/svgs/
@@ -162,3 +191,78 @@ flutter:
           weight: 800
         - asset: assets/fonts/Gilroy-Black.ttf
           weight: 900
+    - family: Alegreya
+      fonts:
+        - asset: assets/fonts/Alegreya-VariableFont_wght.ttf
+
+    - family: B612
+      fonts:
+        - asset: assets/fonts/B612-Regular.ttf
+
+    - family: TitilliumWeb
+      fonts:
+        - asset: assets/fonts/TitilliumWeb-Regular.ttf
+
+    - family: Varela
+      fonts:
+        - asset: assets/fonts/Varela-Regular.ttf
+
+    - family: Vollkorn
+      fonts:
+        - asset: assets/fonts/Vollkorn-Regular.ttf
+
+    - family: Rakkas
+      fonts:
+        - asset: assets/fonts/Rakkas-Regular.ttf
+
+    - family: ConcertOne
+      fonts:
+        - asset: assets/fonts/ConcertOne-Regular.ttf
+
+    - family: YatraOne
+      fonts:
+        - asset: assets/fonts/YatraOne-Regular.ttf
+
+    - family: OldStandardTT
+      fonts:
+        - asset: assets/fonts/OldStandardTT-Italic.ttf
+
+    - family: Neonderthaw
+      fonts:
+        - asset: assets/fonts/Neonderthaw-Regular.ttf
+
+    - family: DancingScript
+      fonts:
+        - asset: assets/fonts/DancingScript-VariableFont_wght.ttf
+
+    - family: SedgwickAve
+      fonts:
+        - asset: assets/fonts/SedgwickAve-Regular.ttf
+
+    - family: IndieFlower
+      fonts:
+        - asset: assets/fonts/IndieFlower-Regular.ttf
+
+    - family: Sacramento
+      fonts:
+        - asset: assets/fonts/Sacramento-Regular.ttf
+
+    - family: PressStart2P
+      fonts:
+        - asset: assets/fonts/PressStart2P-Regular.ttf
+
+    - family: FrederickatheGreat
+      fonts:
+        - asset: assets/fonts/FrederickatheGreat-Regular.ttf
+
+    - family: ReenieBeanie
+      fonts:
+        - asset: assets/fonts/ReenieBeanie-Regular.ttf
+
+    - family: BungeeShade
+      fonts:
+        - asset: assets/fonts/BungeeShade-Regular.ttf
+
+    - family: UnifrakturMaguntia
+      fonts:
+        - asset: assets/fonts/UnifrakturMaguntia-Regular.ttf

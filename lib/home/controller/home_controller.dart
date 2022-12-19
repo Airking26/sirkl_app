@@ -198,13 +198,15 @@ class HomeController extends GetxController{
       }
     }
 
-      List<String> contractAddresses = [];
+    //TODO : MOVE BACK
+      List<String> contractAddresses = ["0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911"];
       for (var element in initialArray) {contractAddresses.add(element.tokenAddress!);}
 
       var addressesAbsent = userMe.value.contractAddresses!.toSet().difference(contractAddresses.toSet()).toList();
       if(client != null && addressesAbsent.isNotEmpty) {
         for (var absentAddress in addressesAbsent) {
-          await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
+          //TODO: PUT BACK
+          //await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
         }
       }
       await updateMe(UpdateMeDto(contractAddresses: contractAddresses));

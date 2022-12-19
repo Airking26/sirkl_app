@@ -20,7 +20,6 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'navigation/ui/navigation_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -97,7 +96,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   final _callController = Get.put(CallsController());
   final _chatController = Get.put(ChatsController());
   final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
@@ -114,18 +112,55 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
       if(message.data["type"] == "0" || message.data["type"] == "1"){
         LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
       } else if(message.data['type'] == "message.new" && message.data['channel_id'] != _chatController.channel.value?.id){
-        final response = await StreamChat.of(context).client.getMessage(message.data['id']);
-        LocalNotificationInitialize.showBigTextNotification(title: "New message from ${response.message.user?.name}", body: response.message.text!, flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+        final client = StreamChat.of(context).client;
+        final response = await client.getMessage(message.data['id']);
+        final respChannel = await client.queryChannel("try", channelId: (message.data["cid"] as String).replaceFirst('try:', ''));
+        if(respChannel.members!.length > 2) {
+          LocalNotificationInitialize.showBigTextNotification(
+              title: respChannel.channel!.name,
+              body: "${response.message.user?.name} : ${response.message.text!}",
+              flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+        } else {
+          LocalNotificationInitialize.showBigTextNotification(
+              title: "New message from ${response.message.user?.name}",
+              body: response.message.text!,
+              flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+        }
       }
       else {
         showCallkitIncoming(message.data['uuid'] as String);
       }
     });
+    FirebaseMessaging.instance.getInitialMessage().then((event) async{
+      final client = StreamChatClient("mhgk84t9jfnt");
+      final box = GetStorage();
+      var refreshToken = box.read(con.REFRESH_TOKEN);
+      var requestToken = await HomeService().refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      var accessToken = refreshTokenDTO.accessToken!;
+      var request = await ProfileService().retrieveTokenStreamChat(accessToken);
+      var id = userFromJson(box.read(con.USER)).id;
+      await client.connectUser(User(id: id!,), request.body!, connectWebSocket: false);
+      final response = await client.queryChannel("try", channelId: (event!.data["cid"] as String).replaceFirst('try:', ''));
+      if(response.members!.length > 2){
+        Get.to(() => DetailedChatScreen(create: false, channelId: (event!.data["cid"] as String).replaceFirst('try:', '')));
+      } else {
+        final user = response.members!.where((element) =>
+        element.user!.id != event!.data["receiver_id"]).toList()[0];
+        await _commonController.getUserById(user.user!.id);
+        Get.to(() => const DetailedChatScreen(create: true,));
+      }
+    });
     FirebaseMessaging.onMessageOpenedApp.listen((event) async{
-      _navigationController.changeCurrentPage(3);
-      _navigationController.pageController.value.jumpToPage(3);
-      await _commonController.getUserById("6399c4bbf7d2390029566622");
-      Get.to(() => const DetailedChatScreen(create: true,));
+      final response = await StreamChat.of(context).client.queryChannel("try", channelId: (event.data["cid"] as String).replaceFirst('try:', ''));
+      if(response.members!.length > 2){
+        Get.to(() => DetailedChatScreen(create: false, channelId: (event.data["cid"] as String).replaceFirst('try:', '')));
+      } else {
+        final user = response.members!.where((element) =>
+        element.user!.id != event.data["receiver_id"]).toList()[0];
+        await _commonController.getUserById(user.user!.id);
+        Get.to(() => const DetailedChatScreen(create: true,));
+      }
     });
     _callController.listenCall();
   }
@@ -144,8 +179,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await LocalNotificationInitialize().initialize(flutterLocalNotificationsPlugin);
   if(message.data["type"] == "0" || message.data["type"] == "1"){
     LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-  } else if(message.data['type'] == "message.new"){
-    /*final client = StreamChatClient("mhgk84t9jfnt");
+  }
+  /*else if(message.data['type'] == "message.new"){
+    final client = StreamChatClient("mhgk84t9jfnt");
     final box = GetStorage();
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var requestToken = await HomeService().refreshToken(refreshToken);
@@ -155,9 +191,20 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     var id = userFromJson(box.read(con.USER)).id;
     await client.connectUser(User(id: id!,), request.body!, connectWebSocket: false);
     final response = await client.getMessage(message.data['id']);
-    LocalNotificationInitialize.showBigTextNotification(title: "New message", body: "${response.message.user?.name} : ${response.message.text}", flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);*/
-  }
-  else {
+    final respChannel = await client.queryChannel("try", channelId: (message.data["cid"] as String).replaceFirst('try:', ''));
+    if(respChannel.members!.length > 2) {
+      LocalNotificationInitialize.showBigTextNotification(
+          title: respChannel.channel!.name,
+          body: "${response.message.user?.name} : ${response.message.text!}",
+          flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+    } else {
+      LocalNotificationInitialize.showBigTextNotification(
+          title: "New message from ${response.message.user?.name}",
+          body: response.message.text!,
+          flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+    }
+  }*/
+  else if(message.data["uuid"] != null) {
     showCallkitIncoming(message.data['uuid'] as String);
   }
 }

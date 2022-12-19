@@ -30,7 +30,7 @@ class GroupsController extends GetxController{
 
   createChannel(StreamChatClient streamChatClient, GroupDto groupDto, String pic) async{
     _chatController.channel.value = streamChatClient.channel("try", id: groupDto.contractAddress.toLowerCase(), extraData: {
-      "members": ["bot_one_06e2b40d-5161-4d2f-88e4-09bd6cfac4db", "bot_two_b0b2f93b-92d4-40d7-9a99-c9765bbeca64", "bot_three_58b30baa-4198-4679-9fdf-ea888ecab388"],
+      "members": ["bot_one", "bot_two", "bot_three"],
       "contractAddress" : groupDto.contractAddress.toLowerCase(),
       "image": pic,
       "name": groupDto.name
@@ -72,10 +72,25 @@ class GroupsController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       req = await _groupService.retrieveGroups(accessToken);
       if(req.isOk){
-
+        var groups = groupDtoFromJson(json.encode(req.body)).sublist(1460);
+        for (var element in groups) {
+          if(!element.image.contains("token-image-placeholder.svg") && !element.image.contains("data:image")) {
+            await Future.delayed(Duration(seconds: 1));
+            var resp = await Dio().get(element.image,
+                options: Options(responseType: ResponseType.bytes));
+            final result = await ImageGallerySaver.saveImage(
+                Uint8List.fromList(resp.data), quality: 100);
+            var pic = await SimpleS3().uploadFile(
+                File(result["filePath"].replaceAll("file://", "")),
+                "sirkl-bucket",
+                "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92",
+                AWSRegions.euCentral1, debugLog: true);
+            await createChannel(streamChatClient, element, pic);
+          }
+        }
       }
     } else if(req.isOk){
-      var groups = groupDtoFromJson(json.encode(req.body)).sublist(1980);
+      var groups = groupDtoFromJson(json.encode(req.body)).sublist(1460);
       for (var element in groups) {
         if(!element.image.contains("token-image-placeholder.svg") && !element.image.contains("data:image")) {
           await Future.delayed(Duration(seconds: 1));
@@ -111,5 +126,26 @@ class GroupsController extends GetxController{
       await createChannel(streamChatClient, GroupDto(name: name, image: image, contractAddress: contractAddress), image);
     }
   }
+
+
+  createHiro(StreamChatClient streamChatClient)async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _groupService.createGroup(accessToken, "SamuraiCats by Hiro Ando", "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384", "0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911");
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken!);
+      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDto.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _groupService.createGroup(accessToken, "SamuraiCats by Hiro Ando", "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384", "0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911");
+      if(request.isOk){
+        await createChannel(streamChatClient, GroupDto(name: "SamuraiCats by Hiro Ando", image: "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384", contractAddress: "0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911"), "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384");
+      }
+    } else if(request.isOk){
+      await createChannel(streamChatClient, GroupDto(name: "SamuraiCats by Hiro Ando", image: "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384", contractAddress: "0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911"), "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384");
+    }
+  }
+
+
 
 }

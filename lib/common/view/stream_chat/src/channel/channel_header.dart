@@ -212,7 +212,7 @@ class StreamChannelHeader extends StatelessWidget
                         children: [
                           IconButton(
                               onPressed: () {
-                                _chatController.channel.value = null;
+                                //_chatController.channel.value = null;
                                 Get.back();
                               },
                               icon: Image.asset(

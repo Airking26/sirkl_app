@@ -50,7 +50,7 @@
                 android:value="sirkl_notifications_id"/>
             <meta-data
                 android:name="com.google.firebase.messaging.default_notification_icon"
-                android:value="@mimap/notif"/>
+                android:resource="@drawable/ic_stat_logorond"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

@@ -481,20 +481,22 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                     FocusManager.instance.primaryFocus?.unfocus();
                     _chatController.messageSending.value = false;
                     if(_chatController.chipsList.value.length == 1){
-                      _chatController.chipsList.clear();
                       Get.back();
                       if(element.id.isNullOrBlank!) {
                         Get.to(() => DetailedChatScreen(create: false, channelId: idChannel));
                       } else {
+                        _commonController.userClicked.value = _chatController.chipsList[0];
                         Get.to(() => const DetailedChatScreen(create: true));
                       }
-                    } else {
-                      _chatController.chipsList.clear();
+                    }
+                    else {
                       _chatController.messageHasBeenSent.value = true;
                       Get.back();
                     }
                   }
                 }
+                //TODO: check
+                _chatController.chipsList.clear();
               },
               child:
                   _chatController.messageSending.value ?

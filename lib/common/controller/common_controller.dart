@@ -67,7 +67,6 @@ class CommonController extends GetxController{
 
   Future<bool> removeUserToSirkl(String id, StreamChatClient streamChatClient, String value) async{
     var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, value]});
-    //var channel = await streamChatClient.queryChannel("try", channelId: "1670417157197");
     var meFollow = channel.channel?.extraData["${value}_follow_channel"] as dynamic;
     if(meFollow == null || (meFollow != null && meFollow == true)) {
       meFollow = false;
