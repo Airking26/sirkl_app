@@ -112,7 +112,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Widget buildNotificationTile(BuildContext context, NotificationDto item, int index){
     return Container(
-      color: item.hasBeenRead ? Colors.transparent : Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282).withOpacity(0.1),
+      color: item.hasBeenRead ? Colors.transparent : Get.isDarkMode ? const Color(0xFF9BA0A5).withOpacity(0.1) : const Color(0xFF828282).withOpacity(0.1),
       child: Padding(
         padding: const EdgeInsets.only(right: 8.0, top: 8, bottom: 8),
         child: ListTile(

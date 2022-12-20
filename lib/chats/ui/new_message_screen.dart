@@ -468,6 +468,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             child: InkWell(
               onTap: () async {
                 _chatController.messageSending.value = true;
+                var k = _messageInputController.text;
                 for(UserDTO element in _chatController.chipsList) {
                   var idChannel = DateTime.now().millisecondsSinceEpoch.toString();
                   if(element.id.isNullOrBlank!) {
@@ -495,7 +496,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                     }
                   }
                 }
-                //TODO: check
                 _chatController.chipsList.clear();
               },
               child:

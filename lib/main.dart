@@ -132,26 +132,34 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
       }
     });
     FirebaseMessaging.instance.getInitialMessage().then((event) async{
-      final client = StreamChatClient("mhgk84t9jfnt");
-      final box = GetStorage();
-      var refreshToken = box.read(con.REFRESH_TOKEN);
-      var requestToken = await HomeService().refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      var accessToken = refreshTokenDTO.accessToken!;
-      var request = await ProfileService().retrieveTokenStreamChat(accessToken);
-      var id = userFromJson(box.read(con.USER)).id;
-      await client.connectUser(User(id: id!,), request.body!, connectWebSocket: false);
-      final response = await client.queryChannel("try", channelId: (event!.data["cid"] as String).replaceFirst('try:', ''));
-      if(response.members!.length > 2){
-        Get.to(() => DetailedChatScreen(create: false, channelId: (event!.data["cid"] as String).replaceFirst('try:', '')));
-      } else {
-        final user = response.members!.where((element) =>
-        element.user!.id != event!.data["receiver_id"]).toList()[0];
-        await _commonController.getUserById(user.user!.id);
-        Get.to(() => const DetailedChatScreen(create: true,));
+      if(event != null) {
+        debugPrint("OnInitialMessage");
+        final client = StreamChatClient("mhgk84t9jfnt");
+        final box = GetStorage();
+        var refreshToken = box.read(con.REFRESH_TOKEN);
+        var requestToken = await HomeService().refreshToken(refreshToken);
+        var refreshTokenDTO = refreshTokenDtoFromJson(
+            json.encode(requestToken.body));
+        var accessToken = refreshTokenDTO.accessToken!;
+        var request = await ProfileService().retrieveTokenStreamChat(
+            accessToken);
+        var id = userFromJson(box.read(con.USER)).id;
+        await client.connectUser(
+            User(id: id!,), request.body!, connectWebSocket: false);
+        final response = await client.queryChannel("try",
+            channelId: (event.data["cid"] as String).replaceFirst('try:', ''));
+        if (response.members!.length > 2) {
+          Get.to(() => DetailedChatScreen(create: false, channelId: (event.data["cid"] as String).replaceFirst('try:', '')));
+        } else {
+          final user = response.members!.where((element) =>
+          element.user!.id != event.data["receiver_id"]).toList()[0];
+          await _commonController.getUserById(user.user!.id);
+          Get.to(() => const DetailedChatScreen(create: true,));
+        }
       }
     });
     FirebaseMessaging.onMessageOpenedApp.listen((event) async{
+      debugPrint("OnMessageOpenedApp");
       final response = await StreamChat.of(context).client.queryChannel("try", channelId: (event.data["cid"] as String).replaceFirst('try:', ''));
       if(response.members!.length > 2){
         Get.to(() => DetailedChatScreen(create: false, channelId: (event.data["cid"] as String).replaceFirst('try:', '')));

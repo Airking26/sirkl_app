@@ -9,12 +9,11 @@ class LocalNotificationInitialize{
     var androidInitialize = const AndroidInitializationSettings("ic_stat_logorond");
     var iOSInitialize = const DarwinInitializationSettings();
     var initializationSettings = InitializationSettings(android: androidInitialize, iOS: iOSInitialize);
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse: onDidReceiveLocalNotification,
-    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   void onDidReceiveLocalNotification(NotificationResponse notificationResponse) async {
+    var k = notificationResponse;
     //Get.to(() => const DetailedChatScreen(create: true,));
   }
 

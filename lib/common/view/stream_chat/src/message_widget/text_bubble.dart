@@ -69,7 +69,7 @@ class TextBubble extends StatelessWidget {
                         fontSize: 42
                       ),
                     )
-                  : messageTheme.copyWith(messageTextStyle: TextStyle(color: reverse ? Get.isDarkMode ? Colors.white : Colors.black : Colors.black , fontSize: 15, fontFamily: 'Gilroy', fontWeight: FontWeight.w500)),
+                  : messageTheme.copyWith(messageTextStyle: TextStyle(color: reverse ? Get.isDarkMode ? Colors.white : Colors.black : Get.isDarkMode ? Colors.white : Colors.black , fontSize: 15, fontFamily: 'Gilroy', fontWeight: FontWeight.w500)),
             ),
     );
   }
