@@ -6,6 +6,7 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/chats/ui/new_message_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -20,16 +21,18 @@ class GroupsScreen extends StatefulWidget {
   State<GroupsScreen> createState() => _GroupsScreenState();
 }
 
-class _GroupsScreenState extends State<GroupsScreen> {
+class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMixin{
 
   YYDialog dialogMenu = YYDialog();
+  late TabController tabController;
   final _groupController = Get.put(GroupsController());
   final _homeController = Get.put(HomeController());
   final _chatController = Get.put(ChatsController());
   final _floatingSearchBarController = FloatingSearchBarController();
   StreamChannelListController? streamChannelListControllerGroups;
+  StreamChannelListController? streamChannelListControllerGroupsFav;
 
-  StreamChannelListController buildStreamChannelListController(){
+  StreamChannelListController buildStreamChannelListController(bool isFav){
     return StreamChannelListController(
       client: StreamChat.of(context).client,
       filter:
@@ -52,131 +55,99 @@ class _GroupsScreenState extends State<GroupsScreen> {
 
   @override
   void initState() {
-    streamChannelListControllerGroups = buildStreamChannelListController();
+    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
+    streamChannelListControllerGroups = buildStreamChannelListController(false);
+    streamChannelListControllerGroupsFav = buildStreamChannelListController(true);
     _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
     super.initState();
   }
 
   @override
+  void dispose() {
+    streamChannelListControllerGroupsFav?.dispose();
+    streamChannelListControllerGroups?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    tabController = TabController(length: 2, vsync: this);
+    tabController.index = _groupController.index.value;
+    tabController.addListener(() {
+      if (tabController.indexIsChanging) {
+        _groupController.index.value = tabController.index;
+      }
+    });
+
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Get.isDarkMode
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() => Column(children: [
-          buildAppBar(context),
+          buildAppbar(context, tabController),
           _groupController.addAGroup.value ? buildSelectNFT() : MediaQuery.removePadding(
             context: context,
             removeTop: true,
             child: Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top:28.0),
-                child: SafeArea(
-                  child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: StreamChannelListView(
-                        emptyBuilder: (context){
-                          return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
-                        },
-                        controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController() : streamChannelListControllerGroups!,
-                        onChannelTap: (channel) async{
-                          _chatController.channel.value = channel;
-                          var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
-                          if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
-                          Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())
-                        )!.then((value) {streamChannelListControllerGroups!.refresh();});
-                      },
-                      ),
-                      ),
-                ),
+              child: TabBarView(
+                physics: NeverScrollableScrollPhysics(),
+                controller: tabController,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top:28.0),
+                    child: SafeArea(
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: StreamChannelListView(
+                            channelSlidableEnabled: true,
+                            emptyBuilder: (context){
+                              return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
+                            },
+                            controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerGroupsFav!,
+                            onChannelTap: (channel) async{
+                              _chatController.channel.value = channel;
+                              var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
+                              if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
+                              Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())
+                            )!.then((value) {
+                              //streamChannelListControllerGroups!.refresh();
+                            });
+                          },
+                          ),
+                          ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top:28.0),
+                    child: SafeArea(
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: StreamChannelListView(
+                            channelSlidableEnabled: true,
+                            emptyBuilder: (context){
+                              return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
+                            },
+                            controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerGroups!,
+                            onChannelTap: (channel) async{
+                              _chatController.channel.value = channel;
+                              var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
+                              if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
+                              Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())
+                            )!.then((value) {
+                              //streamChannelListControllerGroups!.refresh();
+                            });
+                          },
+                          ),
+                          ),
+                    ),
+                  ),
+                ],
               ),
             ),
           )
         ])));
-  }
-
-  Stack buildAppBar(BuildContext context) {
-    return Stack(
-          clipBehavior: Clip.none,
-          alignment: AlignmentDirectional.topCenter,
-          fit: StackFit.loose,
-          children: [
-            Container(
-              height: _groupController.addAGroup.value ? 115 : 140,
-              margin: const EdgeInsets.only(bottom: 0.25),
-              decoration: BoxDecoration(
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.grey,
-                    offset: Offset(0.0, 0.01), //(x,y)
-                    blurRadius: 0.01,
-                  ),
-                ],
-                borderRadius:
-                    const BorderRadius.vertical(bottom: Radius.circular(35)),
-                gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-                      Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
-                    ]),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 44.0),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            _groupController.addAGroup.value = false;
-                            _groupController.query.value = "";
-                            _groupController.searchIsActive.value = false;
-                          },
-                          icon: Image.asset(
-                            "assets/images/arrow_left.png",
-                            color:
-                                _groupController.addAGroup.value ? Get.isDarkMode ? Colors.white : Colors.black : Colors.transparent,
-                          )),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
-                        child: Text(
-                          con.groupsTabRes.tr,
-                          style: TextStyle(
-                              color:  Get.isDarkMode
-                                  ? Colors.white
-                                  : Colors.black,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: "Gilroy",
-                              fontSize: 20),
-                        ),
-                      ),
-                      IconButton(
-                          onPressed: () {
-                            dialogMenu = dialogPopMenu(context);
-                          },
-                          icon: Image.asset(
-                            "assets/images/more.png",
-                            color:
-                            _groupController.addAGroup.value ? Colors.transparent : Get.isDarkMode ? Colors.transparent : Colors.transparent,
-                          )),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            _groupController.addAGroup.value ? Container() : Positioned(
-                top: Platform.isAndroid ? 80 : 60,
-                child: SizedBox(
-                    height: 110,
-                    width: MediaQuery.of(context).size.width,
-                    child: buildFloatingSearchBar()))
-          ],
-        );
   }
 
   YYDialog dialogPopMenu(BuildContext context) {
@@ -231,6 +202,51 @@ class _GroupsScreenState extends State<GroupsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 54.0),
               child: Text(
                 con.noGroupYetRes.tr,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Get.isDarkMode ? Colors.white : Colors.black,
+                    fontSize: 25,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w700),
+              ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 54.0),
+              child: Text(
+                con.errorGroupCollection.tr,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    color: Color(0xFF9BA0A5),
+                    fontSize: 16,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        );
+  }
+
+  Column noNFTFound() {
+    return Column(
+          children: [
+            const SizedBox(
+              height: 100,
+            ),
+            Image.asset(
+              "assets/images/people.png",
+              width: 150,
+              height: 150,
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 54.0),
+              child: Text(
+                "No NFT Found",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: Get.isDarkMode ? Colors.white : Colors.black,
@@ -332,7 +348,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
          const Padding(
            padding: EdgeInsets.only(top: 54.0),
            child: CircularProgressIndicator(color: Color(0xff00CB7D)),
-         ) :
+         ) : _groupController.nftsAvailable.isEmpty ? noNFTFound() :
      MediaQuery.removePadding(
       context: context,
       removeTop: true,
@@ -379,13 +395,222 @@ class _GroupsScreenState extends State<GroupsScreen> {
     );
   }
 
+  Stack buildAppbar(BuildContext context, TabController tabController) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: AlignmentDirectional.topCenter,
+      fit: StackFit.loose,
+      children: [
+        Container(
+          height: 140,
+          margin: const EdgeInsets.only(bottom: 0.25),
+          decoration: BoxDecoration(
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.grey,
+                offset: Offset(0.0, 0.01), //(x,y)
+                blurRadius: 0.01,
+              ),
+            ],
+            borderRadius:
+            const BorderRadius.vertical(bottom: Radius.circular(35)),
+            gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
+                  Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                ]),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 44.0),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Obx(()=>IconButton(
+                      onPressed: () {
+                        _groupController.addAGroup.value = false;
+                        _groupController.searchIsActive.value = ! _groupController.searchIsActive.value;
+                        if(_groupController.searchIsActive.value) {
+                          _groupController.query.value = "";
+                          _floatingSearchBarController.clear();
+                          _floatingSearchBarController.close();
+                        }
+                      },
+                      icon: Image.asset(
+                        _groupController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
+                        color:
+                        Get.isDarkMode ? Colors.white : Colors.black,
+                      ))),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Obx(() =>Text(
+                      _groupController.searchIsActive.value ? _groupController.index.value == 0 ? "Favorites" : "Others" :
+                      con.groupsTabRes.tr,
+                      style: TextStyle(
+                          color: Get.isDarkMode
+                              ? Colors.white
+                              : Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: "Gilroy",
+                          fontSize: 20),
+                    )),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        _groupController.addAGroup.value = !_groupController.addAGroup.value;
+                      },
+                      icon: Image.asset(
+                        _groupController.addAGroup.value ?
+                        "assets/images/close_big.png" :
+                        "assets/images/plus.png",
+                        color:
+                        Get.isDarkMode ? Colors.white : Colors.black,
+                      )),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Obx(()=>Positioned(
+            top: _groupController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
+            child: _groupController.searchIsActive.value ? Container(
+                height: 110,
+                width: MediaQuery.of(context).size.width,
+                child:buildFloatingSearchBar()): Container(
+                height: 50,
+                width: 350,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.grey,
+                        offset: Offset(0.0, 0.01), //(x,y)
+                        blurRadius: 0.01,
+                      ),
+                    ],
+                    color: Get.isDarkMode
+                        ? const Color(0xFF2D465E).withOpacity(1)
+                        : Colors.white),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      top: 4.0, bottom: 2, left: 4, right: 4),
+                  child: Obx(
+                        () => TabBar(
+                      labelPadding: EdgeInsets.zero,
+                      indicatorPadding: EdgeInsets.zero,
+                      indicatorColor: Colors.transparent,
+                      controller: tabController,
+                      padding: EdgeInsets.zero,
+                      tabs: [
+                        Container(
+                          height: 50,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            gradient: _groupController.index.value == 0
+                                ? const LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFF1DE99B),
+                                  Color(0xFF0063FB)
+                                ])
+                                : Get.isDarkMode
+                                ? const LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFF2D465E),
+                                  Color(0xFF2D465E)
+                                ])
+                                : const LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Colors.white,
+                                  Colors.white
+                                ]),
+                          ),
+                          child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Favorites",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontFamily: "Gilroy",
+                                    fontWeight: FontWeight.w700,
+                                    color: _groupController.index.value == 0
+                                        ? Colors.white
+                                        : Get.isDarkMode
+                                        ? const Color(0xFF9BA0A5)
+                                        : const Color(0xFF828282)),
+                              )),
+                        ),
+                        Container(
+                          height: 50,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            gradient: _groupController.index.value == 1
+                                ? const LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFF1DE99B),
+                                  Color(0xFF0063FB)
+                                ])
+                                : Get.isDarkMode
+                                ? const LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFF2D465E),
+                                  Color(0xFF2D465E)
+                                ])
+                                : const LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Colors.white,
+                                  Colors.white
+                                ]),
+                          ),
+                          child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Others",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontFamily: "Gilroy",
+                                    fontWeight: FontWeight.w700,
+                                    color: _groupController.index.value == 1
+                                        ? Colors.white
+                                        : Get.isDarkMode
+                                        ? const Color(0xFF9BA0A5)
+                                        : const Color(0xFF828282)),
+                              )),
+                        )
+                      ],
+                    ),
+                  ),
+                ))))
+      ],
+    );
+  }
+
   Widget buildFloatingSearchBar() {
     return FloatingSearchBar(
       clearQueryOnClose: false,
-      controller: _floatingSearchBarController,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       hint: 'Search here...',
+      controller: _floatingSearchBarController,
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 0),
@@ -399,7 +624,9 @@ class _GroupsScreenState extends State<GroupsScreen> {
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
       hintStyle: TextStyle(
-          color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
+          color: Get.isDarkMode
+              ? const Color(0xff9BA0A5)
+              : const Color(0xFF828282),
           fontSize: 15,
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
@@ -408,31 +635,24 @@ class _GroupsScreenState extends State<GroupsScreen> {
       width: 350,
       accentColor: Get.isDarkMode ? Colors.white : Colors.black,
       borderRadius: BorderRadius.circular(10),
-      backgroundColor:
-          Get.isDarkMode ? const Color(0xFF2D465E).withOpacity(1) : Colors.white,
+      backgroundColor: Get.isDarkMode
+          ? const Color(0xFF2D465E).withOpacity(1)
+          : Colors.white,
       debounceDelay: const Duration(milliseconds: 200),
-      onQueryChanged: (query) {
-        if(query.isNotEmpty){
-          _groupController.query.value = query;
-          _groupController.searchIsActive.value = true;
-        }
+      onQueryChanged: (query) async{
+        if(query.isNotEmpty) _groupController.query.value = query;
       },
-      // Specify a custom transition to be used for
-      // animating between opened and closed stated.
+      transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
         FloatingSearchBarAction.icon(
           icon: Image.asset(
-            _groupController.searchIsActive.value ? "assets/images/close.png" : "assets/images/search.png",
-            width: 24, height: 24, color: Colors.grey,),
+            "assets/images/search.png",
+            width: 24,
+            height: 24,
+          ),
           showIfClosed: true,
           showIfOpened: true,
           onTap: () {
-            if(_groupController.searchIsActive.value){
-              _floatingSearchBarController.clear();
-              _floatingSearchBarController.close();
-              _groupController.query.value = "";
-              _groupController.searchIsActive.value = false;
-            }
           },
         ),
       ],

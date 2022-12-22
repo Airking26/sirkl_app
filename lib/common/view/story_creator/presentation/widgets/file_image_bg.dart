@@ -63,11 +63,11 @@ class _FileImageBGState extends State<FileImageBG> {
         width: screenUtil.screenWidth,
         child: RepaintBoundary(
             key: paintKey,
-            child: Center(
-                child: Image.file(
+            child: Image.file(
               File(widget.filePath!.path),
               key: imageKey,
+              fit: BoxFit.cover,
               filterQuality: FilterQuality.high,
-            ))));
+            )));
   }
 }

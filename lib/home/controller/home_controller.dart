@@ -41,6 +41,7 @@ class HomeController extends GetxController{
   final box = GetStorage();
 
   var id = "".obs;
+  var indexBarHeight = 400.0.obs;
   var isConfiguring = false.obs;
   var tokenAgoraRTM = "".obs;
   var tokenAgoraRTC = "".obs;

@@ -57,6 +57,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.10.0"
+  animate_do:
+    dependency: transitive
+    description:
+      name: animate_do
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.2"
   animated_text_kit:
     dependency: "direct main"
     description:
@@ -337,6 +344,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.7.4"
+  defer_pointer:
+    dependency: "direct main"
+    description:
+      name: defer_pointer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2"
   desktop_drop:
     dependency: "direct main"
     description:
@@ -657,6 +671,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.6.0"
+  flutter_slidable:
+    dependency: "direct main"
+    description:
+      name: flutter_slidable
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -1234,6 +1255,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1"
+  reveal_on_scroll:
+    dependency: "direct main"
+    description:
+      name: reveal_on_scroll
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.3"
   rxdart:
     dependency: "direct main"
     description:
@@ -1793,5 +1821,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.18.0 <3.0.0"
+  dart: ">=2.18.2 <3.0.0"
   flutter: ">=3.3.0"

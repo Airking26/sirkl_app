@@ -28,6 +28,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
     streamChannelListControllerFriends = buildStreamChannelListController(true);
     streamChannelListControllerOthers = buildStreamChannelListController(false);
     super.initState();
@@ -115,11 +116,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         child: SafeArea(
           minimum: const EdgeInsets.only(top: 28),
           child: TabBarView(
+            physics: NeverScrollableScrollPhysics(),
             controller: tabController,
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Obx(() =>StreamChannelListView(
+                  channelSlidableEnabled: false,
                   emptyBuilder: (context){
                     return noGroupUI();
                   },
@@ -135,6 +138,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Obx(() =>StreamChannelListView(
+                  // TODO : REMOVE TRUE
+                  channelSlidableEnabled: true,
+                  onChannelFavPressed: (context){
+
+                  },
                   emptyBuilder: (context){
                     return noGroupUI();
                   },
@@ -269,8 +277,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 tabController.index = 1;
                                 _chatController.messageHasBeenSent.value = false;
                               }
-                              streamChannelListControllerFriends!.refresh();
-                              streamChannelListControllerOthers!.refresh();
+                              //streamChannelListControllerFriends!.refresh();
+                              //streamChannelListControllerOthers!.refresh();
                             });
                           },
                           icon: Image.asset(
@@ -475,6 +483,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    streamChannelListControllerOthers?.dispose();
+    streamChannelListControllerFriends?.dispose();
     _chatController.index.value = 0;
     super.dispose();
   }

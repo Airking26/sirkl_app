@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_badged/flutter_badge.dart';
 import 'package:get/get.dart';
@@ -48,131 +49,140 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: Obx(() =>
             Column(
           children: [
-            Stack(
-              clipBehavior: Clip.none,
-              alignment: AlignmentDirectional.topCenter,
-              fit: StackFit.loose,
-              children: [
-                Container(
-                  height: 180,
-                  margin: const EdgeInsets.only(bottom: 0.25),
-                  decoration: BoxDecoration(
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.grey,
-                        offset: Offset(0.0, 0.01), //(x,y)
-                        blurRadius: 0.01,
-                      ),
-                    ],
-                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(45)),
-                    gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-                          Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
-                        ]
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 44.0),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _profileController.isLoadingPicture.value ?
-                          Container(padding: const EdgeInsets.all(8), width: 48, height: 48, child: const CircularProgressIndicator(color: Color(0xFF00CB7D),))
-                              : IconButton(onPressed: (){
-                            _profileController.isEditingProfile.value ? _profileController.updateMe(UpdateMeDto(
-                              userName: _profileController.usernameTextEditingController.value.text.isEmpty ? _homeController.userMe.value.wallet! : _profileController.usernameTextEditingController.value.text,
-                              description: _profileController.descriptionTextEditingController.value.text.isEmpty ? "" : _profileController.descriptionTextEditingController.value.text,
-                              picture: _profileController.urlPicture.value
-                            ), StreamChat.of(context).client):
-                            Get.to(() => const NotificationScreen())!.then((value) => _profileController.checkIfHasUnreadNotif(_homeController.id.value));
-                            }, icon:
-                          _profileController.isEditingProfile.value ?
-                          Image.asset( "assets/images/edit.png", color: Get.isDarkMode ? Colors.white : Colors.black,):
-                              FlutterBadge(icon: Image.asset("assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,), itemCount: _profileController.hasUnreadNotif.value ? 1 : 0, hideZeroCount: true, badgeColor: Color(0xff00CB7D), badgeTextColor: Color(0xff00CB7D), contentPadding: EdgeInsets.only(top: 0.1,right: 16, left: 12),)
-                          ),
-                          //Image.asset("assets/images/bell.png",  color: Get.isDarkMode ? Colors.white : Colors.black,)),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12.0),
-                            child:
-                                _profileController.isEditingProfile.value ?
-                               SizedBox(
-                                 width: 200,
-                                 child: TextField(
-                                   //autofocus: true,
-                                   maxLines: 1,
-                                   controller: _profileController.usernameTextEditingController.value,
-                                   maxLength: 20,
-                                   textAlign: TextAlign.center,
-                                   style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),
-                                   decoration: const InputDecoration(
-                                     border: InputBorder.none,
-                                     isCollapsed: true,
-                                     hintText: ""
-                                     ),
-                                 ),
-                               )
-                             : Text(_homeController.userMe.value.userName!.isEmpty || _homeController.userMe.value.userName == _homeController.userMe.value.wallet ? "${_homeController.userMe.value.wallet!.substring(0, 20)}..." : _homeController.userMe.value.userName!, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
-                          ),
-                          IconButton(onPressed: ()async{
-                            _groupController.retrieveGroupsToCreate(StreamChat.of(context).client);
-                            //dialogMenu = dialogPopMenu(context);
-                            }, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
-                        ],),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: Platform.isAndroid ? 105 : 95,
-                  child: Container(
+            DeferredPointerHandler(
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: AlignmentDirectional.topCenter,
+                fit: StackFit.loose,
+                children: [
+                  Container(
+                    height: 180,
+                    margin: const EdgeInsets.only(bottom: 0.25),
                     decoration: BoxDecoration(
-                        border: Border.all(color: Get.isDarkMode ? const Color(0xFF122034) : Colors.white, width: 5),
-                        borderRadius: BorderRadius.circular(90)),
-                    child:
-                        ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
-                          child: GestureDetector(onTap: ()async{
-                            if(_profileController.isEditingProfile.value) {
-                              await _profileController.getImage();
-                            }
-                            },
-                              child: _profileController.urlPicture.value.isEmpty ?
-                                   TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 140, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
-                              CachedNetworkImage(imageUrl: _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
-                                  errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))
-
-                          )
-                          ,),)
-                  ),
-                ),
-                _profileController.isEditingProfile.value ? Container() : Positioned(
-                  top: Platform.isAndroid ? 210 : 190,
-                    right: MediaQuery.of(context).size.width / 3.25,
-                    child:
-                    InkWell(
-                      onTap: (){
-                        Get.to(() => StoriesEditor(giphyKey: "", onDone: (uri){},));
-                      },
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [Color(0xFF1DE99B), Color(0xFF0063FB)]),
-                            borderRadius: BorderRadius.circular(90),
-                            border: Border.all(color: Get.isDarkMode ? const Color(0xFF122034) : Colors.white, width: 2)
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.grey,
+                          offset: Offset(0.0, 0.01), //(x,y)
+                          blurRadius: 0.01,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Image.asset('assets/images/plus.png', width: 20, height: 20,),
-                        ),
+                      ],
+                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(45)),
+                      gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
+                            Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                          ]
                       ),
-                    )
-                )
-              ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 44.0),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _profileController.isLoadingPicture.value ?
+                            Container(padding: const EdgeInsets.all(8), width: 48, height: 48, child: const CircularProgressIndicator(color: Color(0xFF00CB7D),))
+                                : IconButton(onPressed: (){
+                              _profileController.isEditingProfile.value ? _profileController.updateMe(UpdateMeDto(
+                                userName: _profileController.usernameTextEditingController.value.text.isEmpty ? _homeController.userMe.value.wallet! : _profileController.usernameTextEditingController.value.text,
+                                description: _profileController.descriptionTextEditingController.value.text.isEmpty ? "" : _profileController.descriptionTextEditingController.value.text,
+                                picture: _profileController.urlPicture.value
+                              ), StreamChat.of(context).client):
+                              Get.to(() => const NotificationScreen())!.then((value) => _profileController.checkIfHasUnreadNotif(_homeController.id.value));
+                              }, icon:
+                            _profileController.isEditingProfile.value ?
+                            Image.asset( "assets/images/edit.png", color: Get.isDarkMode ? Colors.white : Colors.black,):
+                                FlutterBadge(icon: Image.asset("assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,), itemCount: _profileController.hasUnreadNotif.value ? 1 : 0, hideZeroCount: true, badgeColor: Color(0xff00CB7D), badgeTextColor: Color(0xff00CB7D), contentPadding: EdgeInsets.only(top: 0.1,right: 16, left: 12),)
+                            ),
+                            //Image.asset("assets/images/bell.png",  color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child:
+                                  _profileController.isEditingProfile.value ?
+                                 SizedBox(
+                                   width: 200,
+                                   child: TextField(
+                                     //autofocus: true,
+                                     maxLines: 1,
+                                     controller: _profileController.usernameTextEditingController.value,
+                                     maxLength: 20,
+                                     textAlign: TextAlign.center,
+                                     style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),
+                                     decoration: const InputDecoration(
+                                       border: InputBorder.none,
+                                       isCollapsed: true,
+                                       hintText: ""
+                                       ),
+                                   ),
+                                 )
+                               : Text(_homeController.userMe.value.userName!.isEmpty || _homeController.userMe.value.userName == _homeController.userMe.value.wallet ? "${_homeController.userMe.value.wallet!.substring(0, 20)}..." : _homeController.userMe.value.userName!, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
+                            ),
+                            IconButton(onPressed: ()async{
+                              //_groupController.retrieveGroupsToCreate(StreamChat.of(context).client);
+                              dialogMenu = dialogPopMenu(context);
+                              }, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                          ],),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: Platform.isAndroid ? 105 : 95,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Get.isDarkMode ? const Color(0xFF122034) : Colors.white, width: 5),
+                          borderRadius: BorderRadius.circular(90)),
+                      child:
+                          DeferPointer(
+                            child: ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
+                              child: GestureDetector(onTap: ()async{
+                                if(_profileController.isEditingProfile.value) {
+                                  await _profileController.getImage();
+                                }
+                                },
+                                  child: _profileController.urlPicture.value.isEmpty ?
+                                       TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 140, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
+                                  CachedNetworkImage(imageUrl: _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+                                      errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))
+
+                              )
+                              ,),),
+                          )
+                    ),
+                  ),
+                  _profileController.isEditingProfile.value ? Container() :
+                  Positioned(
+                    top: Platform.isAndroid ? 210 : 190,
+                      right: MediaQuery.of(context).size.width / 3.25,
+                      child: DeferPointer(
+                        paintOnTop: true,
+                        child: InkWell(
+                          onTap:(){
+                            Get.to(() => StoriesEditor(giphyKey: '', onDone: (uri){
+                              var t = uri;
+                            }));
+                          },
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                gradient: const LinearGradient(colors: [Color(0xFF1DE99B), Color(0xFF0063FB)]),
+                                borderRadius: BorderRadius.circular(90),
+                                border: Border.all(color: Get.isDarkMode ? const Color(0xFF122034) : Colors.white, width: 2)
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Image.asset('assets/images/plus.png', width: 20, height: 20,),
+                            ),
+                          ),
+                        ),
+                      )
+                  )
+                ],
+              ),
             ),
             const SizedBox(height: 90,),
             Padding(

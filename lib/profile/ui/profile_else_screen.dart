@@ -87,7 +87,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                             } else {
                               widget.fromConversation ? Get.back(): Get.to(() => const DetailedChatScreen(create: true));
                             }
-                            }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: Get.isDarkMode ? Colors.white : Colors.black, height: 28, width: 28,)),
+                            }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? Get.isDarkMode ? Colors.white : Colors.black :Color(0xff00CB7D), height: 28, width: 28,)),
                           Padding(
                             padding: const EdgeInsets.only(top: 12.0),
                             child:
@@ -203,7 +203,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
           }
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(_commonController.userClickedFollowStatus.value ? con.removeOfMySirklRes.tr : con.addToMySirklRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(_commonController.userClickedFollowStatus.value ? con.removeOfMySirklRes.tr : con.addToMySirklRes.tr, style: TextStyle(fontSize: 14, color: _commonController.userClickedFollowStatus.value ? Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282) :Color(0xff00CB7D), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(

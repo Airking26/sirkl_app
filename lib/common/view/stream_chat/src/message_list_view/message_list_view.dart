@@ -1035,6 +1035,7 @@ class _StreamMessageListViewState extends State<StreamMessageListView> {
 
     final userId = StreamChat.of(context).currentUser!.id;
     final isMyMessage = message.user?.id == userId;
+    final members = StreamChannel.of(context).channel.state?.members ?? [];
     final nextMessage = index - 1 >= 0 ? messages[index - 1] : null;
     final isNextUserSame =
         nextMessage != null && message.user!.id == nextMessage.user!.id;
@@ -1066,7 +1067,7 @@ class _StreamMessageListViewState extends State<StreamMessageListView> {
         !hasReplies &&
         (timeDiff >= 1 || !isNextUserSame);
 
-    final showUserAvatar = isMyMessage
+    final showUserAvatar = isMyMessage || members.length == 2
         ? DisplayWidget.gone
         : (timeDiff >= 1 || !isNextUserSame)
             ? DisplayWidget.show
@@ -1088,7 +1089,6 @@ class _StreamMessageListViewState extends State<StreamMessageListView> {
             : null;
 
     final currentUser = StreamChat.of(context).currentUser;
-    final members = StreamChannel.of(context).channel.state?.members ?? [];
     final currentUserMember =
         members.firstWhereOrNull((e) => e.user!.id == currentUser!.id);
 

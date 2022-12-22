@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/chats/ui/chat_screen.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
@@ -33,15 +36,17 @@ class _NavigationScreenState extends State<NavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
-      bottomNavigationBar: FloatingNavbar(
+      backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : Colors.white,
+      extendBody: false,
+      bottomNavigationBar:
+      FloatingNavbar(
         margin: EdgeInsets.zero,
         borderRadius: 0,
-        elevation: 10,
+        elevation: 0,
         currentIndex: _navigationController.currentPage.value,
         selectedBackgroundColor: Colors.transparent,
         selectedItemColor: const Color(0xFF00CB7D),
-        padding: const EdgeInsets.only(top: 8, bottom: 16, left: 8, right: 8),
+        padding: EdgeInsets.only(top: 8, bottom: Platform.isAndroid ? 16 :  0, left: 8, right: 8),
         topMarginText: 0,
         items: [
           FloatingNavbarItem(icon: "assets/images/home_tab.png", title: con.homeTabRes.tr),

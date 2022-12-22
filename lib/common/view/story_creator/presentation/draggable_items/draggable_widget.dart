@@ -95,7 +95,7 @@ class DraggableWidget extends StatelessWidget {
       case ItemType.image:
         if (_controlProvider.mediaPath.isNotEmpty) {
           overlayWidget = SizedBox(
-            width: screenUtil.screenWidth - 144.w,
+            width: screenUtil.screenWidth ,
             child: FileImageBG(
               filePath: File(_controlProvider.mediaPath),
               generatedGradient: (color1, color2) {
@@ -138,7 +138,24 @@ class DraggableWidget extends StatelessWidget {
     }
 
     /// set widget data position on main screen
-    return AnimatedAlignPositioned(
+    return draggableWidget.type == ItemType.image ?
+    Transform.scale(
+      scale: draggableWidget.deletePosition
+          ? _deleteScale()
+          : draggableWidget.scale,
+      child: Transform.rotate(
+        angle: draggableWidget.rotation,
+        child: Listener(
+          onPointerDown: onPointerDown,
+          onPointerUp: onPointerUp,
+          onPointerMove: onPointerMove,
+
+          /// show widget
+          child: overlayWidget,
+        ),
+      ),
+    ) :
+    AnimatedAlignPositioned(
       duration: const Duration(milliseconds: 50),
       dy: (draggableWidget.deletePosition
           ? _deleteTopOffset()

@@ -24,6 +24,30 @@ class CommonController extends GetxController{
   var isCardExpandedList = <int>[].obs;
   var isLoadingUsers = true.obs;
   var users = <UserDTO>[].obs;
+  var fakeUsers = [
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+    UserDTO(id: "kzfjzklfnlefefe", userName: "Dan", picture: "", isAdmin: false, createdAt: DateTime.now(), description: "", fcmToken: "klfelkfef", wallet: "0xkdjjfzfjozjfozjfozjfojzofjzojf", contractAddresses: [], following: 0, isInFollowing: false),
+  ];
   var gettingStoryAndContacts = true.obs;
   var query = "".obs;
   var queryHasChanged = false.obs;

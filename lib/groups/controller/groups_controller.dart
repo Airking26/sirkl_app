@@ -20,6 +20,7 @@ class GroupsController extends GetxController{
 
   var searchIsActive = false.obs;
   var query = "".obs;
+  var index = 0.obs;
   var addAGroup = false.obs;
   final _groupService = GroupService();
   final _homeService = HomeService();

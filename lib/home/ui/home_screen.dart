@@ -4,16 +4,15 @@ import 'package:advstory/advstory.dart';
 import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/common/view/stream_chat/scrollable_positioned_list/src/scrollable_positioned_list.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:bip39/bip39.dart' as bip39;
-import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:slider_button/slider_button.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:widget_circular_animator/widget_circular_animator.dart';
@@ -65,98 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 : Container(),
           ],
         )
-          /*
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            buildAppbar(context),
-            _homeController.accessToken.value.isNotEmpty
-                ? _commonController.gettingStoryAndContacts.value
-                ? Container()
-                : _commonController.users.isNotEmpty
-                ? buildStoryList()
-                : Container()
-                : _homeController.address.value.isEmpty
-                ? buildConnectWalletUI()
-                : _homeController.signPage.value
-                ? buildSignWalletUI() : _homeController.accessToken.value.isNotEmpty
-                ? _commonController.gettingStoryAndContacts.value
-                ? Container(
-                margin: const EdgeInsets.only(top: 150),
-                child: const CircularProgressIndicator())
-                : _commonController.users.isNotEmpty
-                ? buildRepertoireList(context)
-                : buildEmptyFriends()
-                : Container()
-          ],
-        )
-                Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      buildAppbar(context),
-                      _homeController.accessToken.value.isNotEmpty
-                          ? _commonController.gettingStoryAndContacts.value
-                              ? Container()
-                              : _commonController.users.isNotEmpty
-                                  ? buildStoryList()
-                                  : Container()
-                          : _homeController.address.value.isEmpty
-                              ? buildConnectWalletUI()
-                              : _homeController.isUserExists.value
-                                  ? _homeController.forgotPassword.value
-                                      ? _homeController.recoverPassword.value
-                                          ? buildSignUp()
-                                          : buildRecoverPassword()
-                                      : buildSignIn()
-                                  : _homeController.signUpSeedPhrase.value
-                                      ? buildSeedPhraseSignUp()
-                                      : buildSignUp(),
-                      _homeController.accessToken.value.isNotEmpty
-                          ? _commonController.gettingStoryAndContacts.value
-                              ? Container(
-                                  margin: const EdgeInsets.only(top: 150),
-                                  child: const CircularProgressIndicator())
-                              : _commonController.users.isNotEmpty
-                                  ? buildRepertoireList(context)
-                                  : buildEmptyFriends()
-                          : Container(),
-                    ],
-                  )
-                : SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        buildAppbar(context),
-                        _homeController.accessToken.value.isNotEmpty
-                            ? _commonController.gettingStoryAndContacts.value
-                                ? Container()
-                                : _commonController.users.isNotEmpty
-                                    ? buildStoryList()
-                                    : Container()
-                            : _homeController.address.value.isEmpty
-                                ? buildConnectWalletUI()
-                                : _homeController.isUserExists.value
-                                    ? _homeController.forgotPassword.value
-                                        ? _homeController.recoverPassword.value
-                                            ? buildSignUp()
-                                            : buildRecoverPassword()
-                                        : buildSignIn()
-                                    : _homeController.signUpSeedPhrase.value
-                                        ? buildSeedPhraseSignUp()
-                                        : buildSignUp(),
-                        _homeController.accessToken.value.isNotEmpty
-                            ? _commonController.gettingStoryAndContacts.value
-                                ? Container(
-                                    margin: const EdgeInsets.only(top: 150),
-                                    child: const CircularProgressIndicator())
-                                : _commonController.users.isNotEmpty
-                                    ? buildRepertoireList(context)
-                                    : buildEmptyFriends()
-                            : Container(),
-                      ],
-                    ),
-                  )*/
-            ));
+        ));
   }
 
   Container buildAppbar(BuildContext context) {
@@ -328,6 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.only(top: 0),
             child: SafeArea(
               child: AzListView(
+                indexBarWidth: _commonController.users.length > 20 ? 30 : 0,
                 indexBarMargin: const EdgeInsets.only(right: 8, top: 12, bottom: 12),
                 indexHintBuilder: (context, hint) {return Container(
                     width: 60,
@@ -387,7 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Offstage(
           offstage: !_commonController.users[index].isShowSuspension,
           child: Container(
-            padding: const EdgeInsets.only(left: 20, right: 60),
+            padding: EdgeInsets.only(left: 20, right: _commonController.users.length > 20 ? 60 : 0),
             width: double.infinity,
             alignment: Alignment.centerLeft,
             child: Row(
@@ -421,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget buildSirklTile(BuildContext context, int index, bool isShowSuspension) {
     return Padding(
-      padding: const EdgeInsets.only(right: 36.0),
+      padding: EdgeInsets.only(right: _commonController.users.length > 20 ? 36.0 : 0),
       child: Column(
         children: [
           !isShowSuspension ? Divider(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282), indent: 84, endIndent: 24, thickness: 0.2) : Container(),
@@ -727,5 +636,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
+
 
 }

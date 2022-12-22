@@ -102,10 +102,10 @@ class BottomTools extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Image.asset(
-                            'assets/images/instagram_logo.png',
-                            color: Colors.white,
-                            height: 42,
+                            "assets/images/logo.png",
+                            height: 26,
                           ),
+                          const SizedBox(height: 4,),
                           const Text(
                             'Stories Creator',
                             style: TextStyle(

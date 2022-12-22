@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -24,6 +25,8 @@ class StreamChannelListTile extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.onTap,
+    this.slidableEnabled,
+    this.onFavPressed,
     this.onLongPress,
     this.tileColor,
     this.visualDensity = VisualDensity.compact,
@@ -54,6 +57,10 @@ class StreamChannelListTile extends StatelessWidget {
 
   /// Called when the user taps this list tile.
   final GestureTapCallback? onTap;
+
+  final void Function(BuildContext context)? onFavPressed;
+
+  final bool? slidableEnabled;
 
   /// Called when the user long-presses on this list tile.
   final GestureLongPressCallback? onLongPress;
@@ -109,7 +116,9 @@ class StreamChannelListTile extends StatelessWidget {
     Widget? title,
     Widget? subtitle,
     VoidCallback? onTap,
+    void Function(BuildContext context)? onFavPressed,
     VoidCallback? onLongPress,
+    bool? slidableEnabled,
     VisualDensity? visualDensity,
     EdgeInsetsGeometry? contentPadding,
     bool? selected,
@@ -125,7 +134,9 @@ class StreamChannelListTile extends StatelessWidget {
       leading: leading ?? this.leading,
       title: title ?? this.title,
       subtitle: subtitle ?? this.subtitle,
+      slidableEnabled: slidableEnabled ?? this.slidableEnabled,
       onTap: onTap ?? this.onTap,
+      onFavPressed: onFavPressed ?? this.onFavPressed ,
       onLongPress: onLongPress ?? this.onLongPress,
       visualDensity: visualDensity ?? this.visualDensity,
       contentPadding: contentPadding ?? this.contentPadding,
@@ -176,41 +187,57 @@ class StreamChannelListTile extends StatelessWidget {
       builder: (context, isMuted) => AnimatedOpacity(
         opacity: isMuted ? 0.5 : 1,
         duration: const Duration(milliseconds: 300),
-        child: ListTile(
-          onTap: onTap,
-          onLongPress: onLongPress,
-          contentPadding: contentPadding,
-          leading: leading,
-          tileColor: tileColor,
-          selected: selected,
-          selectedTileColor: selectedTileColor ?? StreamChatTheme.of(context).colorTheme.borders,
-          title: Row(
-            children: [
-              Expanded(child: title),
-              BetterStreamBuilder<List<Member>>(
-                stream: channelState.membersStream,
-                initialData: channelState.members,
-                comparator: const ListEquality().equals,
-                builder: (context, members) {
-                  if (members.isEmpty || !members.any((it) => it.user!.id == currentUser.id)) {
-                    return const Offstage();
-                  }
-                  return unreadIndicatorBuilder?.call(context) ??
-                      StreamUnreadIndicator(cid: channel.cid);
-                },
-              ),
-            ],
+        child: Slidable(
+          enabled: slidableEnabled ?? false,
+          endActionPane: ActionPane(
+            extentRatio: 0.25,
+            motion: const ScrollMotion(), children: [
+            SlidableAction(
+              padding: EdgeInsets.zero,
+              onPressed: onFavPressed,
+              backgroundColor: const Color(0xff00CB7D),
+              foregroundColor: Colors.white,
+              icon: Icons.favorite_border_rounded,
+            ),
+          ],
+            
           ),
-          subtitle: Row(
-            children: [
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: subtitle,
+          child: ListTile(
+            onTap: onTap,
+            onLongPress: onLongPress,
+            contentPadding: contentPadding,
+            leading: leading,
+            tileColor: tileColor,
+            selected: selected,
+            selectedTileColor: selectedTileColor ?? StreamChatTheme.of(context).colorTheme.borders,
+            title: Row(
+              children: [
+                Expanded(child: title),
+                BetterStreamBuilder<List<Member>>(
+                  stream: channelState.membersStream,
+                  initialData: channelState.members,
+                  comparator: const ListEquality().equals,
+                  builder: (context, members) {
+                    if (members.isEmpty || !members.any((it) => it.user!.id == currentUser.id)) {
+                      return const Offstage();
+                    }
+                    return unreadIndicatorBuilder?.call(context) ??
+                        StreamUnreadIndicator(cid: channel.cid);
+                  },
                 ),
-              ),
-              trailing,
-            ],
+              ],
+            ),
+            subtitle: Row(
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: subtitle,
+                  ),
+                ),
+                trailing,
+              ],
+            ),
           ),
         ),
       ),

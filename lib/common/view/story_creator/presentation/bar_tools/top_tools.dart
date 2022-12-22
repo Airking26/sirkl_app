@@ -28,7 +28,7 @@ class _TopToolsState extends State<TopTools> {
       builder: (_, controlNotifier, paintingNotifier, itemNotifier, __) {
         return SafeArea(
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 20.w),
+            padding: EdgeInsets.only(top: 50.w, right: 16, left: 16),
             decoration: const BoxDecoration(color: Colors.transparent),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -85,15 +85,7 @@ class _TopToolsState extends State<TopTools> {
                         }
                       }
                     }),
-                ToolButton(
-                    child: const ImageIcon(
-                      AssetImage('assets/images/stickers.png',),
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    backGroundColor: Colors.black12,
-                    onTap: () => createGiphyItem(
-                        context: context, giphyKey: controlNotifier.giphyKey)),
+
                 ToolButton(
                     child: const ImageIcon(
                       AssetImage('assets/images/draw.png',),
