@@ -161,8 +161,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         paintOnTop: true,
                         child: InkWell(
                           onTap:(){
-                            Get.to(() => StoriesEditor(giphyKey: '', onDone: (uri){
-                              var t = uri;
+                            Get.to(() => StoriesEditor(giphyKey: '', onDone: (uri) async{
+                              await _profileController.postStory(uri);
+                              Get.back();
                             }));
                           },
                           child: Container(

@@ -43,11 +43,23 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
         else Filter.equal("contractAddress", ""),
         Filter.greater("member_count", 2)
       ]) :
-      Filter.and([
-        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
-        else Filter.equal("contractAddress", ""),
-        Filter.greater("member_count", 2)
-      ]),
+          isFav ?
+                  Filter.and([
+                    if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
+                    else Filter.equal("contractAddress", ""),
+                    Filter.exists("${_homeController.id.value}_favorite"),
+                    Filter.equal("${_homeController.id.value}_favorite", true),
+                    Filter.greater("member_count", 2)
+                  ]) :
+                      Filter.and([
+                        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
+                        else Filter.equal("contractAddress", ""),
+                        Filter.greater("member_count", 2),
+                        Filter.or([
+                          Filter.notExists("${_homeController.id.value}_favorite"),
+                          Filter.equal("${_homeController.id.value}_favorite", false)
+                        ])
+                      ]),
       channelStateSort: const [SortOption('last_message_at')],
       limit: 10,
     );
@@ -92,7 +104,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             removeTop: true,
             child: Expanded(
               child: TabBarView(
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 controller: tabController,
                 children: [
                   Padding(
@@ -102,6 +114,12 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: StreamChannelListView(
                             channelSlidableEnabled: true,
+                            onChannelFavPressed: (context, channel) async{
+                              await channel.updatePartial(unset: ["${_homeController.id.value}_favorite"]);
+                              streamChannelListControllerGroupsFav?.refresh();
+                              streamChannelListControllerGroups?.refresh();
+                            },
+                            channelFav: true,
                             emptyBuilder: (context){
                               return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
                             },
@@ -126,6 +144,12 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: StreamChannelListView(
                             channelSlidableEnabled: true,
+                            channelFav: false,
+                            onChannelFavPressed: (context, channel) async {
+                              await channel.updatePartial(set: {"${_homeController.id.value}_favorite" : true});
+                              streamChannelListControllerGroupsFav?.refresh();
+                              streamChannelListControllerGroups?.refresh();
+                            },
                             emptyBuilder: (context){
                               return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
                             },
@@ -370,7 +394,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                       boxShadow: const [
                         BoxShadow(
                           color: Colors.grey,
-                          offset: Offset(0.0, 0.01), //(x,y)
+                          offset: Offset(0.0, 0.01),
                           blurRadius: 0.01,
                         ),
                       ],
@@ -380,7 +404,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         await _groupController.createGroup(StreamChat.of(context).client, _groupController.nftsAvailable.value[index].collectionName, _groupController.nftsAvailable.value[index].collectionImages[0], _groupController.nftsAvailable.value[index].contractAddress);
                         Get.to(() => const DetailedChatScreen(create:false));
                       },
-                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftsAvailable[index].collectionImages[0], width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
+                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftsAvailable[index].collectionImages[0], width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
 
                       title: Text(_groupController.nftsAvailable.value[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
                       //subtitle: Transform.translate(offset: const Offset(-8, 0), child: Text("${_homeController.nfts.value[index].collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
@@ -431,7 +455,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Obx(()=>IconButton(
-                      onPressed: () {
+                      onPressed: () async{
+                        //await _groupController.createHiro(StreamChat.of(context).client);
                         _groupController.addAGroup.value = false;
                         _groupController.searchIsActive.value = ! _groupController.searchIsActive.value;
                         if(_groupController.searchIsActive.value) {

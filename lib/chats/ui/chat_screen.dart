@@ -138,11 +138,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Obx(() =>StreamChannelListView(
-                  // TODO : REMOVE TRUE
-                  channelSlidableEnabled: true,
-                  onChannelFavPressed: (context){
-
-                  },
+                  channelSlidableEnabled: false,
                   emptyBuilder: (context){
                     return noGroupUI();
                   },

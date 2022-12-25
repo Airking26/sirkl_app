@@ -57,6 +57,7 @@ class StreamChannelListView extends StatelessWidget {
     this.onChannelLongPress,
     this.onChannelFavPressed,
     this.channelSlidableEnabled,
+    this.channelFav,
     this.loadMoreTriggerIndex = 3,
     this.scrollDirection = Axis.vertical,
     this.reverse = false,
@@ -101,7 +102,7 @@ class StreamChannelListView extends StatelessWidget {
   /// Called when the user long-presses on this list tile.
   final void Function(Channel)? onChannelLongPress;
 
-  final void Function(BuildContext)? onChannelFavPressed;
+  final void Function(BuildContext, Channel)? onChannelFavPressed;
 
   /// The index to take into account when triggering [controller.loadMore].
   final int loadMoreTriggerIndex;
@@ -168,6 +169,7 @@ class StreamChannelListView extends StatelessWidget {
   final bool reverse;
 
   final bool? channelSlidableEnabled;
+  final bool? channelFav;
 
   /// {@template flutter.widgets.scroll_view.controller}
   /// An object that can be used to control the position to which this scroll
@@ -312,11 +314,12 @@ class StreamChannelListView extends StatelessWidget {
         final onLongPress = onChannelLongPress;
         final onFavPressed = onChannelFavPressed;
         final slidableEnabled = channelSlidableEnabled;
-
+        final isFav = channelFav;
         final streamChannelListTile = StreamChannelListTile(
+          isFav: isFav,
           slidableEnabled: slidableEnabled,
-          onFavPressed: onFavPressed,
           channel: channel,
+          onFavPressed: onFavPressed == null ? null : (context) => onFavPressed(context, channel),
           onTap: onTap == null ? null : () => onTap(channel),
           onLongPress: onLongPress == null ? null : () => onLongPress(channel),
         );

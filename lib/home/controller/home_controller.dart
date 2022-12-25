@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:agora_rtm/agora_rtm.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -14,6 +13,8 @@ import 'package:sirkl/common/model/moralis_metadata_dto.dart';
 import 'package:sirkl/common/model/moralis_nft_contract_addresse.dart';
 import 'package:sirkl/common/model/moralis_root_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/common/model/story_dto.dart';
+import 'package:sirkl/common/model/story_modification_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -38,6 +39,7 @@ class HomeController extends GetxController{
   final _commonController = Get.put(CommonController());
 
   Rx<AgoraRtmClient?> agoraClient = (null as AgoraRtmClient?).obs;
+  Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
   final box = GetStorage();
 
   var id = "".obs;
@@ -116,7 +118,6 @@ class HomeController extends GetxController{
       }
     }
   }
-
 
   loginWithWallet(BuildContext context, String wallet, String message, String signature) async{
     var request = await _homeService.verifySignature(walletConnectDtoToJson(WalletConnectDto(wallet: wallet, message: message, signature: signature)));
@@ -199,13 +200,14 @@ class HomeController extends GetxController{
       }
     }
 
-      List<String> contractAddresses = [];
+      List<String> contractAddresses = ["0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911"];
       for (var element in initialArray) {contractAddresses.add(element.tokenAddress!);}
 
       var addressesAbsent = userMe.value.contractAddresses!.toSet().difference(contractAddresses.toSet()).toList();
       if(client != null && addressesAbsent.isNotEmpty) {
         for (var absentAddress in addressesAbsent) {
-          await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
+          //TODO: Reactivate
+          //await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
         }
       }
       await updateMe(UpdateMeDto(contractAddresses: contractAddresses));
@@ -347,6 +349,40 @@ class HomeController extends GetxController{
     var request = await _homeService.isUserExists(wallet);
     return request.body! == "false" ? true : false;
   }
+
+  retrieveStories(int offset) async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _homeService.retrieveStories(accessToken, offset.toString());
+    if(request.statusCode == 401) {
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request =  await _homeService.retrieveStories(accessToken, offset.toString());
+      if(request.isOk) stories.value = storyDtoFromJson(json.encode(request.body));
+    } else if(request.isOk) {
+      stories.value = storyDtoFromJson(json.encode(request.body));
+    }
+  }
+
+  updateStory(StoryModificationDto storyModificationDto) async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _homeService.updateStory(accessToken, storyModificationDtoToJson(storyModificationDto));
+    if(request.statusCode == 401) {
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _homeService.updateStory(accessToken, storyModificationDtoToJson(storyModificationDto));
+      if(request.isOk) {};
+    } else if(request.isOk) {
+    }
+  }
+
 
 }
 

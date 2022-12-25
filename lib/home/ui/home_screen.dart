@@ -7,9 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/common/model/story_dto.dart';
+import 'package:sirkl/common/model/story_modification_dto.dart';
 import 'package:sirkl/common/view/stream_chat/scrollable_positioned_list/src/scrollable_positioned_list.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -33,6 +36,34 @@ class _HomeScreenState extends State<HomeScreen> {
   final _commonController = Get.put(CommonController());
   YYDialog dialogMenu = YYDialog();
   final utils = Utils();
+  final adController = AdvStoryController();
+  final PagingController<int, StoryDto> pagingController = PagingController(firstPageKey: 0);
+  static var pageKey = 0;
+
+  Future<void> fetchPageStories() async {
+    try {
+      List<List<StoryDto>> newItems = await _homeController.retrieveStories(pageKey);
+      final isLastPage = newItems.length < 12;
+      if (isLastPage) {
+        pagingController.appendLastPage(newItems[0]);
+      } else {
+        final nextPageKey = pageKey++;
+        pagingController.appendPage(newItems[0], nextPageKey);
+      }
+    } catch (error) {
+      pagingController.error = error;
+    }
+  }
+
+  @override
+  void initState() {
+    _homeController.retrieveStories(0);
+    adController.addListener((event, position) async{
+      //await _homeController.updateStory(StoryModificationDto(id: _homeController.stories.value?[position.content]?[position.story]!.id!, readers: [_homeController.id.value]));
+    });
+    //pagingController.addPageRequestListener((pageKey) {fetchPageStories();});
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
             _homeController.accessToken.value.isNotEmpty
                 ? _commonController.gettingStoryAndContacts.value
                 ? Container()
-                : _commonController.users.isNotEmpty
+            //TODO: Check story
+                : !_commonController.users.isNotEmpty
                 ? buildStoryList()
                 : Container()
                 : _homeController.address.value.isEmpty
@@ -186,42 +218,49 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.only(top: 16),
       height: 122,
       child: AdvStory(
-        style: AdvStoryStyle(
-            indicatorStyle: IndicatorStyle(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 4, vertical: Platform.isAndroid ? 8 : 48))),
-        storyCount: 6,
-        storyBuilder: (storyIndex) => Story(
-          contentCount: 3,
-          contentBuilder: (contentIndex) => ImageContent(
-              url:
-                  "https://i1.adis.ws/i/canon/canon-get-inspired-party-1-1920?",
-              errorBuilder: () {
-                return const Center(
-                  child: Text("An error occured!"),
-                );
-              }),
-        ),
-        trayBuilder: (index) => AdvStoryTray(
-          url: "https://img.seadn.io/files/9a3bb789c07f93d50d9c50dc0dae7cf1.png?auto=format&fit=max&w=640",
-          username: Text(
-            "Samuel",
-            style: TextStyle(
-                fontFamily: "Gilroy",
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-                color: Get.isDarkMode ? Colors.white : Colors.black),
+        //controller: adController,
+          style: AdvStoryStyle(
+              indicatorStyle: IndicatorStyle(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 4, vertical: Platform.isAndroid ? 8 : 48))),
+          storyCount: _homeController.stories.value?.length ?? 0,
+          storyBuilder: (storyIndex) => Story(
+            contentCount: _homeController.stories.value?[storyIndex]?.length ?? 0,
+            contentBuilder: (contentIndex) => ImageContent(
+                url:
+                _homeController.stories.value?[storyIndex]?[contentIndex]?.url ?? "",
+                errorBuilder: () {
+                  return const Center(
+                    child: Text("An error occured!"),
+                  );
+                }),
           ),
-          gapSize: 0,
-          borderGradientColors: const [
-            Color(0xFF1DE99B),
-            Color(0xFF0063FB),
-            Color(0xFF1DE99B),
-            Color(0xFF0063FB)
-          ],
+          trayBuilder: (index) => AdvStoryTray(
+
+            url:_homeController.stories.value?[index]?.first?.createdBy.picture ?? "",
+            username: Text(
+              _homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank! ?
+              "${_homeController.stories.value![index]!.first!.createdBy.wallet.substring(0, 5)}...":
+              _homeController.stories.value![index]!.first!.createdBy.userName.length > 6 ?
+              "${_homeController.stories.value![index]!.first!.createdBy.userName.substring(0, 7)}..." :
+              _homeController.stories.value![index]!.first!.createdBy.userName,
+              style: TextStyle(
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: Get.isDarkMode ? Colors.white : Colors.black),
+            ),
+            gapSize: 1,
+            borderGradientColors:
+            const [
+              Color(0xFF1DE99B),
+              Color(0xFF0063FB),
+              Color(0xFF1DE99B),
+              Color(0xFF0063FB)
+            ],
+          ),
         ),
-      ),
-    );
+      );
   }
 
   Widget buildRepertoireList(BuildContext context) {

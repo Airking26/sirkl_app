@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -26,6 +27,7 @@ class StreamChannelListTile extends StatelessWidget {
     this.trailing,
     this.onTap,
     this.slidableEnabled,
+    this.isFav,
     this.onFavPressed,
     this.onLongPress,
     this.tileColor,
@@ -61,6 +63,7 @@ class StreamChannelListTile extends StatelessWidget {
   final void Function(BuildContext context)? onFavPressed;
 
   final bool? slidableEnabled;
+  final bool? isFav;
 
   /// Called when the user long-presses on this list tile.
   final GestureLongPressCallback? onLongPress;
@@ -116,9 +119,10 @@ class StreamChannelListTile extends StatelessWidget {
     Widget? title,
     Widget? subtitle,
     VoidCallback? onTap,
-    void Function(BuildContext context)? onFavPressed,
+    void Function(BuildContext context, [Channel channel])? onFavPressed,
     VoidCallback? onLongPress,
     bool? slidableEnabled,
+    bool? isFav,
     VisualDensity? visualDensity,
     EdgeInsetsGeometry? contentPadding,
     bool? selected,
@@ -135,6 +139,7 @@ class StreamChannelListTile extends StatelessWidget {
       title: title ?? this.title,
       subtitle: subtitle ?? this.subtitle,
       slidableEnabled: slidableEnabled ?? this.slidableEnabled,
+      isFav: isFav ?? this.isFav,
       onTap: onTap ?? this.onTap,
       onFavPressed: onFavPressed ?? this.onFavPressed ,
       onLongPress: onLongPress ?? this.onLongPress,
@@ -195,9 +200,9 @@ class StreamChannelListTile extends StatelessWidget {
             SlidableAction(
               padding: EdgeInsets.zero,
               onPressed: onFavPressed,
-              backgroundColor: const Color(0xff00CB7D),
-              foregroundColor: Colors.white,
-              icon: Icons.favorite_border_rounded,
+              backgroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
+              foregroundColor: isFav! ? const Color(0xff00CB7D) : Colors.white,
+              icon: isFav! ? Icons.favorite_rounded : Icons.favorite_border_rounded,
             ),
           ],
             
