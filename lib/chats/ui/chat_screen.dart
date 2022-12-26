@@ -28,9 +28,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
-    streamChannelListControllerFriends = buildStreamChannelListController(true);
-    streamChannelListControllerOthers = buildStreamChannelListController(false);
+      streamChannelListControllerFriends =
+          buildStreamChannelListController(true);
+      streamChannelListControllerOthers =
+          buildStreamChannelListController(false);
     super.initState();
   }
 
@@ -98,24 +99,25 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       }
     });
 
-    return Scaffold(
+    return Obx(() =>Scaffold(
         backgroundColor: Get.isDarkMode
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Column(children: [
           buildAppbar(context, tabController),
           buildListConv(context, tabController)
-        ]));
+        ])));
   }
 
-  MediaQuery buildListConv(BuildContext context, TabController tabController) {
-    return MediaQuery.removePadding(
+  Widget buildListConv(BuildContext context, TabController tabController) {
+    return
+    MediaQuery.removePadding(
       context: context,
       removeTop: true,
       child: Expanded(
         child: SafeArea(
           minimum: const EdgeInsets.only(top: 28),
-          child: TabBarView(
+          child: !_homeController.controllerConnected.value ? Center(child: Container(width: 40, height:40, child: CircularProgressIndicator(color:  const Color(0xff00CB7D)))) : TabBarView(
             physics: NeverScrollableScrollPhysics(),
             controller: tabController,
             children: [

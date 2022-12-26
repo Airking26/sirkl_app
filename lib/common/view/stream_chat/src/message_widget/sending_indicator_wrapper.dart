@@ -69,7 +69,6 @@ class SendingIndicatorWrapper extends StatelessWidget {
             it.user.id != streamChat.currentUser?.id &&
             (it.lastRead.isAfter(message.createdAt) ||
                 it.lastRead.isAtSameMomentAs(message.createdAt)));
-        //TODO: Try to see with only one sent marked
         final isMessageRead = (readList.length >= (channel.memberCount ?? 0) - 1) && !channel.memberCount.isNullOrBlank! && channel.memberCount! > 1;
         Widget child = StreamSendingIndicator(
           message: message,

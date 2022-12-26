@@ -36,8 +36,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
     return StreamChannelListController(
       client: StreamChat.of(context).client,
       filter:
-          isFav ?
       _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ?
+      isFav ?
       Filter.and([
         Filter.autoComplete('name', _groupController.query.value),
         if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
@@ -80,7 +80,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   void initState() {
-    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
+    //_homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
     streamChannelListControllerGroups = buildStreamChannelListController(false);
     streamChannelListControllerGroupsFav = buildStreamChannelListController(true);
     _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
@@ -116,7 +116,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             context: context,
             removeTop: true,
             child: Expanded(
-              child: TabBarView(
+              child: !_homeController.controllerConnected.value ? Center(child: Container(width: 40, height:40, child: CircularProgressIndicator(color:  const Color(0xff00CB7D)))) : TabBarView(
                 physics: const NeverScrollableScrollPhysics(),
                 controller: tabController,
                 children: [

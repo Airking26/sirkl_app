@@ -56,6 +56,7 @@ class HomeController extends GetxController{
   var signPage = false.obs;
   var indexStory = 0.obs;
   var actualStoryIndex = 0.obs;
+  var controllerConnected = false.obs;
 
   var sessionStatus;
   var _uri;
@@ -202,14 +203,13 @@ class HomeController extends GetxController{
       }
     }
 
-      List<String> contractAddresses = ["0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911"];
+      List<String> contractAddresses = [];
       for (var element in initialArray) {contractAddresses.add(element.tokenAddress!);}
 
       var addressesAbsent = userMe.value.contractAddresses!.toSet().difference(contractAddresses.toSet()).toList();
       if(client != null && addressesAbsent.isNotEmpty) {
         for (var absentAddress in addressesAbsent) {
-          //TODO: Reactivate
-          //await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
+          await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
         }
       }
       await updateMe(UpdateMeDto(contractAddresses: contractAddresses));
@@ -288,7 +288,7 @@ class HomeController extends GetxController{
     }
   }
 
-  retrieveTokenStreamChat(StreamChatClient client, String? firebaseMessaging) async{
+  Future<void> retrieveTokenStreamChat(StreamChatClient client, String? firebaseMessaging) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _profileService.retrieveTokenStreamChat(accessToken);
@@ -300,10 +300,12 @@ class HomeController extends GetxController{
       request = await _profileService.retrieveTokenStreamChat(accessToken);
       if(request.isOk){
         await client.connectUser(User(id: id.value, name:  userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
+        controllerConnected.value = true;
         if(firebaseMessaging != null) await client.addDevice(firebaseMessaging, PushProvider.firebase, pushProviderName: "Firebase_Config");
       }
     } else if(request.isOk){
       await client.connectUser(User(id: id.value, name:  userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
+      controllerConnected.value = true;
       if(firebaseMessaging != null) await client.addDevice(firebaseMessaging, PushProvider.firebase, pushProviderName: "Firebase_Config");
     }
   }

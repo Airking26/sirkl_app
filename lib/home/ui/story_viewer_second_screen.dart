@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/model/story_modification_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:story_view/story_view.dart';
 
@@ -39,9 +40,10 @@ class _StoryViewerSecondScreenState extends State<StoryViewerSecondScreen> {
             onVerticalSwipeComplete: (direction){
               if(direction == Direction.down) Get.back();
             },
-            onStoryShow: (story){
+            onStoryShow: (story) async{
               _homeController.actualStoryIndex.value = _homeController.stories.value?.indexOf(_homeController.stories.value![_homeController.indexStory.value]!) ?? 0;
-              var storyToUpdate = _homeController.stories.value?[_homeController.indexStory.value]![storyItems.indexOf(story)];
+              var storyToUpdate = _homeController.stories.value?[_homeController.indexStory.value]![storyItems.indexOf(story)]?.id;
+              await _homeController.updateStory(StoryModificationDto(id: _homeController.id.value, readers: [storyToUpdate!]));
               },
             storyItems: storyItems,
             controller: controller,

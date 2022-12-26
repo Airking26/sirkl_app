@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? _commonController.gettingStoryAndContacts.value
                     ? Container()
                 //TODO: Check story
-                    : !_commonController.users.isNotEmpty
+                    : !_commonController.users.isNotEmpty && false
                     ? buildListOfStories()
                     : Container()
                     : _homeController.address.value.isEmpty
@@ -228,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Get.to(() => const StoryViewerSecondScreen());
             },
           child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 8),
+            margin: const EdgeInsets.symmetric(horizontal: 8),
               width: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
@@ -316,7 +316,7 @@ Widget buildRepertoireList(BuildContext context) {
                   indexHintAlignment: Alignment.centerRight,
                   indexHintOffset: const Offset(0, 0)),
               padding: const EdgeInsets.only(top: 16),
-              indexBarData: const ["0", 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',],
+              indexBarData: _commonController.users.length > 20 ? ["0", 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',] : [],
               data: _commonController.users,
               itemCount: _commonController.users.length,
               itemBuilder: buildSirklRepertoire,
