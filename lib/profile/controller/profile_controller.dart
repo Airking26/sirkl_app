@@ -36,6 +36,7 @@ class ProfileController extends GetxController{
   var descriptionTextEditingController = TextEditingController().obs;
   var urlPicture = "".obs;
   var hasUnreadNotif = false.obs;
+  var isStoryPosting = false.obs;
 
   updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
     isLoadingPicture.value = true;
@@ -106,6 +107,7 @@ class ProfileController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _profileService.postStory(accessToken, storyCreationDtoToJson(storyCreationDto));
       if(request.isOk){
+        isStoryPosting.value = false;
         Fluttertoast.showToast(
             msg: "Story posted",
             toastLength: Toast.LENGTH_SHORT,
@@ -117,6 +119,7 @@ class ProfileController extends GetxController{
         );
       }
     } else if(request.isOk){
+      isStoryPosting.value = false;
       Fluttertoast.showToast(
           msg: "Story posted",
           toastLength: Toast.LENGTH_SHORT,

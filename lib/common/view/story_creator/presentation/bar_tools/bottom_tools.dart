@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gallery_media_picker/gallery_media_picker.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sirkl/common/view/story_creator/domain/providers/notifiers/control_provider.dart';
 import 'package:sirkl/common/view/story_creator/domain/providers/notifiers/draggable_widget_notifier.dart';
 import 'package:sirkl/common/view/story_creator/domain/providers/notifiers/scroll_notifier.dart';
 import 'package:sirkl/common/view/story_creator/domain/sevices/save_as_image.dart';
 import 'package:sirkl/common/view/story_creator/presentation/widgets/animated_onTap_button.dart';
+import 'package:sirkl/profile/controller/profile_controller.dart';
 
 class BottomTools extends StatelessWidget {
   final GlobalKey contentKey;
   final Function(String imageUri) onDone;
   final Widget? onDoneButtonStyle;
+  final _profileController = Get.put(ProfileController());
 
   /// editor background color
   final Color? editorBackgroundColor;
-  const BottomTools(
+  BottomTools(
       {Key? key,
       required this.contentKey,
       required this.onDone,
@@ -120,13 +123,14 @@ class BottomTools extends StatelessWidget {
                   ),
 
                 /// save final image to gallery
-                Expanded(
-                  child: Container(
+                Obx(() =>Expanded(
+                  child: _profileController.isStoryPosting.value ? const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D),),) : Container(
                     alignment: Alignment.centerRight,
                     child: Transform.scale(
                       scale: 0.9,
                       child: AnimatedOnTapButton(
                           onTap: () async {
+                            _profileController.isStoryPosting.value = true;
                             String pngUri;
                             await takePicture(
                                     contentKey: contentKey,
@@ -170,7 +174,7 @@ class BottomTools extends StatelessWidget {
                               )),
                     ),
                   ),
-                ),
+                )),
               ],
             ),
           ),

@@ -8,13 +8,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "47.0.0"
-  advstory:
-    dependency: "direct main"
-    description:
-      name: advstory
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.1"
   after_layout:
     dependency: transitive
     description:
@@ -57,13 +50,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.10.0"
-  animate_do:
-    dependency: transitive
-    description:
-      name: animate_do
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.2"
   animated_text_kit:
     dependency: "direct main"
     description:
@@ -1255,13 +1241,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1"
-  reveal_on_scroll:
-    dependency: "direct main"
-    description:
-      name: reveal_on_scroll
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.3"
   rxdart:
     dependency: "direct main"
     description:
@@ -1428,6 +1407,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.10.0"
+  story:
+    dependency: "direct main"
+    description:
+      name: story
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.0"
+  story_view:
+    dependency: "direct main"
+    description:
+      name: story_view
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.14.0"
   stream_channel:
     dependency: transitive
     description:
@@ -1821,5 +1814,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.18.2 <3.0.0"
+  dart: ">=2.18.0 <3.0.0"
   flutter: ">=3.3.0"

@@ -9,22 +9,30 @@ class StoryDto {
     required this.createdBy,
     required this.readers,
     required this.url,
+    required this.createdAt,
+    required this.id
   });
 
   CreatedBy createdBy;
   List<dynamic> readers;
   String url;
+  DateTime createdAt;
+  String id;
 
   factory StoryDto.fromJson(Map<String, dynamic> json) => StoryDto(
     createdBy: CreatedBy.fromJson(json["createdBy"]),
     readers: List<dynamic>.from(json["readers"].map((x) => x)),
     url: json["url"],
+    id: json['id'],
+    createdAt: DateTime.parse(json["createdAt"])
   );
 
   Map<String, dynamic> toJson() => {
     "createdBy": createdBy.toJson(),
     "readers": List<dynamic>.from(readers.map((x) => x)),
     "url": url,
+    "createdAt": createdAt.toIso8601String(),
+    "id": id
   };
 }
 

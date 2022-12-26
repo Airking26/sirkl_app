@@ -36,12 +36,25 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
     return StreamChannelListController(
       client: StreamChat.of(context).client,
       filter:
+          isFav ?
       _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ?
       Filter.and([
         Filter.autoComplete('name', _groupController.query.value),
         if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
         else Filter.equal("contractAddress", ""),
-        Filter.greater("member_count", 2)
+        Filter.greater("member_count", 2),
+        Filter.exists("${_homeController.id.value}_favorite"),
+        Filter.equal("${_homeController.id.value}_favorite", true),
+      ]):
+      Filter.and([
+        Filter.autoComplete('name', _groupController.query.value),
+        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
+        else Filter.equal("contractAddress", ""),
+        Filter.greater("member_count", 2),
+        Filter.or([
+          Filter.notExists("${_homeController.id.value}_favorite"),
+          Filter.equal("${_homeController.id.value}_favorite", false)
+        ])
       ]) :
           isFav ?
                   Filter.and([

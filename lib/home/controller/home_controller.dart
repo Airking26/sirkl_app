@@ -54,6 +54,8 @@ class HomeController extends GetxController{
   var isUserExists = false.obs;
   var nfts = <CollectionDbDto>[].obs;
   var signPage = false.obs;
+  var indexStory = 0.obs;
+  var actualStoryIndex = 0.obs;
 
   var sessionStatus;
   var _uri;
@@ -361,9 +363,20 @@ class HomeController extends GetxController{
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request =  await _homeService.retrieveStories(accessToken, offset.toString());
-      if(request.isOk) stories.value = storyDtoFromJson(json.encode(request.body));
+      if(request.isOk) {
+        if(stories.value == null) {
+          stories.value = storyDtoFromJson(json.encode(request.body));
+        } else {
+          stories.value = stories.value! + storyDtoFromJson(json.encode(request.body));
+        }        return storyDtoFromJson(json.encode(request.body));
+      }
     } else if(request.isOk) {
-      stories.value = storyDtoFromJson(json.encode(request.body));
+      if(stories.value == null) {
+        stories.value = storyDtoFromJson(json.encode(request.body));
+      } else {
+        stories.value = stories.value! + storyDtoFromJson(json.encode(request.body));
+      }
+      return storyDtoFromJson(json.encode(request.body));
     }
   }
 

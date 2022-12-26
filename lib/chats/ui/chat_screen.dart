@@ -123,14 +123,15 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Obx(() =>StreamChannelListView(
                   channelSlidableEnabled: false,
+                  channelFav: false,
                   emptyBuilder: (context){
                     return noGroupUI();
                   },
                   controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel){
                     _chatController.channel.value = channel;
                   Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value) {
-                    //streamChannelListControllerFriends!.refresh();
-                    //streamChannelListControllerOthers!.refresh();
+                    streamChannelListControllerFriends!.refresh();
+                    streamChannelListControllerOthers!.refresh();
                   });
                   },
                 ),
@@ -139,14 +140,15 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Obx(() =>StreamChannelListView(
                   channelSlidableEnabled: false,
+                  channelFav: false,
                   emptyBuilder: (context){
                     return noGroupUI();
                   },
                   controller:_chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerOthers!, onChannelTap: (channel){
                   _chatController.channel.value = channel;
                   Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value){
-                    //streamChannelListControllerOthers!.refresh();
-                    //streamChannelListControllerFriends!.refresh();
+                    streamChannelListControllerOthers!.refresh();
+                    streamChannelListControllerFriends!.refresh();
                   });
                 },),
               ))
@@ -215,7 +217,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 boxShadow: const [
                   BoxShadow(
                     color: Colors.grey,
-                    offset: Offset(0.0, 0.01), //(x,y)
+                    offset: Offset(0.0, 0.01),
                     blurRadius: 0.01,
                   ),
                 ],
@@ -273,8 +275,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 tabController.index = 1;
                                 _chatController.messageHasBeenSent.value = false;
                               }
-                              //streamChannelListControllerFriends!.refresh();
-                              //streamChannelListControllerOthers!.refresh();
+                              streamChannelListControllerFriends!.refresh();
+                              streamChannelListControllerOthers!.refresh();
                             });
                           },
                           icon: Image.asset(
@@ -300,7 +302,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         boxShadow: const [
                           BoxShadow(
                             color: Colors.grey,
-                            offset: Offset(0.0, 0.01), //(x,y)
+                            offset: Offset(0.0, 0.01),
                             blurRadius: 0.01,
                           ),
                         ],
