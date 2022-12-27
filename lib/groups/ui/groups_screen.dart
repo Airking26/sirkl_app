@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
@@ -80,7 +81,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   void initState() {
-    //_homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
+    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
     streamChannelListControllerGroups = buildStreamChannelListController(false);
     streamChannelListControllerGroupsFav = buildStreamChannelListController(true);
     _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
@@ -116,68 +117,62 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             context: context,
             removeTop: true,
             child: Expanded(
-              child: !_homeController.controllerConnected.value ? Center(child: Container(width: 40, height:40, child: CircularProgressIndicator(color:  const Color(0xff00CB7D)))) : TabBarView(
+              child: !_homeController.controllerConnected.value ? Center(child: Container(width: 40, height:40, child: const CircularProgressIndicator(color:  Color(0xff00CB7D)))) : TabBarView(
                 physics: const NeverScrollableScrollPhysics(),
                 controller: tabController,
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top:28.0),
                     child: SafeArea(
-                      child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: StreamChannelListView(
-                            channelSlidableEnabled: true,
-                            onChannelFavPressed: (context, channel) async{
-                              await channel.updatePartial(unset: ["${_homeController.id.value}_favorite"]);
-                              streamChannelListControllerGroupsFav?.refresh();
-                              streamChannelListControllerGroups?.refresh();
-                            },
-                            channelFav: true,
-                            emptyBuilder: (context){
-                              return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
-                            },
-                            controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerGroupsFav!,
-                            onChannelTap: (channel) async{
-                              _chatController.channel.value = channel;
-                              var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
-                              if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
-                              Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())
-                            )!.then((value) {
-                              //streamChannelListControllerGroups!.refresh();
-                            });
-                          },
-                          ),
-                          ),
+                      child: StreamChannelListView(
+                        channelSlidableEnabled: true,
+                        onChannelFavPressed: (context, channel) async{
+                          await channel.updatePartial(unset: ["${_homeController.id.value}_favorite"]);
+                          streamChannelListControllerGroupsFav?.refresh();
+                          streamChannelListControllerGroups?.refresh();
+                        },
+                        channelFav: true,
+                        emptyBuilder: (context){
+                          return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
+                        },
+                        controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerGroupsFav!,
+                        onChannelTap: (channel) async{
+                          _chatController.channel.value = channel;
+                          var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
+                          if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
+                          Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())
+                        )!.then((value) {
+                          //streamChannelListControllerGroups!.refresh();
+                        });
+                      },
+                      ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top:28.0),
                     child: SafeArea(
-                      child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: StreamChannelListView(
-                            channelSlidableEnabled: true,
-                            channelFav: false,
-                            onChannelFavPressed: (context, channel) async {
-                              await channel.updatePartial(set: {"${_homeController.id.value}_favorite" : true});
-                              streamChannelListControllerGroupsFav?.refresh();
-                              streamChannelListControllerGroups?.refresh();
-                            },
-                            emptyBuilder: (context){
-                              return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
-                            },
-                            controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerGroups!,
-                            onChannelTap: (channel) async{
-                              _chatController.channel.value = channel;
-                              var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
-                              if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
-                              Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())
-                            )!.then((value) {
-                              //streamChannelListControllerGroups!.refresh();
-                            });
-                          },
-                          ),
-                          ),
+                      child: StreamChannelListView(
+                        channelSlidableEnabled: true,
+                        channelFav: false,
+                        onChannelFavPressed: (context, channel) async {
+                          await channel.updatePartial(set: {"${_homeController.id.value}_favorite" : true});
+                          streamChannelListControllerGroupsFav?.refresh();
+                          streamChannelListControllerGroups?.refresh();
+                        },
+                        emptyBuilder: (context){
+                          return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
+                        },
+                        controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerGroups!,
+                        onChannelTap: (channel) async{
+                          _chatController.channel.value = channel;
+                          var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
+                          if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
+                          Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())
+                        )!.then((value) {
+                          //streamChannelListControllerGroups!.refresh();
+                        });
+                      },
+                      ),
                     ),
                   ),
                 ],

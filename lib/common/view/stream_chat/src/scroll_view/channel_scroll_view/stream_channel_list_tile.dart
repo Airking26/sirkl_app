@@ -198,19 +198,19 @@ class StreamChannelListTile extends StatelessWidget {
             extentRatio: 0.25,
             motion: const ScrollMotion(), children: [
             SlidableAction(
+              spacing: 0,
               padding: EdgeInsets.zero,
               onPressed: onFavPressed,
-              backgroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
-              foregroundColor: isFav! ? const Color(0xff00CB7D) : Colors.white,
+              backgroundColor: Colors.white,
+              foregroundColor: isFav! ? const Color(0xff00CB7D) : Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
               icon: isFav! ? Icons.favorite_rounded : Icons.favorite_border_rounded,
             ),
           ],
-            
           ),
           child: ListTile(
             onTap: onTap,
             onLongPress: onLongPress,
-            contentPadding: contentPadding,
+            contentPadding: EdgeInsets.symmetric(horizontal: 24),
             leading: leading,
             tileColor: tileColor,
             selected: selected,

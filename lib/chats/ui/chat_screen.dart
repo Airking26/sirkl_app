@@ -28,6 +28,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
       streamChannelListControllerFriends =
           buildStreamChannelListController(true);
       streamChannelListControllerOthers =
@@ -118,42 +119,38 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         child: SafeArea(
           minimum: const EdgeInsets.only(top: 28),
           child: !_homeController.controllerConnected.value ? Center(child: Container(width: 40, height:40, child: CircularProgressIndicator(color:  const Color(0xff00CB7D)))) : TabBarView(
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             controller: tabController,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Obx(() =>StreamChannelListView(
-                  channelSlidableEnabled: false,
-                  channelFav: false,
-                  emptyBuilder: (context){
-                    return noGroupUI();
-                  },
-                  controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel){
-                    _chatController.channel.value = channel;
-                  Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value) {
-                    streamChannelListControllerFriends!.refresh();
-                    streamChannelListControllerOthers!.refresh();
-                  });
-                  },
-                ),
-              )),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Obx(() =>StreamChannelListView(
-                  channelSlidableEnabled: false,
-                  channelFav: false,
-                  emptyBuilder: (context){
-                    return noGroupUI();
-                  },
-                  controller:_chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerOthers!, onChannelTap: (channel){
+              Obx(() =>StreamChannelListView(
+                channelSlidableEnabled: false,
+                channelFav: false,
+                emptyBuilder: (context){
+                  return noGroupUI();
+                },
+                controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel){
                   _chatController.channel.value = channel;
-                  Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value){
-                    streamChannelListControllerOthers!.refresh();
-                    streamChannelListControllerFriends!.refresh();
-                  });
-                },),
-              ))
+                Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value) {
+                  streamChannelListControllerFriends!.refresh();
+                  streamChannelListControllerOthers!.refresh();
+                });
+                },
+              ),
+              ),
+              Obx(() =>StreamChannelListView(
+                channelSlidableEnabled: false,
+                channelFav: false,
+                emptyBuilder: (context){
+                  return noGroupUI();
+                },
+                controller:_chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerOthers!, onChannelTap: (channel){
+                _chatController.channel.value = channel;
+                Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value){
+                  streamChannelListControllerOthers!.refresh();
+                  streamChannelListControllerFriends!.refresh();
+                });
+              },),
+              )
             ],
           ),
         ),

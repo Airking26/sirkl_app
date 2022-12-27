@@ -11,7 +11,7 @@ import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/home/ui/story_viewer_second_screen.dart';
+import 'package:sirkl/home/ui/story_viewer_screen.dart';
 import 'package:slider_button/slider_button.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/story_view.dart';
@@ -41,7 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    pagingController.addPageRequestListener((pageKey) {fetchPageStories();});
+    pagingController.addPageRequestListener((pageKey) {
+      fetchPageStories();});
     super.initState();
   }
 
@@ -74,8 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _homeController.accessToken.value.isNotEmpty
                     ? _commonController.gettingStoryAndContacts.value
                     ? Container()
-                //TODO: Check story
-                    : !_commonController.users.isNotEmpty
+                    : _commonController.users.isNotEmpty
                     ? buildListOfStories()
                     : Container()
                     : _homeController.address.value.isEmpty
@@ -209,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget buildListOfStories(){
     return Container(
-      padding: const EdgeInsets.only(right: 4, left: 4, top: 12),
+      padding: const EdgeInsets.only(right: 4, left: 4, top: 24),
       height: 122,
       child: PagedListView(
         scrollDirection: Axis.horizontal,
@@ -229,37 +229,37 @@ class _HomeScreenState extends State<HomeScreen> {
         InkWell(
           onTap: () {
             _homeController.indexStory.value = index;
-            Get.to(() => const StoryViewerSecondScreen());
+            Get.to(() => const StoryViewerScreen());
             },
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
               width: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: const Color(0xff00CB7D),
-                  width: hasUnread ? 2.0 : 0.0,
+                  width: hasUnread ? 3.0 : 0.0,
                 ),
               ),
               child: listOfStories.first.createdBy.picture.isNullOrBlank! ?
               TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 70, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
               CircleAvatar(
-                radius: 40,
-                backgroundImage: NetworkImage(listOfStories.first.createdBy.picture ?? ""),
+                radius: 36,
+                backgroundImage: CachedNetworkImageProvider(listOfStories.first.createdBy.picture!),
               )
           ),
         ),
-        SizedBox(height: 4,),
+        const SizedBox(height: 4,),
         Text(
           _homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank! ?
-          "${_homeController.stories.value![index]!.first!.createdBy.wallet.substring(0, 5)}...":
-          _homeController.stories.value![index]!.first!.createdBy.userName.length > 6 ?
-          "${_homeController.stories.value![index]!.first!.createdBy.userName.substring(0, 7)}..." :
-          _homeController.stories.value![index]!.first!.createdBy.userName,
+          "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 5)}...":
+          _homeController.stories.value![index]!.first!.createdBy.userName!.length > 6 ?
+          "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 7)}..." :
+          _homeController.stories.value![index]!.first!.createdBy.userName!,
           style: TextStyle(
               fontFamily: "Gilroy",
               fontWeight: FontWeight.w600,
-              fontSize: 16,
+              fontSize: 14,
               color: Get.isDarkMode ? Colors.white : Colors.black),
         )
       ],
@@ -401,7 +401,7 @@ Widget buildSirklTile(BuildContext context, int index, bool isShowSuspension) {
                     imageUrl: _commonController.users[index].picture!,
                     width: 56,
                     height: 56,
-                    fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+                    fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                     errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                 )),
           ),
@@ -540,11 +540,11 @@ Column buildSignWalletUI() {
         backgroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
         baseColor: Get.isDarkMode ? const Color(0xFF102437)  : Colors.black,
         highlightedColor: Colors.white,
-        alignLabel: Alignment(0.3, 0),
+        alignLabel: const Alignment(0.3, 0),
         action: () async{
           await _homeController.signMessageWithMetamask(context);
         },
-        label: Text("Slide to sign", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),),
+        label: const Text("Slide to sign", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy"),),
         icon: Center(child: Image.asset("assets/images/app_icon_rounded.png", width: 48,),),
       ),
     ],
@@ -680,5 +680,11 @@ Column buildEmptyFriends() {
   );
 }
 
+@override
+  void dispose() {
+    _homeController.stories.value = [];
+    pagingController.dispose();
+    super.dispose();
+  }
 
 }

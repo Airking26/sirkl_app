@@ -467,36 +467,59 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           Flexible(
             child: InkWell(
               onTap: () async {
-                _chatController.messageSending.value = true;
-                var k = _messageInputController.text;
-                for(UserDTO element in _chatController.chipsList) {
-                  var idChannel = DateTime.now().millisecondsSinceEpoch.toString();
-                  if(element.id.isNullOrBlank!) {
-                    await _chatController.createInbox(InboxCreationDto(createdBy: _homeController.id.value, wallets: [_homeController.userMe.value.wallet!, element.wallet!], idChannel: idChannel, message: _messageInputController.text));
-                  } else {
-                    await _chatController.createInbox(InboxCreationDto(createdBy: _homeController.id.value, wallets: [_homeController.userMe.value.wallet!, element.wallet!], idChannel: idChannel, message: _messageInputController.text, members: [_homeController.id.value, element.id!]));
-                  }
-                  if(_chatController.chipsList.value.indexOf(element) == _chatController.chipsList.length - 1) {
-                    _messageInputController.clear();
-                    _searchController.clear();
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    _chatController.messageSending.value = false;
-                    if(_chatController.chipsList.value.length == 1){
-                      Get.back();
-                      if(element.id.isNullOrBlank!) {
-                        Get.to(() => DetailedChatScreen(create: false, channelId: idChannel));
-                      } else {
-                        _commonController.userClicked.value = _chatController.chipsList[0];
-                        Get.to(() => const DetailedChatScreen(create: true));
+                if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!) {
+                  _chatController.messageSending.value = true;
+                  for (UserDTO element in _chatController.chipsList) {
+                    var idChannel = DateTime
+                        .now()
+                        .millisecondsSinceEpoch
+                        .toString();
+                    if (element.id.isNullOrBlank!) {
+                      await _chatController.createInbox(InboxCreationDto(
+                          createdBy: _homeController.id.value,
+                          wallets: [
+                            _homeController.userMe.value.wallet!,
+                            element.wallet!
+                          ],
+                          idChannel: idChannel,
+                          message: _messageInputController.text));
+                    } else {
+                      await _chatController.createInbox(InboxCreationDto(
+                          createdBy: _homeController.id.value,
+                          wallets: [
+                            _homeController.userMe.value.wallet!,
+                            element.wallet!
+                          ],
+                          idChannel: idChannel,
+                          message: _messageInputController.text,
+                          members: [_homeController.id.value, element.id!]));
+                    }
+                    if (_chatController.chipsList.value.indexOf(element) ==
+                        _chatController.chipsList.length - 1) {
+                      _messageInputController.clear();
+                      _searchController.clear();
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      _chatController.messageSending.value = false;
+                      if (_chatController.chipsList.value.length == 1) {
+                        Get.back();
+                        if (element.id.isNullOrBlank!) {
+                          Get.to(() =>
+                              DetailedChatScreen(
+                                  create: false, channelId: idChannel));
+                        } else {
+                          _commonController.userClicked.value =
+                          _chatController.chipsList[0];
+                          Get.to(() => const DetailedChatScreen(create: true));
+                        }
+                      }
+                      else {
+                        _chatController.messageHasBeenSent.value = true;
+                        Get.back();
                       }
                     }
-                    else {
-                      _chatController.messageHasBeenSent.value = true;
-                      Get.back();
-                    }
                   }
+                  _chatController.chipsList.clear();
                 }
-                _chatController.chipsList.clear();
               },
               child:
                   _chatController.messageSending.value ?

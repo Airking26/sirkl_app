@@ -186,7 +186,7 @@ class HomeController extends GetxController{
   }
 
   getNFTsContractAddresses(StreamChatClient? client) async{
-    var req = await _homeService.getNFTsContractAddresses(userMe.value.wallet!);
+    var req = await _homeService.getNFTsContractAddresses("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87");
     if(req.body != null){
     var initialArray = moralisNftContractAdressesFromJson(json.encode(req.body)).result!;
     if(moralisNftContractAdressesFromJson(json.encode(req.body)).cursor != null) {
@@ -194,7 +194,7 @@ class HomeController extends GetxController{
           .cursor;
       while (cursor != null) {
         var newReq = await _homeService.getNextNFTsContractAddresses(
-            userMe.value.wallet!, cursor);
+            "0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87", cursor);
         initialArray.addAll(
             moralisNftContractAdressesFromJson(json.encode(newReq.body))
                 .result!);
@@ -209,7 +209,7 @@ class HomeController extends GetxController{
       var addressesAbsent = userMe.value.contractAddresses!.toSet().difference(contractAddresses.toSet()).toList();
       if(client != null && addressesAbsent.isNotEmpty) {
         for (var absentAddress in addressesAbsent) {
-          await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
+          //await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
         }
       }
       await updateMe(UpdateMeDto(contractAddresses: contractAddresses));
@@ -220,11 +220,11 @@ class HomeController extends GetxController{
   getNFTsTemporary(String wallet, BuildContext context) async{
     isLoadingNfts.value = true;
     nfts.value.clear();
-    var req = await _homeService.getNFTs(wallet);
+    var req = await _homeService.getNFTs("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87");
     var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
     var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
     while(cursor != null){
-      var newReq = await _homeService.getNextNFTs(wallet, cursor);
+      var newReq = await _homeService.getNextNFTs("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87", cursor);
       mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
       cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
     }
@@ -264,7 +264,9 @@ class HomeController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       req = await _chatService.walletsToMessages(accessToken);
       if(req.isOk) isConfiguring.value = false;
-    } else if(req.isOk) isConfiguring.value = false;
+    } else if(req.isOk) {
+      isConfiguring.value = false;
+    }
   }
 
   updateMe(UpdateMeDto updateMeDto) async {
@@ -289,24 +291,45 @@ class HomeController extends GetxController{
   }
 
   Future<void> retrieveTokenStreamChat(StreamChatClient client, String? firebaseMessaging) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.retrieveTokenStreamChat(accessToken);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.retrieveTokenStreamChat(accessToken);
-      if(request.isOk){
-        await client.connectUser(User(id: id.value, name:  userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
+    if(client.wsConnectionStatus != ConnectionStatus.connected) {
+      var accessToken = box.read(con.ACCESS_TOKEN);
+      var refreshToken = box.read(con.REFRESH_TOKEN);
+      var request = await _profileService.retrieveTokenStreamChat(accessToken);
+      var userToPass = userMe.value;
+      userToPass.contractAddresses = [];
+      if (request.statusCode == 401) {
+        var requestToken = await _homeService.refreshToken(refreshToken);
+        var refreshTokenDTO = refreshTokenDtoFromJson(
+            json.encode(requestToken.body));
+        accessToken = refreshTokenDTO.accessToken!;
+        box.write(con.ACCESS_TOKEN, accessToken);
+        request = await _profileService.retrieveTokenStreamChat(accessToken);
+        if (request.isOk) {
+          await client.connectUser(User(id: id.value,
+              name: userMe.value.userName.isNullOrBlank!
+                  ? userMe.value.wallet
+                  : userMe.value.userName!,
+              extraData: {"userDTO": userToPass}), request.body!);
+          controllerConnected.value = true;
+          if (firebaseMessaging != null) {
+            await client.addDevice(
+              firebaseMessaging, PushProvider.firebase,
+              pushProviderName: "Firebase_Config");
+          }
+        }
+      } else if (request.isOk) {
+        await client.connectUser(User(id: id.value,
+            name: userMe.value.userName.isNullOrBlank!
+                ? userMe.value.wallet
+                : userMe.value.userName!,
+            extraData: {"userDTO": userToPass}), request.body!);
         controllerConnected.value = true;
-        if(firebaseMessaging != null) await client.addDevice(firebaseMessaging, PushProvider.firebase, pushProviderName: "Firebase_Config");
+        if (firebaseMessaging != null) {
+          await client.addDevice(
+            firebaseMessaging, PushProvider.firebase,
+            pushProviderName: "Firebase_Config");
+        }
       }
-    } else if(request.isOk){
-      await client.connectUser(User(id: id.value, name:  userMe.value.userName.isNullOrBlank! ? userMe.value.wallet : userMe.value.userName!, extraData: {"userDTO": userMe.value}), request.body!);
-      controllerConnected.value = true;
-      if(firebaseMessaging != null) await client.addDevice(firebaseMessaging, PushProvider.firebase, pushProviderName: "Firebase_Config");
     }
   }
 
