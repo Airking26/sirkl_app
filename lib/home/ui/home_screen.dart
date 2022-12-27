@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? _commonController.gettingStoryAndContacts.value
                     ? Container()
                 //TODO: Check story
-                    : !_commonController.users.isNotEmpty && false
+                    : !_commonController.users.isNotEmpty
                     ? buildListOfStories()
                     : Container()
                     : _homeController.address.value.isEmpty
@@ -220,6 +220,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildStory(List<StoryDto> listOfStories, int index){
+    var hasUnread = false;
+    listOfStories.forEach((element) {
+      if(!element.readers.contains(_homeController.id.value)) hasUnread = true;
+    });
     return Column(
       children: [
         InkWell(
@@ -234,15 +238,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: const Color(0xff00CB7D),
-                  width: 2.0,
+                  width: hasUnread ? 2.0 : 0.0,
                 ),
               ),
-              child: CircleAvatar(
+              child: listOfStories.first.createdBy.picture.isNullOrBlank! ?
+              TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 70, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
+              CircleAvatar(
                 radius: 40,
                 backgroundImage: NetworkImage(listOfStories.first.createdBy.picture ?? ""),
               )
           ),
         ),
+        SizedBox(height: 4,),
         Text(
           _homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank! ?
           "${_homeController.stories.value![index]!.first!.createdBy.wallet.substring(0, 5)}...":

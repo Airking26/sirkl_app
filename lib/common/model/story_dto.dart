@@ -14,14 +14,14 @@ class StoryDto {
   });
 
   CreatedBy createdBy;
-  List<dynamic> readers;
+  List<String> readers;
   String url;
   DateTime createdAt;
   String id;
 
   factory StoryDto.fromJson(Map<String, dynamic> json) => StoryDto(
     createdBy: CreatedBy.fromJson(json["createdBy"]),
-    readers: List<dynamic>.from(json["readers"].map((x) => x)),
+    readers: List<String>.from(json["readers"].map((x) => x)),
     url: json["url"],
     id: json['id'],
     createdAt: DateTime.parse(json["createdAt"])

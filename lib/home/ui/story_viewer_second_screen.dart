@@ -43,7 +43,7 @@ class _StoryViewerSecondScreenState extends State<StoryViewerSecondScreen> {
             onStoryShow: (story) async{
               _homeController.actualStoryIndex.value = _homeController.stories.value?.indexOf(_homeController.stories.value![_homeController.indexStory.value]!) ?? 0;
               var storyToUpdate = _homeController.stories.value?[_homeController.indexStory.value]![storyItems.indexOf(story)]?.id;
-              await _homeController.updateStory(StoryModificationDto(id: _homeController.id.value, readers: [storyToUpdate!]));
+              await _homeController.updateStory(StoryModificationDto(id: storyToUpdate!, readers: [_homeController.id.value]));
               },
             storyItems: storyItems,
             controller: controller,
