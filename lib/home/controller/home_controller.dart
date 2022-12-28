@@ -57,8 +57,7 @@ class HomeController extends GetxController{
   var indexStory = 0.obs;
   var actualStoryIndex = 0.obs;
   var controllerConnected = false.obs;
-  var contractAddressesRetrieved = false.obs;
-
+  var loadingStories = true.obs;
   var sessionStatus;
   var _uri;
 
@@ -139,7 +138,7 @@ class HomeController extends GetxController{
   }
 
   putFCMToken(BuildContext context, StreamChatClient client) async {
-    await retrieveAccessToken();
+    retrieveAccessToken();
     if(accessToken.value.isNotEmpty) {
       final firebaseMessaging = await FirebaseMessaging.instance.getToken();
       var accessToken = box.read(con.ACCESS_TOKEN); //?? this.accessToken.value;
@@ -183,11 +182,12 @@ class HomeController extends GetxController{
     var accessTok = box.read(con.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
     var d = box.read(con.USER);
+    userMe.value = d != null ? userFromJson(box.read(con.USER) ?? "") : UserDTO();
     id.value = d != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
   }
 
   getNFTsContractAddresses(StreamChatClient? client) async{
-    var req = await _homeService.getNFTsContractAddresses("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87");
+    var req = await _homeService.getNFTsContractAddresses(userMe.value.wallet!);
     if(req.body != null){
     var initialArray = moralisNftContractAdressesFromJson(json.encode(req.body)).result!;
     if(moralisNftContractAdressesFromJson(json.encode(req.body)).cursor != null) {
@@ -195,7 +195,7 @@ class HomeController extends GetxController{
           .cursor;
       while (cursor != null) {
         var newReq = await _homeService.getNextNFTsContractAddresses(
-            "0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87", cursor);
+            userMe.value.wallet!, cursor);
         initialArray.addAll(
             moralisNftContractAdressesFromJson(json.encode(newReq.body))
                 .result!);
@@ -210,23 +210,24 @@ class HomeController extends GetxController{
       var addressesAbsent = userMe.value.contractAddresses!.toSet().difference(contractAddresses.toSet()).toList();
       if(client != null && addressesAbsent.isNotEmpty) {
         for (var absentAddress in addressesAbsent) {
-          //await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
+          await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
         }
       }
-      contractAddressesRetrieved.value = true;
+
+      userMe.value.contractAddresses = contractAddresses;
+      box.write(con.USER, userToJson(userMe.value));
       await updateMe(UpdateMeDto(contractAddresses: contractAddresses));
     }
-
   }
 
   getNFTsTemporary(String wallet, BuildContext context) async{
     isLoadingNfts.value = true;
     nfts.value.clear();
-    var req = await _homeService.getNFTs("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87");
+    var req = await _homeService.getNFTs(wallet);
     var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
     var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
     while(cursor != null){
-      var newReq = await _homeService.getNextNFTs("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87", cursor);
+      var newReq = await _homeService.getNextNFTs(wallet, cursor);
       mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
       cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
     }
@@ -237,8 +238,7 @@ class HomeController extends GetxController{
     groupedCollection.forEach((key, value) {
       nfts.add(CollectionDbDto(collectionName: value.first!.name!, contractAddress: value.first!.tokenAddress!, collectionImages: value.map((e) {
         String image;
-          if(e!.metadata != null )debugPrint("${value.first!.name!} : ${moralisMetadataDtoFromJson(e.metadata!).image!}");
-          if (moralisMetadataDtoFromJson(e.metadata!).image!.startsWith("ipfs://")) {
+          if (moralisMetadataDtoFromJson(e!.metadata!).image!.startsWith("ipfs://")) {
             image = "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
           }
           else if (moralisMetadataDtoFromJson(e.metadata!).image!.contains("/ipfs/")) {
@@ -247,7 +247,8 @@ class HomeController extends GetxController{
           else {
             image = moralisMetadataDtoFromJson(e.metadata!).image!;
           }
-          return image;
+        if(e.metadata != null )debugPrint("${value.first!.name!} : $image // ${e.tokenAddress}");
+        return image;
       }
       ).toList()));
     });
@@ -297,7 +298,7 @@ class HomeController extends GetxController{
       var accessToken = box.read(con.ACCESS_TOKEN);
       var refreshToken = box.read(con.REFRESH_TOKEN);
       var request = await _profileService.retrieveTokenStreamChat(accessToken);
-      var userToPass = userMe.value;
+      var userToPass = UserDTO(id: userMe.value.id, userName: userMe.value.userName, picture: userMe.value.picture, isAdmin: userMe.value.isAdmin, createdAt: userMe.value.createdAt, description: userMe.value.description, fcmToken: userMe.value.fcmToken, wallet: userMe.value.wallet, contractAddresses: userMe.value.contractAddresses, following: userMe.value.following, isInFollowing: userMe.value.isInFollowing);
       userToPass.contractAddresses = [];
       if (request.statusCode == 401) {
         var requestToken = await _homeService.refreshToken(refreshToken);
@@ -391,6 +392,7 @@ class HomeController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request =  await _homeService.retrieveStories(accessToken, offset.toString());
       if(request.isOk) {
+        loadingStories.value = false;
         if(stories.value == null) {
           stories.value = storyDtoFromJson(json.encode(request.body));
         } else {
@@ -398,6 +400,7 @@ class HomeController extends GetxController{
         }        return storyDtoFromJson(json.encode(request.body));
       }
     } else if(request.isOk) {
+      loadingStories.value = false;
       if(stories.value == null) {
         stories.value = storyDtoFromJson(json.encode(request.body));
       } else {

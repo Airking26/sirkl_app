@@ -28,7 +28,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    //_homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
+    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
       streamChannelListControllerFriends =
           buildStreamChannelListController(true);
       streamChannelListControllerOthers =

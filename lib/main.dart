@@ -101,8 +101,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
 
   @override
   void initState() {
-    initFirebase();
     _homeController.putFCMToken(context, widget.client);
+    initFirebase();
     super.initState();
   }
 

@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     : _homeController.address.value.isEmpty
                     ? buildConnectWalletUI()
                     : buildSignWalletUI(),
-                _homeController.accessToken.value.isNotEmpty ? _commonController.gettingStoryAndContacts.value ? Container(
+                _homeController.accessToken.value.isNotEmpty ? _commonController.gettingStoryAndContacts.value && _homeController.loadingStories.value ? Container(
                     margin: const EdgeInsets.only(top: 150),
                     child: const CircularProgressIndicator(color: Color(0xff00CB7D)))
                     : _commonController.users.isNotEmpty
@@ -210,13 +210,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget buildListOfStories(){
     return Container(
-      padding: const EdgeInsets.only(right: 4, left: 4, top: 24),
-      height: _homeController.stories.value == null || _homeController.stories.value!.isEmpty ? 0 : 125,
+      padding: const EdgeInsets.only(right: 8, left: 8, top: 24),
+      height: (_homeController.stories.value == null || _homeController.stories.value!.isEmpty) && !_homeController.loadingStories.value ? 0 : 125,
       child: PagedListView(
         scrollDirection: Axis.horizontal,
         pagingController: pagingController,
         builderDelegate: PagedChildBuilderDelegate<List<StoryDto?>?>(
             itemBuilder: (context, item, index) => buildStory(item, index),
+            firstPageProgressIndicatorBuilder: (context) => Center(child: CircularProgressIndicator(color: const Color(0xff00CB7D),),),
             noItemsFoundIndicatorBuilder: (context) => Container()),
       ),
     );
@@ -234,8 +235,6 @@ class _HomeScreenState extends State<HomeScreen> {
             _homeController.indexStory.value = index;
             Get.to(() => const StoryViewerScreen())!.then((value) {
               pagingController.notifyListeners();
-              //_homeController.stories.value = [];
-              //pagingController.refresh();
             });
             },
           child: Container(
@@ -251,6 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: listOfStories.first!.createdBy.picture.isNullOrBlank! ?
               TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 70, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
               CircleAvatar(
+                backgroundColor: const Color(0xff00CB7D),
                 radius: 36,
                 backgroundImage: CachedNetworkImageProvider(listOfStories.first!.createdBy.picture!),
               )
@@ -342,7 +342,12 @@ Widget buildRepertoireList(BuildContext context) {
 
 Widget buildSirklRepertoire(BuildContext context, int index) {
   return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
+      Padding(
+        padding: const EdgeInsets.only(left: 20.0, bottom: 12),
+        child: Text("MY SIRKL", style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w700, fontSize: 18),),
+      ),
       Offstage(
         offstage: !_commonController.users[index].isShowSuspension,
         child: Container(
@@ -689,6 +694,7 @@ Column buildEmptyFriends() {
 
 @override
   void dispose() {
+    _homeController.loadingStories.value = true;
     _homeController.stories.value = [];
     pagingController.dispose();
     super.dispose();

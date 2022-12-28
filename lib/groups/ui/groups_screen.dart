@@ -81,6 +81,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   void initState() {
+    debugPrint("ADDRESSES LENGHT : ${_homeController.userMe.value.contractAddresses?.length}");
     streamChannelListControllerGroups = buildStreamChannelListController(false);
     streamChannelListControllerGroupsFav = buildStreamChannelListController(true);
     _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
@@ -89,6 +90,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   void dispose() {
+    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
     streamChannelListControllerGroupsFav?.dispose();
     streamChannelListControllerGroups?.dispose();
     super.dispose();
@@ -116,7 +118,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             context: context,
             removeTop: true,
             child: Expanded(
-              child: !_homeController.controllerConnected.value || !_homeController.contractAddressesRetrieved.value ?
+              child: !_homeController.controllerConnected.value ?
               const Center(child: SizedBox(width: 40, height:40, child: CircularProgressIndicator(color:  Color(0xff00CB7D)))) :
               TabBarView(
                 physics: const NeverScrollableScrollPhysics(),
@@ -387,10 +389,9 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       removeTop: true,
       child: Expanded(
         child: Padding(
-          padding: const EdgeInsets.only(top: 4.0),
+          padding: const EdgeInsets.only(top: 24.0),
           child: SafeArea(
             child: ListView.builder(
-              cacheExtent: 1000,
               itemCount: _groupController.nftsAvailable.value.length,
               itemBuilder: (context, index){
                 return Padding(
