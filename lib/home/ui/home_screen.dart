@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _commonController = Get.put(CommonController());
   YYDialog dialogMenu = YYDialog();
   final utils = Utils();
-  final PagingController<int, List<StoryDto>> pagingController = PagingController(firstPageKey: 0);
+  final PagingController<int, List<StoryDto?>?> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
   final storyController = StoryController();
 
@@ -48,8 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> fetchPageStories() async {
     try {
-      List<List<StoryDto>> newItems = await _homeController.retrieveStories(pageKey);
-      final isLastPage = newItems.length < 12;
+      await _homeController.retrieveStories(pageKey);
+      List<List<StoryDto?>?>? newItems = pageKey > 0 ? _homeController.stories.value!.sublist(pageKey * 12, _homeController.stories.value!.length >= (pageKey + 1) * 12 ? (pageKey + 1) * 12 : _homeController.stories.value!.length) : _homeController.stories.value;
+      final isLastPage = newItems!.length < 12;
       if (isLastPage) {
         pagingController.appendLastPage(newItems);
       } else {
@@ -210,26 +211,32 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget buildListOfStories(){
     return Container(
       padding: const EdgeInsets.only(right: 4, left: 4, top: 24),
-      height: 122,
+      height: _homeController.stories.value == null || _homeController.stories.value!.isEmpty ? 0 : 125,
       child: PagedListView(
         scrollDirection: Axis.horizontal,
         pagingController: pagingController,
-        builderDelegate: PagedChildBuilderDelegate<List<StoryDto>>(itemBuilder: (context, item, index) => buildStory(item, index)),
+        builderDelegate: PagedChildBuilderDelegate<List<StoryDto?>?>(
+            itemBuilder: (context, item, index) => buildStory(item, index),
+            noItemsFoundIndicatorBuilder: (context) => Container()),
       ),
     );
   }
 
-  Widget buildStory(List<StoryDto> listOfStories, int index){
+  Widget buildStory(List<StoryDto?>? listOfStories, int index){
     var hasUnread = false;
-    listOfStories.forEach((element) {
-      if(!element.readers.contains(_homeController.id.value)) hasUnread = true;
+    listOfStories!.forEach((element) {
+      if(!element!.readers.contains(_homeController.id.value)) hasUnread = true;
     });
     return Column(
       children: [
         InkWell(
           onTap: () {
             _homeController.indexStory.value = index;
-            Get.to(() => const StoryViewerScreen());
+            Get.to(() => const StoryViewerScreen())!.then((value) {
+              pagingController.notifyListeners();
+              //_homeController.stories.value = [];
+              //pagingController.refresh();
+            });
             },
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -241,11 +248,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: hasUnread ? 3.0 : 0.0,
                 ),
               ),
-              child: listOfStories.first.createdBy.picture.isNullOrBlank! ?
+              child: listOfStories.first!.createdBy.picture.isNullOrBlank! ?
               TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 70, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
               CircleAvatar(
                 radius: 36,
-                backgroundImage: CachedNetworkImageProvider(listOfStories.first.createdBy.picture!),
+                backgroundImage: CachedNetworkImageProvider(listOfStories.first!.createdBy.picture!),
               )
           ),
         ),

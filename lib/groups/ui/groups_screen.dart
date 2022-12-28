@@ -81,7 +81,6 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   void initState() {
-    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
     streamChannelListControllerGroups = buildStreamChannelListController(false);
     streamChannelListControllerGroupsFav = buildStreamChannelListController(true);
     _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
@@ -117,7 +116,9 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             context: context,
             removeTop: true,
             child: Expanded(
-              child: !_homeController.controllerConnected.value ? Center(child: Container(width: 40, height:40, child: const CircularProgressIndicator(color:  Color(0xff00CB7D)))) : TabBarView(
+              child: !_homeController.controllerConnected.value || !_homeController.contractAddressesRetrieved.value ?
+              const Center(child: SizedBox(width: 40, height:40, child: CircularProgressIndicator(color:  Color(0xff00CB7D)))) :
+              TabBarView(
                 physics: const NeverScrollableScrollPhysics(),
                 controller: tabController,
                 children: [
@@ -510,7 +511,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
         ),
         Obx(()=>Positioned(
             top: _groupController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
-            child: _groupController.searchIsActive.value ? Container(
+            child: _groupController.searchIsActive.value ? SizedBox(
                 height: 110,
                 width: MediaQuery.of(context).size.width,
                 child:buildFloatingSearchBar()): Container(

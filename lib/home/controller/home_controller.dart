@@ -57,6 +57,7 @@ class HomeController extends GetxController{
   var indexStory = 0.obs;
   var actualStoryIndex = 0.obs;
   var controllerConnected = false.obs;
+  var contractAddressesRetrieved = false.obs;
 
   var sessionStatus;
   var _uri;
@@ -212,6 +213,7 @@ class HomeController extends GetxController{
           //await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
         }
       }
+      contractAddressesRetrieved.value = true;
       await updateMe(UpdateMeDto(contractAddresses: contractAddresses));
     }
 
@@ -416,8 +418,13 @@ class HomeController extends GetxController{
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _homeService.updateStory(accessToken, storyModificationDtoToJson(storyModificationDto));
-      if(request.isOk) {};
+      if(request.isOk) {
+        stories.value?[actualStoryIndex.value]?.where((element) => element?.id == storyModificationDto.id).first?.readers = storyModificationDto.readers;
+        stories.refresh();
+      }
     } else if(request.isOk) {
+      stories.value?[actualStoryIndex.value]?.where((element) => element?.id == storyModificationDto.id).first?.readers = storyModificationDto.readers;
+      stories.refresh();
     }
   }
 
