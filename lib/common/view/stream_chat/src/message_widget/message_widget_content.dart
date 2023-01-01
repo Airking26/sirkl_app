@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:get/get.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/bottom_row.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/message_card.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/pinned_message.dart';
@@ -9,6 +14,7 @@ import 'package:sirkl/common/view/stream_chat/src/message_widget/reactions/react
 import 'package:sirkl/common/view/stream_chat/src/message_widget/reactions/reaction_indicator.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/user_avatar_transform.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/profile/ui/profile_else_screen.dart';
 
 /// {@template messageWidgetContent}
 /// The main content of a [StreamMessageWidget].
@@ -17,7 +23,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 /// {@endtemplate}
 class MessageWidgetContent extends StatelessWidget {
   /// {@macro messageWidgetContent}
-  const MessageWidgetContent({
+  MessageWidgetContent({
     super.key,
     required this.reverse,
     required this.isPinned,
@@ -193,6 +199,8 @@ class MessageWidgetContent extends StatelessWidget {
   /// {@macro usernameBuilder}
   final Widget Function(BuildContext, Message)? usernameBuilder;
 
+  var _commonController = Get.put(CommonController());
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -258,7 +266,10 @@ class MessageWidgetContent extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: 2.0),
                           child: UserAvatarTransform(
-                            onUserAvatarTap: onUserAvatarTap,
+                            onUserAvatarTap:(user){
+                              _commonController.userClicked.value = userFromJson(json.encode(user.extraData["userDTO"]));
+                              Get.to(() => const ProfileElseScreen(fromConversation: true));
+                            },
                             userAvatarBuilder: userAvatarBuilder,
                             translateUserAvatar: translateUserAvatar,
                             messageTheme: messageTheme,
@@ -413,7 +424,7 @@ class MessageWidgetContent extends StatelessWidget {
                       ),
                     ),],
                   if (showBottomRow) SizedBox(
-                      height: context.textScaleFactor * 18.0,
+                      height: 1 * 18.0,
                     ),
 
                 ],

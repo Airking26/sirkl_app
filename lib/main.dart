@@ -26,36 +26,11 @@ import 'package:sirkl/common/constants.dart' as con;
 
 void main() async{
   final client = StreamChatClient("mhgk84t9jfnt");
-  //StreamChatClient('v2s6zx9zjd9b', logLevel: Level.ALL);
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await GetStorage.init();
   runApp(MyApp(client: client));
-}
-
-Future<void> setupVoiceSDKEngine() async {
-  // retrieve or request microphone permission
-  await [Permission.microphone].request();
-
-  //create an instance of the Agora engine
-  var agoraEngine = await RtcEngine.create("appId");
-  await agoraEngine.initialize(RtcEngineContext("appId"));
-
-  // Register the event handler
-  agoraEngine.setEventHandler(
-    RtcEngineEventHandler(
-      joinChannelSuccess: (String x, int y, int elapsed) {
-        var t = x;
-        var tr = y;
-        var trr = elapsed;
-      },
-      userJoined: (int remoteUid, int elapsed) {
-      },
-      userOffline: (int remoteUid, UserOfflineReason reason) {
-      },
-    ),
-  );
 }
 
 class MyApp extends StatelessWidget {
@@ -103,6 +78,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   void initState() {
     _homeController.putFCMToken(context, widget.client);
     initFirebase();
+    _callController.setupVoiceSDKEngine();
     super.initState();
   }
 
@@ -128,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
         }
       }
       else {
-        showCallkitIncoming(message.data['uuid'] as String);
+        showCallkitIncoming(message.data);
       }
     });
     FirebaseMessaging.instance.getInitialMessage().then((event) async{
@@ -213,25 +189,25 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     }
   }*/
   else if(message.data["uuid"] != null) {
-    showCallkitIncoming(message.data['uuid'] as String);
+    showCallkitIncoming(message.data);
   }
 }
 
-Future<void> showCallkitIncoming(String uuid) async {
+Future<void> showCallkitIncoming(Map<String, dynamic> data) async {
   var params = <String, dynamic>{
-    'id': uuid,
-    'nameCaller': 'Hien Nguyen',
-    'appName': 'Callkit',
-    'avatar': 'https://i.pravatar.cc/100',
-    'handle': '0123456789',
+    'id': data['uuid'],
+    'nameCaller': data["caller_name"],
+    'appName': 'Sirkl',
+    'avatar': data["pic"] ?? 'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png',
+    //'handle': '0123456789',
     'type': 0,
     'duration': 30000,
     'textAccept': 'Accept',
     'textDecline': 'Decline',
     'textMissedCall': 'Missed call',
     'textCallback': 'Call back',
-    'extra': <String, dynamic>{'userId': '1a2b3c4d'},
-    'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
+    'extra': <String, dynamic>{'userCalling': data["caller_id"], "userCalled": data['called_id']},
+    //'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
     'android': <String, dynamic>{
       'priority': 'high',
       'isCustomNotification': true,

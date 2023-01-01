@@ -36,7 +36,7 @@ class UserAvatarTransform extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Transform.translate(
-      offset: Offset(
+      offset: const Offset(
         0,
          0,
       ),

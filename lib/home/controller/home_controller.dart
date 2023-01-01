@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:agora_rtm/agora_rtm.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -38,7 +37,6 @@ class HomeController extends GetxController{
   final _callController = Get.put(CallsController());
   final _commonController = Get.put(CommonController());
 
-  Rx<AgoraRtmClient?> agoraClient = (null as AgoraRtmClient?).obs;
   Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
   final box = GetStorage();
 
@@ -46,7 +44,6 @@ class HomeController extends GetxController{
   var indexBarHeight = 400.0.obs;
   var isConfiguring = false.obs;
   var tokenAgoraRTM = "".obs;
-  var tokenAgoraRTC = "".obs;
   var accessToken = "".obs;
   var userMe = UserDTO().obs;
   var isLoadingNfts = true.obs;
@@ -68,7 +65,7 @@ class HomeController extends GetxController{
       description: 'SIRKL Login',
       url: 'https://walletconnect.org',
       icons: [
-        'https://gblobscdn.gitbook.com/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media'
+        'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png'
       ],
     ),
   );
@@ -161,7 +158,7 @@ class HomeController extends GetxController{
           retrieveAccessToken();
           _commonController.showSirklUsers(id.value);
           await retrieveTokenStreamChat(client, firebaseMessaging!);
-          await retrieveTokenAgoraRTM(id.value);
+          //await retrieveTokenAgoraRTM(id.value);
           await getNFTsContractAddresses(client);
         }
       } else if(request.isOk){
@@ -169,7 +166,7 @@ class HomeController extends GetxController{
         retrieveAccessToken();
         _commonController.showSirklUsers(id.value);
         await retrieveTokenStreamChat(client, firebaseMessaging!);
-        await retrieveTokenAgoraRTM(id.value);
+        //await retrieveTokenAgoraRTM(id.value);
         await getNFTsContractAddresses(client);
       } else {
         debugPrint(request.statusText);
@@ -273,7 +270,7 @@ class HomeController extends GetxController{
   }
 
   updateMe(UpdateMeDto updateMeDto) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);// ?? this.accessToken.value;
+    var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _profileService.modifyUser(
         accessToken, updateMeDtoToJson(updateMeDto));
@@ -336,23 +333,7 @@ class HomeController extends GetxController{
     }
   }
 
-  retrieveTokenAgoraRTC(String channel, String role, String tokenType, String id) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.retrieveTokenAgoraRTC(accessToken, channel, role, tokenType, id);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.retrieveTokenAgoraRTC(accessToken, channel, role, tokenType, id);
-      if(request.isOk) tokenAgoraRTC.value = request.body!;
-    } else if(request.isOk) {
-      tokenAgoraRTC.value = request.body!;
-    }
-  }
-
-  retrieveTokenAgoraRTM(String id) async{
+  /*retrieveTokenAgoraRTM(String id) async{
     agoraClient.value = await _callController.initClient();
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
@@ -373,7 +354,7 @@ class HomeController extends GetxController{
       await agoraClient.value?.login(tokenAgoraRTM.value, id);
       await _callController.createClient(agoraClient.value!);
     }
-  }
+  }*/
 
   checkIfUserExists(String wallet) async{
     var request = await _homeService.isUserExists(wallet);

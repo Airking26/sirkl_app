@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/notification_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/utils.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -21,6 +23,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
+  final _commonController = Get.put(CommonController());
   final PagingController<int, NotificationDto> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
 
@@ -116,8 +119,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
       child: Padding(
         padding: const EdgeInsets.only(right: 8.0, top: 8, bottom: 8),
         child: ListTile(
-          onTap: (){
-
+          onTap: () async{
+            await _commonController.getUserById(item.idData);
+            Get.to(() => const ProfileElseScreen(fromConversation: false));
           },
           leading:
               item.type != 0 && item.type != 1 ?
@@ -129,9 +133,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       ),
                   child: Align(alignment: Alignment.center, child: Image.asset('assets/images/stories.png', width: 24, height: 24,),),) :
           item.picture.isNullOrBlank! ?
-          SizedBox(height: 50, width: 50, child: TinyAvatar(baseString: item.wallet?? "", dimension: 50, circular: true,)) :
-          CachedNetworkImage(imageUrl: item.picture!, width: 50, height: 50, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
-              errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", width: 50, height: 50, fit: BoxFit.cover)),
+          SizedBox(height: 50, width: 50, child: TinyAvatar(baseString: item.wallet?? "", dimension: 50, circular: true, colourScheme:TinyAvatarColourScheme.seascape )) :
+          ClipRRect(
+            borderRadius: BorderRadius.circular(90),
+            child: CachedNetworkImage(imageUrl: item.picture!, width: 50, height: 50, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", width: 50, height: 50, fit: BoxFit.cover)),
+          ),
           title: Transform.translate(
             offset: Offset(item.picture.isNullOrBlank! ? 0 : -8, 0),
             child: buildTextNotif(item),

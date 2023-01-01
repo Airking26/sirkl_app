@@ -22,13 +22,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.3.1"
-  agora_rtm:
-    dependency: "direct main"
-    description:
-      name: agora_rtm
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.5.0"
   align_positioned:
     dependency: "direct main"
     description:
@@ -1407,6 +1400,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.10.0"
+  stop_watch_timer:
+    dependency: "direct main"
+    description:
+      name: stop_watch_timer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   story:
     dependency: "direct main"
     description:

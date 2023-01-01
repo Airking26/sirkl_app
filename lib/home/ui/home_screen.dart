@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:nice_buttons/nice_buttons.dart';
+import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/common/model/call_creation_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -32,6 +34,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
+  final _callController = Get.put(CallsController());
   YYDialog dialogMenu = YYDialog();
   final utils = Utils();
   final PagingController<int, List<StoryDto?>?> pagingController = PagingController(firstPageKey: 0);
@@ -426,11 +429,19 @@ Widget buildSirklTile(BuildContext context, int index, bool isShowSuspension) {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Image.asset(
-                      "assets/images/call_tab.png",
-                      color: const Color(0xFF00CB7D),
-                      width: 20,
-                      height: 20,
+                    InkWell(
+                      onTap: () async{
+                        //var client = await _callController.initClient();
+                        _callController.userCalled.value = _commonController.users[index];
+                        await _callController.inviteCall(_commonController.users[index], DateTime.now().toString(), _homeController.id.value);
+                        //_callController.inviteCall(_commonController.users[index].id!, "example", _homeController.id.value);
+                      },
+                      child: Image.asset(
+                        "assets/images/call_tab.png",
+                        color: const Color(0xFF00CB7D),
+                        width: 20,
+                        height: 20,
+                      ),
                     ),
                     const SizedBox(
                       width: 8,

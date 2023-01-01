@@ -68,7 +68,6 @@ dependencies:
   slider_button: ^2.0.0
   agora_rtc_engine: ^5.3.1
   permission_handler: ^9.2.0
-  agora_rtm: ^1.5.0
   flutter_callkit_incoming: ^1.0.2+2
   ethereum_addresses: ^1.0.2
   widget_circular_animator: ^1.0.0
@@ -85,6 +84,7 @@ dependencies:
   flutter_slidable: ^2.0.0
   story_view: ^0.14.0
   story: ^0.8.0
+  stop_watch_timer: ^2.0.0
 
 dev_dependencies:
   dart_code_metrics: ^4.4.0
@@ -168,6 +168,9 @@ flutter:
      - assets/images/photo_filter.png
      - assets/images/video_trim.png
      - assets/images/instagram_logo.png
+     - assets/images/micro.svg
+     - assets/images/volume.svg
+     - assets/images/call_end.svg
      - animations/
      - svgs/
      - lib/svgs/

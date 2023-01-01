@@ -1,10 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:intl/intl.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/call_creation_dto.dart';
+import 'package:sirkl/common/model/call_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:tiny_avatar/tiny_avatar.dart';
 import 'dart:io';
 
 import '../../common/utils.dart';
@@ -20,6 +29,32 @@ class _CallsScreenState extends State<CallsScreen> {
 
   final _callController = Get.put(CallsController());
   final _homeController = Get.put(HomeController());
+  final _commonController = Get.put(CommonController());
+  final PagingController<int, CallDto> pagingController = PagingController(firstPageKey: 0);
+  static var pageKey = 0;
+
+  Future<void> fetchPageCallDTO() async {
+    try {
+      List<CallDto> newItems = await _callController.retrieveCalls(pageKey.toString());
+      final isLastPage = newItems.length < 12;
+      if (isLastPage) {
+        pagingController.appendLastPage(newItems);
+      } else {
+        final nextPageKey = pageKey++;
+        pagingController.appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      pagingController.error = error;
+    }
+  }
+
+  @override
+  void initState() {
+    pagingController.addPageRequestListener((pageKey) {
+      fetchPageCallDTO();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +65,7 @@ class _CallsScreenState extends State<CallsScreen> {
             : const Color.fromARGB(255, 247, 253, 255),
         body: Column(children: [
           buildAppbar(context),
-          noGroupUI()
+          buildListCall(context)
           //buildListCall(context)
         ]));
   }
@@ -181,11 +216,12 @@ class _CallsScreenState extends State<CallsScreen> {
             child: Padding(
               padding: const EdgeInsets.only(top: 24),
               child: SafeArea(
-                child: ListView.separated(
+                child: PagedListView.separated(
+                  pagingController: pagingController,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  itemCount: 50,
-                  itemBuilder: callTile,
-                  separatorBuilder: (context, index){return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
+                  builderDelegate: PagedChildBuilderDelegate<CallDto>(itemBuilder: (context, item, index) => callTile(item, index)),
+                  separatorBuilder: (context, index){
+                    return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
                 ),
               ),
             ),
@@ -193,19 +229,41 @@ class _CallsScreenState extends State<CallsScreen> {
         );
   }
 
-  Widget callTile(BuildContext context, int index){
+  Widget callTile(CallDto callDto, int index){
+    var nowMilli = DateTime.now().millisecondsSinceEpoch;
+    var updatedAtMilli =  DateTime.parse(callDto.updatedAt.toIso8601String()).millisecondsSinceEpoch;
+    var diffMilli = nowMilli - updatedAtMilli;
+    var timeSince = DateTime.now().subtract(Duration(milliseconds: diffMilli));
+    var now = DateTime.now();
+    var dateSubstring = DateTime(callDto.updatedAt.year, callDto.updatedAt.month, callDto.updatedAt.day) == DateTime(now.year, now.month, now.day) ? DateFormat("HH:mm").format(callDto.updatedAt.toLocal()) : DateFormat("dd MMM").format(callDto.updatedAt.toLocal());
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
-        leading: CachedNetworkImage(imageUrl: "https://ik.imagekit.io/bayc/assets/bayc-footer.png", width: 60, height: 60, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
-            errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),
+        leading: callDto.called.picture.isNullOrBlank! ?
+        InkWell(
+          onTap: (){
+            _commonController.userClicked.value = callDto.called;
+            Get.to(() =>  const ProfileElseScreen(fromConversation: false,));
+          },
+            child: SizedBox(height: 50, width: 50, child: TinyAvatar(baseString: callDto.called.wallet!, dimension: 50, circular: true, colourScheme:TinyAvatarColourScheme.seascape))) :
+        InkWell(
+          onTap: (){
+            _commonController.userClicked.value = callDto.called;
+            Get.to(() =>  const ProfileElseScreen(fromConversation: false,));
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(90),
+            child: CachedNetworkImage(imageUrl: callDto.called.picture!, width: 50, height: 50, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", width: 50, height: 50, fit: BoxFit.cover)),
+          ),
+        ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: Text("2 Days", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282))),
+              child: Text(timeago.format(timeSince), style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282))),
             ),
             SizedBox(
               width: 100,
@@ -213,12 +271,13 @@ class _CallsScreenState extends State<CallsScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                 InkWell(onTap:()async{
-                  await _callController.inviteCall(_homeController.agoraClient.value!, "638db80a0753b1001e10b21d", "knflknzzdzdzjjfr");
+                  await _callController.inviteCall(callDto.called, DateTime.now().toString(), _homeController.id.value);
                   } ,child: Image.asset("assets/images/call_tab.png", color: const Color(0xFF00CB7D), width: 20, height: 20,)),
                 const SizedBox(width: 8,),
                 InkWell(
-                  onTap: () async{
-                    //await _callController.inviteCall('dd', "exampleShan");
+                  onTap: () {
+                    _commonController.userClicked.value = callDto.called;
+                    Get.to(() => const DetailedChatScreen(create:true));
                   },
                     child: Image.asset("assets/images/chat_tab.png", width: 20, height: 20, color: const Color(0xFF9BA0A5),)),
                   const SizedBox(width: 4,),
@@ -227,13 +286,17 @@ class _CallsScreenState extends State<CallsScreen> {
             )
           ],
         ),
-        title: Transform.translate(offset: const Offset(-8, 0),child: Text("Bored Ape Yacht", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+        title: Transform.translate(offset: const Offset(-4, 0),child: Text(callDto.called.userName.isNullOrBlank! ? "${callDto.called.wallet!.substring(0, 15)}..." : callDto.called.userName!.length > 15 ? "${callDto.called.userName!.substring(0,15)}..." : callDto.called.userName!, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
         subtitle:
             Transform.translate(
-              offset: const Offset(-8, 0),
+              offset: const Offset(-4, 0),
               child: Row(children: [
-                Image.asset("assets/images/outgoing.png", width: 10, height: 10,),
-                Text( "  Outgoing  - 12:15PM", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
+                if(callDto.status == 0)Image.asset("assets/images/outgoing.png", width: 10, height: 10,)
+                else if(callDto.status == 1)Image.asset("assets/images/incoming.png", width: 10, height: 10,)
+                else Image.asset("assets/images/missed.png", width: 10, height: 10,),
+                if(callDto.status == 0) Text( "  Outgoing - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
+                else if(callDto.status == 1) Text( "  Incoming - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
+                else Text( "  Missed - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
               ],),
             )
       ),
