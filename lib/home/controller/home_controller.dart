@@ -43,7 +43,6 @@ class HomeController extends GetxController{
   var id = "".obs;
   var indexBarHeight = 400.0.obs;
   var isConfiguring = false.obs;
-  var tokenAgoraRTM = "".obs;
   var accessToken = "".obs;
   var userMe = UserDTO().obs;
   var isLoadingNfts = true.obs;
@@ -158,7 +157,6 @@ class HomeController extends GetxController{
           retrieveAccessToken();
           _commonController.showSirklUsers(id.value);
           await retrieveTokenStreamChat(client, firebaseMessaging!);
-          //await retrieveTokenAgoraRTM(id.value);
           await getNFTsContractAddresses(client);
         }
       } else if(request.isOk){
@@ -166,7 +164,6 @@ class HomeController extends GetxController{
         retrieveAccessToken();
         _commonController.showSirklUsers(id.value);
         await retrieveTokenStreamChat(client, firebaseMessaging!);
-        //await retrieveTokenAgoraRTM(id.value);
         await getNFTsContractAddresses(client);
       } else {
         debugPrint(request.statusText);
@@ -201,13 +198,13 @@ class HomeController extends GetxController{
       }
     }
 
-      List<String> contractAddresses = [];
+      List<String> contractAddresses = ["0xc8D2bf842b9f0b601043fb4fd5F23d22b9483911"];
       for (var element in initialArray) {contractAddresses.add(element.tokenAddress!);}
 
       var addressesAbsent = userMe.value.contractAddresses!.toSet().difference(contractAddresses.toSet()).toList();
       if(client != null && addressesAbsent.isNotEmpty) {
         for (var absentAddress in addressesAbsent) {
-          await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
+          //await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
         }
       }
 
@@ -333,29 +330,6 @@ class HomeController extends GetxController{
     }
   }
 
-  /*retrieveTokenAgoraRTM(String id) async{
-    agoraClient.value = await _callController.initClient();
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.retrieveTokenAgoraRTM(accessToken, id);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.retrieveTokenAgoraRTM(accessToken, id);
-      if(request.isOk) {
-        tokenAgoraRTM.value = request.bodyString!;
-        await agoraClient.value?.login(tokenAgoraRTM.value, id);
-        await _callController.createClient(agoraClient.value!);
-      }
-    } else if(request.isOk) {
-      tokenAgoraRTM.value = request.bodyString!;
-      await agoraClient.value?.login(tokenAgoraRTM.value, id);
-      await _callController.createClient(agoraClient.value!);
-    }
-  }*/
-
   checkIfUserExists(String wallet) async{
     var request = await _homeService.isUserExists(wallet);
     return request.body! == "false" ? true : false;
@@ -364,23 +338,18 @@ class HomeController extends GetxController{
   retrieveStories(int offset) async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.retrieveStories(accessToken, offset.toString());
-    if(request.statusCode == 401) {
+    var request;
+    try{
+      request = await _homeService.retrieveStories(accessToken, offset.toString());
+    } on CastError{
       var requestToken = await _homeService.refreshToken(refreshToken);
       var refreshTokenDTO = refreshTokenDtoFromJson(
           json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request =  await _homeService.retrieveStories(accessToken, offset.toString());
-      if(request.isOk) {
-        loadingStories.value = false;
-        if(stories.value == null) {
-          stories.value = storyDtoFromJson(json.encode(request.body));
-        } else {
-          stories.value = stories.value! + storyDtoFromJson(json.encode(request.body));
-        }        return storyDtoFromJson(json.encode(request.body));
-      }
-    } else if(request.isOk) {
+    }
+    if(request.isOk) {
       loadingStories.value = false;
       if(stories.value == null) {
         stories.value = storyDtoFromJson(json.encode(request.body));
@@ -388,6 +357,8 @@ class HomeController extends GetxController{
         stories.value = stories.value! + storyDtoFromJson(json.encode(request.body));
       }
       return storyDtoFromJson(json.encode(request.body));
+    } else {
+      loadingStories.value = false;
     }
   }
 

@@ -13,6 +13,7 @@ const String callsTabRes = "calls";
 const String groupsTabRes = "groups";
 const String chatsTabRes = "chats";
 const String profileTabRes = "profile";
+const String profileMenuyRes = "profile_menu";
 
 /// Home page ///
 const String connectYourWalletRes = "connect_your_wallet";

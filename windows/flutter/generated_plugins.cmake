@@ -4,7 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   agora_rtc_engine
-  connectivity_plus_windows
+  connectivity_plus
   dart_vlc
   desktop_drop
   file_selector_windows

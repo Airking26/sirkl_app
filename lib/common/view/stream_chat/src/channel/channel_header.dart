@@ -6,8 +6,11 @@ import 'package:get/get.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/groups/ui/group_participants_screen.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -134,7 +137,10 @@ class StreamChannelHeader extends StatelessWidget
   final Size preferredSize;
 
   YYDialog dialogMenu = YYDialog();
+  final _commonController = Get.put(CommonController());
+  final _homeController = Get.put(HomeController());
   final _chatController = Get.put(ChatsController());
+  final utils = Utils();
 
 
   @override
@@ -234,6 +240,9 @@ class StreamChannelHeader extends StatelessWidget
                                             .user!
                                             .extraData["userDTO"]));
                                 Get.to(() => const ProfileElseScreen(fromConversation: true,));
+                              } else if(channel.isGroup){
+                                _chatController.channel.value = channel;
+                                Get.to(() => const GroupParticipantScreen());
                               }
                             },
                             child: Padding(
@@ -285,6 +294,9 @@ class StreamChannelHeader extends StatelessWidget
                                             .user!
                                             .extraData["userDTO"]));
                                 Get.to(() => const ProfileElseScreen(fromConversation: true,));
+                              } else if(channel.isGroup){
+                                _chatController.channel.value = channel;
+                                Get.to(() => const GroupParticipantScreen());
                               }
                             },
                             child: Padding(
@@ -382,52 +394,109 @@ class StreamChannelHeader extends StatelessWidget
   }
 
   YYDialog dialogPopMenuConv(BuildContext context, Channel channel) {
+    commonController.userClicked.value = userFromJson(
+        json.encode(channel.state?.members
+            .where((element) =>
+        element.userId != StreamChat
+            .of(context)
+            .currentUser!
+            .id)
+            .first
+            .user!
+            .extraData["userDTO"]));
     return YYDialog().build(context)
       ..width = 180
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
-      ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..barrierColor =
+      Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor =
+      Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(userFromJson(
-              json.encode(channel.state?.members
-                  .where((element) =>
-              element.userId != StreamChat
-                  .of(context)
-                  .currentUser!
-                  .id)
-                  .first
-                  .user!
-                  .extraData["userDTO"])).isInFollowing! ? con.addToMySirklRes.tr : con.removeOfMySirklRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){
-          commonController.userClicked.value = userFromJson(
-              json.encode(channel.state?.members
-                  .where((element) =>
-              element.userId != StreamChat
-                  .of(context)
-                  .currentUser!
-                  .id)
-                  .first
-                  .user!
-                  .extraData["userDTO"]));
-          Get.to(() => const ProfileElseScreen(fromConversation: true,));
+        onTap: () async {
+          dialogMenu.dismiss();
+          if (_commonController.userClickedFollowStatus.value) {
+            if (await _commonController
+                .removeUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)) {
+              utils.showToast(
+                  context,
+                  con.userRemovedofSirklRes.trParams({
+                    "user": _commonController.userClicked.value!.userName.isNullOrBlank!?
+                    _commonController.userClicked.value!.wallet! : _commonController.userClicked.value!.userName!
+                  }));
+            }
+          } else {
+            if (await _commonController
+                .addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)) {
+              utils.showToast(
+                  context,
+                  con.userAddedToSirklRes.trParams({
+                    "user": _commonController.userClicked.value!.userName.isNullOrBlank! ?
+                    _commonController.userClicked.value!.wallet! : _commonController.userClicked.value!.userName!
+                  }));
+            }
+          }
         },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.profileMenuTabRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                _commonController.userClickedFollowStatus.value
+                    ? con.removeOfMySirklRes.tr
+                    : con.addToMySirklRes.tr,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: _commonController.userClickedFollowStatus.value ? Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282) :Color(0xff00CB7D),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+        onTap: () {
+          Get.to(() => const ProfileElseScreen(fromConversation: true));
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                con.profileMenuTabRes.tr,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Get.isDarkMode
+                        ? const Color(0xff9BA0A5)
+                        : const Color(0xFF828282),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: () {},
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                con.reportRes.tr,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Get.isDarkMode
+                        ? const Color(0xff9BA0A5)
+                        : const Color(0xFF828282),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
       ))
       ..show();
   }
+
+
 
 }

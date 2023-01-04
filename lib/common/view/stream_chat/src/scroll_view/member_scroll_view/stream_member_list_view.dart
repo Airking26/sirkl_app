@@ -14,7 +14,7 @@ Widget defaultMemberListViewSeparatorBuilder(
   List<Member> members,
   int index,
 ) =>
-    const StreamUserListSeparator();
+    const StreamChannelListSeparator();
 
 /// Signature for the item builder that creates the children of the
 /// [StreamMemberListView].

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/calls/ui/calls_screen.dart';
 import 'package:sirkl/chats/ui/chat_screen.dart';

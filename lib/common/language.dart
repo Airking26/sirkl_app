@@ -10,6 +10,7 @@ class Language extends Translations{
       c.groupsTabRes: "Groups",
       c.chatsTabRes: "Inbox",
       c.profileTabRes: "Profile",
+      c.profileMenuTabRes: "• Profile",
       c.connectYourWalletRes: "Connect Your Wallet",
       c.walletConnectedRes: "Wallet Connected",
       c.talkWithRes: "Talk with other wallets and your NFT groups",

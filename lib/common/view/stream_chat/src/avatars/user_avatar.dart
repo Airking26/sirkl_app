@@ -83,8 +83,7 @@ class StreamUserAvatar extends StatelessWidget {
     final streamChatTheme = StreamChatTheme.of(context);
     final streamChatConfig = StreamChatConfiguration.of(context);
 
-    final placeholder =
-        this.placeholder ?? streamChatConfig.placeholderUserImage;
+    final placeholder = this.placeholder ?? streamChatConfig.placeholderUserImage;
 
     final backupGradientAvatar = ClipRRect(
       borderRadius: borderRadius ??

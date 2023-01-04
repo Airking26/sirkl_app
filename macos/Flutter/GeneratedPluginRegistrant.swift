@@ -6,7 +6,7 @@ import FlutterMacOS
 import Foundation
 
 import agora_rtc_engine
-import connectivity_plus_macos
+import connectivity_plus
 import desktop_drop
 import file_selector_macos
 import firebase_core

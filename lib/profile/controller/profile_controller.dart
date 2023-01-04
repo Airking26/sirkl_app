@@ -168,16 +168,18 @@ class ProfileController extends GetxController{
   retrieveNotifications(String id, int offset) async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.retrieveNotifications(accessToken, id, offset.toString());
-    if(request.statusCode == 401) {
+    var request;
+    try{
+      request = await _profileService.retrieveNotifications(accessToken, id, offset.toString());
+    } on CastError{
       var requestToken = await _homeService.refreshToken(refreshToken);
       var refreshTokenDTO = refreshTokenDtoFromJson(
           json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request =  await _profileService.retrieveNotifications(accessToken, id, offset.toString());
-      if(request.isOk) return notificationDtoFromJson(json.encode(request.body));
-    } else if(request.isOk) {
+    }
+    if(request.isOk) {
       return notificationDtoFromJson(json.encode(request.body));
     }
   }

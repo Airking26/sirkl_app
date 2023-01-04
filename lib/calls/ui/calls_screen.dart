@@ -8,7 +8,6 @@ import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/model/call_creation_dto.dart';
 import 'package:sirkl/common/model/call_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
@@ -31,7 +30,9 @@ class _CallsScreenState extends State<CallsScreen> {
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
   final PagingController<int, CallDto> pagingController = PagingController(firstPageKey: 0);
+  final PagingController<int, CallDto> pagingSearchController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
+
 
   Future<void> fetchPageCallDTO() async {
     try {
@@ -48,6 +49,15 @@ class _CallsScreenState extends State<CallsScreen> {
     }
   }
 
+  Future<void> fetchPageSearchCallDTO(String query) async {
+    try {
+      List<CallDto> newItems = await _callController.searchInCalls(query);
+      pagingSearchController.appendLastPage(newItems);
+    } catch (error) {
+      pagingSearchController.error = error;
+    }
+  }
+
   @override
   void initState() {
     pagingController.addPageRequestListener((pageKey) {
@@ -58,7 +68,7 @@ class _CallsScreenState extends State<CallsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Obx(()=>Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Get.isDarkMode
             ? const Color(0xFF102437)
@@ -67,7 +77,7 @@ class _CallsScreenState extends State<CallsScreen> {
           buildAppbar(context),
           buildListCall(context)
           //buildListCall(context)
-        ]));
+        ])));
   }
 
   Stack buildAppbar(BuildContext context) {
@@ -77,7 +87,7 @@ class _CallsScreenState extends State<CallsScreen> {
       fit: StackFit.loose,
       children: [
         Container(
-          height: 140,
+          height: _callController.callList.value == null || _callController.callList.value!.isEmpty ? 115 : 140,
           margin: const EdgeInsets.only(bottom: 0.25),
           decoration: BoxDecoration(
             boxShadow: const [
@@ -94,7 +104,6 @@ class _CallsScreenState extends State<CallsScreen> {
                 end: Alignment.bottomCenter,
                 colors: [
                   Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-                  //Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
                   Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
                 ]),
           ),
@@ -140,7 +149,7 @@ class _CallsScreenState extends State<CallsScreen> {
             ),
           ),
         ),
-        Positioned(
+        _callController.callList.value == null || _callController.callList.value!.isEmpty ? Container() : Positioned(
             top: Platform.isAndroid? 80 : 60,
             child: SizedBox(
                 height: 110,
@@ -182,7 +191,14 @@ class _CallsScreenState extends State<CallsScreen> {
       Get.isDarkMode ? const Color(0xFF2D465E).withOpacity(1) : Colors.white,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
-        // Call your model, bloc, controller here.
+        pagingSearchController.itemList = [];
+        pagingSearchController.refresh();
+        if(query.isNotEmpty) {
+          _callController.isSearchIsActive.value = true;
+          fetchPageSearchCallDTO(query);
+        } else {
+          _callController.isSearchIsActive.value = false;
+        }
       },
       // Specify a custom transition to be used for
       // animating between opened and closed stated.
@@ -217,9 +233,11 @@ class _CallsScreenState extends State<CallsScreen> {
               padding: const EdgeInsets.only(top: 24),
               child: SafeArea(
                 child: PagedListView.separated(
-                  pagingController: pagingController,
+                  pagingController: _callController.isSearchIsActive.value ? pagingSearchController : pagingController,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  builderDelegate: PagedChildBuilderDelegate<CallDto>(itemBuilder: (context, item, index) => callTile(item, index)),
+                  builderDelegate: PagedChildBuilderDelegate<CallDto>(
+                    noItemsFoundIndicatorBuilder: (context) => noCallUI(),
+                      itemBuilder: (context, item, index) => callTile(item, index)),
                   separatorBuilder: (context, index){
                     return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
                 ),
@@ -294,16 +312,16 @@ class _CallsScreenState extends State<CallsScreen> {
                 if(callDto.status == 0)Image.asset("assets/images/outgoing.png", width: 10, height: 10,)
                 else if(callDto.status == 1)Image.asset("assets/images/incoming.png", width: 10, height: 10,)
                 else Image.asset("assets/images/missed.png", width: 10, height: 10,),
-                if(callDto.status == 0) Text( "  Outgoing - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
-                else if(callDto.status == 1) Text( "  Incoming - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
-                else Text( "  Missed - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
+                if(callDto.status == 0) Text( "  Outgoing call - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
+                else if(callDto.status == 1) Text( "  Incoming call - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
+                else Text( "  Missed call - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Colors.red))
               ],),
             )
       ),
     );
   }
 
-  Column noGroupUI() {
+  Column noCallUI() {
     return Column(
       children: [
         const SizedBox(
@@ -348,5 +366,11 @@ class _CallsScreenState extends State<CallsScreen> {
     );
   }
 
+  @override
+  void dispose() {
+    pagingSearchController.dispose();
+    pagingController.dispose();
+    super.dispose();
+  }
 
 }

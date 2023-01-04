@@ -85,18 +85,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             _profileController.isLoadingPicture.value ?
-                            Container(padding: const EdgeInsets.all(8), width: 48, height: 48, child: const CircularProgressIndicator(color: Color(0xFF00CB7D),))
+                            Container(padding: const EdgeInsets.all(8), width: 48, height: 48, child: const CircularProgressIndicator(color: Color(0xFF00CB7D),)) :
+                            _profileController.isEditingProfile.value ?
+                                InkWell(
+                                  onTap: (){
+                                    _profileController.updateMe(UpdateMeDto(
+                                        userName: _profileController.usernameTextEditingController.value.text.isEmpty ? _homeController.userMe.value.wallet! : _profileController.usernameTextEditingController.value.text,
+                                        description: _profileController.descriptionTextEditingController.value.text.isEmpty ? "" : _profileController.descriptionTextEditingController.value.text,
+                                        picture: _profileController.urlPicture.value
+                                    ), StreamChat.of(context).client);
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.only(top: 16.0, left: 16),
+                                    child: Text("DONE", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF00CB7D))),
+                                  ),
+                                )
                                 : IconButton(onPressed: (){
-                              _profileController.isEditingProfile.value ? _profileController.updateMe(UpdateMeDto(
-                                userName: _profileController.usernameTextEditingController.value.text.isEmpty ? _homeController.userMe.value.wallet! : _profileController.usernameTextEditingController.value.text,
-                                description: _profileController.descriptionTextEditingController.value.text.isEmpty ? "" : _profileController.descriptionTextEditingController.value.text,
-                                picture: _profileController.urlPicture.value
-                              ), StreamChat.of(context).client):
                               Get.to(() => const NotificationScreen())!.then((value) => _profileController.checkIfHasUnreadNotif(_homeController.id.value));
                               }, icon:
-                            _profileController.isEditingProfile.value ?
-                            Image.asset( "assets/images/edit.png", color: Get.isDarkMode ? Colors.white : Colors.black,):
-                                FlutterBadge(icon: Image.asset("assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,), itemCount: _profileController.hasUnreadNotif.value ? 1 : 0, hideZeroCount: true, badgeColor: Color(0xff00CB7D), badgeTextColor: Color(0xff00CB7D), contentPadding: EdgeInsets.only(top: 0.1,right: 16, left: 12),)
+
+                            //Image.asset( "assets/images/edit.png", color: Get.isDarkMode ? Colors.white : Colors.black,):
+                                FlutterBadge(icon: Image.asset("assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,), itemCount: _profileController.hasUnreadNotif.value ? 1 : 0, hideZeroCount: true, badgeColor: const Color(0xff00CB7D), badgeTextColor: const Color(0xff00CB7D), contentPadding: const EdgeInsets.only(top: 0.1,right: 16, left: 12),)
                             ),
                             //Image.asset("assets/images/bell.png",  color: Get.isDarkMode ? Colors.white : Colors.black,)),
                             Padding(
@@ -145,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 },
                                   child: _profileController.urlPicture.value.isEmpty ?
                                        TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 140, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
-                                  CachedNetworkImage(imageUrl: _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+                                  CachedNetworkImage(imageUrl: _profileController.urlPicture.value, color: Colors.white.withOpacity(_profileController.isEditingProfile.value ? 0.2 : 0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))
 
                               )
@@ -334,7 +343,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             leading: ClipRRect(borderRadius: BorderRadius.circular(90), child:
             //widget.collectionDbDTO.collectionImages[0].contains(".mp4") ?
               //  Obx(() => SizedBox(width: 56, height: 56, child: Image.memory(widget.profileController.videoThumbnail.value!,))) :
-            CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+            CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             trailing: Obx(() => Image.asset(
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
@@ -369,7 +378,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
                             borderRadius: BorderRadius.circular(10),
                             child: SizedBox.fromSize(
                                 child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: widget.collectionDbDTO.collectionImages[i], width: 80, height: 70,
-                                    placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+                                    placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                                     errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
                       ),
                     );

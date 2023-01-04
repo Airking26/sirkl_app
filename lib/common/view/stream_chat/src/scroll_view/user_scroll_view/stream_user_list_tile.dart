@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 /// A widget that displays a user.
@@ -129,15 +130,15 @@ class StreamUserListTile extends StatelessWidget {
         StreamUserAvatar(
           user: user,
           constraints: const BoxConstraints.tightFor(
-            height: 40,
-            width: 40,
+            height: 30,
+            width: 30,
           ),
         );
 
     final title = this.title ??
         Text(
           user.name,
-          style: chatThemeData.textTheme.bodyBold,
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, fontFamily: "Gilroy",color: Get.isDarkMode ? Colors.white : Colors.black),
         );
 
     final subtitle = this.subtitle ??
@@ -157,6 +158,7 @@ class StreamUserListTile extends StatelessWidget {
       trailing: selected ? selectedWidget : null,
       title: title,
       subtitle: subtitle,
+      dense: true,
     );
   }
 }
@@ -180,9 +182,7 @@ class UserLastActive extends StatelessWidget {
           ? context.translations.userOnlineText
           : '${context.translations.userLastOnlineText} '
               '${Jiffy(user.lastActive).fromNow()}',
-      style: chatTheme.textTheme.footnote.copyWith(
-        color: chatTheme.colorTheme.textHighEmphasis.withOpacity(0.5),
-      ),
+      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, fontFamily: "Gilroy",color: Get.isDarkMode ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5)),
     );
   }
 }

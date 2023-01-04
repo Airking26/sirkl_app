@@ -1,6 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:flutter_callkit_incoming/entities/call_event.dart';
+import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
+import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -16,6 +20,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:sirkl/profile/ui/profile_screen.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class CallsController extends GetxController{
 
@@ -25,9 +30,14 @@ class CallsController extends GetxController{
   final box = GetStorage();
   final agoraEngine = (null as RtcEngine?).obs;
   var tokenAgoraRTC = "".obs;
+  var callList = (null as List<CallDto>?).obs;
   var userCalled = UserDTO().obs;
   var userJoinedCall = false.obs;
-  var timerValue = 0.obs;
+  var timer = StopWatchTimer().obs;
+  var currentCallId = "".obs;
+  var isCallMuted = false.obs;
+  var isCallOnSpeaker = false.obs;
+  var isSearchIsActive = false.obs;
 
   Future<void> setupVoiceSDKEngine() async {
     await [Permission.microphone].request();
@@ -39,22 +49,25 @@ class CallsController extends GetxController{
     agoraEngine.value?.setEventHandler(
       RtcEngineEventHandler(
         error: (e){
-          var kj = e;
+          var error = e;
         },
         joinChannelSuccess: (String x, int y, int elapsed) {
           Get.to(() => const CallInviteSendingScreen());
         },
         userJoined: (int remoteUid, int elapsed) {
+          timer.value = StopWatchTimer();
+          timer.value.onStartTimer();
           userJoinedCall.value = true;
         },
-        userOffline: (int remoteUid, UserOfflineReason reason) {
-          userJoinedCall.value = false;
+        userOffline: (int remoteUid, UserOfflineReason reason) async {
+          await leaveChannel();
         },
       ),
     );
   }
 
   leaveChannel() async{
+    userJoinedCall.value = false;
     await agoraEngine.value?.leaveChannel();
     Get.back();
   }
@@ -77,6 +90,7 @@ class CallsController extends GetxController{
 
   inviteCall(UserDTO user, String channel, String myID) async {
     userCalled.value = user;
+    currentCallId.value = channel;
     await createCall(CallCreationDto(updatedAt: DateTime.now(), called: user.id!, status: 0, channel: channel));
     await retrieveTokenAgoraRTC(channel, "publisher", "userAccount", myID);
     //await agoraEngine.value?.registerLocalUserAccount(tokenAgoraRTC.value, "63ad5f91c9b3f4001e421a51");
@@ -91,44 +105,46 @@ class CallsController extends GetxController{
 
   listenCall() {
     FlutterCallkitIncoming.onEvent.listen((event) async{
-      switch (event!.name) {
-        case CallEvent.ACTION_CALL_INCOMING:
+      switch (event!.event) {
+        case Event.ACTION_CALL_INCOMING:
+          await getCurrentCall();
+          currentCallId.value = event.body['id'];
           print('Device Token FCM: $event');
           break;
-        case CallEvent.ACTION_CALL_START:
+        case Event.ACTION_CALL_START:
           print('Device Token FCM: $event');
           break;
-        case CallEvent.ACTION_CALL_ACCEPT:
+        case Event.ACTION_CALL_ACCEPT:
           await join(event.body['id'], event.body['extra']['userCalled'], event.body['extra']['userCalling']);
           break;
-        case CallEvent.ACTION_CALL_DECLINE:
+        case Event.ACTION_CALL_DECLINE:
+          await endCall(event.body["extra"]["userCalling"], event.body["id"]);
+          break;
+        case Event.ACTION_CALL_ENDED:
           print('Device Token FCM: $event');
           break;
-        case CallEvent.ACTION_CALL_ENDED:
+        case Event.ACTION_CALL_TIMEOUT:
+          await updateCall(CallModificationDto(id: event.body["extra"]["callId"], status: 2, updatedAt: DateTime.now()));
+          break;
+        case Event.ACTION_CALL_CALLBACK:
           print('Device Token FCM: $event');
           break;
-        case CallEvent.ACTION_CALL_TIMEOUT:
+        case Event.ACTION_CALL_TOGGLE_HOLD:
           print('Device Token FCM: $event');
           break;
-        case CallEvent.ACTION_CALL_CALLBACK:
+        case Event.ACTION_CALL_TOGGLE_MUTE:
           print('Device Token FCM: $event');
           break;
-        case CallEvent.ACTION_CALL_TOGGLE_HOLD:
+        case Event.ACTION_CALL_TOGGLE_DMTF:
           print('Device Token FCM: $event');
           break;
-        case CallEvent.ACTION_CALL_TOGGLE_MUTE:
+        case Event.ACTION_CALL_TOGGLE_GROUP:
           print('Device Token FCM: $event');
           break;
-        case CallEvent.ACTION_CALL_TOGGLE_DMTF:
+        case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
           print('Device Token FCM: $event');
           break;
-        case CallEvent.ACTION_CALL_TOGGLE_GROUP:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION:
-          print('Device Token FCM: $event');
-          break;
-        case CallEvent.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+        case Event.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
           print('Device Token FCM: $event');
           break;
       }
@@ -182,27 +198,45 @@ class CallsController extends GetxController{
   retrieveCalls(String offset) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _callService.retrieveCalls(accessToken, offset);
-    if(request.statusCode == 401){
+    var request;
+    try{
+      request = await _callService.retrieveCalls(accessToken, offset);
+    } on CastError{
       var requestToken = await _homeService.refreshToken(refreshToken!);
       var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _callService.retrieveCalls(accessToken, offset);
-      if(request.isOk) return callDtoFromJson(json.encode(request.body));
-    } else if(request.isOk) return callDtoFromJson(json.encode(request.body));
+    }
+    if(request.isOk) {
+      callList.value = callDtoFromJson(json.encode(request.body));
+      return callDtoFromJson(json.encode(request.body));
+    }
   }
 
-  notifyCallEntering(String id, String channel) async{
+  endCall(String id, String channel) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _callService.notifyCallEntering(accessToken, id, channel);
+    var request = await _callService.endCall(accessToken, id, channel);
     if(request.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken!);
       var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _callService.notifyCallEntering(accessToken, id, channel);
+      request = await _callService.endCall(accessToken, id, channel);
+    }
+  }
+
+  missedCallNotification(String id) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _callService.missedCallNotification(accessToken, id);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken!);
+      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDto.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _callService.missedCallNotification(accessToken, id);
     }
   }
 
@@ -219,6 +253,28 @@ class CallsController extends GetxController{
       request = await _profileService.getUserByID(accessToken, id);
       if(request.isOk) userCalled.value = userFromJson(json.encode(request.body));
     } else if(request.isOk) userCalled.value = userFromJson(json.encode(request.body));
+  }
+
+  Future<List<CallDto>> searchInCalls(String search) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var req = await _callService.searchCalls(accessToken, search);
+    if(req.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken!);
+      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDto.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      req = await _callService.searchCalls(accessToken, search);
+      if(req.isOk) {
+        return callDtoFromJson(json.encode(req.body));
+      } else {
+        return [];
+      }
+    } else if(req.isOk){
+      return callDtoFromJson(json.encode(req.body));
+    } else {
+      return [];
+    }
   }
 
 }

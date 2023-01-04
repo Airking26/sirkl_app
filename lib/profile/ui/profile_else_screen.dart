@@ -10,8 +10,11 @@ import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/common/view/navbar/floating_navbar.dart';
+import 'package:sirkl/common/view/navbar/floating_navbar_item.dart';
 import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
@@ -27,6 +30,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
+  final _navigationController = Get.put(NavigationController());
   final utils = Utils();
   YYDialog dialogMenu = YYDialog();
 
@@ -203,7 +207,9 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
           }
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(_commonController.userClickedFollowStatus.value ? con.removeOfMySirklRes.tr : con.addToMySirklRes.tr, style: TextStyle(fontSize: 14, color: _commonController.userClickedFollowStatus.value ? Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282) :Color(0xff00CB7D), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(_commonController.userClickedFollowStatus.value ? con.removeOfMySirklRes.tr : con.addToMySirklRes.tr, style: TextStyle(fontSize: 14,
+              color: _commonController.userClickedFollowStatus.value ? Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282) :Color(0xff00CB7D),
+              fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
