@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
@@ -15,6 +17,7 @@ import 'package:sirkl/common/view/navbar/floating_navbar_item.dart';
 import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
@@ -30,17 +33,37 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
+  final _profileController = Get.put(ProfileController());
   final _navigationController = Get.put(NavigationController());
   final utils = Utils();
   YYDialog dialogMenu = YYDialog();
+  final PagingController<int, CollectionDbDto> pagingController = PagingController(firstPageKey: 0);
+  static var pageKey = 0;
 
   @override
   void initState(){
+    _homeController.cursorElse.value = "";
     _commonController.checkUserIsInFollowing();
-    _homeController.getNFTsTemporary(_commonController.userClicked.value!.wallet!, context);
-    //_commonController.userClickedFollowStatus.value = _commonController.userClicked.value!.isInFollowing!;
+    pagingController.addPageRequestListener((pageKey) {
+      fetchNFTs();
+    });
     super.initState();
   }
+
+  Future<void> fetchNFTs() async {
+    try {
+      List<CollectionDbDto> newItems = await _homeController.getNFTsTemporaryForOthers(_commonController.userClicked.value!.wallet!);
+      if (_homeController.cursorElse.value == "") {
+        pagingController.appendLastPage(newItems);
+      } else {
+        final nextPageKey = pageKey++;
+        pagingController.appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      pagingController.error = error;
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -83,19 +106,48 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          _profileController.isEditingProfileElse.value ? InkWell(
+                            onTap: (){
+                              _commonController.updateNicknames(_profileController.usernameElseTextEditingController.value.text, _commonController.userClicked.value!.wallet!);
+                              _profileController.isEditingProfileElse.value = false;
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.only(top: 16.0, left: 16),
+                              child: Text("DONE", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF00CB7D))),
+                            ),
+                          ) :
                           IconButton(onPressed: () async{
                             if(!_commonController.userClickedFollowStatus.value) {
                               if( await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)){
                                 utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
                               }
                             } else {
-                              widget.fromConversation ? Get.back(): Get.to(() => const DetailedChatScreen(create: true));
+                              widget.fromConversation ? Navigator.of(context).pop():
+                              _navigationController.hideNavBar.value = true;
+                              pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
                             }
                             }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? Get.isDarkMode ? Colors.white : Colors.black :Color(0xff00CB7D), height: 28, width: 28,)),
                           Padding(
                             padding: const EdgeInsets.only(top: 12.0),
                             child:
-                            Text(_commonController.userClicked.value!.userName!.isEmpty ? "${_commonController.userClicked.value!.wallet!.substring(0, 20)}..." : _commonController.userClicked.value!.userName!, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
+                                _profileController.isEditingProfileElse.value ?
+                                SizedBox(
+                                  width: 200,
+                                  child: TextField(
+                                    autofocus: true,
+                                    maxLines: 1,
+                                    controller: _profileController.usernameElseTextEditingController.value,
+                                    maxLength: 20,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),
+                                    decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        isCollapsed: true,
+                                        hintText: ""
+                                    ),
+                                  ),
+                                ):
+                                Text(_commonController.nicknames[_commonController.userClicked.value!.wallet!] ?? (_commonController.userClicked.value!.userName!.isEmpty ? "${_commonController.userClicked.value!.wallet!.substring(0, 20)}..." : _commonController.userClicked.value!.userName!), textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
                           ),
                           IconButton(onPressed: (){
                             dialogMenu = dialogPopMenu(context);
@@ -156,31 +208,25 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
               padding: const EdgeInsets.only(left: 24.0),
               child: _homeController.nfts.value.isNotEmpty ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),)) : Container(),
             ),
-            _homeController.isLoadingNfts.value ? const Padding(
-              padding: EdgeInsets.only(top: 32.0),
-              child: CircularProgressIndicator(color: Color(0xff00CB7D)),
-            ) :
-            _homeController.nfts.value.isNotEmpty ? MediaQuery.removePadding(
+            MediaQuery.removePadding(
               context:  context,
               removeTop: true,
               child: Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: SafeArea(
-                    child: ListView.builder(
-                        cacheExtent: 1000,
-                        itemCount: _homeController.nfts.value.length,
-                        itemBuilder: (context, index){
-                          return CardNFT(_homeController.nfts.value[index], _commonController, index);
-                        },
+                    child: PagedListView(
+                      pagingController: pagingController,
+                      builderDelegate: PagedChildBuilderDelegate<CollectionDbDto>(
+                          firstPageProgressIndicatorBuilder: (context) => Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
+                          newPageProgressIndicatorBuilder: (context) => Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
+                          itemBuilder:  (context, item, index) => CardNFT(item, _commonController, index)),
                     ),
                   ),
                 ),
               ),
-            ) :  Container(
-              margin: const EdgeInsets.only(top: 24, left: 48, right: 48),
-              child: Text(con.dontHaveNftRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600),),
             )
+
           ],
         )));
   }
@@ -214,7 +260,17 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){
-          Get.to(() => const DetailedChatScreen(create: true));
+          _profileController.isEditingProfileElse.value = true;
+          dialogMenu.dismiss();
+        },
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.renameRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){
+          _navigationController.hideNavBar.value = true;
+          pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.sendAMessageRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
@@ -226,6 +282,12 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
           child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..show();
+  }
+
+  @override
+  void dispose() {
+    _homeController.cursorElse.value = "";
+    super.dispose();
   }
 
 }
@@ -262,7 +324,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             ],
           ),
           child: ExpansionTile(
-              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImage, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
                   errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             trailing: Obx(() => Image.asset(
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
@@ -278,7 +340,6 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
                 widget.profileController.isCardExpandedList.value.remove(widget.index);
               }
               widget.profileController.isCardExpandedList.refresh();
-              //widget.profileController.isCardExpanded.value = expanded;
             },
             children: [
               Padding(
@@ -312,7 +373,6 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
         ),
       );
     }
-
 
 
 }

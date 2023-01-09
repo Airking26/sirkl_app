@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/chats/ui/chat_screen.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -215,7 +216,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             children: [
               IconButton(
                   onPressed: () {
-                    Get.back();
+                    Navigator.pop(context);
                   },
                   icon: Image.asset(
                     "assets/images/arrow_left.png",
@@ -234,7 +235,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               ),
               IconButton(
                   onPressed: () {
-                    Get.to(() => const NewMessageScreen());
+                    _navigationController.hideNavBar.value = true;
+                    pushNewScreen(context, screen: const NewMessageScreen()).then((value) => _navigationController.hideNavBar.value = false);
                   },
                   icon: Image.asset(
                     "assets/images/plus.png",
@@ -289,7 +291,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         if(query.isNotEmpty && query.contains('.eth')){
           String? ethFromEns = await _chatController.getEthFromEns(query);
           if(_profileController.isUserExists.value == null && ethFromEns != "" && ethFromEns != "0") {
-            pagingController.itemList = [UserDTO(id: '', userName: query, picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: ethFromEns, contractAddresses: [], following: 0, isInFollowing: false)];
+            pagingController.itemList = [UserDTO(id: '', userName: query, picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: ethFromEns, following: 0, isInFollowing: false)];
           } else if(_profileController.isUserExists.value != null){
             pagingController.itemList = [_profileController.isUserExists.value!];
           }
@@ -299,7 +301,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         } else if(query.isNotEmpty && isValidEthereumAddress(query.toLowerCase())){
           _profileController.isUserExists.value = await _profileController.getUserByWallet(query.toLowerCase());
           if(_profileController.isUserExists.value == null) {
-            pagingController.itemList = [UserDTO(id: '', userName: "", picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: query.toLowerCase(), contractAddresses: [], following: 0, isInFollowing: false)];
+            pagingController.itemList = [UserDTO(id: '', userName: "", picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: query.toLowerCase(), following: 0, isInFollowing: false)];
           } else {
             pagingController.itemList = [_profileController.isUserExists.value!];
           }
@@ -341,7 +343,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             onTap: (){
               if(_profileController.isUserExists.value != null) {
                 _commonController.userClicked.value = item;
-                Get.to(() => const ProfileElseScreen(fromConversation: false));
+                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
               }
             },
             child: ClipRRect(
@@ -501,20 +503,21 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                       FocusManager.instance.primaryFocus?.unfocus();
                       _chatController.messageSending.value = false;
                       if (_chatController.chipsList.value.length == 1) {
-                        Get.back();
+                        Navigator.pop(context);
                         if (element.id.isNullOrBlank!) {
-                          Get.to(() =>
-                              DetailedChatScreen(
-                                  create: false, channelId: idChannel));
+                          _navigationController.hideNavBar.value = true;
+                          pushNewScreen(context, screen: DetailedChatScreen(
+                              create: false, channelId: idChannel)).then((value) => _navigationController.hideNavBar.value = false);
                         } else {
                           _commonController.userClicked.value =
                           _chatController.chipsList[0];
-                          Get.to(() => const DetailedChatScreen(create: true));
+                          _navigationController.hideNavBar.value = true;
+                          pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
                         }
                       }
                       else {
                         _chatController.messageHasBeenSent.value = true;
-                        Get.back();
+                        Navigator.pop(context);
                       }
                     }
                   }

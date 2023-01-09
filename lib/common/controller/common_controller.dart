@@ -28,6 +28,7 @@ class CommonController extends GetxController{
   var query = "".obs;
   var queryHasChanged = false.obs;
   var inboxClicked = InboxDto().obs;
+  var nicknames = {}.obs;
 
   Future<bool> addUserToSirkl(String id, StreamChatClient streamChatClient, String myId) async{
     var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, myId], "isConv": true});
@@ -109,6 +110,7 @@ class CommonController extends GetxController{
     try{
       request = await _commonService.getSirklUsers(accessToken, id);
       if(request.isOk) {
+        users.clear();
         users.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
         users.sort((a,b){ return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());});
         users.refresh();
@@ -123,6 +125,7 @@ class CommonController extends GetxController{
         try {
           request = await _commonService.getSirklUsers(accessToken, id);
           if(request.isOk) {
+            users.clear();
             users.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
             users.sort((a,b){ return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());});
             users.refresh();
@@ -136,6 +139,21 @@ class CommonController extends GetxController{
     }
 
     gettingStoryAndContacts.value = false;
+  }
+
+  initNicknames(){
+    nicknames.value = box.read(con.nicknames) ?? {};
+  }
+
+  updateNicknames(String nickname, String wallet){
+    Map<String, dynamic> nicknames = box.read(con.nicknames) ?? {};
+    if(nicknames[nicknames.containsKey(wallet)] != nickname) {
+      nicknames[wallet] = nickname;
+      this.nicknames[wallet] = nickname;
+      this.nicknames.refresh();
+      users.refresh();
+    }
+    box.write(con.nicknames, nicknames);
   }
 
   checkUserIsInFollowing() async{

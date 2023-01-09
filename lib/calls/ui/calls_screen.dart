@@ -1,15 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/call_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -29,23 +32,22 @@ class _CallsScreenState extends State<CallsScreen> {
   final _callController = Get.put(CallsController());
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
-  final PagingController<int, CallDto> pagingController = PagingController(firstPageKey: 0);
+  final _navigationController = Get.put(NavigationController());
   final PagingController<int, CallDto> pagingSearchController = PagingController(firstPageKey: 0);
-  static var pageKey = 0;
 
 
   Future<void> fetchPageCallDTO() async {
     try {
-      List<CallDto> newItems = await _callController.retrieveCalls(pageKey.toString());
+      List<CallDto> newItems = await _callController.retrieveCalls(_callController.pageKey.value.toString());
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
-        pagingController.appendLastPage(newItems);
+        _callController.pagingController.value.appendLastPage(newItems);
       } else {
-        final nextPageKey = pageKey++;
-        pagingController.appendPage(newItems, nextPageKey);
+        final nextPageKey = _callController.pageKey.value++;
+        _callController.pagingController.value.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
-      pagingController.error = error;
+      _callController.pagingController.value.error = error;
     }
   }
 
@@ -60,7 +62,7 @@ class _CallsScreenState extends State<CallsScreen> {
 
   @override
   void initState() {
-    pagingController.addPageRequestListener((pageKey) {
+    _callController.pagingController.value.addPageRequestListener((pageKey) {
       fetchPageCallDTO();
     });
     super.initState();
@@ -233,7 +235,7 @@ class _CallsScreenState extends State<CallsScreen> {
               padding: const EdgeInsets.only(top: 24),
               child: SafeArea(
                 child: PagedListView.separated(
-                  pagingController: _callController.isSearchIsActive.value ? pagingSearchController : pagingController,
+                  pagingController: _callController.isSearchIsActive.value ? pagingSearchController :  _callController.pagingController.value,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   builderDelegate: PagedChildBuilderDelegate<CallDto>(
                     noItemsFoundIndicatorBuilder: (context) => noCallUI(),
@@ -261,13 +263,13 @@ class _CallsScreenState extends State<CallsScreen> {
         InkWell(
           onTap: (){
             _commonController.userClicked.value = callDto.called;
-            Get.to(() =>  const ProfileElseScreen(fromConversation: false,));
+            pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
           },
             child: SizedBox(height: 50, width: 50, child: TinyAvatar(baseString: callDto.called.wallet!, dimension: 50, circular: true, colourScheme:TinyAvatarColourScheme.seascape))) :
         InkWell(
           onTap: (){
             _commonController.userClicked.value = callDto.called;
-            Get.to(() =>  const ProfileElseScreen(fromConversation: false,));
+            pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false)).then((value) => _callController.pagingController.value.notifyListeners());
           },
           child: ClipRRect(
             borderRadius: BorderRadius.circular(90),
@@ -295,16 +297,23 @@ class _CallsScreenState extends State<CallsScreen> {
                 InkWell(
                   onTap: () {
                     _commonController.userClicked.value = callDto.called;
-                    Get.to(() => const DetailedChatScreen(create:true));
+                    _navigationController.hideNavBar.value = true;
+                    pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false).then((value) => _callController.pagingController.value.notifyListeners());
                   },
                     child: Image.asset("assets/images/chat_tab.png", width: 20, height: 20, color: const Color(0xFF9BA0A5),)),
                   const SizedBox(width: 4,),
-                  Image.asset("assets/images/more.png", width: 20, height: 20,color: const Color(0xFF9BA0A5))
+                  InkWell(
+                    onTap: () async {
+                      await FlutterCallkitIncoming.endAllCalls();
+                    },
+                      child: Image.asset("assets/images/more.png", width: 20, height: 20,color: const Color(0xFF9BA0A5)))
               ],),
             )
           ],
         ),
-        title: Transform.translate(offset: const Offset(-4, 0),child: Text(callDto.called.userName.isNullOrBlank! ? "${callDto.called.wallet!.substring(0, 15)}..." : callDto.called.userName!.length > 15 ? "${callDto.called.userName!.substring(0,15)}..." : callDto.called.userName!, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+        title: Transform.translate(offset: const Offset(-4, 0),child: Text(
+            _commonController.nicknames[callDto.called.wallet!]
+                ?? (callDto.called.userName.isNullOrBlank! ? "${callDto.called.wallet!.substring(0, 15)}..." : callDto.called.userName!.length > 15 ? "${callDto.called.userName!.substring(0,15)}..." : callDto.called.userName!), style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
         subtitle:
             Transform.translate(
               offset: const Offset(-4, 0),
@@ -369,7 +378,7 @@ class _CallsScreenState extends State<CallsScreen> {
   @override
   void dispose() {
     pagingSearchController.dispose();
-    pagingController.dispose();
+    _callController.pagingController.value.dispose();
     super.dispose();
   }
 

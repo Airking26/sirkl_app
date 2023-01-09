@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/bottom_row.dart';
@@ -268,7 +269,7 @@ class MessageWidgetContent extends StatelessWidget {
                           child: UserAvatarTransform(
                             onUserAvatarTap:(user){
                               _commonController.userClicked.value = userFromJson(json.encode(user.extraData["userDTO"]));
-                              Get.to(() => const ProfileElseScreen(fromConversation: true));
+                              pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: true));
                             },
                             userAvatarBuilder: userAvatarBuilder,
                             translateUserAvatar: translateUserAvatar,

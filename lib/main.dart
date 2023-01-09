@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_callkit_incoming/entities/entities.dart';
+import 'package:flutter_callkit_incoming/entities/entities.dart' as entities;
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
@@ -19,6 +20,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:sirkl/profile/ui/profile_screen.dart';
 import 'navigation/ui/navigation_screen.dart';
@@ -71,14 +73,16 @@ class _MyHomePageState extends State<MyHomePage>{
   final _callController = Get.put(CallsController());
   final _chatController = Get.put(ChatsController());
   final _commonController = Get.put(CommonController());
+  final _navigationController = Get.put(NavigationController());
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
+    _commonController.initNicknames();
     _homeController.putFCMToken(context, widget.client);
     initFirebase();
-    _callController.setupVoiceSDKEngine();
+    _callController.setupVoiceSDKEngine(context);
     getCurrentCall();
     super.initState();
   }
@@ -88,7 +92,11 @@ class _MyHomePageState extends State<MyHomePage>{
     if (calls is List) {
       calls.forEach((element) {print(element);});
       if (calls.isNotEmpty) {
-        await _callController.join(calls.last['id'], calls.last["extra"]["userCalled"], calls.last['extra']['userCalling']);
+        if(calls[0]['id'] != null && calls[0]['id'] != '') {
+          await _callController.join(
+              calls[0]['id'], calls[0]["extra"]["userCalled"],
+              calls[0]['extra']['userCalling']);
+        }
         return calls[0];
       } else {
         return null;
@@ -102,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage>{
       if(message.data["type"] == "0" || message.data["type"] == "1"){
         LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
       } else if(message.data['type'] == "2"){
-        await FlutterCallkitIncoming.endCall(message.data['channel_id']);
+        await FlutterCallkitIncoming.endAllCalls();
         await _callController.leaveChannel();
       } else if(message.data['type'] == "3"){
         LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
@@ -136,15 +144,16 @@ class _MyHomePageState extends State<MyHomePage>{
             .queryChannel("try",
             channelId: (event.data["cid"] as String).replaceFirst('try:', ''));
         if (response.members!.length > 2) {
-          Get.to(() =>
-              DetailedChatScreen(create: false,
-                  channelId: (event.data["cid"] as String).replaceFirst(
-                      'try:', '')));
+          _navigationController.hideNavBar.value = true;
+          pushNewScreen(context, screen: DetailedChatScreen(create: false,
+              channelId: (event.data["cid"] as String).replaceFirst(
+                  'try:', ''))).then((value) => _navigationController.hideNavBar.value = false);
         } else {
           final user = response.members!.where((element) =>
           element.user!.id != event.data["receiver_id"]).toList()[0];
           await _commonController.getUserById(user.user!.id);
-          Get.to(() => const DetailedChatScreen(create: true,));
+          _navigationController.hideNavBar.value = true;
+          pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
         }
       }
     });
@@ -170,20 +179,17 @@ class _MyHomePageState extends State<MyHomePage>{
               channelId: (event.data["cid"] as String).replaceFirst(
                   'try:', ''));
           if (response.members!.length > 2) {
-            Get.to(() =>
-                DetailedChatScreen(create: false,
-                    channelId: (event.data["cid"] as String).replaceFirst(
-                        'try:', '')));
+            _navigationController.hideNavBar.value = true;
+            pushNewScreen(context, screen: DetailedChatScreen(create: false,
+                channelId: (event.data["cid"] as String).replaceFirst(
+                    'try:', ''))).then((value) => _navigationController.hideNavBar.value = false);
           } else {
             final user = response.members!.where((element) =>
             element.user!.id != event.data["receiver_id"]).toList()[0];
             await _commonController.getUserById(user.user!.id);
-            Get.to(() => const DetailedChatScreen(create: true,));
+            _navigationController.hideNavBar.value = true;
+            pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
           }
-        }
-        else if(event.data['uuid'] != null){
-          debugPrint("OnDebugSirkl : UUID not null");
-          await _callController.join(event.data['uuid'], event.data['called_id'], event.data['caller_id']);
         }
       }
       else {
@@ -209,16 +215,16 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if(message.data["type"] == "0" || message.data["type"] == "1"){
     LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
   } else if(message.data['type'] == "2"){
-    await FlutterCallkitIncoming.endCall(message.data['channel_id']);
+    await FlutterCallkitIncoming.endAllCalls();
   } else if(message.data['type'] == "3"){
     LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
   } else if(message.data["uuid"] != null) {
     showCallNotification(message.data);
-  }
+    }
 }
 
 Future<void> showCallNotification(Map<String, dynamic> data) async {
-  var params = CallKitParams(
+  var params = entities.CallKitParams(
       id: data['uuid'],
       nameCaller : data["title"],
       appName: 'Sirkl',
@@ -231,7 +237,7 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
     textMissedCall: 'Missed call',
     textCallback: 'Call back',
     extra: <String, dynamic>{'userCalling': data["caller_id"], "userCalled": data['called_id'], "callId": data["call_id"]},
-    android: const AndroidParams(
+    android: const entities.AndroidParams(
       isCustomNotification: true,
       isShowLogo: false,
       isShowCallback: false,
@@ -240,7 +246,7 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
       backgroundColor: '#102437',
       actionColor: '#4CAF50'
     ),
-    ios: IOSParams(
+    ios: entities.IOSParams(
       iconName: 'CallKitLogo',
       handleType: '',
       supportsVideo: true,

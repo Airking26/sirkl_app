@@ -1,18 +1,18 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
-import 'package:sirkl/chats/ui/new_message_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
 class GroupsScreen extends StatefulWidget {
@@ -29,6 +29,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
   final _groupController = Get.put(GroupsController());
   final _homeController = Get.put(HomeController());
   final _chatController = Get.put(ChatsController());
+  final _navigationController = Get.put(NavigationController());
   final _floatingSearchBarController = FloatingSearchBarController();
   StreamChannelListController? streamChannelListControllerGroups;
   StreamChannelListController? streamChannelListControllerGroupsFav;
@@ -41,7 +42,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       isFav ?
       Filter.and([
         Filter.autoComplete('name', _groupController.query.value),
-        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
+        if(_homeController.contractAddresses.isNotEmpty) Filter.in_("contractAddress", _homeController.contractAddresses)
         else Filter.equal("contractAddress", ""),
         Filter.greater("member_count", 2),
         Filter.exists("${_homeController.id.value}_favorite"),
@@ -49,7 +50,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       ]):
       Filter.and([
         Filter.autoComplete('name', _groupController.query.value),
-        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
+        if(_homeController.contractAddresses.isNotEmpty) Filter.in_("contractAddress", _homeController.contractAddresses)
         else Filter.equal("contractAddress", ""),
         Filter.greater("member_count", 2),
         Filter.or([
@@ -59,14 +60,14 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       ]) :
           isFav ?
                   Filter.and([
-                    if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
+                    if(_homeController.contractAddresses.isNotEmpty) Filter.in_("contractAddress", _homeController.contractAddresses)
                     else Filter.equal("contractAddress", ""),
                     Filter.exists("${_homeController.id.value}_favorite"),
                     Filter.equal("${_homeController.id.value}_favorite", true),
                     Filter.greater("member_count", 2)
                   ]) :
                       Filter.and([
-                        if(_homeController.userMe.value.contractAddresses!.isNotEmpty) Filter.in_("contractAddress", _homeController.userMe.value.contractAddresses!.map((e) => e.toLowerCase()).toList())
+                        if(_homeController.contractAddresses.isNotEmpty) Filter.in_("contractAddress", _homeController.contractAddresses)
                         else Filter.equal("contractAddress", ""),
                         Filter.greater("member_count", 2),
                         Filter.or([
@@ -81,18 +82,18 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   void initState() {
-    debugPrint("ADDRESSES LENGHT : ${_homeController.userMe.value.contractAddresses?.length}");
     streamChannelListControllerGroups = buildStreamChannelListController(false);
     streamChannelListControllerGroupsFav = buildStreamChannelListController(true);
-    _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
+    //_homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
     super.initState();
   }
 
   @override
   void dispose() {
-    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
-    streamChannelListControllerGroupsFav?.dispose();
-    streamChannelListControllerGroups?.dispose();
+    _groupController.index.value = 0;
+    //_homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
+    // streamChannelListControllerGroupsFav?.dispose();
+    //streamChannelListControllerGroups?.dispose();
     super.dispose();
   }
 
@@ -143,10 +144,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           _chatController.channel.value = channel;
                           var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
                           if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
-                          Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())
-                        )!.then((value) {
-                          //streamChannelListControllerGroups!.refresh();
-                        });
+                          _navigationController.hideNavBar.value = true;
+                          pushNewScreen(context, screen: StreamChannel(child: const ChannelPage(), channel: channel)).then((value) => _navigationController.hideNavBar.value = false);
                       },
                       ),
                     ),
@@ -170,10 +169,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           _chatController.channel.value = channel;
                           var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
                           if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
-                          Get.to(() => StreamChannel(channel: channel, child: const ChannelPage())
-                        )!.then((value) {
-                          //streamChannelListControllerGroups!.refresh();
-                        });
+                          _navigationController.hideNavBar.value = true;
+                          pushNewScreen(context, screen: StreamChannel(child: const ChannelPage(), channel: channel)).then((value) => _navigationController.hideNavBar.value = false);
                       },
                       ),
                     ),
@@ -378,7 +375,6 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
   }
 
   Widget buildSelectNFT(){
-    _groupController.retrieveGroups(_homeController.nfts.value);
     return _groupController.isLoadingAvailableNFT.value ?
          const Padding(
            padding: EdgeInsets.only(top: 54.0),
@@ -411,10 +407,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     ),
                     child: ListTile(
                       onTap: ()async{
-                        await _groupController.createGroup(StreamChat.of(context).client, _groupController.nftsAvailable.value[index].collectionName, _groupController.nftsAvailable.value[index].collectionImages[0], _groupController.nftsAvailable.value[index].contractAddress);
-                        Get.to(() => const DetailedChatScreen(create:false));
+                        await _groupController.createGroup(StreamChat.of(context).client, _groupController.nftsAvailable.value[index].collectionName, _groupController.nftsAvailable.value[index].collectionImage , _groupController.nftsAvailable.value[index].contractAddress);
+                        _navigationController.hideNavBar.value = true;
+                        pushNewScreen(context, screen: const DetailedChatScreen(create: false)).then((value) => _navigationController.hideNavBar.value = false);
                       },
-                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftsAvailable[index].collectionImages[0], width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
+                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftsAvailable[index].collectionImage, width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
 
                       title: Text(_groupController.nftsAvailable.value[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
                       //subtitle: Transform.translate(offset: const Offset(-8, 0), child: Text("${_homeController.nfts.value[index].collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
@@ -496,6 +493,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                   ),
                   IconButton(
                       onPressed: () {
+                        if(!_groupController.addAGroup.value && _groupController.nftsAvailable.value.isEmpty) _groupController.retrieveGroups(_homeController.userMe.value.wallet!);
                         _groupController.addAGroup.value = !_groupController.addAGroup.value;
                       },
                       icon: Image.asset(

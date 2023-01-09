@@ -5,6 +5,9 @@ import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_badged/flutter_badge.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
@@ -13,6 +16,7 @@ import 'package:sirkl/common/view/story_creator/stories_editor.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -29,17 +33,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
-  final _groupController = Get.put(GroupsController());
+  final PagingController<int, CollectionDbDto> pagingController = PagingController(firstPageKey: 0);
+  final _navigationController = Get.put(NavigationController());
   YYDialog dialogMenu = YYDialog();
+  static var pageKey = 0;
 
   @override
   void initState(){
     _profileController.checkIfHasUnreadNotif(_homeController.id.value);
-    _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
+    pagingController.addPageRequestListener((pageKey) {
+      fetchNFTs();
+    });
     _profileController.usernameTextEditingController.value.text = _homeController.userMe.value.userName!.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _homeController.userMe.value.userName!;
     _profileController.descriptionTextEditingController.value.text = _homeController.userMe.value.description == "" ? "" : _homeController.userMe.value.description!;
     _profileController.urlPicture.value = _homeController.userMe.value.picture == null ? "" : _homeController.userMe.value.picture!;
     super.initState();
+  }
+
+  Future<void> fetchNFTs() async {
+    try {
+      List<CollectionDbDto> newItems = await _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
+      if (_homeController.cursor.value == "") {
+        pagingController.appendLastPage(newItems);
+      } else {
+        final nextPageKey = pageKey++;
+        pagingController.appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      pagingController.error = error;
+    }
   }
 
   @override
@@ -101,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 )
                                 : IconButton(onPressed: (){
-                              Get.to(() => const NotificationScreen())!.then((value) => _profileController.checkIfHasUnreadNotif(_homeController.id.value));
+                                  pushNewScreen(context, screen: const NotificationScreen()).then((value) => _profileController.checkIfHasUnreadNotif(_homeController.id.value));
                               }, icon:
 
                             //Image.asset( "assets/images/edit.png", color: Get.isDarkMode ? Colors.white : Colors.black,):
@@ -170,10 +192,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         paintOnTop: true,
                         child: InkWell(
                           onTap:(){
-                            Get.to(() => StoriesEditor(giphyKey: '', onDone: (uri) async{
+                            _navigationController.hideNavBar.value = true;
+                            pushNewScreen(context, screen: StoriesEditor(giphyKey: '', onDone: (uri) async{
+                              _navigationController.hideNavBar.value = false;
                               await _profileController.postStory(uri);
-                              Get.back();
-                            }));
+                              Navigator.pop(context);
+                            })).then((value) => _navigationController.hideNavBar.value = false);
                           },
                           child: Container(
                             width: 40,
@@ -228,35 +252,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.only(left: 24.0),
               child: _homeController.nfts.value.isNotEmpty ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),)) : Container(),
             ),
-            _homeController.isLoadingNfts.value ? const Padding(
-              padding: EdgeInsets.only(top: 32.0),
-              child: CircularProgressIndicator(color: Color(0xff00CB7D)),
-            ) :
-            _homeController.nfts.value.isNotEmpty ? MediaQuery.removePadding(
+            MediaQuery.removePadding(
               context:  context,
               removeTop: true,
               child: Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: SafeArea(
-                    child: RefreshIndicator(
-                      color: const Color(0xFF00CB7D),
-                      onRefresh: () async{
-                        _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!, context);
-                      },
-                      child: ListView.builder(
-                          itemCount: _homeController.nfts.value.length,
-                          itemBuilder: (context, index){
-                            return CardNFT(_homeController.nfts.value[index], _profileController, index);
-                          },
-                      ),
+                    child: PagedListView(
+                      pagingController: pagingController,
+                        builderDelegate: PagedChildBuilderDelegate<CollectionDbDto>(
+                          firstPageProgressIndicatorBuilder: (context) => Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
+                          newPageProgressIndicatorBuilder: (context) => Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
+                            itemBuilder:  (context, item, index) => CardNFT(item, _profileController, index)),
                     ),
                   ),
                 ),
               ),
-            ) : Container(
-              margin: const EdgeInsets.only(top: 24, left: 48, right: 48),
-              child: Text(con.dontHaveNftRes.tr, textAlign: TextAlign.center, style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600),),
             )
           ],
         )));
@@ -341,9 +353,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
           ),
           child: ExpansionTile(
             leading: ClipRRect(borderRadius: BorderRadius.circular(90), child:
-            //widget.collectionDbDTO.collectionImages[0].contains(".mp4") ?
-              //  Obx(() => SizedBox(width: 56, height: 56, child: Image.memory(widget.profileController.videoThumbnail.value!,))) :
-            CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImages[0], width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+            CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImage, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             trailing: Obx(() => Image.asset(
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
@@ -359,7 +369,6 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
                 widget.profileController.isCardExpandedList.value.remove(widget.index);
               }
               widget.profileController.isCardExpandedList.refresh();
-              //widget.profileController.isCardExpanded.value = expanded;
             },
             children: [
               Padding(
@@ -389,6 +398,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
         ),
       );
     }
+
 
 
 

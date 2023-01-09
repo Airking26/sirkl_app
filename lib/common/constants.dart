@@ -4,8 +4,11 @@ const String ACCESS_TOKEN = "access_token";
 const String REFRESH_TOKEN = "refresh_token";
 const String USER = "user";
 const String errorRes = "error";
+const String nicknames = "nicknames";
+const String contractAddresses = "contract_addresses";
 const String errorWalletAlreadyUsedRes = "error_wallet_already_used";
 const String moralisApiKey = "i9AyfrkBTZQg3gUEXqANDoGAY4h3W7zjUhpoPNtO69sCAFvSVO7ICpZSEdCsYxIj";
+const String alchemyApiKey =  "ELrNU9K6I9RNfXbIkJqq6H6NeoXNbF10";
 
 /// Navigation page ///
 const String homeTabRes = "home";
@@ -61,6 +64,7 @@ const String addToMySirklRes = "add_to_my_sirkl";
 const String removeOfMySirklRes = "remove_of_my_sirkl";
 const String reportRes = "report";
 const String sendAMessageRes = "send_a_message";
+const String renameRes = "rename";
 
 /// COMMON ///
 const String userAddedToSirklRes = "user_added_to_sirkl";

@@ -3,14 +3,19 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/groups/ui/group_participants_screen.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -138,8 +143,11 @@ class StreamChannelHeader extends StatelessWidget
 
   YYDialog dialogMenu = YYDialog();
   final _commonController = Get.put(CommonController());
+  final _navigationController = Get.put(NavigationController());
   final _homeController = Get.put(HomeController());
   final _chatController = Get.put(ChatsController());
+  final _groupController = Get.put(GroupsController());
+  final _profileController = Get.put(ProfileController());
   final utils = Utils();
 
 
@@ -219,7 +227,7 @@ class StreamChannelHeader extends StatelessWidget
                           IconButton(
                               onPressed: () {
                                 //_chatController.channel.value = null;
-                                Get.back();
+                                Navigator.pop(context);
                               },
                               icon: Image.asset(
                                 "assets/images/arrow_left.png",
@@ -239,10 +247,12 @@ class StreamChannelHeader extends StatelessWidget
                                             .first
                                             .user!
                                             .extraData["userDTO"]));
-                                Get.to(() => const ProfileElseScreen(fromConversation: true,));
+                                _navigationController.hideNavBar.value = false;
+                                pushNewScreen(context,screen: const ProfileElseScreen(fromConversation: true)).then((value) => _navigationController.hideNavBar.value = true);
                               } else if(channel.isGroup){
                                 _chatController.channel.value = channel;
-                                Get.to(() => const GroupParticipantScreen());
+                                _navigationController.hideNavBar.value = false;
+                                pushNewScreen(context,screen: const GroupParticipantScreen()).then((value) => _navigationController.hideNavBar.value = true).then((value) => _navigationController.hideNavBar.value = true);
                               }
                             },
                             child: Padding(
@@ -293,10 +303,12 @@ class StreamChannelHeader extends StatelessWidget
                                             .first
                                             .user!
                                             .extraData["userDTO"]));
-                                Get.to(() => const ProfileElseScreen(fromConversation: true,));
+                                _navigationController.hideNavBar.value = false;
+                                pushNewScreen(context,screen: const ProfileElseScreen(fromConversation: true)).then((value) => _navigationController.hideNavBar.value = true);
                               } else if(channel.isGroup){
+                                _navigationController.hideNavBar.value = false;
                                 _chatController.channel.value = channel;
-                                Get.to(() => const GroupParticipantScreen());
+                                pushNewScreen(context,screen: const GroupParticipantScreen()).then((value) => _navigationController.hideNavBar.value = true);
                               }
                             },
                             child: Padding(
@@ -310,8 +322,8 @@ class StreamChannelHeader extends StatelessWidget
                                   "${(channel.extraData["wallet"] as String).substring(0, 20)}..." :
                                     channel.memberCount != null && channel.memberCount! > 2 ?
                                         channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
-                                    !userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
-                                        userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName! : "${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(0,20)}...",
+                                        _commonController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] ?? (!userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
+                                        userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName! : "${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(0,20)}..."),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -343,7 +355,7 @@ class StreamChannelHeader extends StatelessWidget
                     ),
                     IconButton(
                         onPressed: () {
-                          dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) :dialogPopMenuGroup(context);
+                          dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
                         },
                         icon: Image.asset(
                           "assets/images/more.png",
@@ -359,7 +371,7 @@ class StreamChannelHeader extends StatelessWidget
     );
   }
 
-  YYDialog dialogPopMenuGroup(BuildContext context) {
+  YYDialog dialogPopMenuGroup(BuildContext context, Channel channel) {
     return YYDialog().build(context)
       ..width = 180
       ..borderRadius = 10.0
@@ -368,21 +380,43 @@ class StreamChannelHeader extends StatelessWidget
       ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
-        onTap: (){},
+        onTap: () async {
+          var creator = await _groupController.retrieveCreatorGroup(channel.id!);
+          dialogMenu.dismiss();
+          if(!creator.isNullOrBlank!) {
+            if(creator == _homeController.userMe.value.wallet!){
+              await StreamChat.of(context).client.updateChannelPartial(channel.id!, 'try', set: {"owner": _homeController.userMe.value.wallet!});
+              utils.showToast(context, "You are now the owner of the group");
+            } else utils.showToast(context, 'You are not the owner of the group');
+          } else utils.showToast(context, 'Error. Try again later');
+        },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.notificationsOffRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.claimOwnershipeRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){},
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..show();
+  }
+
+  YYDialog dialogPopMenuGroupWithOwner(BuildContext context, Channel channel) {
+    return YYDialog().build(context)
+      ..width = 180
+      ..borderRadius = 10.0
+      ..gravity = Gravity.rightTop
+      ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..margin = const EdgeInsets.only(top: 90, right: 20)
+      ..widget(InkWell(
+        onTap: () async{
+          _commonController.userClicked.value = await _profileController.getUserByWallet(channel.extraData["owner"] as String);
+          if(_commonController.userClicked.value!.wallet != channel.extraData["owner"] as String) pushNewScreen(context, screen: DetailedChatScreen(create: true));
+        },
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
@@ -457,7 +491,8 @@ class StreamChannelHeader extends StatelessWidget
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: () {
-          Get.to(() => const ProfileElseScreen(fromConversation: true));
+          _navigationController.hideNavBar.value = false;
+          pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: true));
         },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),

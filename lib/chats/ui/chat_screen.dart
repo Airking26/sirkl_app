@@ -2,12 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/new_message_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 
 
 class ChatScreen extends StatefulWidget {
@@ -21,6 +23,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   final _chatController = Get.put(ChatsController());
   final _homeController = Get.put(HomeController());
+  final _navigationController = Get.put(NavigationController());
   StreamChannelListController? streamChannelListControllerFriends;
   StreamChannelListController? streamChannelListControllerOthers;
   final _floatingSearchBarController = FloatingSearchBarController();
@@ -28,7 +31,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
+    //_homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
       streamChannelListControllerFriends =
           buildStreamChannelListController(true);
       streamChannelListControllerOthers =
@@ -130,10 +133,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 },
                 controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel){
                   _chatController.channel.value = channel;
-                Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value) {
-                  streamChannelListControllerFriends!.refresh();
-                  streamChannelListControllerOthers!.refresh();
-                });
+                  _navigationController.hideNavBar.value = true;
+                  pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {
+                    _navigationController.hideNavBar.value = false;
+                    //streamChannelListControllerFriends!.refresh();
+                    //streamChannelListControllerOthers!.refresh();
+                  });
                 },
               ),
               ),
@@ -145,9 +150,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 },
                 controller:_chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerOthers!, onChannelTap: (channel){
                 _chatController.channel.value = channel;
-                Get.to(() => StreamChannel(channel: channel, child: const ChannelPage()))!.then((value){
-                  streamChannelListControllerOthers!.refresh();
-                  streamChannelListControllerFriends!.refresh();
+                _navigationController.hideNavBar.value = true;
+                pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {
+                  _navigationController.hideNavBar.value = false;
+                  //streamChannelListControllerFriends!.refresh();
+                  //streamChannelListControllerOthers!.refresh();
                 });
               },),
               )
@@ -268,14 +275,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       ),
                       IconButton(
                           onPressed: () {
-                            Get.to(() => const NewMessageScreen())!.then((value) {
+                            _navigationController.hideNavBar.value = true;
+                            pushNewScreen(context, screen: const NewMessageScreen()).then((value) {
+                              _navigationController.hideNavBar.value = false;
                               if(_chatController.messageHasBeenSent.value) {
                                 _chatController.index.value = 1;
                                 tabController.index = 1;
                                 _chatController.messageHasBeenSent.value = false;
                               }
-                              streamChannelListControllerFriends!.refresh();
-                              streamChannelListControllerOthers!.refresh();
+                              //streamChannelListControllerFriends!.refresh();
+                              //streamChannelListControllerOthers!.refresh();
                             });
                           },
                           icon: Image.asset(
@@ -480,8 +489,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    streamChannelListControllerOthers?.dispose();
-    streamChannelListControllerFriends?.dispose();
+    //streamChannelListControllerOthers?.dispose();
+    //streamChannelListControllerFriends?.dispose();
     _chatController.index.value = 0;
     super.dispose();
   }

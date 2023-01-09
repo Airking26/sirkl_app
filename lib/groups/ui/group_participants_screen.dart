@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -53,7 +53,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
               padding: const EdgeInsets.only(top: 8.0),
               child: StreamMemberListView(controller: _memberListController, onMemberTap: (member){
                 _commonController.userClicked.value = userFromJson(json.encode(member.user?.extraData['userDTO']));
-                Get.to(() => const ProfileElseScreen(fromConversation: false));
+                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
               },),
             ),
           ),

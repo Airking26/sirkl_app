@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:nice_buttons/nice_buttons.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
@@ -14,6 +15,7 @@ import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/home/ui/story_viewer_screen.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:slider_button/slider_button.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/story_view.dart';
@@ -35,33 +37,33 @@ class _HomeScreenState extends State<HomeScreen> {
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
   final _callController = Get.put(CallsController());
+  final _navigationController = Get.put(NavigationController());
   YYDialog dialogMenu = YYDialog();
   final utils = Utils();
-  final PagingController<int, List<StoryDto?>?> pagingController = PagingController(firstPageKey: 0);
-  static var pageKey = 0;
   final storyController = StoryController();
 
 
   @override
   void initState() {
-    pagingController.addPageRequestListener((pageKey) {
+    if(_homeController.accessToken.value.isEmpty) _navigationController.hideNavBar.value = true;
+    _homeController.pagingController.value.addPageRequestListener((pageKey) {
       fetchPageStories();});
     super.initState();
   }
 
   Future<void> fetchPageStories() async {
     try {
-      await _homeController.retrieveStories(pageKey);
-      List<List<StoryDto?>?>? newItems = pageKey > 0 ? _homeController.stories.value!.sublist(pageKey * 12, _homeController.stories.value!.length >= (pageKey + 1) * 12 ? (pageKey + 1) * 12 : _homeController.stories.value!.length) : _homeController.stories.value;
+      await _homeController.retrieveStories(_homeController.pageKey.value);
+      List<List<StoryDto?>?>? newItems = _homeController.pageKey.value > 0 ? _homeController.stories.value!.sublist(_homeController.pageKey.value * 12, _homeController.stories.value!.length >= (_homeController.pageKey.value + 1) * 12 ? (_homeController.pageKey.value + 1) * 12 : _homeController.stories.value!.length) : _homeController.stories.value;
       final isLastPage = newItems!.length < 12;
       if (isLastPage) {
-        pagingController.appendLastPage(newItems);
+        _homeController.pagingController.value.appendLastPage(newItems);
       } else {
-        final nextPageKey = pageKey++;
-        pagingController.appendPage(newItems, nextPageKey);
+        final nextPageKey = _homeController.pageKey.value++;
+        _homeController.pagingController.value.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
-      pagingController.error = error;
+      _homeController.pagingController.value.error = error;
     }
   }
 
@@ -77,7 +79,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 buildAppbar(context),
                 _homeController.accessToken.value.isNotEmpty
-                    ? _commonController.gettingStoryAndContacts.value
+                    ?
+                _commonController.gettingStoryAndContacts.value
                     ? Container()
                     : _commonController.users.isNotEmpty
                     ? buildListOfStories()
@@ -217,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
       height: (_homeController.stories.value == null || _homeController.stories.value!.isEmpty) && !_homeController.loadingStories.value ? 0 : 125,
       child: PagedListView(
         scrollDirection: Axis.horizontal,
-        pagingController: pagingController,
+        pagingController: _homeController.pagingController.value,
         builderDelegate: PagedChildBuilderDelegate<List<StoryDto?>?>(
             itemBuilder: (context, item, index) => buildStory(item, index),
             firstPageProgressIndicatorBuilder: (context) => Center(child: CircularProgressIndicator(color: const Color(0xff00CB7D),),),
@@ -236,9 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
         InkWell(
           onTap: () {
             _homeController.indexStory.value = index;
-            Get.to(() => const StoryViewerScreen())!.then((value) {
-              pagingController.notifyListeners();
-            });
+            pushNewScreen(context, screen: const StoryViewerScreen()).then((value) => _homeController.pagingController.value.notifyListeners());
             },
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -261,11 +262,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 4,),
         Text(
-          _homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank! ?
+          _commonController.nicknames[_homeController.stories.value![index]!.first!.createdBy.wallet!] ?? (_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank! ?
           "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 5)}...":
           _homeController.stories.value![index]!.first!.createdBy.userName!.length > 6 ?
           "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 7)}..." :
-          _homeController.stories.value![index]!.first!.createdBy.userName!,
+          _homeController.stories.value![index]!.first!.createdBy.userName!),
           style: TextStyle(
               fontFamily: "Gilroy",
               fontWeight: FontWeight.w600,
@@ -275,7 +276,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
-
 
 Widget buildRepertoireList(BuildContext context) {
   SuspensionUtil.sortListBySuspensionTag(_commonController.users);
@@ -360,8 +360,8 @@ Widget buildSirklRepertoire(BuildContext context, int index) {
           child: Row(
             children: [
               Text(
-                _commonController.users[index].userName.isNullOrBlank! ?
-                _commonController.users[index].wallet![0] : _commonController.users[index].userName![0].toUpperCase(),
+                _commonController.nicknames[_commonController.users[index].wallet!][0]?.toString().toUpperCase() ?? (_commonController.users[index].userName.isNullOrBlank! ?
+                _commonController.users[index].wallet![0] : _commonController.users[index].userName![0].toUpperCase()),
                 softWrap: false,
                 style: TextStyle(
                     fontFamily: "Gilroy",
@@ -398,7 +398,7 @@ Widget buildSirklTile(BuildContext context, int index, bool isShowSuspension) {
             onTap: () {
               _commonController.userClicked.value =
               _commonController.users[index];
-              Get.to(() => const ProfileElseScreen(fromConversation: false));
+              pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
             },
             child: _commonController.users[index].picture == null
                 ? SizedBox(
@@ -431,10 +431,8 @@ Widget buildSirklTile(BuildContext context, int index, bool isShowSuspension) {
                   children: [
                     InkWell(
                       onTap: () async{
-                        //var client = await _callController.initClient();
                         _callController.userCalled.value = _commonController.users[index];
                         await _callController.inviteCall(_commonController.users[index], DateTime.now().toString(), _homeController.id.value);
-                        //_callController.inviteCall(_commonController.users[index].id!, "example", _homeController.id.value);
                       },
                       child: Image.asset(
                         "assets/images/call_tab.png",
@@ -450,7 +448,8 @@ Widget buildSirklTile(BuildContext context, int index, bool isShowSuspension) {
                         onTap: () {
                           _commonController.userClicked.value =
                           _commonController.users[index];
-                          Get.to(() => const DetailedChatScreen(create:true));
+                          _navigationController.hideNavBar.value = true;
+                          pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
                         },
                         child: Image.asset(
                           "assets/images/chat_tab.png",
@@ -472,13 +471,13 @@ Widget buildSirklTile(BuildContext context, int index, bool isShowSuspension) {
               onTap: () {
                 _commonController.userClicked.value =
                 _commonController.users[index];
-                Get.to(() => const ProfileElseScreen(fromConversation: false));
+                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false)).then((value) => _commonController.users.refresh());
               },
               child: Transform.translate(
                   offset: const Offset(-8, 0),
                   child: Text(
-                      _commonController.users[index].userName.isNullOrBlank! ?
-                      _commonController.users[index].wallet! : _commonController.users[index].userName!,
+                    _commonController.nicknames[_commonController.users[index].wallet!] ?? (_commonController.users[index].userName.isNullOrBlank! ?
+                      _commonController.users[index].wallet! : _commonController.users[index].userName!),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -492,7 +491,7 @@ Widget buildSirklTile(BuildContext context, int index, bool isShowSuspension) {
               onTap: () {
                 _commonController.userClicked.value =
                 _commonController.users[index];
-                Get.to(() => const ProfileElseScreen(fromConversation:false));
+                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false)).then((value) => _commonController.users.refresh());
               },
               child: Transform.translate(
                   offset: const Offset(-8, 0),
@@ -644,6 +643,7 @@ Column buildConnectWalletUI() {
 }
 
 Column buildEmptyFriends() {
+
   return Column(
     children: [
       const SizedBox(
@@ -707,7 +707,7 @@ Column buildEmptyFriends() {
   void dispose() {
     _homeController.loadingStories.value = true;
     _homeController.stories.value = [];
-    pagingController.dispose();
+    _homeController.pagingController.value.dispose();
     super.dispose();
   }
 

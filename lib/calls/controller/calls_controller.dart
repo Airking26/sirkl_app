@@ -2,13 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
-import 'package:flutter_callkit_incoming/entities/call_event.dart';
-import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/calls/service/calls_service.dart';
 import 'package:sirkl/calls/ui/call_invite_sending_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -18,6 +19,7 @@ import 'package:sirkl/common/model/call_modification_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/home/service/home_service.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:sirkl/profile/ui/profile_screen.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
@@ -27,6 +29,7 @@ class CallsController extends GetxController{
   final _callService = CallService();
   final _homeService = HomeService();
   final _profileService = ProfileService();
+  final _navigationController = Get.put(NavigationController());
   final box = GetStorage();
   final agoraEngine = (null as RtcEngine?).obs;
   var tokenAgoraRTC = "".obs;
@@ -38,8 +41,10 @@ class CallsController extends GetxController{
   var isCallMuted = false.obs;
   var isCallOnSpeaker = false.obs;
   var isSearchIsActive = false.obs;
+  Rx<PagingController<int, CallDto>> pagingController = PagingController<int, CallDto>(firstPageKey: 0).obs;
+  var pageKey = 0.obs;
 
-  Future<void> setupVoiceSDKEngine() async {
+  Future<void> setupVoiceSDKEngine(BuildContext context) async {
     await [Permission.microphone].request();
 
     agoraEngine.value = await RtcEngine.create("13d8acd177bf4c35a0d07bdd18c8e84e");
@@ -52,7 +57,11 @@ class CallsController extends GetxController{
           var error = e;
         },
         joinChannelSuccess: (String x, int y, int elapsed) {
-          Get.to(() => const CallInviteSendingScreen());
+          _navigationController.hideNavBar.value = true;
+          pushNewScreen(context, screen: const CallInviteSendingScreen()).then((value) {
+            pageKey.value = 0;
+            pagingController.value.refresh();
+            _navigationController.hideNavBar.value = false;});
         },
         userJoined: (int remoteUid, int elapsed) {
           timer.value = StopWatchTimer();
@@ -107,7 +116,6 @@ class CallsController extends GetxController{
     FlutterCallkitIncoming.onEvent.listen((event) async{
       switch (event!.event) {
         case Event.ACTION_CALL_INCOMING:
-          await getCurrentCall();
           currentCallId.value = event.body['id'];
           print('Device Token FCM: $event');
           break;
@@ -118,9 +126,11 @@ class CallsController extends GetxController{
           await join(event.body['id'], event.body['extra']['userCalled'], event.body['extra']['userCalling']);
           break;
         case Event.ACTION_CALL_DECLINE:
+          await FlutterCallkitIncoming.endAllCalls();
           await endCall(event.body["extra"]["userCalling"], event.body["id"]);
           break;
         case Event.ACTION_CALL_ENDED:
+          await FlutterCallkitIncoming.endAllCalls();
           print('Device Token FCM: $event');
           break;
         case Event.ACTION_CALL_TIMEOUT:
@@ -151,7 +161,7 @@ class CallsController extends GetxController{
     });
   }
 
-  getCurrentCall() async {
+  /*getCurrentCall() async {
     var calls = await FlutterCallkitIncoming.activeCalls();
     if (calls is List) {
       if (calls.isNotEmpty) {
@@ -167,7 +177,7 @@ class CallsController extends GetxController{
     if (currentCall != null) {
       Get.to(() => const ProfileScreen());
     }
-  }
+  }*/
 
   createCall(CallCreationDto callCreationDto) async {
     var accessToken = box.read(con.ACCESS_TOKEN);

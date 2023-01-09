@@ -22,6 +22,7 @@ class MessageActionsModal extends StatefulWidget {
     required this.message,
     required this.messageWidget,
     required this.messageTheme,
+    required this.wallet,
     this.showReactions = true,
     this.showDeleteMessage = true,
     this.showEditMessage = true,
@@ -32,12 +33,14 @@ class MessageActionsModal extends StatefulWidget {
     this.showResendMessage = true,
     this.showThreadReplyMessage = true,
     this.showFlagButton = true,
-    this.showPinButton = true,
+    this.showPinButton = false,
     this.editMessageInputBuilder,
     this.reverse = false,
     this.customActions = const [],
     this.onCopyTap,
   });
+
+  final String wallet;
 
   /// Widget that shows the message
   final Widget messageWidget;
@@ -225,7 +228,7 @@ class _MessageActionsModalState extends State<MessageActionsModal> {
                           FlagMessageButton(
                             onTap: _showFlagDialog,
                           ),
-                        if (widget.showPinButton)
+                        if (!channel.isGroup || channel.isGroup && channel.extraData["owner"] != null && channel.extraData['owner'] == widget.wallet)
                           PinMessageButton(
                             onTap: _togglePin,
                             pinned: widget.message.pinned,

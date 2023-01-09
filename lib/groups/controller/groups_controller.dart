@@ -9,7 +9,9 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:simple_s3/simple_s3.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
+import 'package:sirkl/common/model/contract_creator_dto.dart';
 import 'package:sirkl/common/model/group_dto.dart';
+import 'package:sirkl/common/model/nft_alchemy_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/service/group_service.dart';
@@ -40,7 +42,34 @@ class GroupsController extends GetxController{
     await _chatController.channel.value!.addMembers([streamChatClient.state.currentUser!.id]);
   }
 
-  retrieveGroups(List<CollectionDbDto> nfts) async{
+  getNFTsToCreateGroup(String wallet) async{
+    var nfts = [];
+    var cursor = "";
+    var cursorInitialized = true;
+    while(cursorInitialized || cursor.isNotEmpty){
+      var req = await _homeService.getNextNFTByAlchemyForGroup(wallet, cursor);
+      var res = nftAlchemyDtoFromJson(json.encode(req.body));
+      res.pageKey == null || res.pageKey!.isEmpty ? cursor = "" : cursor = res.pageKey!;
+      res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty );
+      var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
+      gc?.forEach((key, value) {
+        nfts.add(CollectionDbDto(collectionName: value.first.title!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
+      });
+      cursorInitialized = false;
+    }
+
+    return nfts;
+  }
+
+  Future<String?> retrieveCreatorGroup(String contract) async {
+    var request = await _groupService.retrieveCreatorGroup(contract);
+    if(request.isOk) {
+      return contractCreatorDtoFromJson(json.encode(request.body))?.result?.first?.contractCreator;
+    }
+  }
+
+  retrieveGroups(String wallet) async{
+    var nfts = await getNFTsToCreateGroup("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87");
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var req = await _groupService.retrieveGroups(accessToken);
@@ -57,7 +86,7 @@ class GroupsController extends GetxController{
       }
     } else if(req.isOk){
       var groups = groupDtoFromJson(json.encode(req.body));
-      nftsAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress).contains(element.contractAddress)).toList();
+      nftsAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress).contains(element.contractAddress)).toList().cast<CollectionDbDto>() ;
       isLoadingAvailableNFT.value = false;
     }
   }
@@ -149,4 +178,11 @@ class GroupsController extends GetxController{
 
 
 
+}
+
+extension Iterables<E> on Iterable<E> {
+  Map<K, List<E>> groupBy<K>(K Function(E) keyFunction) => fold(
+      <K, List<E>>{},
+          (Map<K, List<E>> map, E element) =>
+      map..putIfAbsent(keyFunction(element), () => <E>[]).add(element));
 }

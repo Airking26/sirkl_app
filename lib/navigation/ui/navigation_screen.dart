@@ -2,11 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/calls/ui/calls_screen.dart';
 import 'package:sirkl/chats/ui/chat_screen.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-import '../../common/view/navbar/floating_navbar.dart';
-import '../../common/view/navbar/floating_navbar_item.dart';
 import '../../groups/ui/groups_screen.dart';
 import '../../home/ui/home_screen.dart';
 import '../../profile/ui/profile_screen.dart';
@@ -23,7 +24,12 @@ class NavigationScreen extends StatefulWidget {
 class _NavigationScreenState extends State<NavigationScreen> {
 
   final _navigationController = Get.put(NavigationController());
+  final _callController = Get.put(CallsController());
+  final _commonController = Get.put(CommonController());
   final _homeController = Get.put(HomeController());
+
+  final PersistentTabController _controller =PersistentTabController(initialIndex: 0);
+
   final List<Widget> _pages = [
     const HomeScreen(),
     const CallsScreen(),
@@ -32,7 +38,94 @@ class _NavigationScreenState extends State<NavigationScreen> {
     const ProfileScreen()
   ];
 
+
+  List<PersistentBottomNavBarItem> _navBarsItems() {
+    return [
+      PersistentBottomNavBarItem(
+        icon: const ImageIcon(AssetImage("assets/images/home_tab.png"), size: 18,),
+        title: (con.homeTabRes.tr),
+        activeColorPrimary: const Color(0xFF00CB7D),
+        inactiveColorPrimary: const Color(0xFF9BA0A5),
+          textStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 12)
+
+      ),
+      PersistentBottomNavBarItem(
+        icon: const ImageIcon(AssetImage("assets/images/call_tab.png"), size: 18,),
+        title: (con.callsTabRes.tr),
+        activeColorPrimary: const Color(0xFF00CB7D),
+        inactiveColorPrimary: const Color(0xFF9BA0A5),
+          textStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 12)
+
+      ),
+      PersistentBottomNavBarItem(
+        icon: const ImageIcon(AssetImage("assets/images/group-tab.png"), size: 18,),
+        title: (con.groupsTabRes.tr),
+        activeColorPrimary: const Color(0xFF00CB7D),
+        inactiveColorPrimary: const Color(0xFF9BA0A5),
+          textStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 12)
+
+      ),
+      PersistentBottomNavBarItem(
+
+        icon: const ImageIcon(AssetImage("assets/images/chat_tab.png"), size: 18,),
+        title: (con.chatsTabRes.tr),
+        activeColorPrimary: const Color(0xFF00CB7D),
+        inactiveColorPrimary: const Color(0xFF9BA0A5),
+          textStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 12)
+      ),
+      PersistentBottomNavBarItem(
+        icon: const ImageIcon(AssetImage("assets/images/profile_tab.png"), size: 18,),
+        title: (con.profileTabRes.tr),
+        activeColorPrimary: const Color(0xFF00CB7D),
+        inactiveColorPrimary: const Color(0xFF9BA0A5),
+        contentPadding: 10,
+        textStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 12)
+      ),
+
+    ];
+  }
+
   @override
+  Widget build(BuildContext context) {
+    return Obx(() =>Scaffold(
+        backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : Colors.white,
+        body: PersistentTabView(
+          context,
+          screens: _pages,
+          hideNavigationBar: _navigationController.hideNavBar.value,
+          controller: _controller,
+          items: _navBarsItems(),
+          confineInSafeArea: true,
+          handleAndroidBackButtonPress: true,
+          decoration: NavBarDecoration(gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+                Get.isDarkMode ? const Color(0xFF1E2032): Colors.white
+              ]
+          ),),
+          resizeToAvoidBottomInset: true,
+          hideNavigationBarWhenKeyboardShows: true,
+          popAllScreensOnTapOfSelectedTab: true,
+          navBarStyle: NavBarStyle.style3,
+          onItemSelected: (index){
+            if(index == 1) {
+              _callController.pageKey.value = 0;
+              _callController.pagingController.value.refresh();
+            } else if(index == 0) {
+              _commonController.gettingStoryAndContacts.value = true;
+              _homeController.loadingStories.value = true;
+              _homeController.pageKey.value = 0;
+              _homeController.pagingController.value.refresh();
+              _commonController.showSirklUsers(_homeController.id.value);
+            }
+          },
+        )
+    ));
+  }
+
+  /*@override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : Colors.white,
@@ -69,5 +162,5 @@ class _NavigationScreenState extends State<NavigationScreen> {
         children: _pages,
       )
     );
-  }
+  }*/
 }

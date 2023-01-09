@@ -2,10 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/notification_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/utils.dart';
@@ -24,6 +26,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
+  final _navigationScreen = Get.put(NavigationController());
   final PagingController<int, NotificationDto> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
 
@@ -85,7 +88,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(onPressed: (){Get.back();}, icon: Image.asset("assets/images/arrow_left.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                      IconButton(onPressed: (){Navigator.of(context).pop();}, icon: Image.asset("assets/images/arrow_left.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
                       Padding(
                         padding: const EdgeInsets.only(top: 12.0),
                         child: Text(con.notificationsRes.tr, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
@@ -121,7 +124,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         child: ListTile(
           onTap: () async{
             await _commonController.getUserById(item.idData);
-            Get.to(() => const ProfileElseScreen(fromConversation: false));
+            pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
           },
           leading:
               item.type != 0 && item.type != 1 ?

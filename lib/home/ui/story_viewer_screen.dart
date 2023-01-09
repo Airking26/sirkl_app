@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -20,6 +22,7 @@ class StoryViewerScreen extends StatefulWidget {
 class _StoryViewerScreenState extends State<StoryViewerScreen> {
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
+  final _navigationController = Get.put(NavigationController());
   var controller = StoryController();
   List<StoryItem> storyItems = [];
 
@@ -38,14 +41,15 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
             onComplete: (){
               if(_homeController.stories.value!.length - 1 > _homeController.actualStoryIndex.value) {
                 _homeController.indexStory.value++;
-                Get.back();
-                Get.to(() => const StoryViewerScreen());
+                Navigator.pop(context);
+                _navigationController.hideNavBar.value = true;
+                pushNewScreen(context, screen: const StoryViewerScreen()).then((value) => _navigationController.hideNavBar.value = false);
               } else {
-                Get.back();
+                Navigator.pop(context);
               }
               },
             onVerticalSwipeComplete: (direction){
-              if(direction == Direction.down) Get.back();
+              if(direction == Direction.down) Navigator.pop(context);
             },
             onStoryShow: (story) async{
               _homeController.actualStoryIndex.value = _homeController.stories.value?.indexOf(_homeController.stories.value![_homeController.indexStory.value]!) ?? 0;
@@ -78,7 +82,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
     return InkWell(
       onTap: (){
         _commonController.userClicked.value = story.createdBy;
-        Get.to(() => const ProfileElseScreen(fromConversation: false));
+        pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
       },
       child: Padding(
         padding: const EdgeInsets.only(top: 8.0),
@@ -107,7 +111,8 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  story.createdBy.userName.isNullOrBlank! ? "${story.createdBy.wallet!.substring(0, 10)}..." : story.createdBy.userName!,
+                  _commonController.nicknames[story.createdBy.wallet!] ??
+    (story.createdBy.userName.isNullOrBlank! ? "${story.createdBy.wallet!.substring(0, 10)}..." : story.createdBy.userName!),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontFamily: "Gilroy",

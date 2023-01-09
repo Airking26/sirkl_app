@@ -20,6 +20,8 @@ import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
 import 'package:sirkl/common/view/stream_chat/src/utils/helpers.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../home/controller/home_controller.dart';
+
 /// The display behaviour of a widget
 enum DisplayWidget {
   /// Hides the widget replacing its space with a spacer
@@ -778,6 +780,8 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
   late StreamChatThemeData _streamChatTheme;
   late StreamChatState _streamChat;
 
+  final _homeController = Get.put(HomeController());
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -1059,7 +1063,6 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
 
   void _showMessageActionModalBottomSheet(BuildContext context) {
     final channel = StreamChannel.of(context).channel;
-
     showDialog(
       useRootNavigator: false,
       context: context,
@@ -1067,6 +1070,7 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
       builder: (context) => StreamChannel(
         channel: channel,
         child: MessageActionsModal(
+          wallet: _homeController.userMe.value.wallet!,
           messageWidget: widget.copyWith(
             key: const Key('MessageWidget'),
             message: widget.message.copyWith(
@@ -1078,6 +1082,7 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
             showUsername: false,
             showTimestamp: false,
             translateUserAvatar: false,
+            showPinButton: true,
             showSendingIndicator: false,
             padding: EdgeInsets.zero,
             showReactionPickerIndicator: widget.showReactions &&
@@ -1104,7 +1109,6 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
           showReplyMessage: shouldShowReplyAction,
           showThreadReplyMessage: shouldShowThreadReplyAction,
           showFlagButton: widget.showFlagButton,
-          showPinButton: widget.showPinButton,
           customActions: widget.customActions,
         ),
       ),

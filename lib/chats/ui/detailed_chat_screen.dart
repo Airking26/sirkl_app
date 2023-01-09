@@ -8,6 +8,7 @@ import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 
 class DetailedChatScreen extends StatefulWidget {
@@ -27,6 +28,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
   final _commonController = Get.put(CommonController());
   final _chatController = Get.put(ChatsController());
   final _homeController = Get.put(HomeController());
+  final _navigationController = Get.put(NavigationController());
 
   @override
   void initState() {

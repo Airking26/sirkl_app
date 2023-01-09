@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/service/chats_service.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
@@ -11,6 +12,7 @@ import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/moralis_metadata_dto.dart';
 import 'package:sirkl/common/model/moralis_nft_contract_addresse.dart';
 import 'package:sirkl/common/model/moralis_root_dto.dart';
+import 'package:sirkl/common/model/nft_alchemy_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
@@ -18,6 +20,7 @@ import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/service/home_service.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -34,7 +37,7 @@ class HomeController extends GetxController{
   final ProfileService _profileService = ProfileService();
   final ChatsService _chatService = ChatsService();
 
-  final _callController = Get.put(CallsController());
+  final _navigationController = Get.put(NavigationController());
   final _commonController = Get.put(CommonController());
 
   Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
@@ -56,6 +59,11 @@ class HomeController extends GetxController{
   var loadingStories = true.obs;
   var sessionStatus;
   var _uri;
+  RxList<String> contractAddresses = <String>[].obs;
+  var cursor = "".obs;
+  var cursorElse = "".obs;
+  Rx<PagingController<int, List<StoryDto?>?>> pagingController = PagingController<int, List<StoryDto?>?>(firstPageKey: 0).obs;
+  var pageKey = 0.obs;
 
   final connector = WalletConnect(
     bridge: 'https://bridge.walletconnect.org',
@@ -121,6 +129,7 @@ class HomeController extends GetxController{
   loginWithWallet(BuildContext context, String wallet, String message, String signature) async{
     var request = await _homeService.verifySignature(walletConnectDtoToJson(WalletConnectDto(wallet: wallet, message: message, signature: signature)));
     if(request.isOk){
+      _navigationController.hideNavBar.value = false;
       var signSuccess = signInSuccessDtoFromJson(json.encode(request.body));
       userMe.value = signSuccess.user!;
       box.write(con.ACCESS_TOKEN, signSuccess.accessToken!);
@@ -157,14 +166,14 @@ class HomeController extends GetxController{
           retrieveAccessToken();
           _commonController.showSirklUsers(id.value);
           await retrieveTokenStreamChat(client, firebaseMessaging!);
-          await getNFTsContractAddresses(client);
+          await getNFTsContractAddresses(client, userMe.value.wallet!);
         }
       } else if(request.isOk){
         userMe.value = userFromJson(json.encode(request.body));
         retrieveAccessToken();
         _commonController.showSirklUsers(id.value);
         await retrieveTokenStreamChat(client, firebaseMessaging!);
-        await getNFTsContractAddresses(client);
+        await getNFTsContractAddresses(client, userMe.value.wallet!);
       } else {
         debugPrint(request.statusText);
         debugPrint(request.bodyString);
@@ -175,79 +184,67 @@ class HomeController extends GetxController{
   retrieveAccessToken(){
     var accessTok = box.read(con.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
+    var checkBoxRead = box.read(con.contractAddresses);
+    if(checkBoxRead != null) contractAddresses.value = box.read(con.contractAddresses).cast<String>() ?? [];
+    else contractAddresses.value = [];
     var d = box.read(con.USER);
     userMe.value = d != null ? userFromJson(box.read(con.USER) ?? "") : UserDTO();
     id.value = d != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
   }
 
-  getNFTsContractAddresses(StreamChatClient? client) async{
-    var req = await _homeService.getNFTsContractAddresses(userMe.value.wallet!);
+  getNFTsContractAddresses(StreamChatClient? client, String wallet) async{
+    var stockedContractAddresses = box.read(con.contractAddresses) ?? [];
+    var req = await _homeService.getNFTsContractAddresses("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87");
     if(req.body != null){
     var initialArray = moralisNftContractAdressesFromJson(json.encode(req.body)).result!;
     if(moralisNftContractAdressesFromJson(json.encode(req.body)).cursor != null) {
-      var cursor = moralisNftContractAdressesFromJson(json.encode(req.body))
-          .cursor;
+      var cursor = moralisNftContractAdressesFromJson(json.encode(req.body)).cursor;
       while (cursor != null) {
-        var newReq = await _homeService.getNextNFTsContractAddresses(
-            userMe.value.wallet!, cursor);
-        initialArray.addAll(
-            moralisNftContractAdressesFromJson(json.encode(newReq.body))
-                .result!);
-        cursor =
-            moralisNftContractAdressesFromJson(json.encode(newReq.body)).cursor;
+        var newReq = await _homeService.getNextNFTsContractAddresses("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87", cursor);
+        initialArray.addAll(moralisNftContractAdressesFromJson(json.encode(newReq.body)).result!);
+        cursor = moralisNftContractAdressesFromJson(json.encode(newReq.body)).cursor;
       }
     }
 
-      List<String> contractAddresses = ["0xc8D2bf842b9f0b601043fb4fd5F23d22b9483911"];
-      for (var element in initialArray) {contractAddresses.add(element.tokenAddress!);}
+     for (var element in initialArray) {
+       if(!contractAddresses.contains(element.tokenAddress)) contractAddresses.add(element.tokenAddress!.toLowerCase());
+     }
 
-      var addressesAbsent = userMe.value.contractAddresses!.toSet().difference(contractAddresses.toSet()).toList();
+      var addressesAbsent = stockedContractAddresses.toSet().difference(contractAddresses.toSet()).toList();
       if(client != null && addressesAbsent.isNotEmpty) {
         for (var absentAddress in addressesAbsent) {
-          //await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
+          await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
         }
       }
 
-      userMe.value.contractAddresses = contractAddresses;
-      box.write(con.USER, userToJson(userMe.value));
-      await updateMe(UpdateMeDto(contractAddresses: contractAddresses));
+      box.write(con.contractAddresses, contractAddresses);
     }
   }
 
-  getNFTsTemporary(String wallet, BuildContext context) async{
-    isLoadingNfts.value = true;
+  getNFTsTemporary(String wallet) async{
     nfts.value.clear();
-    var req = await _homeService.getNFTs(wallet);
-    var mainCollection = moralisRootDtoFromJson(json.encode(req.body)).result!;
-    var cursor = moralisRootDtoFromJson(json.encode(req.body)).cursor;
-    while(cursor != null){
-      var newReq = await _homeService.getNextNFTs(wallet, cursor);
-      mainCollection.addAll(moralisRootDtoFromJson(json.encode(newReq.body)).result!);
-      cursor = moralisRootDtoFromJson(json.encode(newReq.body)).cursor;
-    }
-
-    mainCollection.removeWhere((element) => element?.metadata == null || element?.name == null || moralisMetadataDtoFromJson(element!.metadata!).image == null || element.metadata != null && moralisMetadataDtoFromJson(element!.metadata!).image != null && moralisMetadataDtoFromJson(element.metadata!).image!.contains(".mp4"));
-    var groupedCollection = mainCollection.groupBy((p0) => p0!.tokenAddress);
-
-    groupedCollection.forEach((key, value) {
-      nfts.add(CollectionDbDto(collectionName: value.first!.name!, contractAddress: value.first!.tokenAddress!, collectionImages: value.map((e) {
-        String image;
-          if (moralisMetadataDtoFromJson(e!.metadata!).image!.startsWith("ipfs://")) {
-            image = "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("ipfs://").last}";
-          }
-          else if (moralisMetadataDtoFromJson(e.metadata!).image!.contains("/ipfs/")) {
-            image =  "https://ipfs.moralis.io:2053/ipfs/${moralisMetadataDtoFromJson(e.metadata!).image!.split("/ipfs/").last}";
-          }
-          else {
-            image = moralisMetadataDtoFromJson(e.metadata!).image!;
-          }
-        if(e.metadata != null )debugPrint("${value.first!.name!} : $image // ${e.tokenAddress}");
-        return image;
-      }
-      ).toList()));
+    var req = await _homeService.getNextNFTByAlchemy("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87", cursor.value);
+    var res = nftAlchemyDtoFromJson(json.encode(req.body));
+    res.pageKey == null || res.pageKey!.isEmpty ? cursor.value = "" : cursor.value = res.pageKey!;
+    res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty );
+    var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
+    gc?.forEach((key, value) {
+      nfts.add(CollectionDbDto(collectionName: value.first.title!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
     });
-    nfts.refresh();
-    isLoadingNfts.value = false;
+    return nfts;
+  }
+
+  getNFTsTemporaryForOthers(String wallet) async{
+    nfts.value.clear();
+    var req = await _homeService.getNextNFTByAlchemy(wallet, cursorElse.value);
+    var res = nftAlchemyDtoFromJson(json.encode(req.body));
+    res.pageKey == null || res.pageKey!.isEmpty ? cursorElse.value = "" : cursorElse.value = res.pageKey!;
+    res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty );
+    var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
+    gc?.forEach((key, value) {
+      nfts.add(CollectionDbDto(collectionName: value.first.title!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
+    });
+    return nfts;
   }
 
   retrieveInboxes() async{
@@ -292,8 +289,7 @@ class HomeController extends GetxController{
       var accessToken = box.read(con.ACCESS_TOKEN);
       var refreshToken = box.read(con.REFRESH_TOKEN);
       var request = await _profileService.retrieveTokenStreamChat(accessToken);
-      var userToPass = UserDTO(id: userMe.value.id, userName: userMe.value.userName, picture: userMe.value.picture, isAdmin: userMe.value.isAdmin, createdAt: userMe.value.createdAt, description: userMe.value.description, fcmToken: userMe.value.fcmToken, wallet: userMe.value.wallet, contractAddresses: userMe.value.contractAddresses, following: userMe.value.following, isInFollowing: userMe.value.isInFollowing);
-      userToPass.contractAddresses = [];
+      var userToPass = UserDTO(id: userMe.value.id, userName: userMe.value.userName, picture: userMe.value.picture, isAdmin: userMe.value.isAdmin, createdAt: userMe.value.createdAt, description: userMe.value.description, fcmToken: userMe.value.fcmToken, wallet: userMe.value.wallet, following: userMe.value.following, isInFollowing: userMe.value.isInFollowing);
       if (request.statusCode == 401) {
         var requestToken = await _homeService.refreshToken(refreshToken);
         var refreshTokenDTO = refreshTokenDtoFromJson(

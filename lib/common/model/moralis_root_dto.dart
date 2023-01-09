@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:sirkl/common/model/moralis_metadata_dto.dart';
+
 MoralisRootDto moralisRootDtoFromJson(String str) => MoralisRootDto.fromJson(json.decode(str));
 
 String moralisRootDtoToJson(MoralisRootDto data) => json.encode(data.toJson());
@@ -49,7 +51,7 @@ class Result {
     this.blockNumber,
     this.blockNumberMinted,
     this.tokenUri,
-    this.metadata,
+    this.normalizedMetadata,
     this.amount,
     this.name,
     this.symbol,
@@ -65,7 +67,7 @@ class Result {
   String? blockNumber;
   String? blockNumberMinted;
   String? tokenUri;
-  String? metadata;
+  NormalizedMetadata? normalizedMetadata;
   String? amount;
   String? name;
   String? symbol;
@@ -81,7 +83,7 @@ class Result {
     blockNumber: json["block_number"],
     blockNumberMinted: json["block_number_minted"],
     tokenUri: json["token_uri"],
-    metadata: json["metadata"],
+    normalizedMetadata: json["normalized_metadata"] == null ? null : NormalizedMetadata.fromJson(json["normalized_metadata"]),
     amount: json["amount"],
     name: json["name"],
     symbol: json["symbol"],
@@ -98,12 +100,48 @@ class Result {
     "block_number": blockNumber,
     "block_number_minted": blockNumberMinted,
     "token_uri": tokenUri,
-    "metadata": metadata,
+    "normalizedMetadata": normalizedMetadata?.toJson(),
     "amount": amount,
     "name": name,
     "symbol": symbol,
     "token_hash": tokenHash,
     "last_token_uri_sync": lastTokenUriSync,
     "last_metadata_sync": lastMetadataSync,
+  };
+}
+
+class NormalizedMetadata {
+  NormalizedMetadata({
+    this.name,
+    this.description,
+    this.image,
+    this.externalLink,
+    this.animationUrl,
+    this.attributes,
+  });
+
+  String? name;
+  String? description;
+  dynamic image;
+  dynamic externalLink;
+  dynamic animationUrl;
+  List<dynamic>? attributes;
+
+  factory NormalizedMetadata.fromJson(Map<String, dynamic> json) => NormalizedMetadata(
+    name: json["name"] == null ? null : json["name"],
+    description: json["description"] == null ? null : json["description"],
+    image: json["image"],
+    externalLink: json["external_link"],
+    animationUrl: json["animation_url"],
+    attributes: json["attributes"] == null ? null : List<dynamic>.from(json["attributes"].map((x) => x)),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "name": name == null ? null : name,
+    "description": description == null ? null : description,
+    "image": image,
+    "external_link": externalLink,
+    "animation_url": animationUrl,
+    "attributes": attributes == null ? null : List<dynamic>.from(attributes!.map((x) => x)),
   };
 }

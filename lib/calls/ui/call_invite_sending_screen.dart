@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/size_config.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
@@ -19,6 +20,7 @@ class CallInviteSendingScreen extends StatefulWidget {
 class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
 
   final _callController = Get.put(CallsController());
+  final _commonController = Get.put(CommonController());
   late Timer timer ;
 
   @override
@@ -60,7 +62,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                 children: [
                   const VerticalSpacing(of: 24),
                   Text(
-                    _callController.userCalled.value.userName.isNullOrBlank! ? "${_callController.userCalled.value.wallet!.substring(0, 10)}..." : _callController.userCalled.value.userName!.length > 10 ? "${_callController.userCalled.value.userName!.substring(0,10)}..." : _callController.userCalled.value.userName!,
+                    _commonController.nicknames[_callController.userCalled.value.wallet!] ?? (_callController.userCalled.value.userName.isNullOrBlank! ? "${_callController.userCalled.value.wallet!.substring(0, 10)}..." : _callController.userCalled.value.userName!.length > 10 ? "${_callController.userCalled.value.userName!.substring(0,10)}..." : _callController.userCalled.value.userName!),
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
@@ -145,6 +147,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                               await _callController.leaveChannel();
                             } else {
                               await _callController.missedCallNotification(_callController.userCalled.value.id!);
+                              await FlutterCallkitIncoming.endAllCalls();
                               await _callController.endCall(_callController.userCalled.value.id!, _callController.currentCallId.value);
                               await _callController.leaveChannel();
                             }

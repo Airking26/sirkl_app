@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:azlistview/azlistview.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 SignInSuccessDto signInSuccessDtoFromJson(String str) => SignInSuccessDto.fromJson(json.decode(str));
 String signInSuccessDtoToJson(SignInSuccessDto data) => json.encode(data.toJson());
@@ -42,7 +43,6 @@ class UserDTO extends ISuspensionBean{
     this.description,
     this.fcmToken,
     this.wallet,
-    this.contractAddresses,
     this.following,
     this.isInFollowing,
   });
@@ -55,7 +55,6 @@ class UserDTO extends ISuspensionBean{
   String? description;
   String? fcmToken;
   String? wallet;
-  List<String>? contractAddresses;
   int? following;
   bool? isInFollowing;
 
@@ -68,7 +67,6 @@ class UserDTO extends ISuspensionBean{
     description: json["description"],
     fcmToken: json["fcmToken"],
     wallet: json["wallet"],
-    contractAddresses: json["contractAddresses"] == null ? null : List<String>.from(json["contractAddresses"].map((x) => x)),
     following: json["following"],
     isInFollowing: json["isInFollowing"],
   );
@@ -82,11 +80,11 @@ class UserDTO extends ISuspensionBean{
     "description": description,
     "fcmToken": fcmToken,
     "wallet": wallet,
-    "contractAddresses": contractAddresses == null ? null : List<dynamic>.from(contractAddresses!.map((x) => x)),
     "following": following,
     "isInFollowing": isInFollowing,
   };
 
   @override
-  String getSuspensionTag() => userName.isNullOrBlank! ? wallet![0] : userName![0].toUpperCase();
+  String getSuspensionTag(){
+    return GetStorage().read("nicknames")[wallet!][0] ?? (userName.isNullOrBlank! ? wallet![0] : userName![0].toUpperCase());}
 }

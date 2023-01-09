@@ -36,6 +36,7 @@ class Language extends Translations{
       c.removeOfMySirklRes: "• Remove from My Sirkl",
       c.reportRes: "• Report",
       c.sendAMessageRes: "• Send a message",
+      c.renameRes: "• Rename",
       c.userAddedToSirklRes: "@user is now added to your Sirkl",
       c.userRemovedofSirklRes: "@user is now removed from your Sirkl",
       c.dontHaveNftRes: "No NFT Found",

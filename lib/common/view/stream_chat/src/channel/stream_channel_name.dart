@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
@@ -29,6 +30,8 @@ class StreamChannelName extends StatelessWidget {
 
   /// How visual overflow should be handled.
   final TextOverflow textOverflow;
+
+  final _commonController = Get.put(CommonController());
 
   @override
   Widget build(BuildContext context) => BetterStreamBuilder<String>(
@@ -59,7 +62,7 @@ class StreamChannelName extends StatelessWidget {
               final user = otherMembers.first.user;
               if (user != null) {
                 var userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
-                channelName = userDTO.userName.isNullOrBlank! ? userDTO.wallet! : userDTO.userName!;
+                channelName = _commonController.nicknames[userDTO.wallet!] ?? (userDTO.userName.isNullOrBlank! ? userDTO.wallet! : userDTO.userName!);
               }
             } else {
               final maxWidth = constraints.maxWidth;
