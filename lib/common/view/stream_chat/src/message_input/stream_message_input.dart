@@ -484,8 +484,8 @@ class StreamMessageInputState extends State<StreamMessageInput>
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
-                            Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                            MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF111D28) : Colors.white,
+                            MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
                           ]),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
@@ -744,7 +744,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
             clipBehavior: Clip.hardEdge,
             margin: margin,
             decoration: BoxDecoration(
-              color: Get.isDarkMode
+              color: MediaQuery.of(context).platformBrightness == Brightness.dark
                   ? const Color(0xFF2D465E)
                   : const Color(0xFFF2F2F2),
               borderRadius: BorderRadius.circular(20),
@@ -820,7 +820,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
           fontWeight: FontWeight.w500,
           fontSize: 16,
           fontFamily: "Gilroy",
-          color: Get.isDarkMode
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark
               ? const Color(0xff9BA0A5)
               : const Color(0xFF828282)),
       border: const OutlineInputBorder(

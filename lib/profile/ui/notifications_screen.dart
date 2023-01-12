@@ -56,7 +56,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
+        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
         body: Column(
           children: [
             Container(
@@ -75,8 +75,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-                      Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                      MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+                      MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
                     ]
                 ),
               ),
@@ -88,12 +88,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(onPressed: (){Navigator.of(context).pop();}, icon: Image.asset("assets/images/arrow_left.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                      IconButton(onPressed: (){Navigator.of(context).pop();}, icon: Image.asset("assets/images/arrow_left.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
                       Padding(
                         padding: const EdgeInsets.only(top: 12.0),
-                        child: Text(con.notificationsRes.tr, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
+                        child: Text(con.notificationsRes.tr, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
                       ),
-                      IconButton(onPressed: (){Utils().dialogPopMenu(context);}, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                      IconButton(onPressed: (){Utils().dialogPopMenu(context);}, icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
                     ],),
                 ),
               ),
@@ -107,7 +107,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 child: PagedListView.separated(
                   pagingController: pagingController,
                   builderDelegate: PagedChildBuilderDelegate<NotificationDto>(itemBuilder: (context, item, index) => buildNotificationTile(context, item, index),),
-                    separatorBuilder: (context, index){return Divider(color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 20, height: 0,);},
+                    separatorBuilder: (context, index){return Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF9BA0A5) : const Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 20, height: 0,);},
                 ),
               )
               ),
@@ -118,7 +118,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Widget buildNotificationTile(BuildContext context, NotificationDto item, int index){
     return Container(
-      color: item.hasBeenRead ? Colors.transparent : Get.isDarkMode ? const Color(0xFF9BA0A5).withOpacity(0.1) : const Color(0xFF828282).withOpacity(0.1),
+      color: item.hasBeenRead ? Colors.transparent : MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF9BA0A5).withOpacity(0.1) : const Color(0xFF828282).withOpacity(0.1),
       child: Padding(
         padding: const EdgeInsets.only(right: 8.0, top: 8, bottom: 8),
         child: ListTile(
@@ -163,7 +163,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             style: const TextStyle(),
             children: [
               TextSpan(text: item.username ?? item.wallet , style: const TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Color(0xff00CB7D))),
-              TextSpan(text: " added you in his SIRKL - ${timeago.format(timeSince)}", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Colors.white : Colors.black.withOpacity(0.6))),
+              TextSpan(text: " added you in his SIRKL - ${timeago.format(timeSince)}", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.6))),
             ]
         ),
       );
@@ -172,9 +172,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
         text: TextSpan(
             style: const TextStyle(),
             children: [
-              TextSpan(text: "You have added ", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Colors.white : Colors.black.withOpacity(0.6))),
+              TextSpan(text: "You have added ", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color:MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.6))),
               TextSpan(text: item.username ?? item.wallet , style: const TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Color(0xff00CB7D))),
-              TextSpan(text: " in your SIRKL - ${timeago.format(timeSince)}", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Colors.white : Colors.black.withOpacity(0.6))),
+              TextSpan(text: " in your SIRKL - ${timeago.format(timeSince)}", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.6))),
             ]
         ),
       );

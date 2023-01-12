@@ -22,7 +22,7 @@ class UnreadMessagesSeparator extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Get.isDarkMode ?  const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
         ),
         child: Padding(
           padding: const EdgeInsets.all(8),

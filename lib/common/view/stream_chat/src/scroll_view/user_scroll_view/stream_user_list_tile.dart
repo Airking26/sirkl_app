@@ -145,7 +145,7 @@ class StreamUserListTile extends StatelessWidget {
         Text(
           _commonController.nicknames[userFromJson(json.encode(user.extraData["userDTO"])).wallet!] ??
               (userFromJson(json.encode(user.extraData["userDTO"])).userName.isNullOrBlank! ? "${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(0,25)}...": userFromJson(json.encode(user.extraData["userDTO"])).userName!),
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, fontFamily: "Gilroy",color: Get.isDarkMode ? Colors.white : Colors.black),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, fontFamily: "Gilroy",color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
         );
 
     final subtitle = this.subtitle ??
@@ -165,7 +165,7 @@ class StreamUserListTile extends StatelessWidget {
       trailing: selected ? selectedWidget : null,
       title: title,
       subtitle: subtitle,
-      dense: true,
+      dense: false,
     );
   }
 }
@@ -189,7 +189,7 @@ class UserLastActive extends StatelessWidget {
           ? context.translations.userOnlineText
           : '${context.translations.userLastOnlineText} '
               '${Jiffy(user.lastActive).fromNow()}',
-      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, fontFamily: "Gilroy",color: Get.isDarkMode ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5)),
+      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, fontFamily: "Gilroy",color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5)),
     );
   }
 }

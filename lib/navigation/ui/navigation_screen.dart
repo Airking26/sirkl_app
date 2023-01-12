@@ -28,7 +28,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
   final _commonController = Get.put(CommonController());
   final _homeController = Get.put(HomeController());
 
-  final PersistentTabController _controller =PersistentTabController(initialIndex: 0);
 
   final List<Widget> _pages = [
     const HomeScreen(),
@@ -88,12 +87,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Obx(() =>Scaffold(
-        backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : Colors.white,
         body: PersistentTabView(
           context,
           screens: _pages,
           hideNavigationBar: _navigationController.hideNavBar.value,
-          controller: _controller,
+          controller: _navigationController.controller.value,
           items: _navBarsItems(),
           confineInSafeArea: true,
           handleAndroidBackButtonPress: true,
@@ -101,8 +99,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
-                Get.isDarkMode ? const Color(0xFF1E2032): Colors.white
+                MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF111D28) : Colors.white,
+                MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032): Colors.white
               ]
           ),),
           resizeToAvoidBottomInset: true,
@@ -110,15 +108,33 @@ class _NavigationScreenState extends State<NavigationScreen> {
           popAllScreensOnTapOfSelectedTab: true,
           navBarStyle: NavBarStyle.style3,
           onItemSelected: (index){
-            if(index == 1) {
-              _callController.pageKey.value = 0;
-              _callController.pagingController.value.refresh();
-            } else if(index == 0) {
-              _commonController.gettingStoryAndContacts.value = true;
-              _homeController.loadingStories.value = true;
-              _homeController.pageKey.value = 0;
-              _homeController.pagingController.value.refresh();
-              _commonController.showSirklUsers(_homeController.id.value);
+            if(index == 0) {
+              if(_homeController.accessToken.value.isNotEmpty) {
+                _commonController.gettingStoryAndContacts.value = true;
+                _homeController.loadingStories.value = true;
+                _homeController.pageKey.value = 0;
+                _homeController.pagingController.value.refresh();
+                _commonController.showSirklUsers(_homeController.id.value);
+              }
+            } else if(index == 1) {
+              if(_homeController.accessToken.value.isEmpty){
+                _navigationController.controller.value.index = 0;
+              } else {
+                _callController.pageKey.value = 0;
+                _callController.pagingController.value.refresh();
+              }
+            } else if(index == 2){
+              if(_homeController.accessToken.value.isEmpty){
+                _navigationController.controller.value.index = 0;
+              }
+            } else if(index == 3){
+              if(_homeController.accessToken.value.isEmpty){
+                _navigationController.controller.value.index = 0;
+              }
+            } else if(index == 4){
+              if(_homeController.accessToken.value.isEmpty){
+                _navigationController.controller.value.index = 0;
+              }
             }
           },
         )

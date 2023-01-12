@@ -179,7 +179,7 @@ class _MessageActionsModalState extends State<MessageActionsModal> {
                 child: SizedBox(
                   width: mediaQueryData.size.width * 0.75,
                   child: Material(
-                    color: Get.isDarkMode?  const Color(0xFF102437) : Colors.white,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark?  const Color(0xFF102437) : Colors.white,
                     clipBehavior: Clip.hardEdge,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),

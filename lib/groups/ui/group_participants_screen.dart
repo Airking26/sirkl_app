@@ -42,7 +42,11 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
   
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Column(
+    return Scaffold(
+      backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
+          ? const Color(0xFF102437)
+          : const Color.fromARGB(255, 247, 253, 255),
+        body: Column(
       children: [
         buildAppbar(context),
         MediaQuery.removePadding(
@@ -79,8 +83,8 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-              Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
             ]),
       ),
       child: Padding(
@@ -95,7 +99,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                   onPressed: () {},
                   icon: Image.asset(
                     "assets/images/arrow_left.png",
-                    color: Get.isDarkMode
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
                         ? Colors.transparent
                         : Colors.transparent,
                   )),
@@ -104,7 +108,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                 child: Text(
                    "Members" ,
                   style: TextStyle(
-                      color: Get.isDarkMode
+                      color: MediaQuery.of(context).platformBrightness == Brightness.dark
                           ? Colors.white
                           : Colors.black,
                       fontWeight: FontWeight.w600,

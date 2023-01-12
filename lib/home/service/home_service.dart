@@ -7,9 +7,9 @@ class HomeService extends GetConnect{
   Future<Response<Map<String, dynamic>>> signIn(String signInDTO) => post('${con.URL_SERVER}auth/signIn', signInDTO);
   Future<Response<Map<String, dynamic>>> verifySignature(String walletConnectDTO) => post('${con.URL_SERVER}auth/verifySignature', walletConnectDTO);
   Future<Response<Map<String, dynamic>>> signInSeedPhrase(String signInDTO) => post('${con.URL_SERVER}auth/signIn/seedPhrase', signInDTO);
-  Future<Response<String>> isUserExists(String wallet) => get('${con.URL_SERVER}auth/availability/wallet/$wallet');
   Future<Response<Map<String, dynamic>>> refreshToken(String refreshToken) => get('${con.URL_SERVER}auth/refresh', headers: {'Refresh': refreshToken});
   Future<Response<Map<String, dynamic>>> uploadFCMToken(String accessToken, String updateFcmdto) => put('${con.URL_SERVER}user/me/fcm', updateFcmdto, headers: {'Authorization':'Bearer $accessToken'});
+  Future<Response<Map<String, dynamic>>> uploadAPNToken(String accessToken, String apnToken) => put('${con.URL_SERVER}user/me/apn/$apnToken', null, headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> getNFTs(String wallet) => get("https://deep-index.moralis.io/api/v2/$wallet/nft", headers: {"accept": 'application/json', "X-API-Key": con.moralisApiKey}, query: {"chain": 'eth', "format": 'decimal', "disable_total": 'true', "normalizeMetadata": 'true'});
   Future<Response<Map<String, dynamic>>> getNFTByAlchemy(String wallet) => get("https://eth-mainnet.g.alchemy.com/v2/${con.alchemyApiKey}/getNFTs?owner=$wallet&omitMetadata=false&filters[]=AIRDROPS&filters[]=SPAM",  headers: {"accept": 'application/json'});
   Future<Response<Map<String, dynamic>>> getNextNFTByAlchemy(String wallet, String cursor) => get("https://eth-mainnet.g.alchemy.com/v2/${con.alchemyApiKey}/getNFTs?owner=$wallet&omitMetadata=false&filters[]=AIRDROPS&filters[]=SPAM&pageSize=25&pageKey=$cursor",  headers: {"accept": 'application/json'});

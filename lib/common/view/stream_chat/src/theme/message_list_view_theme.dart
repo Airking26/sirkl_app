@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
@@ -82,7 +83,7 @@ class StreamMessageListViewThemeData with Diagnosticable {
     DecorationImage? backgroundImage,
   }) {
     return StreamMessageListViewThemeData(
-      backgroundColor: Get.isDarkMode ? const Color(0xFF102437)
+      backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? const Color(0xFF102437)
           : const Color.fromARGB(255, 247, 253, 255),
       backgroundImage: backgroundImage ?? this.backgroundImage,
     );

@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -163,16 +165,26 @@ class HomeController extends GetxController{
         request = await _homeService.uploadFCMToken(accessToken, fcm);
         if(request.isOk){
           userMe.value = userFromJson(json.encode(request.body));
+          box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
           retrieveAccessToken();
           _commonController.showSirklUsers(id.value);
           await retrieveTokenStreamChat(client, firebaseMessaging!);
+          if(Platform.isIOS) {
+            var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+            await _homeService.uploadAPNToken(accessToken, token);
+          }
           await getNFTsContractAddresses(client, userMe.value.wallet!);
         }
       } else if(request.isOk){
         userMe.value = userFromJson(json.encode(request.body));
+        box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
         retrieveAccessToken();
         _commonController.showSirklUsers(id.value);
         await retrieveTokenStreamChat(client, firebaseMessaging!);
+        if(Platform.isIOS) {
+          var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+          await _homeService.uploadAPNToken(accessToken, token);
+        }
         await getNFTsContractAddresses(client, userMe.value.wallet!);
       } else {
         debugPrint(request.statusText);
@@ -185,8 +197,11 @@ class HomeController extends GetxController{
     var accessTok = box.read(con.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
     var checkBoxRead = box.read(con.contractAddresses);
-    if(checkBoxRead != null) contractAddresses.value = box.read(con.contractAddresses).cast<String>() ?? [];
-    else contractAddresses.value = [];
+    if(checkBoxRead != null) {
+      contractAddresses.value = box.read(con.contractAddresses).cast<String>() ?? [];
+    } else {
+      contractAddresses.value = [];
+    }
     var d = box.read(con.USER);
     userMe.value = d != null ? userFromJson(box.read(con.USER) ?? "") : UserDTO();
     id.value = d != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
@@ -194,13 +209,13 @@ class HomeController extends GetxController{
 
   getNFTsContractAddresses(StreamChatClient? client, String wallet) async{
     var stockedContractAddresses = box.read(con.contractAddresses) ?? [];
-    var req = await _homeService.getNFTsContractAddresses("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87");
+    var req = await _homeService.getNFTsContractAddresses(wallet);
     if(req.body != null){
     var initialArray = moralisNftContractAdressesFromJson(json.encode(req.body)).result!;
     if(moralisNftContractAdressesFromJson(json.encode(req.body)).cursor != null) {
       var cursor = moralisNftContractAdressesFromJson(json.encode(req.body)).cursor;
       while (cursor != null) {
-        var newReq = await _homeService.getNextNFTsContractAddresses("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87", cursor);
+        var newReq = await _homeService.getNextNFTsContractAddresses(wallet, cursor);
         initialArray.addAll(moralisNftContractAdressesFromJson(json.encode(newReq.body)).result!);
         cursor = moralisNftContractAdressesFromJson(json.encode(newReq.body)).cursor;
       }
@@ -223,13 +238,13 @@ class HomeController extends GetxController{
 
   getNFTsTemporary(String wallet) async{
     nfts.value.clear();
-    var req = await _homeService.getNextNFTByAlchemy("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87", cursor.value);
+    var req = await _homeService.getNextNFTByAlchemy(wallet, cursor.value);
     var res = nftAlchemyDtoFromJson(json.encode(req.body));
     res.pageKey == null || res.pageKey!.isEmpty ? cursor.value = "" : cursor.value = res.pageKey!;
-    res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty );
+    res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty || element.contractMetadata!.openSea!.collectionName == null ||  element.contractMetadata!.openSea!.collectionName!.isEmpty ||  element.contractMetadata!.openSea!.collectionName! == "Secret FLClub Pass");
     var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
     gc?.forEach((key, value) {
-      nfts.add(CollectionDbDto(collectionName: value.first.title!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
+      nfts.add(CollectionDbDto(collectionName: value.first.contractMetadata!.openSea!.collectionName!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
     });
     return nfts;
   }
@@ -302,7 +317,7 @@ class HomeController extends GetxController{
               name: userMe.value.userName.isNullOrBlank!
                   ? userMe.value.wallet
                   : userMe.value.userName!,
-              extraData: {"userDTO": userToPass}), request.body!);
+              extraData: {"userDTO": userToPass}), request.body! );
           controllerConnected.value = true;
           if (firebaseMessaging != null) {
             await client.addDevice(
@@ -324,11 +339,6 @@ class HomeController extends GetxController{
         }
       }
     }
-  }
-
-  checkIfUserExists(String wallet) async{
-    var request = await _homeService.isUserExists(wallet);
-    return request.body! == "false" ? true : false;
   }
 
   retrieveStories(int offset) async {

@@ -3,9 +3,6 @@ PODS:
     - AgoraIrisRTC_iOS (= 3.7.0.3)
     - AgoraRtcEngine_iOS (= 3.7.0.3)
     - Flutter
-  - agora_rtm (1.5.0):
-    - AgoraRtm_iOS (= 1.5.1)
-    - Flutter
   - AgoraIrisRTC_iOS (3.7.0.3)
   - AgoraRtcEngine_iOS (3.7.0.3):
     - AgoraRtcEngine_iOS/AINS (= 3.7.0.3)
@@ -30,7 +27,6 @@ PODS:
   - AgoraRtcEngine_iOS/SuperResolution (3.7.0.3)
   - AgoraRtcEngine_iOS/VideoPreprocess (3.7.0.3)
   - AgoraRtcEngine_iOS/VirtualBackground (3.7.0.3)
-  - AgoraRtm_iOS (1.5.1)
   - AWSCognito (2.19.1):
     - AWSCore (= 2.19.1)
   - AWSCore (2.19.1)
@@ -211,7 +207,6 @@ PODS:
 
 DEPENDENCIES:
   - agora_rtc_engine (from `.symlinks/plugins/agora_rtc_engine/ios`)
-  - agora_rtm (from `.symlinks/plugins/agora_rtm/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - file_selector_ios (from `.symlinks/plugins/file_selector_ios/ios`)
@@ -241,7 +236,6 @@ SPEC REPOS:
   trunk:
     - AgoraIrisRTC_iOS
     - AgoraRtcEngine_iOS
-    - AgoraRtm_iOS
     - AWSCognito
     - AWSCore
     - AWSS3
@@ -269,8 +263,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   agora_rtc_engine:
     :path: ".symlinks/plugins/agora_rtc_engine/ios"
-  agora_rtm:
-    :path: ".symlinks/plugins/agora_rtm/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/ios"
   file_picker:
@@ -322,10 +314,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   agora_rtc_engine: 47e0ddc177bae1b85eb00d01a0ea546d87ce0b8b
-  agora_rtm: fe254f84e056f8dbcf878a2a20b9f46aa9e7d0dd
   AgoraIrisRTC_iOS: d802443ae16f043e7b2805c978880eb62ee8154c
   AgoraRtcEngine_iOS: 549bb3853d5afb18fabca4197786f39f31141da8
-  AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   AWSCognito: f50de600804941d083af37a7568905f31a774727
   AWSCore: 55c154ae27efc5c98bdc30a0eeea5a35d10a2ab5
   AWSS3: 2272253b098d07803af8dd20ce6ce7302bcffb47

@@ -194,12 +194,12 @@ class _MessageCardState extends State<MessageCard> {
   Widget build(BuildContext context) {
     return Material(
       elevation: 1,
-      shadowColor: Get.isDarkMode ? Colors.transparent: Colors.transparent,
+      shadowColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent: Colors.transparent,
       borderRadius: BorderRadius.circular(10),
       color: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(width: widget.reverse ? Get.isDarkMode ? 0 : 1 : Get.isDarkMode ? 2 : 0.1, color: widget.reverse ? Get.isDarkMode ? Colors.transparent : Color(0xFF00CB7D).withOpacity(0.2) : Colors.grey.withOpacity(0.35)),
+          border: Border.all(width: widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? 0 : 1 : MediaQuery.of(context).platformBrightness == Brightness.dark ? 2 : 0.1, color: widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Color(0xFF00CB7D).withOpacity(0.2) : Colors.grey.withOpacity(0.35)),
           borderRadius: BorderRadius.only(
               bottomLeft: const Radius.circular(10),
               bottomRight: widget.reverse && widget.showTimeStamp ? const Radius.circular(0) : const Radius.circular(10),
@@ -209,8 +209,8 @@ class _MessageCardState extends State<MessageCard> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                widget.reverse ? Get.isDarkMode ?  Colors.white.withOpacity(0.1) : const Color(0xFF00CB7D).withOpacity(0.05) : Get.isDarkMode ? Colors.transparent : Colors.white,
-                widget.reverse ? Get.isDarkMode ? Colors.white.withOpacity(0.05) : const Color(0xFF00CB7D).withOpacity(0.05)  : Get.isDarkMode ? Colors.transparent : Colors.white
+                widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ?  Colors.white.withOpacity(0.1) : const Color(0xFF00CB7D).withOpacity(0.05) : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.white,
+                widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.05) : const Color(0xFF00CB7D).withOpacity(0.05)  : MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.transparent : Colors.white
               ]),
 
         ),

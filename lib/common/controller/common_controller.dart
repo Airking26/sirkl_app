@@ -6,7 +6,6 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/service/common_service.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 

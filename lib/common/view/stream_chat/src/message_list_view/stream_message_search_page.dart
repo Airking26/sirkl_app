@@ -34,7 +34,7 @@ class _StreamMessageSearchState extends State<StreamMessageSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Obx(() => Scaffold(
-    backgroundColor: Get.isDarkMode
+    backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
         ? const Color(0xFF102437)
         : const Color.fromARGB(255, 247, 253, 255),
     body: StreamMessageSearchListView(

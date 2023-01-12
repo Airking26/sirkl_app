@@ -29,9 +29,16 @@
 	<key>NSCameraUsageDescription</key>
 	<string>We require camera access to connect to a call</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Example usage description</string>
+	<string>We require microphone access to connect to a call</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Example usage description</string>
+	<string>We require library access to show pictures to choose from</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+		<string>voip</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

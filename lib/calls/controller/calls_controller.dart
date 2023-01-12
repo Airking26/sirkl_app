@@ -100,6 +100,7 @@ class CallsController extends GetxController{
   inviteCall(UserDTO user, String channel, String myID) async {
     userCalled.value = user;
     currentCallId.value = channel;
+    var voip = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
     await createCall(CallCreationDto(updatedAt: DateTime.now(), called: user.id!, status: 0, channel: channel));
     await retrieveTokenAgoraRTC(channel, "publisher", "userAccount", myID);
     //await agoraEngine.value?.registerLocalUserAccount(tokenAgoraRTC.value, "63ad5f91c9b3f4001e421a51");
@@ -123,7 +124,7 @@ class CallsController extends GetxController{
           print('Device Token FCM: $event');
           break;
         case Event.ACTION_CALL_ACCEPT:
-          await join(event.body['id'], event.body['extra']['userCalled'], event.body['extra']['userCalling']);
+          await join(event.body['extra']["channel"] ?? event.body['id'], event.body['extra']['userCalled'], event.body['extra']['userCalling']);
           break;
         case Event.ACTION_CALL_DECLINE:
           await FlutterCallkitIncoming.endAllCalls();

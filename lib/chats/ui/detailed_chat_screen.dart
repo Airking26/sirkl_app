@@ -32,6 +32,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
 
   @override
   void initState() {
+    _navigationController.hideNavBar.value = true;
     _commonController.checkUserIsInFollowing();
     if(widget.create) {
       _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value);
@@ -44,7 +45,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Get.isDarkMode
+        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() => StreamChat(

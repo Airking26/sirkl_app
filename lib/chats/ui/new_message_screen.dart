@@ -86,7 +86,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         extendBody: true,
-        backgroundColor: Get.isDarkMode
+        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() =>Column(children: [
@@ -123,7 +123,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                                 fontSize: 20,
                                 fontFamily: "Gilroy",
                                 color:
-                                Get.isDarkMode ? Colors.white : Colors.black),
+                                MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
                           ),
                         ),
                         const SizedBox(
@@ -154,7 +154,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                             fontSize: 20,
                             fontFamily: "Gilroy",
                             color:
-                                Get.isDarkMode ? Colors.white : Colors.black),
+                            MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
                       ),
                     ),
                     MediaQuery.removePadding(
@@ -202,8 +202,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-              Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
             ]),
       ),
       child: Padding(
@@ -220,14 +220,14 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   },
                   icon: Image.asset(
                     "assets/images/arrow_left.png",
-                    color: Get.isDarkMode ? Colors.white : Colors.black,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                   )),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Text(
                   con.newMessageRes.tr,
                   style: TextStyle(
-                      color: Get.isDarkMode ? Colors.white : Colors.black,
+                      color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                       fontWeight: FontWeight.w600,
                       fontFamily: "Gilroy",
                       fontSize: 20),
@@ -240,7 +240,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   },
                   icon: Image.asset(
                     "assets/images/plus.png",
-                    color: Get.isDarkMode
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
                         ? Colors.transparent
                         : Colors.transparent,
                   )),
@@ -267,12 +267,12 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       axisAlignment: 0.0,
       openAxisAlignment: 0.0,
       queryStyle: TextStyle(
-          color: Get.isDarkMode ? Colors.white : Colors.black,
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
           fontSize: 15,
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
       hintStyle: TextStyle(
-          color: Get.isDarkMode
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark
               ? const Color(0xff9BA0A5)
               : const Color(0xFF828282),
           fontSize: 15,
@@ -281,9 +281,9 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       elevation: 5,
       showCursor: true,
       width: 350,
-      accentColor: Get.isDarkMode ? Colors.white : Colors.black,
+      accentColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
       borderRadius: BorderRadius.circular(10),
-      backgroundColor: Get.isDarkMode
+      backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
           ? const Color(0xFF2D465E).withOpacity(1)
           : Colors.white,
       debounceDelay: Duration.zero,
@@ -306,8 +306,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             pagingController.itemList = [_profileController.isUserExists.value!];
           }
         } else {
-          if(query.isNotEmpty) pagingController.itemList = [];
-          else pagingController.refresh();
+          if(query.isNotEmpty) {
+            pagingController.itemList = [];
+          } else {
+            pagingController.refresh();
+          }
         }
         /*_chatController.searchToRefresh.value = true;
         _commonController.query.value = query;
@@ -383,7 +386,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   fontSize: 18,
                   fontFamily: "Gilroy",
                   fontWeight: FontWeight.w600,
-                  color: Get.isDarkMode ? Colors.white : Colors.black)),
+                  color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
         ),
         subtitle: !item.userName.isNullOrBlank! ? Transform.translate(
           offset: const Offset(-8, 0),
@@ -394,7 +397,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   fontSize: 15,
                   fontFamily: "Gilroy",
                   fontWeight: FontWeight.w500,
-                  color: Get.isDarkMode
+                  color: MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? const Color(0xFF9BA0A5)
                       : const Color(0xFF828282))),
         ) : null
@@ -436,8 +439,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
-              Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF111D28) : Colors.white,
+              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
             ]),
       ),
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
@@ -454,12 +457,12 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
                     fontFamily: "Gilroy",
-                    color: Get.isDarkMode
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
                         ? const Color(0xff9BA0A5)
                         : const Color(0xFF828282)),
                 filled: true,
                 fillColor:
-                Get.isDarkMode ? const Color(0xFF2D465E) : const Color(0xFFF2F2F2),
+                MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF2D465E) : const Color(0xFFF2F2F2),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide.none),

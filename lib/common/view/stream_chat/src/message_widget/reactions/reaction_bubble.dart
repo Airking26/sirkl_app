@@ -60,7 +60,7 @@ class StreamReactionBubble extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
-              color: !Get.isDarkMode
+              color: MediaQuery.of(context).platformBrightness == Brightness.light
         ? const Color(0xFF102437)
         : const Color.fromARGB(255, 247, 253, 255),
               borderRadius: const BorderRadius.all(Radius.circular(16)),
@@ -72,11 +72,11 @@ class StreamReactionBubble extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: !Get.isDarkMode
+                  color: MediaQuery.of(context).platformBrightness == Brightness.light
                       ? const Color(0xFF102437)
                       : const Color.fromARGB(255, 247, 253, 255),
                 ),
-                color: !Get.isDarkMode
+                color: MediaQuery.of(context).platformBrightness == Brightness.light
     ? const Color(0xFF102437)
         : const Color.fromARGB(255, 247, 253, 255),
                 borderRadius: const BorderRadius.all(Radius.circular(14)),

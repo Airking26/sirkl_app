@@ -206,8 +206,8 @@ class StreamChannelHeader extends StatelessWidget
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-                    Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                    MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+                    MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
                   ]),
             ),
             child: Padding(
@@ -231,7 +231,7 @@ class StreamChannelHeader extends StatelessWidget
                               },
                               icon: Image.asset(
                                 "assets/images/arrow_left.png",
-                                color: Get.isDarkMode ? Colors.white : Colors.black,
+                                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                               )),
                           InkWell(
                             onTap: () async {
@@ -330,7 +330,7 @@ class StreamChannelHeader extends StatelessWidget
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
                                         fontFamily: "Gilroy",
-                                        color: Get.isDarkMode
+                                        color: MediaQuery.of(context).platformBrightness == Brightness.dark
                                             ? Colors.white
                                             : Colors.black),
                                   ),
@@ -342,7 +342,7 @@ class StreamChannelHeader extends StatelessWidget
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
                                         fontFamily: "Gilroy",
-                                        color: Get.isDarkMode
+                                        color: MediaQuery.of(context).platformBrightness == Brightness.dark
                                             ? Colors.white
                                             : Colors.black),
                                   ) : Container(),
@@ -353,13 +353,13 @@ class StreamChannelHeader extends StatelessWidget
                         ],
                       ),
                     ),
-                    IconButton(
+                    (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ? Container() : IconButton(
                         onPressed: () {
                           dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
                         },
                         icon: Image.asset(
                           "assets/images/more.png",
-                          color: Get.isDarkMode ? Colors.white : Colors.black,
+                          color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                         )),
                   ],
                 ),
@@ -376,8 +376,8 @@ class StreamChannelHeader extends StatelessWidget
       ..width = 180
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
-      ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: () async {
@@ -391,13 +391,13 @@ class StreamChannelHeader extends StatelessWidget
           } else utils.showToast(context, 'Error. Try again later');
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.claimOwnershipeRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.claimOwnershipeRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..show();
   }
@@ -407,8 +407,8 @@ class StreamChannelHeader extends StatelessWidget
       ..width = 180
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
-      ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: () async{
@@ -416,13 +416,13 @@ class StreamChannelHeader extends StatelessWidget
           if(_commonController.userClicked.value!.wallet != channel.extraData["owner"] as String) pushNewScreen(context, screen: DetailedChatScreen(create: true));
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..show();
   }
@@ -443,9 +443,9 @@ class StreamChannelHeader extends StatelessWidget
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
       ..barrierColor =
-      Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
+      MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
       ..backgroundColor =
-      Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: () async {
@@ -482,7 +482,7 @@ class StreamChannelHeader extends StatelessWidget
                     : con.addToMySirklRes.tr,
                 style: TextStyle(
                     fontSize: 14,
-                    color: _commonController.userClickedFollowStatus.value ? Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282) :Color(0xff00CB7D),
+                    color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) :Color(0xff00CB7D),
                     fontFamily: "Gilroy",
                     fontWeight: FontWeight.w600),
               )),
@@ -502,7 +502,7 @@ class StreamChannelHeader extends StatelessWidget
                 con.profileMenuTabRes.tr,
                 style: TextStyle(
                     fontSize: 14,
-                    color: Get.isDarkMode
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
                         ? const Color(0xff9BA0A5)
                         : const Color(0xFF828282),
                     fontFamily: "Gilroy",
@@ -521,7 +521,7 @@ class StreamChannelHeader extends StatelessWidget
                 con.reportRes.tr,
                 style: TextStyle(
                     fontSize: 14,
-                    color: Get.isDarkMode
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
                         ? const Color(0xff9BA0A5)
                         : const Color(0xFF828282),
                     fontFamily: "Gilroy",

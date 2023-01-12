@@ -111,8 +111,8 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _commonController.nicknames[story.createdBy.wallet!] ??
-    (story.createdBy.userName.isNullOrBlank! ? "${story.createdBy.wallet!.substring(0, 10)}..." : story.createdBy.userName!),
+                  story.createdBy.nickname.isNullOrBlank! ?
+    (story.createdBy.userName.isNullOrBlank! ? "${story.createdBy.wallet!.substring(0, 10)}..." : story.createdBy.userName!) :story.createdBy.nickname! ,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontFamily: "Gilroy",

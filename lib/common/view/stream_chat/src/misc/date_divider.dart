@@ -45,7 +45,7 @@ class StreamDateDivider extends StatelessWidget {
         children: [
           Flexible(
               child: Container(
-                color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0XFF828282),
+                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Color(0xFF9BA0A5) : Color(0XFF828282),
                 height:  0.25,
               )),
           Padding(
@@ -53,7 +53,7 @@ class StreamDateDivider extends StatelessWidget {
             child: Text(
               dayInfo.toUpperCase(),
               style:  TextStyle(
-                  color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0XFF828282),
+                  color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Color(0xFF9BA0A5) : Color(0XFF828282),
                   fontSize: 14,
                   fontFamily: "Gilroy",
                   fontWeight: FontWeight.w600),
@@ -61,7 +61,7 @@ class StreamDateDivider extends StatelessWidget {
           ),
           Flexible(
               child: Container(
-                color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0XFF828282),
+                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Color(0xFF9BA0A5) : Color(0XFF828282),
                 height: 0.25,
               )),
         ],

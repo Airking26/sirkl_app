@@ -51,7 +51,7 @@ class _StreamReactionPickerState extends State<StreamReactionPicker>
 
     final child = Material(
       borderRadius: BorderRadius.circular(24),
-      color: Get.isDarkMode ?  const Color(0xFF102437) : Colors.white,
+      color: MediaQuery.of(context).platformBrightness == Brightness.dark?  const Color(0xFF102437) : Colors.white,
       clipBehavior: Clip.hardEdge,
       child: Padding(
         padding: const EdgeInsets.symmetric(

@@ -9,11 +9,9 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
+import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/common/view/detailed_message/detailed_message_screen.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
-import 'package:sirkl/common/view/navbar/floating_navbar.dart';
-import 'package:sirkl/common/view/navbar/floating_navbar_item.dart';
 import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
@@ -68,7 +66,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
+        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() =>
             Column(
           children: [
@@ -93,8 +91,8 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-                          Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                          MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+                          MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
                         ]
                     ),
                   ),
@@ -107,7 +105,8 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _profileController.isEditingProfileElse.value ? InkWell(
-                            onTap: (){
+                            onTap: () async {
+                              await _profileController.updateMe(UpdateMeDto(nicknames: {_commonController.userClicked.value!.wallet! : _profileController.usernameElseTextEditingController.value.text}), StreamChat.of(context).client);
                               _commonController.updateNicknames(_profileController.usernameElseTextEditingController.value.text, _commonController.userClicked.value!.wallet!);
                               _profileController.isEditingProfileElse.value = false;
                             },
@@ -126,7 +125,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                               _navigationController.hideNavBar.value = true;
                               pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
                             }
-                            }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? Get.isDarkMode ? Colors.white : Colors.black :Color(0xff00CB7D), height: 28, width: 28,)),
+                            }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :Color(0xff00CB7D), height: 28, width: 28,)),
                           Padding(
                             padding: const EdgeInsets.only(top: 12.0),
                             child:
@@ -139,7 +138,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                                     controller: _profileController.usernameElseTextEditingController.value,
                                     maxLength: 20,
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),
+                                    style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
                                     decoration: const InputDecoration(
                                         border: InputBorder.none,
                                         isCollapsed: true,
@@ -147,11 +146,11 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                                     ),
                                   ),
                                 ):
-                                Text(_commonController.nicknames[_commonController.userClicked.value!.wallet!] ?? (_commonController.userClicked.value!.userName!.isEmpty ? "${_commonController.userClicked.value!.wallet!.substring(0, 20)}..." : _commonController.userClicked.value!.userName!), textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
+                                Text(_commonController.nicknames[_commonController.userClicked.value!.wallet!] ?? (_commonController.userClicked.value!.userName!.isEmpty ? "${_commonController.userClicked.value!.wallet!.substring(0, 20)}..." : _commonController.userClicked.value!.userName!), textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
                           ),
                           IconButton(onPressed: (){
                             dialogMenu = dialogPopMenu(context);
-                            }, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                            }, icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
                         ],),
                     ),
                   ),
@@ -160,7 +159,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                   top: Platform.isAndroid ? 105 : 95,
                   child: Container(
                     decoration: BoxDecoration(
-                        border: Border.all(color: Get.isDarkMode ? const Color(0xFF122034) : Colors.white, width: 5),
+                        border: Border.all(color: MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xFF122034) : Colors.white, width: 5),
                         borderRadius: BorderRadius.circular(90)),
                     child:
                         ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(70),
@@ -206,7 +205,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
             const SizedBox(height: 10,),
             Padding(
               padding: const EdgeInsets.only(left: 24.0),
-              child: _homeController.nfts.value.isNotEmpty ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),)) : Container(),
+              child: _homeController.nfts.value.isNotEmpty ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),)) : Container(),
             ),
             MediaQuery.removePadding(
               context:  context,
@@ -236,8 +235,8 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
       ..width = 180
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
-      ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: () async{
@@ -254,17 +253,17 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(_commonController.userClickedFollowStatus.value ? con.removeOfMySirklRes.tr : con.addToMySirklRes.tr, style: TextStyle(fontSize: 14,
-              color: _commonController.userClickedFollowStatus.value ? Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282) :Color(0xff00CB7D),
+              color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) :Color(0xff00CB7D),
               fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
-        onTap: (){
+        onTap: () async {
           _profileController.isEditingProfileElse.value = true;
           dialogMenu.dismiss();
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.renameRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.renameRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
@@ -273,13 +272,13 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
           pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.sendAMessageRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.sendAMessageRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..show();
   }
@@ -313,7 +312,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 6),
         child: Container(
           decoration: BoxDecoration(
-            color: Get.isDarkMode ? const Color(0xFF1A2E40) : Colors.white,
+            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1A2E40) : Colors.white,
             borderRadius: BorderRadius.circular(20),
             boxShadow: const [
               BoxShadow(
@@ -330,8 +329,8 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
               "assets/images/arrow_up_rev.png" :
               "assets/images/arrow_down_rev.png",
-              color: Get.isDarkMode ? Colors.white : Colors.black, height: 20, width: 20,),),
-            title: Text(widget.collectionDbDTO.collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
+              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, height: 20, width: 20,),),
+            title: Text(widget.collectionDbDTO.collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black)),
             subtitle: Text("${widget.collectionDbDTO.collectionImages.length} available", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
             onExpansionChanged: (expanded){
               if(expanded) {

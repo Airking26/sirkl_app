@@ -91,7 +91,7 @@ Future<T?> showStreamAttachmentPickerModalBottomSheet<T>({
 
   return showModalBottomSheet<T>(
     context: context,
-    backgroundColor: Get.isDarkMode ? const Color(0xFF111D28) : Colors.white,
+    backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF111D28) : Colors.white,
     elevation: elevation,
     shape: shape,
     clipBehavior: clipBehavior,

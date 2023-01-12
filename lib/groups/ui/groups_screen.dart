@@ -110,7 +110,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: Get.isDarkMode
+        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() => Column(children: [
@@ -129,6 +129,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     padding: const EdgeInsets.only(top:28.0),
                     child: SafeArea(
                       child: StreamChannelListView(
+                        errorBuilder: (context, error){
+                          var g = error;
+                          var t = error.message;
+                          return Container();
+                        },
                         channelSlidableEnabled: true,
                         onChannelFavPressed: (context, channel) async{
                           await channel.updatePartial(unset: ["${_homeController.id.value}_favorite"]);
@@ -187,31 +192,31 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       ..width = 180
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
-      ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..barrierColor =MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.notificationsOffRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.notificationsOffRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.claimOwnershipeRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.claimOwnershipeRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..show();
   }
@@ -236,7 +241,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                 con.noGroupYetRes.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: Get.isDarkMode ? Colors.white : Colors.black,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                     fontSize: 25,
                     fontFamily: "Gilroy",
                     fontWeight: FontWeight.w700),
@@ -281,7 +286,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                 "No NFT Found",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: Get.isDarkMode ? Colors.white : Colors.black,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                     fontSize: 25,
                     fontFamily: "Gilroy",
                     fontWeight: FontWeight.w700),
@@ -326,7 +331,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                 con.noGroupYetRes.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: Get.isDarkMode ? Colors.white : Colors.black,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                     fontSize: 25,
                     fontFamily: "Gilroy",
                     fontWeight: FontWeight.w700),
@@ -395,7 +400,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Get.isDarkMode ? const Color(0xFF1A2E40) : Colors.white,
+                      color: MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xFF1A2E40) : Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: const [
                         BoxShadow(
@@ -413,7 +418,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                       },
                       leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftsAvailable[index].collectionImage, width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
 
-                      title: Text(_groupController.nftsAvailable.value[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
+                      title: Text(_groupController.nftsAvailable.value[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
                       //subtitle: Transform.translate(offset: const Offset(-8, 0), child: Text("${_homeController.nfts.value[index].collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
                     ),
                   ),
@@ -449,8 +454,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-                  Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                  MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+                  MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xFF1E2032) : Colors.white
                 ]),
           ),
           child: Padding(
@@ -475,7 +480,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                       icon: Image.asset(
                         _groupController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
                         color:
-                        Get.isDarkMode ? Colors.white : Colors.black,
+                        MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                       ))),
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),
@@ -483,7 +488,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                       _groupController.searchIsActive.value ? _groupController.index.value == 0 ? "Favorites" : "Others" :
                       con.groupsTabRes.tr,
                       style: TextStyle(
-                          color: Get.isDarkMode
+                          color: MediaQuery.of(context).platformBrightness == Brightness.dark
                               ? Colors.white
                               : Colors.black,
                           fontWeight: FontWeight.w600,
@@ -501,7 +506,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         "assets/images/close_big.png" :
                         "assets/images/plus.png",
                         color:
-                        Get.isDarkMode ? Colors.white : Colors.black,
+                        MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                       )),
                 ],
               ),
@@ -525,7 +530,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         blurRadius: 0.01,
                       ),
                     ],
-                    color: Get.isDarkMode
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
                         ? const Color(0xFF2D465E).withOpacity(1)
                         : Colors.white),
                 child: Padding(
@@ -552,7 +557,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                                   Color(0xFF1DE99B),
                                   Color(0xFF0063FB)
                                 ])
-                                : Get.isDarkMode
+                                : MediaQuery.of(context).platformBrightness == Brightness.dark
                                 ? const LinearGradient(
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
@@ -579,7 +584,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                                     fontWeight: FontWeight.w700,
                                     color: _groupController.index.value == 0
                                         ? Colors.white
-                                        : Get.isDarkMode
+                                        : MediaQuery.of(context).platformBrightness == Brightness.dark
                                         ? const Color(0xFF9BA0A5)
                                         : const Color(0xFF828282)),
                               )),
@@ -597,7 +602,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                                   Color(0xFF1DE99B),
                                   Color(0xFF0063FB)
                                 ])
-                                : Get.isDarkMode
+                                : MediaQuery.of(context).platformBrightness == Brightness.dark
                                 ? const LinearGradient(
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
@@ -624,7 +629,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                                     fontWeight: FontWeight.w700,
                                     color: _groupController.index.value == 1
                                         ? Colors.white
-                                        : Get.isDarkMode
+                                        : MediaQuery.of(context).platformBrightness == Brightness.dark
                                         ? const Color(0xFF9BA0A5)
                                         : const Color(0xFF828282)),
                               )),
@@ -652,12 +657,12 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       axisAlignment: 0.0,
       openAxisAlignment: 0.0,
       queryStyle: TextStyle(
-          color: Get.isDarkMode ? Colors.white : Colors.black,
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black,
           fontSize: 15,
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
       hintStyle: TextStyle(
-          color: Get.isDarkMode
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark
               ? const Color(0xff9BA0A5)
               : const Color(0xFF828282),
           fontSize: 15,
@@ -666,9 +671,9 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       elevation: 5,
       showCursor: true,
       width: 350,
-      accentColor: Get.isDarkMode ? Colors.white : Colors.black,
+      accentColor:MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
       borderRadius: BorderRadius.circular(10),
-      backgroundColor: Get.isDarkMode
+      backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
           ? const Color(0xFF2D465E).withOpacity(1)
           : Colors.white,
       debounceDelay: const Duration(milliseconds: 200),

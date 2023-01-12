@@ -34,7 +34,7 @@
               "client_id": "208005039506-v8hdtf1gq1hkbs58l6hsiui8kfbprqfv.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.sirkl"
+                "bundle_id": "com.airking.sirkl"
               }
             }
           ]
@@ -45,7 +45,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:208005039506:android:043d322518f49448892d4b",
         "android_client_info": {
-          "package_name": "com.example.sirkl"
+          "package_name": "com.airking.sirkl"
         }
       },
       "oauth_client": [
@@ -70,7 +70,7 @@
               "client_id": "208005039506-v8hdtf1gq1hkbs58l6hsiui8kfbprqfv.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.sirkl"
+                "bundle_id": "com.airking.sirkl"
               }
             }
           ]

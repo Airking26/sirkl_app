@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:azlistview/azlistview.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 
 SignInSuccessDto signInSuccessDtoFromJson(String str) => SignInSuccessDto.fromJson(json.decode(str));
 String signInSuccessDtoToJson(SignInSuccessDto data) => json.encode(data.toJson());
@@ -45,6 +44,7 @@ class UserDTO extends ISuspensionBean{
     this.wallet,
     this.following,
     this.isInFollowing,
+    this.nickname
   });
 
   String? id;
@@ -57,6 +57,7 @@ class UserDTO extends ISuspensionBean{
   String? wallet;
   int? following;
   bool? isInFollowing;
+  String? nickname;
 
   factory UserDTO.fromJson(Map<String, dynamic> json) => UserDTO(
     id: json["id"],
@@ -69,6 +70,7 @@ class UserDTO extends ISuspensionBean{
     wallet: json["wallet"],
     following: json["following"],
     isInFollowing: json["isInFollowing"],
+    nickname: json['nickname']
   );
 
   Map<String, dynamic> toJson() => {
@@ -82,9 +84,10 @@ class UserDTO extends ISuspensionBean{
     "wallet": wallet,
     "following": following,
     "isInFollowing": isInFollowing,
+    "nickname": nickname
   };
 
   @override
   String getSuspensionTag(){
-    return GetStorage().read("nicknames")[wallet!][0] ?? (userName.isNullOrBlank! ? wallet![0] : userName![0].toUpperCase());}
+    return nickname.isNullOrBlank! ? (userName.isNullOrBlank! ? wallet![0] : userName![0].toUpperCase()) : nickname![0];}
 }

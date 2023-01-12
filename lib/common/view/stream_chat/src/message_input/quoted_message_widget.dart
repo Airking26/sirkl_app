@@ -173,7 +173,7 @@ class _QuotedMessage extends StatelessWidget {
                 : messageTheme.copyWith(
                     messageTextStyle: messageTheme.messageTextStyle?.copyWith(
                       fontSize: 12,
-                      color: reverse ? Get.isDarkMode ? Colors.black : Colors.white : Colors.black,
+                      color: reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.black : Colors.white : Colors.black,
                       fontFamily: 'Gilroy',
                       fontWeight: FontWeight.w500
                     ),
@@ -199,8 +199,8 @@ class _QuotedMessage extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-               !Get.isDarkMode ? reverse ? Color(0xFF102437) : Colors.white : reverse ? Colors.white : Colors.white,
-                !Get.isDarkMode ? reverse ? Color(0xFF13171B) : Colors.white : reverse ? Colors.white : Colors.white
+               MediaQuery.of(context).platformBrightness == Brightness.light ? reverse ? Color(0xFF102437) : Colors.white : reverse ? Colors.white : Colors.white,
+                MediaQuery.of(context).platformBrightness == Brightness.light ? reverse ? Color(0xFF13171B) : Colors.white : reverse ? Colors.white : Colors.white
             ]),
       ),
       padding: const EdgeInsets.all(12),

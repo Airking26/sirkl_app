@@ -11,10 +11,8 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
-import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/story_creator/stories_editor.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
@@ -67,7 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Get.isDarkMode ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
+        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() =>
             Column(
           children: [
@@ -93,8 +91,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-                            Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                            MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+                            MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
                           ]
                       ),
                     ),
@@ -127,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               }, icon:
 
                             //Image.asset( "assets/images/edit.png", color: Get.isDarkMode ? Colors.white : Colors.black,):
-                                FlutterBadge(icon: Image.asset("assets/images/bell.png", color: Get.isDarkMode ? Colors.white : Colors.black,), itemCount: _profileController.hasUnreadNotif.value ? 1 : 0, hideZeroCount: true, badgeColor: const Color(0xff00CB7D), badgeTextColor: const Color(0xff00CB7D), contentPadding: const EdgeInsets.only(top: 0.1,right: 16, left: 12),)
+                                FlutterBadge(icon: Image.asset("assets/images/bell.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,), itemCount: _profileController.hasUnreadNotif.value ? 1 : 0, hideZeroCount: true, badgeColor: const Color(0xff00CB7D), badgeTextColor: const Color(0xff00CB7D), contentPadding: const EdgeInsets.only(top: 0.1,right: 16, left: 12),)
                             ),
                             //Image.asset("assets/images/bell.png",  color: Get.isDarkMode ? Colors.white : Colors.black,)),
                             Padding(
@@ -142,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                      controller: _profileController.usernameTextEditingController.value,
                                      maxLength: 20,
                                      textAlign: TextAlign.center,
-                                     style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),
+                                     style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
                                      decoration: const InputDecoration(
                                        border: InputBorder.none,
                                        isCollapsed: true,
@@ -150,12 +148,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                        ),
                                    ),
                                  )
-                               : Text(_homeController.userMe.value.userName!.isEmpty || _homeController.userMe.value.userName == _homeController.userMe.value.wallet ? "${_homeController.userMe.value.wallet!.substring(0, 20)}..." : _homeController.userMe.value.userName!, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),),
+                               : Text(_homeController.userMe.value.userName!.isEmpty || _homeController.userMe.value.userName == _homeController.userMe.value.wallet ? "${_homeController.userMe.value.wallet!.substring(0, 20)}..." : _homeController.userMe.value.userName!, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
                             ),
                             IconButton(onPressed: ()async{
                               //_groupController.retrieveGroupsToCreate(StreamChat.of(context).client);
                               dialogMenu = dialogPopMenu(context);
-                              }, icon: Image.asset("assets/images/more.png", color: Get.isDarkMode ? Colors.white : Colors.black,)),
+                              }, icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
                           ],),
                       ),
                     ),
@@ -164,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     top: Platform.isAndroid ? 105 : 95,
                     child: Container(
                       decoration: BoxDecoration(
-                          border: Border.all(color: Get.isDarkMode ? const Color(0xFF122034) : Colors.white, width: 5),
+                          border: Border.all(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF122034) : Colors.white, width: 5),
                           borderRadius: BorderRadius.circular(90)),
                       child:
                           DeferPointer(
@@ -205,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             decoration: BoxDecoration(
                                 gradient: const LinearGradient(colors: [Color(0xFF1DE99B), Color(0xFF0063FB)]),
                                 borderRadius: BorderRadius.circular(90),
-                                border: Border.all(color: Get.isDarkMode ? const Color(0xFF122034) : Colors.white, width: 2)
+                                border: Border.all(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF122034) : Colors.white, width: 2)
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(4.0),
@@ -233,7 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 controller: _profileController.descriptionTextEditingController.value,
                 maxLength: 120,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)),
+                style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF9BA0A5) : const Color(0xFF828282)),
                 decoration: const InputDecoration(
                     border: InputBorder.none,
                     isCollapsed: true,
@@ -250,7 +248,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 10,),
             Padding(
               padding: const EdgeInsets.only(left: 24.0),
-              child: _homeController.nfts.value.isNotEmpty ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black),)) : Container(),
+              child: _homeController.nfts.value.isNotEmpty ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),)) : Container(),
             ),
             MediaQuery.removePadding(
               context:  context,
@@ -263,7 +261,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       pagingController: pagingController,
                         builderDelegate: PagedChildBuilderDelegate<CollectionDbDto>(
                           firstPageProgressIndicatorBuilder: (context) => Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
-                          newPageProgressIndicatorBuilder: (context) => Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
+                          newPageProgressIndicatorBuilder: (context) => Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
+                          ),
                             itemBuilder:  (context, item, index) => CardNFT(item, _profileController, index)),
                     ),
                   ),
@@ -279,8 +280,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ..width = 120
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
-      ..barrierColor = Get.isDarkMode ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = Get.isDarkMode ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: (){
@@ -288,26 +289,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
           dialogMenu.dismiss();
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.editProfileRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.editProfileRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactUsRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactUsRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: (){},
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.rulesRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.rulesRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
-        onTap: (){},
+        onTap: () async {
+          dialogMenu.dismiss();
+          await GetStorage().erase();
+          await StreamChat.of(context).client.disconnectUser();
+          _homeController.accessToken.value = "";
+          _navigationController.controller.value.jumpToTab(0);
+        },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.logoutRes.tr, style: TextStyle(fontSize: 14, color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.logoutRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..show();
   }

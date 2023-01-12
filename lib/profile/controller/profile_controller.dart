@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -54,8 +55,11 @@ class ProfileController extends GetxController{
       request = await _profileService.modifyUser(accessToken, updateMeDtoToJson(updateMeDto));
       if(request.isOk){
         _homeController.userMe.value = userFromJson(json.encode(request.body));
-        await streamChatClient.disconnectUser();
-        await _homeController.retrieveTokenStreamChat(streamChatClient, null);
+        box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
+        if(!updateMeDto.userName.isNullOrBlank! || !updateMeDto.picture.isNullOrBlank!) {
+          await streamChatClient.disconnectUser();
+          await _homeController.retrieveTokenStreamChat(streamChatClient, null);
+        }
         isEditingProfile.value = false;
         isLoadingPicture.value = false;
       } else {
@@ -63,11 +67,13 @@ class ProfileController extends GetxController{
       }
     } else if(request.isOk){
       _homeController.userMe.value = userFromJson(json.encode(request.body));
-      await streamChatClient.disconnectUser();
-      await _homeController.retrieveTokenStreamChat(streamChatClient, null);
+      box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
+      if(!updateMeDto.userName.isNullOrBlank! || !updateMeDto.picture.isNullOrBlank!) {
+        await streamChatClient.disconnectUser();
+        await _homeController.retrieveTokenStreamChat(streamChatClient, null);
+      }
       isEditingProfile.value = false;
       isLoadingPicture.value = false;
-      //var k = await streamChatClient.updateUser(User(id: _homeController.id.value, extraData: {"userDTO": _homeController.userMe.value}));
     } else {
       isLoadingPicture.value = false;
     }
@@ -116,8 +122,8 @@ class ProfileController extends GetxController{
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
-            backgroundColor: Get.isDarkMode ? Colors.white : const Color(0xFF102437) ,
-            textColor: Get.isDarkMode ? Colors.black : Colors.white,
+            backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
+            textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
             fontSize: 16.0
         );
       }
@@ -128,8 +134,8 @@ class ProfileController extends GetxController{
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 1,
-          backgroundColor: Get.isDarkMode ? Colors.white : const Color(0xFF102437) ,
-          textColor: Get.isDarkMode ? Colors.black : Colors.white,
+          backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark? Colors.white : const Color(0xFF102437) ,
+          textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark? Colors.black : Colors.white,
           fontSize: 16.0
       );
     }

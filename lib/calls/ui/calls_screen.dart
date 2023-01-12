@@ -72,7 +72,7 @@ class _CallsScreenState extends State<CallsScreen> {
   Widget build(BuildContext context) {
     return Obx(()=>Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: Get.isDarkMode
+        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Column(children: [
@@ -105,8 +105,8 @@ class _CallsScreenState extends State<CallsScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-                  Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                  MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+                  MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
                 ]),
           ),
           child: Padding(
@@ -122,14 +122,14 @@ class _CallsScreenState extends State<CallsScreen> {
                       icon: Image.asset(
                         "assets/images/arrow_left.png",
                         color:
-                        Get.isDarkMode ? Colors.transparent : Colors.transparent,
+                        MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.transparent,
                       )),
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),
                     child: Text(
                       con.callsTabRes.tr,
                       style: TextStyle(
-                          color: Get.isDarkMode
+                          color: MediaQuery.of(context).platformBrightness == Brightness.dark
                               ? Colors.white
                               : Colors.black,
                           fontWeight: FontWeight.w600,
@@ -144,7 +144,7 @@ class _CallsScreenState extends State<CallsScreen> {
                       icon: Image.asset(
                         "assets/images/more.png",
                         color:
-                        Get.isDarkMode ? Colors.transparent : Colors.transparent,
+                        MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.transparent,
                       )),
                 ],
               ),
@@ -175,22 +175,22 @@ class _CallsScreenState extends State<CallsScreen> {
       axisAlignment: 0.0,
       openAxisAlignment: 0.0,
       queryStyle: TextStyle(
-          color: Get.isDarkMode ? Colors.white : Colors.black,
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
           fontSize: 15,
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
       hintStyle: TextStyle(
-          color: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282),
           fontSize: 15,
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
       elevation: 5,
       showCursor: true,
       width: 350,
-      accentColor: Get.isDarkMode ? Colors.white : Colors.black,
+      accentColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
       borderRadius: BorderRadius.circular(10),
       backgroundColor:
-      Get.isDarkMode ? const Color(0xFF2D465E).withOpacity(1) : Colors.white,
+      MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF2D465E).withOpacity(1) : Colors.white,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
         pagingSearchController.itemList = [];
@@ -283,7 +283,7 @@ class _CallsScreenState extends State<CallsScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: Text(timeago.format(timeSince), style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282))),
+              child: Text(timeago.format(timeSince), style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color:MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF9BA0A5) : const Color(0xFF828282))),
             ),
             SizedBox(
               width: 100,
@@ -293,7 +293,7 @@ class _CallsScreenState extends State<CallsScreen> {
                 InkWell(onTap:()async{
                   await _callController.inviteCall(callDto.called, DateTime.now().toString(), _homeController.id.value);
                   } ,child: Image.asset("assets/images/call_tab.png", color: const Color(0xFF00CB7D), width: 20, height: 20,)),
-                const SizedBox(width: 8,),
+                const SizedBox(width: 10,),
                 InkWell(
                   onTap: () {
                     _commonController.userClicked.value = callDto.called;
@@ -301,19 +301,13 @@ class _CallsScreenState extends State<CallsScreen> {
                     pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false).then((value) => _callController.pagingController.value.notifyListeners());
                   },
                     child: Image.asset("assets/images/chat_tab.png", width: 20, height: 20, color: const Color(0xFF9BA0A5),)),
-                  const SizedBox(width: 4,),
-                  InkWell(
-                    onTap: () async {
-                      await FlutterCallkitIncoming.endAllCalls();
-                    },
-                      child: Image.asset("assets/images/more.png", width: 20, height: 20,color: const Color(0xFF9BA0A5)))
+                  const SizedBox(width: 6,),
               ],),
             )
           ],
         ),
         title: Transform.translate(offset: const Offset(-4, 0),child: Text(
-            _commonController.nicknames[callDto.called.wallet!]
-                ?? (callDto.called.userName.isNullOrBlank! ? "${callDto.called.wallet!.substring(0, 15)}..." : callDto.called.userName!.length > 15 ? "${callDto.called.userName!.substring(0,15)}..." : callDto.called.userName!), style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black))),
+            callDto.called.nickname.isNullOrBlank! ? (callDto.called.userName.isNullOrBlank! ? "${callDto.called.wallet!.substring(0, 15)}..." : callDto.called.userName!.length > 15 ? "${callDto.called.userName!.substring(0,15)}..." : callDto.called.userName!): callDto.called.nickname!, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black))),
         subtitle:
             Transform.translate(
               offset: const Offset(-4, 0),
@@ -321,8 +315,8 @@ class _CallsScreenState extends State<CallsScreen> {
                 if(callDto.status == 0)Image.asset("assets/images/outgoing.png", width: 10, height: 10,)
                 else if(callDto.status == 1)Image.asset("assets/images/incoming.png", width: 10, height: 10,)
                 else Image.asset("assets/images/missed.png", width: 10, height: 10,),
-                if(callDto.status == 0) Text( "  Outgoing call - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
-                else if(callDto.status == 1) Text( "  Incoming call - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
+                if(callDto.status == 0) Text( "  Outgoing call - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
+                else if(callDto.status == 1) Text( "  Incoming call - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
                 else Text( "  Missed call - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Colors.red))
               ],),
             )
@@ -350,7 +344,7 @@ class _CallsScreenState extends State<CallsScreen> {
             con.noCallsRes.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
-                color: Get.isDarkMode ? Colors.white : Colors.black,
+                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                 fontSize: 25,
                 fontFamily: "Gilroy",
                 fontWeight: FontWeight.w700),

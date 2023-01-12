@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -113,6 +114,7 @@ class _MyHomePageState extends State<MyHomePage>{
         await FlutterCallkitIncoming.endAllCalls();
         await _callController.leaveChannel();
       } else if(message.data['type'] == "3"){
+        await FlutterCallkitIncoming.endAllCalls();
         LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
       }
       else if(message.data['type'] == "message.new" && message.data['channel_id'] != _chatController.channel.value?.id){
@@ -236,9 +238,10 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
     textDecline: 'Decline',
     textMissedCall: 'Missed call',
     textCallback: 'Call back',
-    extra: <String, dynamic>{'userCalling': data["caller_id"], "userCalled": data['called_id'], "callId": data["call_id"]},
+    extra: <String, dynamic>{'userCalling': data["caller_id"], "userCalled": data['called_id'], "callId": data["call_id"], "channel": data["channel"]},
     android: const entities.AndroidParams(
       isCustomNotification: true,
+      isCustomSmallExNotification: true,
       isShowLogo: false,
       isShowCallback: false,
       isShowMissedCallNotification: false,

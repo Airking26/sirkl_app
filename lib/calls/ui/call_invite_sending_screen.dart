@@ -36,7 +36,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
   @override
   void dispose() {
     timer.cancel();
-    _callController.timer.value.dispose();
+    //_callController.timer.value.dispose();
     super.dispose();
   }
 
@@ -62,7 +62,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                 children: [
                   const VerticalSpacing(of: 24),
                   Text(
-                    _commonController.nicknames[_callController.userCalled.value.wallet!] ?? (_callController.userCalled.value.userName.isNullOrBlank! ? "${_callController.userCalled.value.wallet!.substring(0, 10)}..." : _callController.userCalled.value.userName!.length > 10 ? "${_callController.userCalled.value.userName!.substring(0,10)}..." : _callController.userCalled.value.userName!),
+                    _callController.userCalled.value.nickname.isNullOrBlank! ? (_callController.userCalled.value.userName.isNullOrBlank! ? "${_callController.userCalled.value.wallet!.substring(0, 10)}..." : _callController.userCalled.value.userName!.length > 10 ? "${_callController.userCalled.value.userName!.substring(0,10)}..." : _callController.userCalled.value.userName!) : _callController.userCalled.value.nickname!,
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
@@ -144,6 +144,8 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                         InkWell(
                           onTap: () async{
                             if(_callController.userJoinedCall.value) {
+                              await _callController.endCall(_callController.userCalled.value.id!, _callController.currentCallId.value);
+                              await FlutterCallkitIncoming.endAllCalls();
                               await _callController.leaveChannel();
                             } else {
                               await _callController.missedCallNotification(_callController.userCalled.value.id!);

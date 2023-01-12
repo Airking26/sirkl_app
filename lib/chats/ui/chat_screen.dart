@@ -104,7 +104,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     });
 
     return Obx(() =>Scaffold(
-        backgroundColor: Get.isDarkMode
+        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Column(children: [
@@ -185,7 +185,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             con.noChatsRes.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
-                color: Get.isDarkMode ? Colors.white : Colors.black,
+                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                 fontSize: 25,
                 fontFamily: "Gilroy",
                 fontWeight: FontWeight.w700),
@@ -233,8 +233,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Get.isDarkMode ? const Color(0xFF113751) : Colors.white,
-                      Get.isDarkMode ? const Color(0xFF1E2032) : Colors.white
+                      MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+                      MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
                     ]),
               ),
               child: Padding(
@@ -257,7 +257,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           icon: Image.asset(
                             _chatController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
                             color:
-                                Get.isDarkMode ? Colors.white : Colors.black,
+                            MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                           ))),
                       Padding(
                         padding: const EdgeInsets.only(top: 12.0),
@@ -265,7 +265,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           _chatController.searchIsActive.value ? _chatController.index.value == 0 ? "Friends" : "Others" :
                           con.chatsTabRes.tr,
                           style: TextStyle(
-                              color: Get.isDarkMode
+                              color: MediaQuery.of(context).platformBrightness == Brightness.dark
                                   ? Colors.white
                                   : Colors.black,
                               fontWeight: FontWeight.w600,
@@ -290,7 +290,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           icon: Image.asset(
                             "assets/images/plus.png",
                             color:
-                                Get.isDarkMode ? Colors.white : Colors.black,
+                            MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                           )),
                     ],
                   ),
@@ -314,7 +314,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             blurRadius: 0.01,
                           ),
                         ],
-                        color: Get.isDarkMode
+                        color: MediaQuery.of(context).platformBrightness == Brightness.dark
                             ? const Color(0xFF2D465E).withOpacity(1)
                             : Colors.white),
                     child: Padding(
@@ -341,7 +341,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                             Color(0xFF1DE99B),
                                             Color(0xFF0063FB)
                                           ])
-                                    : Get.isDarkMode
+                                    : MediaQuery.of(context).platformBrightness == Brightness.dark
                                         ? const LinearGradient(
                                             begin: Alignment.centerLeft,
                                             end: Alignment.centerRight,
@@ -368,7 +368,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                         fontWeight: FontWeight.w700,
                                         color: _chatController.index.value == 0
                                             ? Colors.white
-                                            : Get.isDarkMode
+                                            : MediaQuery.of(context).platformBrightness == Brightness.dark
                                                 ? const Color(0xFF9BA0A5)
                                                 : const Color(0xFF828282)),
                                   )),
@@ -386,7 +386,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                             Color(0xFF1DE99B),
                                             Color(0xFF0063FB)
                                           ])
-                                    : Get.isDarkMode
+                                    : MediaQuery.of(context).platformBrightness == Brightness.dark
                                         ? const LinearGradient(
                                             begin: Alignment.centerLeft,
                                             end: Alignment.centerRight,
@@ -413,7 +413,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                         fontWeight: FontWeight.w700,
                                         color: _chatController.index.value == 1
                                             ? Colors.white
-                                            : Get.isDarkMode
+                                            : MediaQuery.of(context).platformBrightness == Brightness.dark
                                                 ? const Color(0xFF9BA0A5)
                                                 : const Color(0xFF828282)),
                                   )),
@@ -441,12 +441,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       axisAlignment: 0.0,
       openAxisAlignment: 0.0,
       queryStyle: TextStyle(
-          color: Get.isDarkMode ? Colors.white : Colors.black,
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
           fontSize: 15,
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
       hintStyle: TextStyle(
-          color: Get.isDarkMode
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark
               ? const Color(0xff9BA0A5)
               : const Color(0xFF828282),
           fontSize: 15,

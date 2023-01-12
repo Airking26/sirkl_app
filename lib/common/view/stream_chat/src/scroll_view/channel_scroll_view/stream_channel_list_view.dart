@@ -391,7 +391,7 @@ class StreamChannelListSeparator extends StatelessWidget {
       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 80, right: 4),
       child: Container(
         height: 0.1,
-        color: Get.isDarkMode ?  const Color(0xff9BA0A5) : const Color(0xFF828282),
+        color: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xff9BA0A5) : const Color(0xFF828282),
       ),
     );
   }

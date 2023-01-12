@@ -413,7 +413,7 @@ class DefaultTranslations implements Translations {
   }) {
     final pinnedByCurrentUser = currentUser.id == pinnedBy.id;
     if (pinnedByCurrentUser) return 'Pinned by You';
-    return 'Pinned by ${pinnedBy.name}';
+    return 'Pinned by ${pinnedBy.name.length > 15 ? "${pinnedBy.name.substring(0, 10)}..." : pinnedBy.name}';
   }
 
   @override

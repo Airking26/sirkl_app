@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
 class YYDialog {
@@ -24,7 +25,7 @@ class YYDialog {
   bool useRootNavigator = true;
 
   Decoration? decoration; //弹窗内的装饰，与backgroundColor和borderRadius互斥
-  Color backgroundColor = Get.isDarkMode ? Color(0xFF1E3244).withOpacity(0.7) : Colors.white; //弹窗内的背景色
+  Color backgroundColor = SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Color(0xFF1E3244).withOpacity(0.7) : Colors.white; //弹窗内的背景色
   double borderRadius = 0.0; //弹窗圆角
 
   Function()? showCallBack; //展示的回调

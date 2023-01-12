@@ -796,7 +796,7 @@ class _StreamMessageListViewState extends State<StreamMessageListView> {
     if (backgroundColor != null || backgroundImage != null) {
       return DecoratedBox(
         decoration: BoxDecoration(
-          color: Get.isDarkMode ? const Color(0xFF102437) :const Color.fromARGB(255, 247, 253, 255) ,
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xFF102437) :const Color.fromARGB(255, 247, 253, 255) ,
           image: backgroundImage,
         ),
         child: child,
