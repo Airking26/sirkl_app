@@ -127,8 +127,8 @@ class CallsController extends GetxController{
           await join(event.body['extra']["channel"] ?? event.body['id'], event.body['extra']['userCalled'], event.body['extra']['userCalling']);
           break;
         case Event.ACTION_CALL_DECLINE:
-          await FlutterCallkitIncoming.endAllCalls();
-          await endCall(event.body["extra"]["userCalling"], event.body["id"]);
+          //await FlutterCallkitIncoming.endAllCalls();
+          //await endCall(event.body["extra"]["userCalling"], event.body["id"]);
           break;
         case Event.ACTION_CALL_ENDED:
           await FlutterCallkitIncoming.endAllCalls();

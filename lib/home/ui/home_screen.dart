@@ -2,6 +2,7 @@ import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:highlight_text/highlight_text.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
@@ -11,6 +12,7 @@ import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/home/ui/pdf_screen.dart';
 import 'package:sirkl/home/ui/story_viewer_screen.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:slider_button/slider_button.dart';
@@ -558,7 +560,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
+  Map<String, HighlightedWord> words = {
+    "terms and conditions": HighlightedWord(
+      onTap: () {
+        Get.to(() => const PDFScreen(isTermsAndConditions : true));
+      },
+      textStyle: const TextStyle(
+          color: Color(0xFF00CB7D),
+          fontSize: 16,
+          fontFamily: "Gilroy",
+          fontWeight: FontWeight.w500),
+    ),
+    "privacy policy": HighlightedWord(
+      onTap: () {
+        Get.to(() => const PDFScreen(isTermsAndConditions : false));
+      },
+      textStyle: const TextStyle(
+          color: Color(0xFF00CB7D),
+          fontSize: 16,
+          fontFamily: "Gilroy",
+          fontWeight: FontWeight.w500),
+    ),
+  };
 
   Column buildSignWalletUI() {
     return Column(
@@ -591,13 +614,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Text(
-            con.bySigningRes.tr,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color:MediaQuery.of(context).platformBrightness == Brightness.dark
-                    ? const Color(0xFF9BA0A5)
-                    : const Color(0xFF828282),
+          child: TextHighlight(text: con.bySigningRes.tr, words: words,
+            textAlign: TextAlign.center, textStyle: TextStyle(
+                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                 fontSize: 16,
                 fontFamily: "Gilroy",
                 fontWeight: FontWeight.w500),

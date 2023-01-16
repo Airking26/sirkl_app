@@ -322,7 +322,7 @@ class StreamChannelHeader extends StatelessWidget
                                   "${(channel.extraData["wallet"] as String).substring(0, 20)}..." :
                                     channel.memberCount != null && channel.memberCount! > 2 ?
                                         channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
-                                        _commonController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] ?? (!userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
+                                        _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] ?? (!userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
                                         userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName! : "${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(0,20)}..."),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,

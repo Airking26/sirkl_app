@@ -14,6 +14,7 @@ import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/view/story_creator/stories_editor.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/home/ui/pdf_screen.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
@@ -277,7 +278,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   YYDialog dialogPopMenu(BuildContext context) {
     return YYDialog().build(context)
-      ..width = 120
+      ..width = 180
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
       ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
@@ -298,13 +299,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Align(alignment: Alignment.centerLeft, child: Text(con.contactUsRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.rulesRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: () async {
           dialogMenu.dismiss();
@@ -313,8 +307,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _homeController.accessToken.value = "";
           _navigationController.controller.value.jumpToTab(0);
         },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.logoutRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){
+          dialogMenu.dismiss();
+          pushNewScreen(context, screen: const PDFScreen(isTermsAndConditions: false));
+        },
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.privacyPolicyRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){
+          dialogMenu.dismiss();
+          pushNewScreen(context, screen: const PDFScreen(isTermsAndConditions: true));
+        },
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.termsAndConditionsRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..show();
   }

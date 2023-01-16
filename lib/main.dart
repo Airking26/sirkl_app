@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +22,6 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
-import 'package:sirkl/profile/ui/profile_screen.dart';
 import 'navigation/ui/navigation_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
@@ -80,7 +78,6 @@ class _MyHomePageState extends State<MyHomePage>{
 
   @override
   void initState() {
-    _commonController.initNicknames();
     _homeController.putFCMToken(context, widget.client);
     initFirebase();
     _callController.setupVoiceSDKEngine(context);
@@ -91,11 +88,10 @@ class _MyHomePageState extends State<MyHomePage>{
   getCurrentCall() async {
     var calls = await FlutterCallkitIncoming.activeCalls();
     if (calls is List) {
-      calls.forEach((element) {print(element);});
       if (calls.isNotEmpty) {
         if(calls[0]['id'] != null && calls[0]['id'] != '') {
           await _callController.join(
-              calls[0]['id'], calls[0]["extra"]["userCalled"],
+              calls[0]['extra']['channel'], calls[0]["extra"]["userCalled"],
               calls[0]['extra']['userCalling']);
         }
         return calls[0];
@@ -147,6 +143,7 @@ class _MyHomePageState extends State<MyHomePage>{
             channelId: (event.data["cid"] as String).replaceFirst('try:', ''));
         if (response.members!.length > 2) {
           _navigationController.hideNavBar.value = true;
+          // ignore: use_build_context_synchronously
           pushNewScreen(context, screen: DetailedChatScreen(create: false,
               channelId: (event.data["cid"] as String).replaceFirst(
                   'try:', ''))).then((value) => _navigationController.hideNavBar.value = false);
@@ -155,6 +152,7 @@ class _MyHomePageState extends State<MyHomePage>{
           element.user!.id != event.data["receiver_id"]).toList()[0];
           await _commonController.getUserById(user.user!.id);
           _navigationController.hideNavBar.value = true;
+          // ignore: use_build_context_synchronously
           pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
         }
       }
@@ -182,6 +180,7 @@ class _MyHomePageState extends State<MyHomePage>{
                   'try:', ''));
           if (response.members!.length > 2) {
             _navigationController.hideNavBar.value = true;
+            // ignore: use_build_context_synchronously
             pushNewScreen(context, screen: DetailedChatScreen(create: false,
                 channelId: (event.data["cid"] as String).replaceFirst(
                     'try:', ''))).then((value) => _navigationController.hideNavBar.value = false);
@@ -190,6 +189,7 @@ class _MyHomePageState extends State<MyHomePage>{
             element.user!.id != event.data["receiver_id"]).toList()[0];
             await _commonController.getUserById(user.user!.id);
             _navigationController.hideNavBar.value = true;
+            // ignore: use_build_context_synchronously
             pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
           }
         }

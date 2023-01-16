@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 
 /// A widget that displays a user.
 ///
@@ -95,7 +96,7 @@ class StreamUserListTile extends StatelessWidget {
   /// If null, `EdgeInsets.symmetric(horizontal: 16.0)` is used.
   final EdgeInsetsGeometry contentPadding;
 
-  final _commonController = Get.put(CommonController());
+  final _homeController = Get.put(HomeController());
 
   /// Creates a copy of this tile but with the given fields replaced with
   /// the new values.
@@ -143,7 +144,7 @@ class StreamUserListTile extends StatelessWidget {
 
     final title = this.title ??
         Text(
-          _commonController.nicknames[userFromJson(json.encode(user.extraData["userDTO"])).wallet!] ??
+          _homeController.nicknames[userFromJson(json.encode(user.extraData["userDTO"])).wallet!] ??
               (userFromJson(json.encode(user.extraData["userDTO"])).userName.isNullOrBlank! ? "${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(0,25)}...": userFromJson(json.encode(user.extraData["userDTO"])).userName!),
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, fontFamily: "Gilroy",color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
         );

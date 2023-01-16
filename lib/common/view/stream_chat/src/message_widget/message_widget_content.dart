@@ -15,6 +15,8 @@ import 'package:sirkl/common/view/stream_chat/src/message_widget/reactions/react
 import 'package:sirkl/common/view/stream_chat/src/message_widget/reactions/reaction_indicator.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/user_avatar_transform.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 
 /// {@template messageWidgetContent}
@@ -200,7 +202,8 @@ class MessageWidgetContent extends StatelessWidget {
   /// {@macro usernameBuilder}
   final Widget Function(BuildContext, Message)? usernameBuilder;
 
-  var _commonController = Get.put(CommonController());
+  final _commonController = Get.put(CommonController());
+  final _navigationController = Get.put(NavigationController());
 
   @override
   Widget build(BuildContext context) {
@@ -268,8 +271,9 @@ class MessageWidgetContent extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 2.0),
                           child: UserAvatarTransform(
                             onUserAvatarTap:(user){
+                              _navigationController.hideNavBar.value = false;
                               _commonController.userClicked.value = userFromJson(json.encode(user.extraData["userDTO"]));
-                              pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: true));
+                              pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: true)).then((value) => _navigationController.hideNavBar.value = true);
                             },
                             userAvatarBuilder: userAvatarBuilder,
                             translateUserAvatar: translateUserAvatar,

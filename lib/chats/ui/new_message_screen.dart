@@ -38,7 +38,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
   YYDialog dialogMenu = YYDialog();
-  static var _pageKey = 0;
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
   FocusNode? _focusNode;
@@ -50,36 +49,12 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     _focusNode = FocusNode();
     _chatController.searchToRefresh.value = true;
     pagingController.addPageRequestListener((pageKey) {
-      if(_commonController.query.value.isNotEmpty) {
-        fetchPage(_commonController.query.value, _pageKey);
-      } else {
+       if(_commonController.query.value.isEmpty){
         pagingController.refresh();
         pagingController.appendLastPage(_commonController.users);
       }
     });
     super.initState();
-  }
-
-  Future<void> fetchPage(String query, int pageKey) async {
-    try {
-      final newItems = await _commonController.searchUsers(query, _pageKey.toString());
-      final isLastPage = newItems.length < 12;
-      if (isLastPage) {
-        if(pageKey == 0 && _chatController.searchToRefresh.value){
-          pagingController.itemList = [];
-          _chatController.searchToRefresh.value = false;
-          pagingController.refresh();
-        } else {
-          pagingController.appendLastPage(newItems);
-        }
-      } else {
-        final nextPageKey = _pageKey++;
-        pagingController.refresh();
-        pagingController.appendPage(newItems, nextPageKey);
-      }
-    } catch (error) {
-      pagingController.error = error;
-    }
   }
 
   @override
@@ -312,11 +287,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             pagingController.refresh();
           }
         }
-        /*_chatController.searchToRefresh.value = true;
-        _commonController.query.value = query;
-        _pageKey = 0;
-        if(query.isNotEmpty) fetchPage(_commonController.query.value, _pageKey);
-        else pagingController.refresh();*/
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [

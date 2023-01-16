@@ -107,7 +107,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                           _profileController.isEditingProfileElse.value ? InkWell(
                             onTap: () async {
                               await _profileController.updateMe(UpdateMeDto(nicknames: {_commonController.userClicked.value!.wallet! : _profileController.usernameElseTextEditingController.value.text}), StreamChat.of(context).client);
-                              _commonController.updateNicknames(_profileController.usernameElseTextEditingController.value.text, _commonController.userClicked.value!.wallet!);
+                              _homeController.updateNickname(_commonController.userClicked.value!.wallet!, _profileController.usernameElseTextEditingController.value.text);
                               _profileController.isEditingProfileElse.value = false;
                             },
                             child: const Padding(
@@ -125,7 +125,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                               _navigationController.hideNavBar.value = true;
                               pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
                             }
-                            }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :Color(0xff00CB7D), height: 28, width: 28,)),
+                            }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :const Color(0xff00CB7D), height: 28, width: 28,)),
                           Padding(
                             padding: const EdgeInsets.only(top: 12.0),
                             child:
@@ -146,7 +146,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                                     ),
                                   ),
                                 ):
-                                Text(_commonController.nicknames[_commonController.userClicked.value!.wallet!] ?? (_commonController.userClicked.value!.userName!.isEmpty ? "${_commonController.userClicked.value!.wallet!.substring(0, 20)}..." : _commonController.userClicked.value!.userName!), textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                                Text(_homeController.nicknames[_commonController.userClicked.value!.wallet!] ?? (_commonController.userClicked.value!.userName!.isEmpty ? "${_commonController.userClicked.value!.wallet!.substring(0, 20)}..." : _commonController.userClicked.value!.userName!), textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
                           ),
                           IconButton(onPressed: (){
                             dialogMenu = dialogPopMenu(context);
@@ -166,7 +166,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                           child: GestureDetector(onTap: (){},
                               child:_commonController.userClicked.value!.picture == null ?
                               TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 140, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
-                            CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture! , color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+                            CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture! , color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))
                           ,),)
                   ),
@@ -180,6 +180,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
               child: InkWell(
                 onTap: () async {
                   await Clipboard.setData(ClipboardData(text: _commonController.userClicked.value!.wallet!));
+                  // ignore: use_build_context_synchronously
                   utils.showToast(context, con.walletCopiedRes.tr);
                 },
                 child: Row(
@@ -217,8 +218,8 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                     child: PagedListView(
                       pagingController: pagingController,
                       builderDelegate: PagedChildBuilderDelegate<CollectionDbDto>(
-                          firstPageProgressIndicatorBuilder: (context) => Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
-                          newPageProgressIndicatorBuilder: (context) => Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
+                          firstPageProgressIndicatorBuilder: (context) => const Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
+                          newPageProgressIndicatorBuilder: (context) => const Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
                           itemBuilder:  (context, item, index) => CardNFT(item, _commonController, index)),
                     ),
                   ),
@@ -253,7 +254,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(_commonController.userClickedFollowStatus.value ? con.removeOfMySirklRes.tr : con.addToMySirklRes.tr, style: TextStyle(fontSize: 14,
-              color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) :Color(0xff00CB7D),
+              color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) :const Color(0xff00CB7D),
               fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
@@ -323,7 +324,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             ],
           ),
           child: ExpansionTile(
-              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImage, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImage, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                   errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             trailing: Obx(() => Image.asset(
               widget.profileController.isCardExpandedList.value.contains(widget.index) ?
@@ -345,7 +346,6 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
                 padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
                 child: SizedBox(height: 80,
                     child: ListView.builder(
-                  cacheExtent: 1000,
                   itemCount: widget.collectionDbDTO.collectionImages.length,
                   itemBuilder: (context, i){
                     return buildCard(i, widget.collectionDbDTO);
@@ -367,7 +367,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
           child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: SizedBox.fromSize(
-                  child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: collectionDbDTO.collectionImages[i], width: 80, height: 70,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+                  child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: collectionDbDTO.collectionImages[i], width: 80, height: 70,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         ),
       );

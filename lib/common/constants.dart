@@ -38,6 +38,8 @@ const String rulesRes = "rules";
 const String myNFTCollectionRes = "my_nft_collection";
 const String editProfileRes = "edit_profile";
 const String contactUsRes = "contact_us";
+const String termsAndConditionsRes = "terms_and_conditions";
+const String privacyPolicyRes = "privacy_policy";
 const String logoutRes = "logout";
 const String noDescYetRes = "no_description_yet";
 

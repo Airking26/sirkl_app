@@ -75,8 +75,8 @@ import flutter_callkit_incoming
         
         let data = flutter_callkit_incoming.Data(id: id, nameCaller: nameCaller, handle: handle, type: 0)
         data.extra = ["userCalling": callerId, "userCalled": userCalled, "callId": callerId, "channel": channel]
-        if(UIApplication.shared.applicationState == .background || UIApplication.shared.applicationState == .inactive){
+        //if(UIApplication.shared.applicationState == .background || UIApplication.shared.applicationState == .inactive){
             SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
-        }
+        
     }
 }

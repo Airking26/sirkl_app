@@ -27,7 +27,6 @@ class CommonController extends GetxController{
   var query = "".obs;
   var queryHasChanged = false.obs;
   var inboxClicked = InboxDto().obs;
-  var nicknames = {}.obs;
 
   Future<bool> addUserToSirkl(String id, StreamChatClient streamChatClient, String myId) async{
     var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, myId], "isConv": true});
@@ -140,7 +139,7 @@ class CommonController extends GetxController{
     gettingStoryAndContacts.value = false;
   }
 
-  initNicknames(){
+  /*initNicknames(){
     nicknames.value = box.read(con.nicknames) ?? {};
   }
 
@@ -153,7 +152,7 @@ class CommonController extends GetxController{
       users.refresh();
     }
     box.write(con.nicknames, nicknames);
-  }
+  }*/
 
   checkUserIsInFollowing() async{
     var accessToken = box.read(con.ACCESS_TOKEN);
@@ -187,27 +186,6 @@ class CommonController extends GetxController{
     }
   }
 
-  searchUsers(String substring, String offset) async{
-      var accessToken = box.read(con.ACCESS_TOKEN);
-      var refreshToken = box.read(con.REFRESH_TOKEN);
-      var request = await _commonService.searchUsers(accessToken, substring, offset);
-      if (request.statusCode == 401) {
-        var requestToken = await _homeService.refreshToken(refreshToken!);
-        var refreshTokenDto = refreshTokenDtoFromJson(
-            json.encode(requestToken.body));
-        accessToken = refreshTokenDto.accessToken!;
-        box.write(con.ACCESS_TOKEN, accessToken);
-        request =
-        await _commonService.searchUsers(accessToken, substring, offset);
-        if (request.isOk) {
-          return request.body!.map<UserDTO>((user) =>
-            userFromJson(json.encode(user))).toList();
-        }
-      } else if (request.isOk) {
-        return request.body!.map<UserDTO>((user) =>
-            userFromJson(json.encode(user))).toList();
-      }
-  }
 
   defineUserFromChannel(String? userId, StreamChatClient streamChatClient) async {
     if(userId != null) {

@@ -18,5 +18,7 @@ class HomeService extends GetConnect{
   Future<Response<Map<String, dynamic>>> getNFTsContractAddresses(String wallet) => get("https://deep-index.moralis.io/api/v2/$wallet/nft/collections?chain=eth&disable_total=true", headers: {"accept": 'application/json', "X-API-Key": con.moralisApiKey}, query: {"chain": 'eth', "format": 'decimal'});
   Future<Response<Map<String, dynamic>>> getNextNFTsContractAddresses(String wallet, String cursor) => get("https://deep-index.moralis.io/api/v2/$wallet/nft/collections?chain=eth&disable_total=true", headers: {"accept": 'application/json', "X-API-Key": con.moralisApiKey}, query: {"chain": 'eth', "format": 'decimal',"cursor": cursor});
   Future<Response<Map<String, dynamic>>> updateStory(String accessToken, String storyModificationDTO) => patch('${con.URL_SERVER}story/modify', storyModificationDTO, headers: {'Authorization':'Bearer $accessToken'});
+  Future<Response<Map<String, dynamic>>> updateNicknames(String accessToken, String wallet, String nickname) => put('${con.URL_SERVER}nicknames/$wallet/$nickname', null, headers: {'Authorization':'Bearer $accessToken'});
+  Future<Response<Map<String, dynamic>>> retrieveNicknames(String accessToken) => get('${con.URL_SERVER}nicknames/retrieve', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<List<dynamic>>> retrieveStories(String accessToken, String offset) => get('${con.URL_SERVER}story/$offset', headers: {'Authorization':'Bearer $accessToken'});
 }
