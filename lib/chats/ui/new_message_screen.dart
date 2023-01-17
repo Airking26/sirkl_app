@@ -261,7 +261,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
           ? const Color(0xFF2D465E).withOpacity(1)
           : Colors.white,
-      debounceDelay: Duration.zero,
+      debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async{
         if(query.isNotEmpty && query.contains('.eth')){
           String? ethFromEns = await _chatController.getEthFromEns(query);
@@ -271,7 +271,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             pagingController.itemList = [_profileController.isUserExists.value!];
           }
           else {
-            pagingController.refresh();
+            pagingController.itemList = [];
           }
         } else if(query.isNotEmpty && isValidEthereumAddress(query.toLowerCase())){
           _profileController.isUserExists.value = await _profileController.getUserByWallet(query.toLowerCase());

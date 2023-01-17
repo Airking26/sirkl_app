@@ -28,7 +28,11 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
 
   @override
   void initState() {
-    storyItems = _homeController.stories.value![_homeController.indexStory.value]!.map((e) => StoryItem.pageImage(url: e!.url, controller: controller, imageFit: BoxFit.cover)).toList();
+    storyItems = _homeController.stories.value![_homeController.indexStory.value]!.map((e) =>
+    e!.type == 0 ?
+        StoryItem.pageImage(url: e.url, controller: controller, imageFit: BoxFit.cover, duration: const Duration(seconds: 5)) :
+        StoryItem.pageVideo(e.url, controller: controller, imageFit: BoxFit.cover)
+    ).toList();
     super.initState();
   }
 
@@ -42,14 +46,17 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
               if(_homeController.stories.value!.length - 1 > _homeController.actualStoryIndex.value) {
                 _homeController.indexStory.value++;
                 Navigator.pop(context);
-                _navigationController.hideNavBar.value = true;
-                pushNewScreen(context, screen: const StoryViewerScreen()).then((value) => _navigationController.hideNavBar.value = false);
+                pushNewScreen(context, screen: const StoryViewerScreen());
               } else {
+                _navigationController.hideNavBar.value = false;
                 Navigator.pop(context);
               }
               },
             onVerticalSwipeComplete: (direction){
-              if(direction == Direction.down) Navigator.pop(context);
+              if(direction == Direction.down) {
+                _navigationController.hideNavBar.value = false;
+                Navigator.pop(context);
+              }
             },
             onStoryShow: (story) async{
               _homeController.actualStoryIndex.value = _homeController.stories.value?.indexOf(_homeController.stories.value![_homeController.indexStory.value]!) ?? 0;

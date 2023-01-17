@@ -141,6 +141,41 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
+  camera:
+    dependency: "direct main"
+    description:
+      name: camera
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.10.1"
+  camera_android:
+    dependency: transitive
+    description:
+      name: camera_android
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.10.2+1"
+  camera_avfoundation:
+    dependency: transitive
+    description:
+      name: camera_avfoundation
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.9.10+1"
+  camera_platform_interface:
+    dependency: transitive
+    description:
+      name: camera_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.3.3"
+  camera_web:
+    dependency: transitive
+    description:
+      name: camera_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.1"
   characters:
     dependency: transitive
     description:
@@ -372,6 +407,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.1"
+  ffmpeg_kit_flutter:
+    dependency: transitive
+    description:
+      name: ffmpeg_kit_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.1.0"
+  ffmpeg_kit_flutter_platform_interface:
+    dependency: transitive
+    description:
+      name: ffmpeg_kit_flutter_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.1"
   file:
     dependency: transitive
     description:
@@ -1575,6 +1624,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.3"
+  transparent_image:
+    dependency: transitive
+    description:
+      name: transparent_image
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   typed_data:
     dependency: transitive
     description:
@@ -1708,6 +1764,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.5.3"
+  video_trimmer:
+    dependency: "direct main"
+    description:
+      name: video_trimmer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   visibility_detector:
     dependency: transitive
     description:
@@ -1849,5 +1912,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.18.0 <3.0.0"
+  dart: ">=2.18.2 <3.0.0"
   flutter: ">=3.3.0"

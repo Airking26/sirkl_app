@@ -12,7 +12,8 @@ class StoryDto {
     required this.readers,
     required this.url,
     required this.createdAt,
-    required this.id
+    required this.id,
+    required this.type
   });
 
   UserDTO createdBy;
@@ -20,13 +21,15 @@ class StoryDto {
   String url;
   DateTime createdAt;
   String id;
+  int type;
 
   factory StoryDto.fromJson(Map<String, dynamic> json) => StoryDto(
     createdBy: UserDTO.fromJson(json["createdBy"]),
     readers: List<String>.from(json["readers"].map((x) => x)),
     url: json["url"],
     id: json['id'],
-    createdAt: DateTime.parse(json["createdAt"])
+    createdAt: DateTime.parse(json["createdAt"]),
+    type: json["type"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -34,7 +37,8 @@ class StoryDto {
     "readers": List<dynamic>.from(readers.map((x) => x)),
     "url": url,
     "createdAt": createdAt.toIso8601String(),
-    "id": id
+    "id": id,
+    'type': type
   };
 }
 

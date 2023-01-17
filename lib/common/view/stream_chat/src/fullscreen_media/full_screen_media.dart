@@ -9,12 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sirkl/common/view/stream_chat/platform_widget_builder/src/platform_widget_builder.dart';
-import 'package:sirkl/common/view/stream_chat/src/attachment/stream_attachment_package.dart';
 import 'package:sirkl/common/view/stream_chat/src/context_menu_items/download_menu_item.dart';
 import 'package:sirkl/common/view/stream_chat/src/fullscreen_media/full_screen_media_widget.dart';
-import 'package:sirkl/common/view/stream_chat/src/gallery/gallery_header.dart';
-import 'package:sirkl/common/view/stream_chat/src/utils/extensions.dart';
-import 'package:sirkl/common/view/stream_chat/src/utils/typedefs.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:video_player/video_player.dart';
 

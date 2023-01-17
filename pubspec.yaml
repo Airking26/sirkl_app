@@ -88,6 +88,8 @@ dependencies:
   persistent_bottom_nav_bar_v2: ^4.2.6
   syncfusion_flutter_pdfviewer: ^20.4.43
   highlight_text: ^1.6.0
+  camera: ^0.10.1
+  video_trimmer: ^2.0.0
 
 dev_dependencies:
   dart_code_metrics: ^4.4.0

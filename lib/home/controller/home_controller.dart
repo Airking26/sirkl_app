@@ -347,6 +347,7 @@ class HomeController extends GetxController{
   }
 
   retrieveStories(int offset) async {
+    if(offset == 0) stories.value?.clear();
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request;

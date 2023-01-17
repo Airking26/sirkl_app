@@ -11,7 +11,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
-import 'package:sirkl/common/view/story_creator/stories_editor.dart';
+import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/ui/pdf_screen.dart';
@@ -19,6 +19,7 @@ import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
+import 'package:video_player/video_player.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -30,6 +31,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
 
+  late final GalleryController controller;
   final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
   final PagingController<int, CollectionDbDto> pagingController = PagingController(firstPageKey: 0);
@@ -37,8 +39,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
   YYDialog dialogMenu = YYDialog();
   static var pageKey = 0;
 
+  final _defaultBackgrounds = [
+    const GradientBackground(colors: [Color(0xFF00C6FF), Color(0xFF0078FF)]),
+    const GradientBackground(colors: [Color(0xFFeb3349), Color(0xFFf45c43)]),
+    const GradientBackground(colors: [Color(0xFF26a0da), Color(0xFF314755)]),
+    const GradientBackground(colors: [Color(0xFFe65c00), Color(0xFFF9D423)]),
+    const GradientBackground(colors: [Color(0xFFfc6767), Color(0xFFec008c)]),
+    const GradientBackground(
+      colors: [Color(0xFF5433FF), Color(0xFF20BDFF), Color(0xFFA5FECB)],
+    ),
+    const GradientBackground(colors: [Color(0xFF334d50), Color(0xFFcbcaa5)]),
+    const GradientBackground(colors: [Color(0xFF1565C0), Color(0xFFb92b27)]),
+    const GradientBackground(
+      colors: [Color(0xFF0052D4), Color(0xFF4364F7), Color(0xFFA5FECB)],
+    ),
+    const GradientBackground(colors: [Color(0xFF2193b0), Color(0xFF6dd5ed)]),
+    const GradientBackground(colors: [Color(0xFF753a88), Color(0xFFcc2b5e)]),
+  ];
+
+  final _colors = [
+    Colors.white,
+    Colors.black,
+    Colors.red,
+    Colors.yellow,
+    Colors.blue,
+    Colors.teal,
+    Colors.green,
+    Colors.orange,
+  ];
+
   @override
   void initState(){
+    controller = GalleryController();
     _profileController.checkIfHasUnreadNotif(_homeController.id.value);
     pagingController.addPageRequestListener((pageKey) {
       fetchNFTs();
@@ -125,10 +157,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   pushNewScreen(context, screen: const NotificationScreen()).then((value) => _profileController.checkIfHasUnreadNotif(_homeController.id.value));
                               }, icon:
 
-                            //Image.asset( "assets/images/edit.png", color: Get.isDarkMode ? Colors.white : Colors.black,):
                                 FlutterBadge(icon: Image.asset("assets/images/bell.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,), itemCount: _profileController.hasUnreadNotif.value ? 1 : 0, hideZeroCount: true, badgeColor: const Color(0xff00CB7D), badgeTextColor: const Color(0xff00CB7D), contentPadding: const EdgeInsets.only(top: 0.1,right: 16, left: 12),)
                             ),
-                            //Image.asset("assets/images/bell.png",  color: Get.isDarkMode ? Colors.white : Colors.black,)),
                             Padding(
                               padding: const EdgeInsets.only(top: 12.0),
                               child:
@@ -190,13 +220,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: DeferPointer(
                         paintOnTop: true,
                         child: InkWell(
-                          onTap:(){
+                          onTap:() async {
                             _navigationController.hideNavBar.value = true;
-                            pushNewScreen(context, screen: StoriesEditor(giphyKey: '', onDone: (uri) async{
+                            await controller.pick(context, setting: const GallerySetting(enableCamera: true, maximumCount: 1, requestType: RequestType.all, selectionMode: SelectionMode.actionBased)).then((value) async{
+                              if(!value.first.pickedFile.isNullOrBlank!){
+                                final file = await value.first.file;
+                                await _profileController.postStory(file!, value.first.type == AssetType.image ? 0 : 1);
+                              } else {
+                                await _profileController.postStory(value.first.pickedFile!, value.first.type == AssetType.image ? 0 : 1);
+                              }
                               _navigationController.hideNavBar.value = false;
-                              await _profileController.postStory(uri);
-                              Navigator.pop(context);
-                            })).then((value) => _navigationController.hideNavBar.value = false);
+                            });
                           },
                           child: Container(
                             width: 40,
@@ -228,7 +262,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: _profileController.isEditingProfile.value ?
               TextField(
                 maxLines: null,
-                //autofocus: true,
                 controller: _profileController.descriptionTextEditingController.value,
                 maxLength: 120,
                 textAlign: TextAlign.center,
@@ -261,9 +294,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: PagedListView(
                       pagingController: pagingController,
                         builderDelegate: PagedChildBuilderDelegate<CollectionDbDto>(
-                          firstPageProgressIndicatorBuilder: (context) => Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
-                          newPageProgressIndicatorBuilder: (context) => Padding(
-                            padding: const EdgeInsets.all(8.0),
+                          firstPageProgressIndicatorBuilder: (context) => const Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
+                          newPageProgressIndicatorBuilder: (context) => const Padding(
+                            padding: EdgeInsets.all(8.0),
                             child: Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
                           ),
                             itemBuilder:  (context, item, index) => CardNFT(item, _profileController, index)),
@@ -275,6 +308,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         )));
   }
+
+
 
   YYDialog dialogPopMenu(BuildContext context) {
     return YYDialog().build(context)
@@ -330,6 +365,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ))
       ..show();
   }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
 
 }
 
@@ -417,9 +459,4 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
         ),
       );
     }
-
-
-
-
 }
-

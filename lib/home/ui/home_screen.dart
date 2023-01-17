@@ -184,10 +184,12 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         InkWell(
           onTap: () {
+            _navigationController.hideNavBar.value = true;
             _homeController.indexStory.value = index;
             pushNewScreen(context, screen: const StoryViewerScreen()).then(
-                (value) =>
-                    _homeController.pagingController.value.notifyListeners());
+                (value) {
+                    _homeController.pagingController.value.notifyListeners();
+                });
           },
           child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 4),
