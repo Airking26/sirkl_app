@@ -45,7 +45,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
             onComplete: (){
               if(_homeController.stories.value!.length - 1 > _homeController.actualStoryIndex.value) {
                 _homeController.indexStory.value++;
-                Navigator.pop(context);
+                Navigator.of(context).pop(true);
                 pushNewScreen(context, screen: const StoryViewerScreen());
               } else {
                 _navigationController.hideNavBar.value = false;
@@ -89,7 +89,8 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
     return InkWell(
       onTap: (){
         _commonController.userClicked.value = story.createdBy;
-        pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
+        _navigationController.hideNavBar.value = false;
+        pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
       },
       child: Padding(
         padding: const EdgeInsets.only(top: 8.0),

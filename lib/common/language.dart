@@ -7,7 +7,7 @@ class Language extends Translations{
     'en_US':{
       c.homeTabRes: "SIRKL",
       c.callsTabRes: "Calls",
-      c.groupsTabRes: "Groups",
+      c.groupsTabRes: "Community",
       c.chatsTabRes: "Inbox",
       c.profileTabRes: "Profile",
       c.profileMenuTabRes: "• Profile",
@@ -27,6 +27,7 @@ class Language extends Translations{
       c.errorGroupCollection: "You don't have NFT related group",
       c.addGroupRes: "+ Add a group chat to the list",
       c.newMessageRes: "New Message",
+      c.newCallRes: "New Call",
       c.toRes: "To",
       c.contactsRes: "Contacts",
       c.writeHereRes: "Write a message",

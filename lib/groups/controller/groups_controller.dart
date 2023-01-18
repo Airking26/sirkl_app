@@ -50,7 +50,7 @@ class GroupsController extends GetxController{
       var req = await _homeService.getNextNFTByAlchemyForGroup(wallet, cursor);
       var res = nftAlchemyDtoFromJson(json.encode(req.body));
       res.pageKey == null || res.pageKey!.isEmpty ? cursor = "" : cursor = res.pageKey!;
-      res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty );
+      res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty  ||  element.contractMetadata!.openSea!.collectionName! == "Secret FLClub Pass");
       var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
       gc?.forEach((key, value) {
         nfts.add(CollectionDbDto(collectionName: value.first.title!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
@@ -69,7 +69,7 @@ class GroupsController extends GetxController{
   }
 
   retrieveGroups(String wallet) async{
-    var nfts = await getNFTsToCreateGroup("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87");
+    var nfts = await getNFTsToCreateGroup(wallet);
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var req = await _groupService.retrieveGroups(accessToken);

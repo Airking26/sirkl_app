@@ -214,13 +214,13 @@ class HomeController extends GetxController{
 
   getNFTsContractAddresses(StreamChatClient? client, String wallet) async{
     var stockedContractAddresses = box.read(con.contractAddresses) ?? [];
-    var req = await _homeService.getNFTsContractAddresses("0x9aB328b9d8ece399e629Db772F73edFc8ddB244E");
+    var req = await _homeService.getNFTsContractAddresses(wallet);
     if(req.body != null){
     var initialArray = moralisNftContractAdressesFromJson(json.encode(req.body)).result!;
     if(moralisNftContractAdressesFromJson(json.encode(req.body)).cursor != null) {
       var cursor = moralisNftContractAdressesFromJson(json.encode(req.body)).cursor;
       while (cursor != null) {
-        var newReq = await _homeService.getNextNFTsContractAddresses("0x9aB328b9d8ece399e629Db772F73edFc8ddB244E", cursor);
+        var newReq = await _homeService.getNextNFTsContractAddresses(wallet, cursor);
         initialArray.addAll(moralisNftContractAdressesFromJson(json.encode(newReq.body)).result!);
         cursor = moralisNftContractAdressesFromJson(json.encode(newReq.body)).cursor;
       }

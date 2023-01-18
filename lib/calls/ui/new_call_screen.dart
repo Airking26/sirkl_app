@@ -1,60 +1,69 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ethereum_addresses/ethereum_addresses.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import 'package:sirkl/chats/ui/chat_screen.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../common/view/dialog/custom_dial.dart';
-import '../controller/chats_controller.dart';
 
-class NewMessageScreen extends StatefulWidget {
-  const NewMessageScreen({Key? key}) : super(key: key);
+class NewCallScreen extends StatefulWidget {
+  const NewCallScreen({Key? key}) : super(key: key);
 
   @override
-  State<NewMessageScreen> createState() => _NewMessageScreenState();
+  State<NewCallScreen> createState() => _NewCallScreenState();
 }
 
-class _NewMessageScreenState extends State<NewMessageScreen> {
+class _NewCallScreenState extends State<NewCallScreen> {
 
-  final _chatController = Get.put(ChatsController());
+  final _callController = Get.put(CallsController());
   final _homeController = Get.put(HomeController());
   final _profileController = Get.put(ProfileController());
   final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
-  YYDialog dialogMenu = YYDialog();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
-  FocusNode? _focusNode;
-  final StreamMessageInputController _messageInputController = StreamMessageInputController();
   final _searchController = FloatingSearchBarController();
+  static var pageKey = 0;
 
   @override
   void initState() {
-    _focusNode = FocusNode();
+    _callController.focusNode.value;
     pagingController.addPageRequestListener((pageKey) {
-       if(_commonController.query.value.isEmpty){
+       if(_callController.callQuery.value.isEmpty){
         pagingController.refresh();
         pagingController.appendLastPage(_commonController.users);
       }
     });
     super.initState();
   }
+
+  Future<void> fetchPageUsers() async {
+    try {
+      List<UserDTO> newItems;
+      if(pageKey == 0) newItems = [];
+        newItems = await _callController.retrieveUsers(_callController.callQuery.value, pageKey);
+      final isLastPage = newItems.length < 12;
+      if (isLastPage) {
+        pagingController.appendLastPage(newItems);
+      } else {
+        final nextPageKey = pageKey++;
+        pagingController.appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      pagingController.error = error;
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +72,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
-        body: Obx(() =>Column(children: [
+        body: Column(children: [
           Stack(
             clipBehavior: Clip.none,
             alignment: AlignmentDirectional.topCenter,
@@ -84,40 +93,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _chatController.chipsList.isNotEmpty ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Text(
-                            con.toRes.tr,
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 20,
-                                fontFamily: "Gilroy",
-                                color:
-                                MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 0),
-                          height: 50,
-                          child: ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: _chatController.chipsList.length,
-                              itemBuilder: buildToSendChip),
-                        ),
-                        const SizedBox(
-                          height: 25,
-                        ),
-                      ],
-                    ) : Container(),
-
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
@@ -155,8 +130,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   ],
                 )),
           ),
-          buildBottomBar(),
-        ])));
+        ]));
   }
 
   Container buildAppBar() {
@@ -199,7 +173,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Text(
-                  con.newMessageRes.tr,
+                  con.newCallRes.tr,
                   style: TextStyle(
                       color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                       fontWeight: FontWeight.w600,
@@ -209,8 +183,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               ),
               IconButton(
                   onPressed: () {
-                    _navigationController.hideNavBar.value = true;
-                    pushNewScreen(context, screen: const NewMessageScreen()).then((value) => _navigationController.hideNavBar.value = false);
                   },
                   icon: Image.asset(
                     "assets/images/plus.png",
@@ -232,7 +204,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       controller: _searchController,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      hint: 'Paste a wallet address or an ENS',
+      hint: 'Paste a wallet address or a username',
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 0),
@@ -262,7 +234,15 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           : Colors.white,
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async{
-        if(query.isNotEmpty && query.contains('.eth')){
+        if(query.isNotEmpty) {
+          pagingController.itemList = [];
+          _callController.callQuery.value = query;
+          fetchPageUsers();
+        } else {
+          pagingController.refresh();
+          pagingController.appendLastPage(_commonController.users);
+        }
+        /*if(query.isNotEmpty && query.contains('.eth')){
           String? ethFromEns = await _chatController.getEthFromEns(query);
           if(_profileController.isUserExists.value == null && ethFromEns != "" && ethFromEns != "0") {
             pagingController.itemList = [UserDTO(id: '', userName: query, picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: ethFromEns, following: 0, isInFollowing: false)];
@@ -272,20 +252,22 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           else {
             pagingController.itemList = [];
           }
-        } else if(query.isNotEmpty && isValidEthereumAddress(query.toLowerCase())){
+        }
+        else if(query.isNotEmpty && isValidEthereumAddress(query.toLowerCase())){
           _profileController.isUserExists.value = await _profileController.getUserByWallet(query.toLowerCase());
           if(_profileController.isUserExists.value == null) {
             pagingController.itemList = [UserDTO(id: '', userName: "", picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: query.toLowerCase(), following: 0, isInFollowing: false)];
           } else {
             pagingController.itemList = [_profileController.isUserExists.value!];
           }
-        } else {
+        }
+        else {
           if(query.isNotEmpty) {
             pagingController.itemList = [];
           } else {
             pagingController.refresh();
           }
-        }
+        }*/
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
@@ -324,26 +306,16 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
             CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
-        trailing: Checkbox(
-          onChanged: (selected) {
-            if (_chatController.chipsList.value.length == 3) {
-              utils.showToast(context, con.maxUserSelectedRes.tr);
-            }
-            else {
-              if (selected!) {
-                _chatController.chipsList.add(item);
-              } else {
-                _chatController.chipsList.removeWhere((element) =>
-                element.wallet == item.wallet);
-              }
-              _chatController.chipsList.refresh();
-            }
+        trailing: InkWell(
+          onTap: () async {
+            _callController.userCalled.value = item;
+            await _callController.inviteCall(item, DateTime.now().toString(), _homeController.id.value);
           },
-          value: _chatController.chipsList.map((element) => element.wallet).contains(item.wallet),
-          checkColor: const Color(0xFF00CB7D),
-          fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
-          side: MaterialStateBorderSide.resolveWith(
-            (states) => const BorderSide(width: 1.0, color: Color(0xFF00CB7D)),
+          child: Image.asset(
+            "assets/images/call_tab.png",
+            color: const Color(0xFF00CB7D),
+            width: 20,
+            height: 20,
           ),
         ),
         title: Transform.translate(
@@ -373,163 +345,12 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     );
   }
 
-  Widget buildToSendChip(BuildContext context, int index) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: InputChip(
-          deleteIconColor: Colors.white,
-          deleteIcon: Image.asset(
-            'assets/images/close.png',
-            color: Colors.white,
-          ),
-          padding: const EdgeInsets.all(12),
-          onDeleted: () {
-            _chatController.chipsList.removeAt(index);
-            _chatController.chipsList.refresh();
-          },
-          backgroundColor: const Color(0xFF00CB7D),
-          label: Text(
-            _chatController.chipsList[index].userName.isNullOrBlank! ? "${_chatController.chipsList[index].wallet!.substring(0, 10)}..." : _chatController.chipsList[index].userName!,
-            style: const TextStyle(
-                fontFamily: "Gilroy",
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.white),
-          )),
-    );
-  }
-
-  Container buildBottomBar() {
-    return Container(
-      height: 110,
-      decoration: BoxDecoration(
-        border: const Border(top: BorderSide(color: Colors.grey, width: 0.01)),
-        gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF111D28) : Colors.white,
-              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
-            ]),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Flexible(
-            flex: 3,
-            child: TextField(
-              controller: _messageInputController.textFieldController,
-              decoration: InputDecoration(
-                hintText: con.writeHereRes.tr,
-                hintStyle: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                    fontFamily: "Gilroy",
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282)),
-                filled: true,
-                fillColor:
-                MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF2D465E) : const Color(0xFFF2F2F2),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide.none),
-              ),
-            ),
-          ),
-          Flexible(
-            child: InkWell(
-              onTap: () async {
-                if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!) {
-                  _chatController.messageSending.value = true;
-                  for (UserDTO element in _chatController.chipsList) {
-                    var idChannel = DateTime
-                        .now()
-                        .millisecondsSinceEpoch
-                        .toString();
-                    if (element.id.isNullOrBlank!) {
-                      await _chatController.createInbox(InboxCreationDto(
-                          createdBy: _homeController.id.value,
-                          wallets: [
-                            _homeController.userMe.value.wallet!,
-                            element.wallet!
-                          ],
-                          idChannel: idChannel,
-                          message: _messageInputController.text));
-                    } else {
-                      await _chatController.createInbox(InboxCreationDto(
-                          createdBy: _homeController.id.value,
-                          wallets: [
-                            _homeController.userMe.value.wallet!,
-                            element.wallet!
-                          ],
-                          idChannel: idChannel,
-                          message: _messageInputController.text,
-                          members: [_homeController.id.value, element.id!]));
-                    }
-                    if (_chatController.chipsList.value.indexOf(element) ==
-                        _chatController.chipsList.length - 1) {
-                      _messageInputController.clear();
-                      _searchController.clear();
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      _chatController.messageSending.value = false;
-                      if (_chatController.chipsList.value.length == 1) {
-                        Navigator.pop(context);
-                        if (element.id.isNullOrBlank!) {
-                          _navigationController.hideNavBar.value = true;
-                          pushNewScreen(context, screen: DetailedChatScreen(
-                              create: false, channelId: idChannel)).then((value) => _navigationController.hideNavBar.value = false);
-                        } else {
-                          _commonController.userClicked.value =
-                          _chatController.chipsList[0];
-                          _navigationController.hideNavBar.value = true;
-                          pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
-                        }
-                      }
-                      else {
-                        _chatController.messageHasBeenSent.value = true;
-                        Navigator.pop(context);
-                      }
-                    }
-                  }
-                  _chatController.chipsList.clear();
-                }
-              },
-              child:
-                  _chatController.messageSending.value ?
-                      Container(width: 55, height: 55, child: const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D),),)) :
-              Container(
-                width: 55,
-                height: 55,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: const LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [Color(0xFF1DE99B), Color(0xFF0063FB)])),
-                child: Align(
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/images/send.png",
-                      height: 32,
-                      width: 32,
-                    )),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-
   @override
   void dispose() {
-    _focusNode!.dispose();
-    _chatController.chipsList.clear();
+    //pagingController.itemList = [];
+    _callController.focusNode.value.dispose();
     pagingController.dispose();
-    _commonController.query.value = "";
+    _callController.callQuery.value = "";
     super.dispose();
   }
 

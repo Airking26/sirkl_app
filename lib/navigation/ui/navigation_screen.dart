@@ -117,22 +117,22 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 _commonController.showSirklUsers(_homeController.id.value);
               }
             } else if(index == 1) {
-              if(_homeController.accessToken.value.isEmpty){
+              if(_homeController.accessToken.value.isEmpty || _homeController.isConfiguring.value){
                 _navigationController.controller.value.index = 0;
               } else {
                 _callController.pageKey.value = 0;
                 _callController.pagingController.value.refresh();
               }
             } else if(index == 2){
-              if(_homeController.accessToken.value.isEmpty){
+              if(_homeController.accessToken.value.isEmpty || _homeController.isConfiguring.value){
                 _navigationController.controller.value.index = 0;
               }
             } else if(index == 3){
-              if(_homeController.accessToken.value.isEmpty){
+              if(_homeController.accessToken.value.isEmpty || _homeController.isConfiguring.value){
                 _navigationController.controller.value.index = 0;
               }
             } else if(index == 4){
-              if(_homeController.accessToken.value.isEmpty){
+              if(_homeController.accessToken.value.isEmpty || _homeController.isConfiguring.value){
                 _navigationController.controller.value.index = 0;
               }
             }

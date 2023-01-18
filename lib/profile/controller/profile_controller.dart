@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:images_picker/images_picker.dart';
+import 'package:ndialog/ndialog.dart';
 import 'package:simple_s3/simple_s3.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
@@ -41,6 +42,7 @@ class ProfileController extends GetxController{
   var urlPicture = "".obs;
   var hasUnreadNotif = false.obs;
   var isStoryPosting = false.obs;
+  var simpleS3 = SimpleS3().obs;
 
   updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
     isLoadingPicture.value = true;
@@ -103,8 +105,17 @@ class ProfileController extends GetxController{
     return user;
   }
 
-  postStory(File file, int type) async{
-    var uri = await SimpleS3().uploadFile(file, "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
+  Future<bool> postStory(File file, int type) async{
+    Fluttertoast.showToast(
+        msg: "Story is being posted",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
+        textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
+        fontSize: 16.0
+    );
+    var uri = await simpleS3.value.uploadFile(file, "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
     var storyCreationDto = StoryCreationDto(url: uri, type: type);
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
@@ -116,28 +127,14 @@ class ProfileController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _profileService.postStory(accessToken, storyCreationDtoToJson(storyCreationDto));
       if(request.isOk){
-        isStoryPosting.value = false;
-        Fluttertoast.showToast(
-            msg: "Story posted",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 1,
-            backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
-            textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
-            fontSize: 16.0
-        );
+        return true;
+      } else {
+        return false;
       }
     } else if(request.isOk){
-      isStoryPosting.value = false;
-      Fluttertoast.showToast(
-          msg: "Story posted",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark? Colors.white : const Color(0xFF102437) ,
-          textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark? Colors.black : Colors.white,
-          fontSize: 16.0
-      );
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -191,6 +188,14 @@ class ProfileController extends GetxController{
     if(request.isOk) {
       return notificationDtoFromJson(json.encode(request.body));
     }
+  }
+
+  displayProgress(){
+    return StreamBuilder(
+      stream: simpleS3.value.getUploadPercentage,
+        builder: (context, snapshot){
+      return Text(snapshot.data != null ? "Uploaded : ${snapshot.data}" : "Error");
+    });
   }
 
 }

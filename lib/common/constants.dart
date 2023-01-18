@@ -54,6 +54,7 @@ const String claimOwnershipeRes = "claim_ownership";
 
 /// Inbox Page ///
 const String newMessageRes = "new_message";
+const String newCallRes = "new_call";
 const String toRes = "to";
 const String contactsRes = "contacts";
 const String writeHereRes = "write_here";

@@ -382,7 +382,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
   Widget buildSelectNFT(){
     return _groupController.isLoadingAvailableNFT.value ?
          const Padding(
-           padding: EdgeInsets.only(top: 54.0),
+           padding: EdgeInsets.only(top: 24.0),
            child: CircularProgressIndicator(color: Color(0xff00CB7D)),
          ) : _groupController.nftsAvailable.isEmpty ? noNFTFound() :
      MediaQuery.removePadding(
@@ -390,7 +390,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       removeTop: true,
       child: Expanded(
         child: Padding(
-          padding: const EdgeInsets.only(top: 24.0),
+          padding: const EdgeInsets.only(top: 8.0),
           child: SafeArea(
             child: ListView.builder(
               itemCount: _groupController.nftsAvailable.value.length,
@@ -438,7 +438,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       fit: StackFit.loose,
       children: [
         Container(
-          height: 140,
+          height: _groupController.addAGroup.value ? 115 : 140,
           margin: const EdgeInsets.only(bottom: 0.25),
           decoration: BoxDecoration(
             boxShadow: const [
@@ -468,23 +468,25 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                 children: [
                   Obx(()=>IconButton(
                       onPressed: () async{
-                        //await _groupController.createHiro(StreamChat.of(context).client);
-                        _groupController.addAGroup.value = false;
-                        _groupController.searchIsActive.value = ! _groupController.searchIsActive.value;
-                        if(_groupController.searchIsActive.value) {
-                          _groupController.query.value = "";
-                          _floatingSearchBarController.clear();
-                          _floatingSearchBarController.close();
+                        if(!_groupController.addAGroup.value) {
+                          _groupController.searchIsActive.value =
+                          !_groupController.searchIsActive.value;
+                          if (_groupController.searchIsActive.value) {
+                            _groupController.query.value = "";
+                            _floatingSearchBarController.clear();
+                            _floatingSearchBarController.close();
+                          }
                         }
                       },
                       icon: Image.asset(
                         _groupController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
                         color:
-                        MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                        _groupController.addAGroup.value ? Colors.transparent : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                       ))),
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),
                     child: Obx(() =>Text(
+                      _groupController.addAGroup.value ? "New Group" :
                       _groupController.searchIsActive.value ? _groupController.index.value == 0 ? "Favorites" : "Others" :
                       con.groupsTabRes.tr,
                       style: TextStyle(
@@ -518,7 +520,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             child: _groupController.searchIsActive.value ? SizedBox(
                 height: 110,
                 width: MediaQuery.of(context).size.width,
-                child:buildFloatingSearchBar()): Container(
+                child:buildFloatingSearchBar()):
+            _groupController.addAGroup.value ? Container() : Container(
                 height: 50,
                 width: 350,
                 decoration: BoxDecoration(
@@ -644,6 +647,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   Widget buildFloatingSearchBar() {
     return FloatingSearchBar(
+      automaticallyImplyBackButton: false,
       clearQueryOnClose: false,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),

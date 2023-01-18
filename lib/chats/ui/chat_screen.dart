@@ -288,7 +288,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             });
                           },
                           icon: Image.asset(
-                            "assets/images/plus.png",
+                            "assets/images/edit.png",
                             color:
                             MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                           )),
@@ -428,6 +428,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Widget buildFloatingSearchBar() {
     return FloatingSearchBar(
+      automaticallyImplyBackButton: false,
       clearQueryOnClose: false,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),

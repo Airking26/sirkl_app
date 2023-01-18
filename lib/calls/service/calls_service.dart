@@ -9,5 +9,6 @@ class CallService extends GetConnect{
   Future<Response<Map<String, dynamic>>> updateCall(String accessToken, String callModificationDTO) => patch('${con.URL_SERVER}call/update', callModificationDTO, headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<List<dynamic>>> retrieveCalls(String accessToken, String offset) => get('${con.URL_SERVER}call/retrieve/$offset', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<List<dynamic>>> searchCalls(String accessToken, String substring) => get('${con.URL_SERVER}call/search/$substring', headers: {'Authorization':'Bearer $accessToken'});
+  Future<Response<List<dynamic>>> searchUser(String accessToken, String substring, String offset) => get('${con.URL_SERVER}search/users/$substring/$offset', headers: {'Authorization':'Bearer $accessToken'});
 
 }

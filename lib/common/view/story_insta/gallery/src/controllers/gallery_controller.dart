@@ -143,7 +143,7 @@ class GalleryController extends ValueNotifier<GalleryValue> {
         } else {
           var file = await entity.file;
           Get.to(() => TrimmerView(file!))?.then((value) {
-            entity = entity.copyWith(pickedFile: value[0]);
+            entity = entity.copyWith(pickedFile: value[0], isFavorite: true);
             _onChanged?.call(entity, false);
             completeTask(context, items: [entity]);
           });

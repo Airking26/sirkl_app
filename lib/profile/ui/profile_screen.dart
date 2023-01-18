@@ -11,6 +11,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
@@ -38,6 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _navigationController = Get.put(NavigationController());
   YYDialog dialogMenu = YYDialog();
   static var pageKey = 0;
+  Utils utils = Utils();
 
   final _defaultBackgrounds = [
     const GradientBackground(colors: [Color(0xFF00C6FF), Color(0xFF0078FF)]),
@@ -223,13 +225,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap:() async {
                             _navigationController.hideNavBar.value = true;
                             await controller.pick(context, setting: const GallerySetting(enableCamera: true, maximumCount: 1, requestType: RequestType.all, selectionMode: SelectionMode.actionBased)).then((value) async{
-                              if(!value.first.pickedFile.isNullOrBlank!){
-                                final file = await value.first.file;
-                                await _profileController.postStory(file!, value.first.type == AssetType.image ? 0 : 1);
-                              } else {
-                                await _profileController.postStory(value.first.pickedFile!, value.first.type == AssetType.image ? 0 : 1);
-                              }
                               _navigationController.hideNavBar.value = false;
+                              if(!value.first.isFavorite){
+                                final file = await value.first.file;
+                                if(await _profileController.postStory(file!, value.first.type == AssetType.image ? 0 : 1)){
+                                  // ignore: use_build_context_synchronously
+                                  utils.showToast(context, "Story has been posted");
+                                }
+                              } else {
+                                if(await _profileController.postStory(value.first.pickedFile!, value.first.type == AssetType.image ? 0 : 1)){
+                                  utils.showToast(context, "Story has been posted");
+                                }
+                              }
                             });
                           },
                           child: Container(
@@ -281,8 +288,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 10,),
             Padding(
-              padding: const EdgeInsets.only(left: 24.0),
-              child: _homeController.nfts.value.isNotEmpty ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),)) : Container(),
+              padding: const EdgeInsets.only(left: 24.0, right: 24),
+              child: _homeController.nfts.value.isNotEmpty ?
+              Row(
+                children: [
+                  Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),)),
+                  const Spacer(),
+                  const Icon(Icons.star_border_rounded)
+                ],
+              ) :
+              Container(),
             ),
             MediaQuery.removePadding(
               context:  context,

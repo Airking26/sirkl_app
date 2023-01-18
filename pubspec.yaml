@@ -90,6 +90,7 @@ dependencies:
   highlight_text: ^1.6.0
   camera: ^0.10.1
   video_trimmer: ^2.0.0
+  ndialog: ^4.2.3
 
 dev_dependencies:
   dart_code_metrics: ^4.4.0

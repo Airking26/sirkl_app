@@ -44,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     _homeController.pagingController.value.addPageRequestListener((pageKey) {
+      _homeController.pagingController.value.itemList = [];
       fetchPageStories();
     });
     super.initState();
@@ -188,7 +189,10 @@ class _HomeScreenState extends State<HomeScreen> {
             _homeController.indexStory.value = index;
             pushNewScreen(context, screen: const StoryViewerScreen()).then(
                 (value) {
-                    _homeController.pagingController.value.notifyListeners();
+                  if(value == null){
+                    _navigationController.hideNavBar.value = false;
+                  }
+                  _homeController.pagingController.value.notifyListeners();
                 });
           },
           child: Container(

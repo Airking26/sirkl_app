@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/calls/ui/new_call_screen.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
@@ -139,12 +140,14 @@ class _CallsScreenState extends State<CallsScreen> {
                   ),
                   IconButton(
                       onPressed: () {
-                        Utils().dialogPopMenu(context);
+                        pushNewScreen(context, screen: const NewCallScreen()).then((value) => _callController.focusNode.value.dispose());
                       },
                       icon: Image.asset(
-                        "assets/images/more.png",
+                        "assets/images/call_tab.png",
+                        width: 24,
+                        height: 24,
                         color:
-                        MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.transparent,
+                        MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                       )),
                 ],
               ),
@@ -205,6 +208,7 @@ class _CallsScreenState extends State<CallsScreen> {
       // Specify a custom transition to be used for
       // animating between opened and closed stated.
       transition: CircularFloatingSearchBarTransition(),
+      automaticallyImplyBackButton: false,
       leadingActions: [
         FloatingSearchBarAction.icon(
           icon: Image.asset(
@@ -217,7 +221,7 @@ class _CallsScreenState extends State<CallsScreen> {
           onTap: () {},
         ),
       ],
-      actions: const [],
+      actions: [],
       builder: (context, transition) {
         return const SizedBox(
           height: 0,
@@ -298,7 +302,9 @@ class _CallsScreenState extends State<CallsScreen> {
                   onTap: () {
                     _commonController.userClicked.value = callDto.called;
                     _navigationController.hideNavBar.value = true;
-                    pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false).then((value) => _callController.pagingController.value.notifyListeners());
+                    pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) =>
+                    _navigationController.hideNavBar.value = false).then((value) =>
+                        _callController.pagingController.value.notifyListeners());
                   },
                     child: Image.asset("assets/images/chat_tab.png", width: 20, height: 20, color: const Color(0xFF9BA0A5),)),
                   const SizedBox(width: 6,),

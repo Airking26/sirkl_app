@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
@@ -41,8 +42,10 @@ class CallsController extends GetxController{
   var isCallMuted = false.obs;
   var isCallOnSpeaker = false.obs;
   var isSearchIsActive = false.obs;
+  var callQuery = "".obs;
   Rx<PagingController<int, CallDto>> pagingController = PagingController<int, CallDto>(firstPageKey: 0).obs;
   var pageKey = 0.obs;
+  var focusNode = FocusNode().obs;
 
   Future<void> setupVoiceSDKEngine(BuildContext context) async {
     await [Permission.microphone].request();
@@ -222,6 +225,24 @@ class CallsController extends GetxController{
     if(request.isOk) {
       callList.value = callDtoFromJson(json.encode(request.body));
       return callDtoFromJson(json.encode(request.body));
+    }
+  }
+
+  retrieveUsers(String substring, int offset) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request;
+    try{
+      request = await _callService.searchUser(accessToken, substring, offset.toString());
+    } on CastError{
+      var requestToken = await _homeService.refreshToken(refreshToken!);
+      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDto.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _callService.searchUser(accessToken, substring, offset.toString());
+    }
+    if(request.isOk) {
+      return request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
     }
   }
 
