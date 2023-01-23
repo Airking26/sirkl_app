@@ -121,7 +121,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       child: Expanded(
         child: SafeArea(
           minimum: const EdgeInsets.only(top: 28),
-          child: !_homeController.controllerConnected.value ? Center(child: Container(width: 40, height:40, child: CircularProgressIndicator(color:  const Color(0xff00CB7D)))) : TabBarView(
+          child: !_homeController.controllerConnected.value ? const Center(child: SizedBox(width: 40, height:40, child: CircularProgressIndicator(color:  Color(0xff00CB7D)))) : TabBarView(
             physics: const NeverScrollableScrollPhysics(),
             controller: tabController,
             children: [
@@ -299,7 +299,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             ),
             Obx(()=>Positioned(
                 top: _chatController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
-                child: _chatController.searchIsActive.value ? Container(
+                child: _chatController.searchIsActive.value ? SizedBox(
                     height: 110,
                     width: MediaQuery.of(context).size.width,
                     child:buildFloatingSearchBar()): Container(

@@ -9,6 +9,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
+import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
@@ -35,12 +36,11 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
   final _navigationController = Get.put(NavigationController());
   final utils = Utils();
   YYDialog dialogMenu = YYDialog();
-  final PagingController<int, CollectionDbDto> pagingController = PagingController(firstPageKey: 0);
+  final PagingController<int, NftDto> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
 
   @override
   void initState(){
-    _homeController.cursorElse.value = "";
     _commonController.checkUserIsInFollowing();
     pagingController.addPageRequestListener((pageKey) {
       fetchNFTs();
@@ -50,8 +50,9 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
   Future<void> fetchNFTs() async {
     try {
-      List<CollectionDbDto> newItems = await _homeController.getNFTsTemporaryForOthers(_commonController.userClicked.value!.wallet!);
-      if (_homeController.cursorElse.value == "") {
+      List<NftDto> newItems = await _homeController.getNFT(_commonController.userClicked.value!.id!, false, pageKey);
+      final isLastPage = newItems.length < 12;
+      if (isLastPage) {
         pagingController.appendLastPage(newItems);
       } else {
         final nextPageKey = pageKey++;
@@ -186,7 +187,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Wallet: ${_commonController.userClicked.value!.wallet!.substring(0,20)}...",overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF00CB7D), fontSize: 15),),
+                    Text("${_commonController.userClicked.value!.wallet!.substring(0,6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}",overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF00CB7D), fontSize: 15),),
                     const SizedBox(width: 4,),
                     Image.asset("assets/images/copy.png", height: 18, width: 18, color: const Color(0xFF00CB7D),)
                   ],
@@ -206,7 +207,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
             const SizedBox(height: 10,),
             Padding(
               padding: const EdgeInsets.only(left: 24.0),
-              child: _homeController.nfts.value.isNotEmpty ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),)) : Container(),
+              child: _homeController.heHasNft.value ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),)) : Container(),
             ),
             MediaQuery.removePadding(
               context:  context,
@@ -217,7 +218,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                   child: SafeArea(
                     child: PagedListView(
                       pagingController: pagingController,
-                      builderDelegate: PagedChildBuilderDelegate<CollectionDbDto>(
+                      builderDelegate: PagedChildBuilderDelegate<NftDto>(
                           firstPageProgressIndicatorBuilder: (context) => const Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
                           newPageProgressIndicatorBuilder: (context) => const Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
                           itemBuilder:  (context, item, index) => CardNFT(item, _commonController, index)),
@@ -284,19 +285,13 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
       ..show();
   }
 
-  @override
-  void dispose() {
-    _homeController.cursorElse.value = "";
-    super.dispose();
-  }
-
 }
 
 class CardNFT extends StatefulWidget {
-  final CollectionDbDto collectionDbDTO;
+  final NftDto nftDto;
   final CommonController profileController;
   final int index;
-  CardNFT(this.collectionDbDTO, this.profileController, this.index, {Key? key}) : super(key: key);
+  CardNFT(this.nftDto, this.profileController, this.index, {Key? key}) : super(key: key);
 
   @override
   State<CardNFT> createState() => _CardNFTState();
@@ -324,15 +319,10 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             ],
           ),
           child: ExpansionTile(
-              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImage, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.nftDto.collectionImage!, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                   errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
-            trailing: Obx(() => Image.asset(
-              widget.profileController.isCardExpandedList.value.contains(widget.index) ?
-              "assets/images/arrow_up_rev.png" :
-              "assets/images/arrow_down_rev.png",
-              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, height: 20, width: 20,),),
-            title: Text(widget.collectionDbDTO.collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black)),
-            subtitle: Text("${widget.collectionDbDTO.collectionImages.length} available", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
+            title: Text(widget.nftDto.title!, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black)),
+            subtitle: Text("${widget.nftDto.images!.length} available", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
             onExpansionChanged: (expanded){
               if(expanded) {
                 widget.profileController.isCardExpandedList.value.assign(widget.index);
@@ -346,9 +336,9 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
                 padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
                 child: SizedBox(height: 80,
                     child: ListView.builder(
-                  itemCount: widget.collectionDbDTO.collectionImages.length,
+                  itemCount: widget.nftDto.images!.length,
                   itemBuilder: (context, i){
-                    return buildCard(i, widget.collectionDbDTO);
+                    return buildCard(i, widget.nftDto);
                   }, scrollDirection: Axis.horizontal,)),
               )
             ],
@@ -357,7 +347,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
       );
     }
 
-    Padding buildCard(int i, CollectionDbDto collectionDbDTO) {
+    Padding buildCard(int i, NftDto nftDto) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4.0),
         child: InkWell(
@@ -367,7 +357,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
           child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: SizedBox.fromSize(
-                  child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: collectionDbDTO.collectionImages[i], width: 80, height: 70,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                  child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: nftDto.images![i], width: 80, height: 70,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         ),
       );

@@ -5,19 +5,10 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/view/story_insta/animations/src/route_transition.dart';
-import 'package:sirkl/common/view/story_insta/camera/src/controllers/exposure_controller.dart';
-import 'package:sirkl/common/view/story_insta/camera/src/controllers/zoom_controller.dart';
-import 'package:sirkl/common/view/story_insta/camera/src/entities/cam_value.dart';
-import 'package:sirkl/common/view/story_insta/camera/src/entities/camera_setting.dart';
-import 'package:sirkl/common/view/story_insta/camera/src/entities/camera_type.dart';
-import 'package:sirkl/common/view/story_insta/drishya_entity.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
-import 'package:sirkl/common/view/story_insta/editor/src/controllers/drishya_editing_controller.dart';
-import 'package:sirkl/common/view/story_insta/editor/src/drishya_editor.dart';
-import 'package:sirkl/common/view/story_insta/editor/src/entities/editor_background.dart';
-import 'package:sirkl/common/view/story_insta/editor/src/entities/editor_setting.dart';
-import 'package:sirkl/common/view/story_insta/gallery/src/controllers/gallery_controller.dart';
+import 'package:sirkl/common/view/trimmer/trimmer_view.dart';
 
 /// Camera controller
 
@@ -415,9 +406,17 @@ class CamController extends ValueNotifier<CamValue> {
           if (entity != null) {
             final drishyaEntity = entity.toDrishya.copyWith(
               pickedFile: file,
+              isFavorite: true
             );
             if (navigator.mounted) {
-              navigator.pop([drishyaEntity]);
+              var tempFile = await drishyaEntity.file;
+              pushNewScreen(context, screen: TrimmerView(tempFile!)).then((value) async{
+                final dreish = drishyaEntity.copyWith(pickedFile: value[0]);
+                var p = tempFile.lengthSync();
+                var t = (value[0] as File).lengthSync();
+                navigator.pop([dreish]);
+              }
+              );
             }
             return drishyaEntity;
           } else {

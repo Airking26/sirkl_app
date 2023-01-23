@@ -22,8 +22,8 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
-import 'package:sirkl/profile/ui/profile_screen.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
+
 
 class CallsController extends GetxController{
 
@@ -46,6 +46,7 @@ class CallsController extends GetxController{
   Rx<PagingController<int, CallDto>> pagingController = PagingController<int, CallDto>(firstPageKey: 0).obs;
   var pageKey = 0.obs;
   var focusNode = FocusNode().obs;
+  var isFromConv = false.obs;
 
   Future<void> setupVoiceSDKEngine(BuildContext context) async {
     await [Permission.microphone].request();
@@ -56,15 +57,14 @@ class CallsController extends GetxController{
 
     agoraEngine.value?.setEventHandler(
       RtcEngineEventHandler(
-        error: (e){
-          var error = e;
-        },
         joinChannelSuccess: (String x, int y, int elapsed) {
           _navigationController.hideNavBar.value = true;
           pushNewScreen(context, screen: const CallInviteSendingScreen()).then((value) {
             pageKey.value = 0;
             pagingController.value.refresh();
-            _navigationController.hideNavBar.value = false;});
+            _navigationController.hideNavBar.value = isFromConv.value;
+            isFromConv.value = false;
+          });
         },
         userJoined: (int remoteUid, int elapsed) {
           timer.value = StopWatchTimer();
@@ -103,10 +103,8 @@ class CallsController extends GetxController{
   inviteCall(UserDTO user, String channel, String myID) async {
     userCalled.value = user;
     currentCallId.value = channel;
-    var voip = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
     await createCall(CallCreationDto(updatedAt: DateTime.now(), called: user.id!, status: 0, channel: channel));
     await retrieveTokenAgoraRTC(channel, "publisher", "userAccount", myID);
-    //await agoraEngine.value?.registerLocalUserAccount(tokenAgoraRTC.value, "63ad5f91c9b3f4001e421a51");
     await agoraEngine.value?.joinChannelWithUserAccount(tokenAgoraRTC.value, channel, myID);
   }
 
@@ -164,24 +162,6 @@ class CallsController extends GetxController{
       }
     });
   }
-
-  /*getCurrentCall() async {
-    var calls = await FlutterCallkitIncoming.activeCalls();
-    if (calls is List) {
-      if (calls.isNotEmpty) {
-        return calls[0];
-      } else {
-        return null;
-      }
-    }
-  }
-
-  checkAndNavigationCallingPage() async {
-    var currentCall = await getCurrentCall();
-    if (currentCall != null) {
-      Get.to(() => const ProfileScreen());
-    }
-  }*/
 
   createCall(CallCreationDto callCreationDto) async {
     var accessToken = box.read(con.ACCESS_TOKEN);

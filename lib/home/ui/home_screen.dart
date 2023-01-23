@@ -139,8 +139,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: _homeController.accessToken.value.isEmpty
                         ? Colors.transparent
                         : MediaQuery.of(context).platformBrightness == Brightness.dark
-                            ? Colors.transparent
-                            : Colors.transparent,
+                            ? Colors.white
+                            : Colors.black,
                   )),
             ],
           ),
@@ -830,56 +830,30 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
-
-
-
   YYDialog dialogPopMenu(BuildContext context) {
     return YYDialog().build(context)
-      ..width = 120
+      ..width = 180
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
-      ..barrierColor =
-      MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark
-          ? const Color(0xFF1E3244).withOpacity(0.95)
-          : Colors.white
+      ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
-        onTap: () {},
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                con.contactUsRes.tr,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
+        onTap: (){
+          dialogMenu.dismiss();
+          pushNewScreen(context, screen: const PDFScreen(isTermsAndConditions: false));
+        },
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.privacyPolicyRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
-        onTap: () {},
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                con.rulesRes.tr,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
+        onTap: (){
+          dialogMenu.dismiss();
+          pushNewScreen(context, screen: const PDFScreen(isTermsAndConditions: true));
+        },
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.termsAndConditionsRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..show();
   }

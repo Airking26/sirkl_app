@@ -233,7 +233,7 @@ class _MessageActionsModalState extends State<MessageActionsModal> {
                             onTap: _togglePin,
                             pinned: widget.message.pinned,
                           ),
-                        if (widget.showDeleteMessage)
+                        if (widget.showDeleteMessage || channel.isGroup && channel.extraData["owner"] != null && channel.extraData['owner'] == widget.wallet)
                           DeleteMessageButton(
                             isDeleteFailed: widget.message.status ==
                                 MessageSendingStatus.failed_delete,

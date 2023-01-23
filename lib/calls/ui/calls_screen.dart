@@ -172,7 +172,7 @@ class _CallsScreenState extends State<CallsScreen> {
       hint: 'Search here...',
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
-      transitionDuration: const Duration(milliseconds: 800),
+      transitionDuration: const Duration(milliseconds: 0),
       transitionCurve: Curves.easeInOut,
       physics: const BouncingScrollPhysics(),
       axisAlignment: 0.0,
@@ -194,7 +194,7 @@ class _CallsScreenState extends State<CallsScreen> {
       borderRadius: BorderRadius.circular(10),
       backgroundColor:
       MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF2D465E).withOpacity(1) : Colors.white,
-      debounceDelay: const Duration(milliseconds: 500),
+      debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) {
         pagingSearchController.itemList = [];
         pagingSearchController.refresh();

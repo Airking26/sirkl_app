@@ -7,7 +7,7 @@ class Language extends Translations{
     'en_US':{
       c.homeTabRes: "SIRKL",
       c.callsTabRes: "Calls",
-      c.groupsTabRes: "Community",
+      c.groupsTabRes: "Communities",
       c.chatsTabRes: "Inbox",
       c.profileTabRes: "Profile",
       c.profileMenuTabRes: "• Profile",

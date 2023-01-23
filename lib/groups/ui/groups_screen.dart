@@ -8,11 +8,13 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/model/nft_modification_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/profile/controller/profile_controller.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
 class GroupsScreen extends StatefulWidget {
@@ -31,12 +33,14 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
   final _chatController = Get.put(ChatsController());
   final _navigationController = Get.put(NavigationController());
   final _floatingSearchBarController = FloatingSearchBarController();
+  final _profileController = Get.put(ProfileController());
   StreamChannelListController? streamChannelListControllerGroups;
   StreamChannelListController? streamChannelListControllerGroupsFav;
+  late StreamChatClient client;
 
   StreamChannelListController buildStreamChannelListController(bool isFav){
     return StreamChannelListController(
-      client: StreamChat.of(context).client,
+      client: client,
       filter:
       _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ?
       isFav ?
@@ -82,24 +86,20 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   void initState() {
+    client = StreamChat.of(context).client;
     streamChannelListControllerGroups = buildStreamChannelListController(false);
     streamChannelListControllerGroupsFav = buildStreamChannelListController(true);
-    //_homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
     super.initState();
   }
 
   @override
   void dispose() {
     _groupController.index.value = 0;
-    //_homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
-    // streamChannelListControllerGroupsFav?.dispose();
-    //streamChannelListControllerGroups?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
     tabController = TabController(length: 2, vsync: this);
     tabController.index = _groupController.index.value;
     tabController.addListener(() {
@@ -129,14 +129,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     padding: const EdgeInsets.only(top:28.0),
                     child: SafeArea(
                       child: StreamChannelListView(
-                        errorBuilder: (context, error){
-                          var g = error;
-                          var t = error.message;
-                          return Container();
-                        },
                         channelSlidableEnabled: true,
                         onChannelFavPressed: (context, channel) async{
                           await channel.updatePartial(unset: ["${_homeController.id.value}_favorite"]);
+                          _homeController.isInFav.remove(channel.id);
+                          await _profileController.updateNft(NftModificationDto(contractAddress: channel.id!, id: _homeController.id.value, isFav: false), client);
                           streamChannelListControllerGroupsFav?.refresh();
                           streamChannelListControllerGroups?.refresh();
                         },
@@ -163,6 +160,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         channelFav: false,
                         onChannelFavPressed: (context, channel) async {
                           await channel.updatePartial(set: {"${_homeController.id.value}_favorite" : true});
+                          _homeController.isInFav.add(channel.id!);
+                          await _profileController.updateNft(NftModificationDto(contractAddress: channel.id!, id: _homeController.id.value, isFav: true), client);
                           streamChannelListControllerGroupsFav?.refresh();
                           streamChannelListControllerGroups?.refresh();
                         },

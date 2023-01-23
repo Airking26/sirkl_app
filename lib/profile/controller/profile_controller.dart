@@ -12,6 +12,7 @@ import 'package:ndialog/ndialog.dart';
 import 'package:simple_s3/simple_s3.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/nft_modification_dto.dart';
 import 'package:sirkl/common/model/notification_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -32,7 +33,6 @@ class ProfileController extends GetxController{
   Rx<UserDTO?> isUserExists = (null as UserDTO?).obs;
   var isCardExpanded = false.obs;
   Rx<Uint8List?> videoThumbnail = Uint8List(0).obs;
-  var isCardExpandedList = <int>[].obs;
   var isEditingProfile = false.obs;
   var isEditingProfileElse = false.obs;
   var isLoadingPicture = false.obs;
@@ -174,7 +174,7 @@ class ProfileController extends GetxController{
   retrieveNotifications(String id, int offset) async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request;
+    Response<List<dynamic>> request;
     try{
       request = await _profileService.retrieveNotifications(accessToken, id, offset.toString());
     } on CastError{
@@ -187,6 +187,32 @@ class ProfileController extends GetxController{
     }
     if(request.isOk) {
       return notificationDtoFromJson(json.encode(request.body));
+    }
+  }
+
+  updateNft(NftModificationDto nftModificationDto, StreamChatClient client) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _homeService.updateNFTStatus(accessToken, nftModificationDtoToJson(nftModificationDto));
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _homeService.updateNFTStatus(accessToken, nftModificationDtoToJson(nftModificationDto));
+      if(request.isOk){
+        if(nftModificationDto.isFav) {
+          await client.updateChannelPartial(nftModificationDto.contractAddress, 'try', set: {"${_homeController.id.value}_favorite" : true});
+        } else {
+          await client.updateChannelPartial(nftModificationDto.contractAddress, 'try', unset: ["${_homeController.id.value}_favorite"]);
+        }
+      }
+    } else if(request.isOk){
+      if(nftModificationDto.isFav) {
+        await client.updateChannelPartial(nftModificationDto.contractAddress, 'try', set: {"${_homeController.id.value}_favorite" : true});
+      } else {
+        await client.updateChannelPartial(nftModificationDto.contractAddress, 'try', unset: ["${_homeController.id.value}_favorite"]);
+      }
     }
   }
 

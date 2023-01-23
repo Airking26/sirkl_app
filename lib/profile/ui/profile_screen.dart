@@ -3,24 +3,25 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_badged/flutter_badge.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:light_compressor/light_compressor.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/model/collection_dto.dart';
+import 'package:sirkl/common/model/nft_dto.dart';
+import 'package:sirkl/common/model/nft_modification_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/home/ui/pdf_screen.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
-import 'package:video_player/video_player.dart';
 import '../../common/view/dialog/custom_dial.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -35,48 +36,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late final GalleryController controller;
   final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
-  final PagingController<int, CollectionDbDto> pagingController = PagingController(firstPageKey: 0);
+  final PagingController<int, NftDto> pagingController = PagingController(firstPageKey: 0);
   final _navigationController = Get.put(NavigationController());
   YYDialog dialogMenu = YYDialog();
   static var pageKey = 0;
   Utils utils = Utils();
 
-  final _defaultBackgrounds = [
-    const GradientBackground(colors: [Color(0xFF00C6FF), Color(0xFF0078FF)]),
-    const GradientBackground(colors: [Color(0xFFeb3349), Color(0xFFf45c43)]),
-    const GradientBackground(colors: [Color(0xFF26a0da), Color(0xFF314755)]),
-    const GradientBackground(colors: [Color(0xFFe65c00), Color(0xFFF9D423)]),
-    const GradientBackground(colors: [Color(0xFFfc6767), Color(0xFFec008c)]),
-    const GradientBackground(
-      colors: [Color(0xFF5433FF), Color(0xFF20BDFF), Color(0xFFA5FECB)],
-    ),
-    const GradientBackground(colors: [Color(0xFF334d50), Color(0xFFcbcaa5)]),
-    const GradientBackground(colors: [Color(0xFF1565C0), Color(0xFFb92b27)]),
-    const GradientBackground(
-      colors: [Color(0xFF0052D4), Color(0xFF4364F7), Color(0xFFA5FECB)],
-    ),
-    const GradientBackground(colors: [Color(0xFF2193b0), Color(0xFF6dd5ed)]),
-    const GradientBackground(colors: [Color(0xFF753a88), Color(0xFFcc2b5e)]),
-  ];
-
-  final _colors = [
-    Colors.white,
-    Colors.black,
-    Colors.red,
-    Colors.yellow,
-    Colors.blue,
-    Colors.teal,
-    Colors.green,
-    Colors.orange,
-  ];
-
   @override
   void initState(){
     controller = GalleryController();
     _profileController.checkIfHasUnreadNotif(_homeController.id.value);
-    pagingController.addPageRequestListener((pageKey) {
-      fetchNFTs();
-    });
+    pagingController.addPageRequestListener((pageKey) {fetchNFTs();});
     _profileController.usernameTextEditingController.value.text = _homeController.userMe.value.userName!.isEmpty ? _homeController.userMe.value.wallet!.substring(0, 20) : _homeController.userMe.value.userName!;
     _profileController.descriptionTextEditingController.value.text = _homeController.userMe.value.description == "" ? "" : _homeController.userMe.value.description!;
     _profileController.urlPicture.value = _homeController.userMe.value.picture == null ? "" : _homeController.userMe.value.picture!;
@@ -85,8 +55,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> fetchNFTs() async {
     try {
-      List<CollectionDbDto> newItems = await _homeController.getNFTsTemporary(_homeController.userMe.value.wallet!);
-      if (_homeController.cursor.value == "") {
+      List<NftDto> newItems = await _homeController.getNFT(_homeController.id.value, _homeController.isFavNftSelected.value, pageKey);
+      final isLastPage = newItems.length < 12;
+      if (isLastPage) {
         pagingController.appendLastPage(newItems);
       } else {
         final nextPageKey = pageKey++;
@@ -233,6 +204,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   utils.showToast(context, "Story has been posted");
                                 }
                               } else {
+                                final LightCompressor _lightCompressor = LightCompressor();
+                                final dynamic response = await _lightCompressor.compressVideo(
+                                  path: value.first.pickedFile!.path,
+                                  videoQuality: VideoQuality.medium,
+                                  isMinBitrateCheckEnabled: false,
+                                  video: Video(videoName: "videoName"),
+                                  android: AndroidConfig(isSharedStorage: true, saveAt: SaveAt.Movies),
+                                  ios: IOSConfig(saveInGallery: true),);
                                 if(await _profileController.postStory(value.first.pickedFile!, value.first.type == AssetType.image ? 0 : 1)){
                                   utils.showToast(context, "Story has been posted");
                                 }
@@ -261,7 +240,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 90,),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 48.0),
-              child: Text("Wallet: ${_homeController.userMe.value.wallet!.substring(0,20)}...",overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF00CB7D), fontSize: 15),),
+              child: InkWell(
+                onTap: () async {
+                  await Clipboard.setData(ClipboardData(text: _homeController.userMe.value.wallet!));
+                  // ignore: use_build_context_synchronously
+                  utils.showToast(context, con.walletCopiedRes.tr);
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("${_homeController.userMe.value.wallet!.substring(0,6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}",overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF00CB7D), fontSize: 15),),
+                    const SizedBox(width: 4,),
+                    Image.asset("assets/images/copy.png", height: 18, width: 18, color: const Color(0xFF00CB7D),)
+                  ],
+                ),
+              ),
             ),
             const SizedBox(height: 10,),
             Padding(
@@ -289,12 +282,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 10,),
             Padding(
               padding: const EdgeInsets.only(left: 24.0, right: 24),
-              child: _homeController.nfts.value.isNotEmpty ?
+              child: _homeController.iHaveNft.value ?
               Row(
                 children: [
                   Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),)),
                   const Spacer(),
-                  const Icon(Icons.star_border_rounded)
+                  IconButton(icon: Icon(_homeController.isFavNftSelected.value ? Icons.star_rounded : Icons.star_border_rounded, color: _homeController.isFavNftSelected.value ? const Color(0xFF00CB7D) : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,), onPressed: () {
+                    pageKey = 0;
+                    _homeController.isFavNftSelected.value = !_homeController.isFavNftSelected.value;
+                    pagingController.refresh();
+                  },)
                 ],
               ) :
               Container(),
@@ -308,13 +305,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: SafeArea(
                     child: PagedListView(
                       pagingController: pagingController,
-                        builderDelegate: PagedChildBuilderDelegate<CollectionDbDto>(
+                        builderDelegate: PagedChildBuilderDelegate<NftDto>(
                           firstPageProgressIndicatorBuilder: (context) => const Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
                           newPageProgressIndicatorBuilder: (context) => const Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
                           ),
-                            itemBuilder:  (context, item, index) => CardNFT(item, _profileController, index)),
+                            itemBuilder:  (context, item, index) => CardNFT(item, index, pagingController)
+                        ),
                     ),
                   ),
                 ),
@@ -324,11 +322,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         )));
   }
 
-
-
   YYDialog dialogPopMenu(BuildContext context) {
     return YYDialog().build(context)
-      ..width = 180
+      ..width = 140
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
       ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
@@ -357,26 +353,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _homeController.accessToken.value = "";
           _navigationController.controller.value.jumpToTab(0);
         },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.logoutRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){
-          dialogMenu.dismiss();
-          pushNewScreen(context, screen: const PDFScreen(isTermsAndConditions: false));
-        },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.privacyPolicyRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){
-          dialogMenu.dismiss();
-          pushNewScreen(context, screen: const PDFScreen(isTermsAndConditions: true));
-        },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.termsAndConditionsRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.logoutRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..show();
   }
@@ -391,10 +369,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class CardNFT extends StatefulWidget {
-  final CollectionDbDto collectionDbDTO;
-  final ProfileController profileController;
+  final NftDto nftDto;
   final int index;
-  CardNFT(this.collectionDbDTO, this.profileController, this.index, {Key? key}) : super(key: key);
+  final PagingController pagingController;
+  const CardNFT(this.nftDto, this.index, this.pagingController, {Key? key}) : super(key: key);
 
   @override
   State<CardNFT> createState() => _CardNFTState();
@@ -402,17 +380,15 @@ class CardNFT extends StatefulWidget {
 
 class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
 
+  final profileController = Get.put(ProfileController());
+  final homeController = Get.put(HomeController());
+
     @override
     bool get wantKeepAlive => true;
 
     @override
-  void initState() {
-      //widget.profileController.getThumbnail(widget.collectionDbDTO.collectionImages[0]);
-    super.initState();
-  }
-
-    @override
     Widget build(BuildContext context) {
+      super.build(context);
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 6),
         child: Container(
@@ -429,40 +405,37 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
           ),
           child: ExpansionTile(
             leading: ClipRRect(borderRadius: BorderRadius.circular(90), child:
-            CachedNetworkImage(imageUrl: widget.collectionDbDTO.collectionImage, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+            CachedNetworkImage(imageUrl: widget.nftDto.collectionImage!, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
-            trailing: Obx(() => Image.asset(
-              widget.profileController.isCardExpandedList.value.contains(widget.index) ?
-              "assets/images/arrow_up_rev.png" :
-              "assets/images/arrow_down_rev.png",
-              color: Get.isDarkMode ? Colors.white : Colors.black, height: 20, width: 20,),),
-            title: Text(widget.collectionDbDTO.collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Get.isDarkMode ? Colors.white : Colors.black)),
-            subtitle: Text("${widget.collectionDbDTO.collectionImages.length} available", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
-            onExpansionChanged: (expanded){
-              if(expanded) {
-                widget.profileController.isCardExpandedList.value.assign(widget.index);
+            trailing:
+            Obx(() => homeController.isFavNftSelected.value ? const SizedBox(width: 0, height: 0,) : IconButton(icon: Icon(homeController.isInFav.contains(widget.nftDto.contractAddress) ? Icons.star_rounded : Icons.star_border_rounded, size: 18, color: homeController.isInFav.contains(widget.nftDto.contractAddress) ? const Color(0xff00CB7D) : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black), onPressed: () async {
+              if(homeController.isInFav.contains(widget.nftDto.contractAddress)){
+                homeController.isInFav.remove(widget.nftDto.contractAddress);
               } else {
-                widget.profileController.isCardExpandedList.value.remove(widget.index);
+                homeController.isInFav.add(widget.nftDto.contractAddress!);
               }
-              widget.profileController.isCardExpandedList.refresh();
-            },
+              widget.pagingController.notifyListeners();
+              await profileController.updateNft(NftModificationDto(contractAddress: widget.nftDto.contractAddress!, id: homeController.id.value, isFav: !widget.nftDto.isFav!), StreamChat.of(context).client);
+            },)),
+            title: Text(widget.nftDto.title!, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark  ? Colors.white : Colors.black)),
+            subtitle: Text("${widget.nftDto.images!.length} available", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
             children: [
               Padding(
                 padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
                 child: SizedBox(height: 80,
                     child: ListView.builder(
-                  itemCount: widget.collectionDbDTO.collectionImages.length,
+                  itemCount: widget.nftDto.images!.length,
                   itemBuilder: (context, i){
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
                       child: InkWell(
                         onTap: (){
-                          if(widget.profileController.isEditingProfile.value) widget.profileController.urlPicture.value = widget.collectionDbDTO.collectionImages[i];
+                          if(profileController.isEditingProfile.value) profileController.urlPicture.value = widget.nftDto.images![i];
                         },
                         child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: SizedBox.fromSize(
-                                child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: widget.collectionDbDTO.collectionImages[i], width: 80, height: 70,
+                                child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: widget.nftDto.images![i], width: 80, height: 70,
                                     placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                                     errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
                       ),

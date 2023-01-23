@@ -912,6 +912,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.2"
+  light_compressor:
+    dependency: "direct main"
+    description:
+      name: light_compressor
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   linkify:
     dependency: transitive
     description:
@@ -1449,13 +1456,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
-  story:
-    dependency: "direct main"
-    description:
-      name: story
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.8.0"
   story_view:
     dependency: "direct main"
     description:
@@ -1926,5 +1926,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.18.2 <3.0.0"
+  dart: ">=2.18.5 <3.0.0"
   flutter: ">=3.3.0"

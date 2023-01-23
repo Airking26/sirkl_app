@@ -72,6 +72,7 @@ class _GalleryHeaderState extends State<GalleryHeader> {
                     child: _IconButton(
                       iconData: Icons.close,
                       onPressed: widget.onClose,
+                      size: 36,
                     ),
                   ),
                 ),
@@ -103,17 +104,12 @@ class _GalleryHeaderState extends State<GalleryHeader> {
                           builder: (value, child) {
                             return InkWell(
                               onTap: () {
-                                if (_controller.value.isAlbumVisible) {
-                                  widget.onAlbumToggle(true);
-                                } else {
-                                  _controller.toogleMultiSelection();
-                                }
                               },
                               child: Icon(
                                 CupertinoIcons.rectangle_stack,
                                 color: value.enableMultiSelection
-                                    ? Colors.white
-                                    : Colors.white38,
+                                    ? Colors.transparent
+                                    : Colors.transparent,
                               ),
                             );
                           },

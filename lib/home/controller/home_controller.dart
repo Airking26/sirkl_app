@@ -7,14 +7,12 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/service/chats_service.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
-import 'package:sirkl/common/model/moralis_metadata_dto.dart';
 import 'package:sirkl/common/model/moralis_nft_contract_addresse.dart';
-import 'package:sirkl/common/model/moralis_root_dto.dart';
 import 'package:sirkl/common/model/nft_alchemy_dto.dart';
+import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
@@ -42,31 +40,32 @@ class HomeController extends GetxController{
   final _navigationController = Get.put(NavigationController());
   final _commonController = Get.put(CommonController());
 
-  Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
   final box = GetStorage();
 
+  var sessionStatus;
+  var _uri;
+
+  Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
+  RxList<String> contractAddresses = <String>[].obs;
+  Rx<PagingController<int, List<StoryDto?>?>> pagingController = PagingController<int, List<StoryDto?>?>(firstPageKey: 0).obs;
+
   var id = "".obs;
-  var indexBarHeight = 400.0.obs;
   var isConfiguring = false.obs;
   var accessToken = "".obs;
   var userMe = UserDTO().obs;
   var isLoadingNfts = true.obs;
   var address = "".obs;
-  var isUserExists = false.obs;
-  var nfts = <CollectionDbDto>[].obs;
   var signPage = false.obs;
   var indexStory = 0.obs;
   var actualStoryIndex = 0.obs;
   var controllerConnected = false.obs;
   var loadingStories = true.obs;
-  var sessionStatus;
-  var _uri;
-  RxList<String> contractAddresses = <String>[].obs;
-  var cursor = "".obs;
-  var cursorElse = "".obs;
-  Rx<PagingController<int, List<StoryDto?>?>> pagingController = PagingController<int, List<StoryDto?>?>(firstPageKey: 0).obs;
   var pageKey = 0.obs;
   var nicknames = {}.obs;
+  var iHaveNft = false.obs;
+  var heHasNft = false.obs;
+  var isInFav = <String>[].obs;
+  var isFavNftSelected = false.obs;
 
   final connector = WalletConnect(
     bridge: 'https://bridge.walletconnect.org',
@@ -79,6 +78,20 @@ class HomeController extends GetxController{
       ],
     ),
   );
+
+  retrieveAccessToken(){
+    var accessTok = box.read(con.ACCESS_TOKEN);
+    accessToken.value = accessTok ?? '';
+    var checkBoxRead = box.read(con.contractAddresses);
+    if(checkBoxRead != null) {
+      contractAddresses.value = box.read(con.contractAddresses).cast<String>() ?? [];
+    } else {
+      contractAddresses.value = [];
+    }
+    var d = box.read(con.USER);
+    userMe.value = d != null ? userFromJson(box.read(con.USER) ?? "") : UserDTO();
+    id.value = d != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
+  }
 
   connectWallet(BuildContext context) async {
 
@@ -102,7 +115,6 @@ class HomeController extends GetxController{
       );
     }
   }
-
   String generateSessionMessage(String accountAddress) {
     String message =
         'Hello $accountAddress, welcome to our app. By signing this message you agree to learn and have fun with blockchain';
@@ -111,7 +123,6 @@ class HomeController extends GetxController{
 
     return hashString;
   }
-
   signMessageWithMetamask(BuildContext context) async {
     if (connector.connected) {
       try {
@@ -129,7 +140,6 @@ class HomeController extends GetxController{
       }
     }
   }
-
   loginWithWallet(BuildContext context, String wallet, String message, String signature) async{
     var request = await _homeService.verifySignature(walletConnectDtoToJson(WalletConnectDto(wallet: wallet, message: message, signature: signature)));
     if(request.isOk){
@@ -143,6 +153,7 @@ class HomeController extends GetxController{
       isConfiguring.value = true;
       // ignore: use_build_context_synchronously
       await putFCMToken(context, StreamChat.of(context).client);
+      await getAllNftConfig();
       await retrieveInboxes();
     }
   }
@@ -198,20 +209,6 @@ class HomeController extends GetxController{
     }
   }
 
-  retrieveAccessToken(){
-    var accessTok = box.read(con.ACCESS_TOKEN);
-    accessToken.value = accessTok ?? '';
-    var checkBoxRead = box.read(con.contractAddresses);
-    if(checkBoxRead != null) {
-      contractAddresses.value = box.read(con.contractAddresses).cast<String>() ?? [];
-    } else {
-      contractAddresses.value = [];
-    }
-    var d = box.read(con.USER);
-    userMe.value = d != null ? userFromJson(box.read(con.USER) ?? "") : UserDTO();
-    id.value = d != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
-  }
-
   getNFTsContractAddresses(StreamChatClient? client, String wallet) async{
     var stockedContractAddresses = box.read(con.contractAddresses) ?? [];
     var req = await _homeService.getNFTsContractAddresses(wallet);
@@ -241,45 +238,37 @@ class HomeController extends GetxController{
     }
   }
 
-  getNFTsTemporary(String wallet) async{
-    nfts.value.clear();
-    var req = await _homeService.getNextNFTByAlchemy(wallet, cursor.value);
-    var res = nftAlchemyDtoFromJson(json.encode(req.body));
-    res.pageKey == null || res.pageKey!.isEmpty ? cursor.value = "" : cursor.value = res.pageKey!;
-    res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty || element.contractMetadata!.openSea!.collectionName == null ||  element.contractMetadata!.openSea!.collectionName!.isEmpty ||  element.contractMetadata!.openSea!.collectionName! == "Secret FLClub Pass");
-    var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
-    gc?.forEach((key, value) {
-      nfts.add(CollectionDbDto(collectionName: value.first.contractMetadata!.openSea!.collectionName!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
-    });
-    return nfts;
+  getAllNftConfig() async{
+    await _homeService.getAllNFTConfig(accessToken.value);
   }
 
-  getNFTsTemporaryForOthers(String wallet) async{
-    nfts.value.clear();
-    var req = await _homeService.getNextNFTByAlchemy(wallet, cursorElse.value);
-    var res = nftAlchemyDtoFromJson(json.encode(req.body));
-    res.pageKey == null || res.pageKey!.isEmpty ? cursorElse.value = "" : cursorElse.value = res.pageKey!;
-    res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty || element.contractMetadata!.openSea!.collectionName == null ||  element.contractMetadata!.openSea!.collectionName!.isEmpty ||  element.contractMetadata!.openSea!.collectionName! == "Secret FLClub Pass");
-    var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
-    gc?.forEach((key, value) {
-      nfts.add(CollectionDbDto(collectionName: value.first.contractMetadata!.openSea!.collectionName!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
-    });
-    return nfts;
-  }
-
-  retrieveInboxes() async{
+  getNFT(String id, bool isFav, int offset) async{
+    if(offset == 0) isInFav.clear();
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var req = await _chatService.walletsToMessages(accessToken);
-    if(req.statusCode == 401){
+    Response<List<dynamic>> request;
+    try{
+      request = await _homeService.retrieveNFTs(accessToken, id, isFav, offset.toString());
+    } on CastError {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      req = await _chatService.walletsToMessages(accessToken);
-      if(req.isOk) isConfiguring.value = false;
-    } else if(req.isOk) {
-      isConfiguring.value = false;
+      request = await _homeService.retrieveNFTs(accessToken, id, isFav, offset.toString());
+    }
+
+    if(request.isOk){
+      if(request.body != null && request.body!.isNotEmpty){
+        if(id == this.id.value) {
+          iHaveNft.value = true;
+        } else {
+          heHasNft.value = true;
+        }
+      }
+      var nft = nftDtoFromJson(json.encode(request.body));
+      isInFav.addAll(nft.where((element) => element.isFav!).map((e) => e.contractAddress!).toList());
+     return nft;
     }
   }
 
@@ -301,6 +290,45 @@ class HomeController extends GetxController{
       }}
     else if (request.isOk) {
       userMe.value = userFromJson(json.encode(request.body));
+    }
+  }
+  updateStory(StoryModificationDto storyModificationDto) async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _homeService.updateStory(accessToken, storyModificationDtoToJson(storyModificationDto));
+    if(request.statusCode == 401) {
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _homeService.updateStory(accessToken, storyModificationDtoToJson(storyModificationDto));
+      if(request.isOk) {
+        stories.value?[actualStoryIndex.value]?.where((element) => element?.id == storyModificationDto.id).first?.readers = storyModificationDto.readers;
+        stories.refresh();
+      }
+    } else if(request.isOk) {
+      stories.value?[actualStoryIndex.value]?.where((element) => element?.id == storyModificationDto.id).first?.readers = storyModificationDto.readers;
+      stories.refresh();
+    }
+  }
+  updateNickname(String wallet, String nickname) async {
+    if(nicknames[wallet] != nickname) {
+      nicknames[wallet] = nickname;
+      nicknames.refresh();
+      _commonController.users.refresh();
+      var accessToken = box.read(con.ACCESS_TOKEN);
+      var refreshToken = box.read(con.REFRESH_TOKEN);
+      var request = await _homeService.updateNicknames(
+          accessToken, wallet, nickname);
+      if (request.statusCode == 401) {
+        var requestToken = await _homeService.refreshToken(refreshToken);
+        var refreshTokenDTO = refreshTokenDtoFromJson(
+            json.encode(requestToken.body));
+        accessToken = refreshTokenDTO.accessToken!;
+        box.write(con.ACCESS_TOKEN, accessToken);
+        await _homeService.updateNicknames(accessToken, wallet, nickname);
+      }
     }
   }
 
@@ -326,8 +354,8 @@ class HomeController extends GetxController{
           controllerConnected.value = true;
           if (firebaseMessaging != null) {
             await client.addDevice(
-              firebaseMessaging, PushProvider.firebase,
-              pushProviderName: "Firebase_Config");
+                firebaseMessaging, PushProvider.firebase,
+                pushProviderName: "Firebase_Config");
           }
         }
       } else if (request.isOk) {
@@ -339,18 +367,32 @@ class HomeController extends GetxController{
         controllerConnected.value = true;
         if (firebaseMessaging != null) {
           await client.addDevice(
-            firebaseMessaging, PushProvider.firebase,
-            pushProviderName: "Firebase_Config");
+              firebaseMessaging, PushProvider.firebase,
+              pushProviderName: "Firebase_Config");
         }
       }
     }
   }
-
+  retrieveNicknames() async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _homeService.retrieveNicknames(accessToken);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      if(request.isOk) nicknames.value = request.body!;
+    } else if(request.isOk) {
+      nicknames.value = request.body!;
+    }
+  }
   retrieveStories(int offset) async {
     if(offset == 0) stories.value?.clear();
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request;
+    Response<List> request;
     try{
       request = await _homeService.retrieveStories(accessToken, offset.toString());
     } on CastError{
@@ -373,68 +415,47 @@ class HomeController extends GetxController{
       loadingStories.value = false;
     }
   }
-
-  updateStory(StoryModificationDto storyModificationDto) async {
+  retrieveInboxes() async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.updateStory(accessToken, storyModificationDtoToJson(storyModificationDto));
-    if(request.statusCode == 401) {
+    var req = await _chatService.walletsToMessages(accessToken);
+    if(req.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _homeService.updateStory(accessToken, storyModificationDtoToJson(storyModificationDto));
-      if(request.isOk) {
-        stories.value?[actualStoryIndex.value]?.where((element) => element?.id == storyModificationDto.id).first?.readers = storyModificationDto.readers;
-        stories.refresh();
-      }
-    } else if(request.isOk) {
-      stories.value?[actualStoryIndex.value]?.where((element) => element?.id == storyModificationDto.id).first?.readers = storyModificationDto.readers;
-      stories.refresh();
-    }
+      req = await _chatService.walletsToMessages(accessToken);
+      if(req.isOk) isConfiguring.value = false;
+      else isConfiguring.value = false;
+    } else if(req.isOk) {
+      isConfiguring.value = false;
+    } else isConfiguring.value = false;
   }
 
-  updateNickname(String wallet, String nickname) async {
-    if(nicknames[wallet] != nickname) {
-      nicknames[wallet] = nickname;
-      nicknames.refresh();
-      _commonController.users.refresh();
-      var accessToken = box.read(con.ACCESS_TOKEN);
-      var refreshToken = box.read(con.REFRESH_TOKEN);
-      var request = await _homeService.updateNicknames(
-          accessToken, wallet, nickname);
-      if (request.statusCode == 401) {
-        var requestToken = await _homeService.refreshToken(refreshToken);
-        var refreshTokenDTO = refreshTokenDtoFromJson(
-            json.encode(requestToken.body));
-        accessToken = refreshTokenDTO.accessToken!;
-        box.write(con.ACCESS_TOKEN, accessToken);
-        await _homeService.updateNicknames(accessToken, wallet, nickname);
-      }
-    }
+/*getNFTsTemporary(String wallet) async{
+    nfts.value.clear();
+    var req = await _homeService.getNextNFTByAlchemy(wallet, cursor.value);
+    var res = nftAlchemyDtoFromJson(json.encode(req.body));
+    res.pageKey == null || res.pageKey!.isEmpty ? cursor.value = "" : cursor.value = res.pageKey!;
+    res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty || element.contractMetadata!.openSea!.collectionName == null ||  element.contractMetadata!.openSea!.collectionName!.isEmpty ||  element.contractMetadata!.openSea!.collectionName! == "Secret FLClub Pass");
+    var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
+    gc?.forEach((key, value) {
+      nfts.add(CollectionDbDto(collectionName: value.first.contractMetadata!.openSea!.collectionName!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
+    });
+    return nfts;
   }
 
-  retrieveNicknames() async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.retrieveNicknames(accessToken);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      if(request.isOk) nicknames.value = request.body!;
-    } else if(request.isOk) nicknames.value = request.body!;
-  }
+  getNFTsTemporaryForOthers(String wallet) async{
+    nfts.value.clear();
+    var req = await _homeService.getNextNFTByAlchemy(wallet, cursorElse.value);
+    var res = nftAlchemyDtoFromJson(json.encode(req.body));
+    res.pageKey == null || res.pageKey!.isEmpty ? cursorElse.value = "" : cursorElse.value = res.pageKey!;
+    res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty || element.contractMetadata!.openSea!.collectionName == null ||  element.contractMetadata!.openSea!.collectionName!.isEmpty ||  element.contractMetadata!.openSea!.collectionName! == "Secret FLClub Pass");
+    var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
+    gc?.forEach((key, value) {
+      nfts.add(CollectionDbDto(collectionName: value.first.contractMetadata!.openSea!.collectionName!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
+    });
+    return nfts;
+  }*/
 
-
-}
-
-extension Iterables<E> on Iterable<E> {
-  Map<K, List<E>> groupBy<K>(K Function(E) keyFunction) => fold(
-      <K, List<E>>{},
-          (Map<K, List<E>> map, E element) =>
-      map..putIfAbsent(keyFunction(element), () => <E>[]).add(element));
 }

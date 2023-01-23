@@ -6,13 +6,13 @@ import 'package:video_trimmer/video_trimmer.dart';
 class TrimmerView extends StatefulWidget {
   final File file;
 
-  const TrimmerView(this.file);
+  const TrimmerView(this.file, {super.key});
 
   @override
-  _TrimmerViewState createState() => _TrimmerViewState();
+  TrimmerViewState createState() => TrimmerViewState();
 }
 
-class _TrimmerViewState extends State<TrimmerView> {
+class TrimmerViewState extends State<TrimmerView> {
   final Trimmer _trimmer = Trimmer();
 
   double _startValue = 0.0;

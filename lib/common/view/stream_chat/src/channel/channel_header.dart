@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
@@ -148,26 +149,13 @@ class StreamChannelHeader extends StatelessWidget
   final _chatController = Get.put(ChatsController());
   final _groupController = Get.put(GroupsController());
   final _profileController = Get.put(ProfileController());
+  final _callController = Get.put(CallsController());
   final utils = Utils();
 
 
   @override
   Widget build(BuildContext context) {
-    final effectiveCenterTitle = getEffectiveCenterTitle(
-      Theme.of(context),
-      actions: actions,
-      centerTitle: centerTitle,
-    );
     final channel = StreamChannel.of(context).channel;
-    final channelHeaderTheme = StreamChannelHeaderTheme.of(context);
-
-    final leadingWidget = leading ??
-        (showBackButton
-            ? StreamBackButton(
-                onPressed: onBackPressed,
-                showUnreadCount: true,
-              )
-            : const SizedBox());
 
     return StreamConnectionStatusBuilder(
       statusBuilder: (context, status) {
@@ -219,7 +207,7 @@ class StreamChannelHeader extends StatelessWidget
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
-                      width: 300,
+                      width: channel.isGroup ? 300 : 280,
                       height: 50,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -271,7 +259,7 @@ class StreamChannelHeader extends StatelessWidget
                                     width: 40,
                                     height: 40,
                                     fit: BoxFit.cover,
-                                      placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+                                      placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                                   ) :
                                       channel.image == null ?
@@ -282,7 +270,7 @@ class StreamChannelHeader extends StatelessWidget
                                     width: 40,
                                     height: 40,
                                     fit: BoxFit.cover,
-                                      placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+                                      placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                                   )
                               )
@@ -353,12 +341,36 @@ class StreamChannelHeader extends StatelessWidget
                         ],
                       ),
                     ),
+                    channel.isGroup ? Container() : Transform.translate(
+                      offset: const Offset(16, 1),
+                      child: IconButton(onPressed: () async {
+                        _callController.userCalled.value = userFromJson(
+                            json.encode(channel.state?.members
+                                .where((element) =>
+                            element.userId != StreamChat
+                                .of(context)
+                                .currentUser!
+                                .id)
+                                .first
+                                .user!
+                                .extraData["userDTO"]));
+                        _callController.isFromConv.value = true;
+                        await _callController.inviteCall(_callController.userCalled.value, DateTime.now().toString(), _homeController.id.value);
+                      }, icon: Image.asset(
+                        "assets/images/call_tab.png",
+                        width: 24,
+                        height: 24,
+                        color:
+                        MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                      )),
+                    ),
                     (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ? Container() : IconButton(
                         onPressed: () {
                           dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
                         },
                         icon: Image.asset(
                           "assets/images/more.png",
+
                           color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                         )),
                   ],
@@ -413,7 +425,7 @@ class StreamChannelHeader extends StatelessWidget
       ..widget(InkWell(
         onTap: () async{
           _commonController.userClicked.value = await _profileController.getUserByWallet(channel.extraData["owner"] as String);
-          if(_commonController.userClicked.value!.wallet != channel.extraData["owner"] as String) pushNewScreen(context, screen: DetailedChatScreen(create: true));
+          if(_commonController.userClicked.value!.wallet != channel.extraData["owner"] as String) pushNewScreen(context, screen: const DetailedChatScreen(create: true));
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
@@ -482,7 +494,7 @@ class StreamChannelHeader extends StatelessWidget
                     : con.addToMySirklRes.tr,
                 style: TextStyle(
                     fontSize: 14,
-                    color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) :Color(0xff00CB7D),
+                    color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) :const Color(0xff00CB7D),
                     fontFamily: "Gilroy",
                     fontWeight: FontWeight.w600),
               )),
