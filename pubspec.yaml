@@ -31,7 +31,6 @@ dependencies:
   thumblr: ^0.0.4
   video_player: ^2.4.5
   video_player_macos: ^1.0.6
-  video_thumbnail: ^0.5.0
   cupertino_icons: ^1.0.2
   get: ^4.6.3
   get_storage: ^2.0.3
@@ -90,7 +89,6 @@ dependencies:
   camera: ^0.10.1
   video_trimmer: ^2.0.0
   ndialog: ^4.2.3
-  light_compressor: ^2.0.1
 
 dev_dependencies:
   dart_code_metrics: ^4.4.0
@@ -179,6 +177,7 @@ flutter:
      - assets/images/call_end.svg
      - assets/pdf/tc.pdf
      - assets/pdf/pp.pdf
+     - assets/pdf/all.pdf
      - animations/
      - svgs/
      - lib/svgs/

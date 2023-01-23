@@ -20,6 +20,7 @@ class Language extends Translations{
       c.editProfileRes: "• Edit profile",
       c.contactUsRes: "• Contact us",
       c.termsAndConditionsRes: "• Terms & Conditions",
+      c.legalRes: "• Legal",
       c.privacyPolicyRes: "• Privacy Policy",
       c.logoutRes: "• Logout",
       c.noGroupYetRes: "No Groups Yet",

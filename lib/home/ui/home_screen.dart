@@ -37,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final _commonController = Get.put(CommonController());
   final _callController = Get.put(CallsController());
   final _navigationController = Get.put(NavigationController());
-  YYDialog dialogMenu = YYDialog();
   final utils = Utils();
   final storyController = StoryController();
 
@@ -132,15 +131,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                   onPressed: () {
-                    dialogMenu = dialogPopMenu(context);
                   },
                   icon: Image.asset(
                     "assets/images/more.png",
                     color: _homeController.accessToken.value.isEmpty
                         ? Colors.transparent
                         : MediaQuery.of(context).platformBrightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
+                            ? Colors.transparent
+                            : Colors.transparent,
                   )),
             ],
           ),
@@ -569,7 +567,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, HighlightedWord> words = {
     "terms and conditions": HighlightedWord(
       onTap: () {
-        Get.to(() => const PDFScreen(isTermsAndConditions : true));
+        Get.to(() => const PDFScreen(isTermsAndConditions : 0));
       },
       textStyle: const TextStyle(
           color: Color(0xFF00CB7D),
@@ -579,7 +577,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     "privacy policy": HighlightedWord(
       onTap: () {
-        Get.to(() => const PDFScreen(isTermsAndConditions : false));
+        Get.to(() => const PDFScreen(isTermsAndConditions : 1));
       },
       textStyle: const TextStyle(
           color: Color(0xFF00CB7D),
@@ -827,35 +825,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _homeController.stories.value = [];
     _homeController.pagingController.value.dispose();
     super.dispose();
-  }
-
-
-  YYDialog dialogPopMenu(BuildContext context) {
-    return YYDialog().build(context)
-      ..width = 180
-      ..borderRadius = 10.0
-      ..gravity = Gravity.rightTop
-      ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
-      ..margin = const EdgeInsets.only(top: 90, right: 20)
-      ..widget(InkWell(
-        onTap: (){
-          dialogMenu.dismiss();
-          pushNewScreen(context, screen: const PDFScreen(isTermsAndConditions: false));
-        },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.privacyPolicyRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){
-          dialogMenu.dismiss();
-          pushNewScreen(context, screen: const PDFScreen(isTermsAndConditions: true));
-        },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.termsAndConditionsRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..show();
   }
 
 }

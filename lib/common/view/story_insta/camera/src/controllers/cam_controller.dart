@@ -412,8 +412,6 @@ class CamController extends ValueNotifier<CamValue> {
               var tempFile = await drishyaEntity.file;
               pushNewScreen(context, screen: TrimmerView(tempFile!)).then((value) async{
                 final dreish = drishyaEntity.copyWith(pickedFile: value[0]);
-                var p = tempFile.lengthSync();
-                var t = (value[0] as File).lengthSync();
                 navigator.pop([dreish]);
               }
               );

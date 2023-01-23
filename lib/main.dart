@@ -78,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
   @override
   void initState() {
-    _homeController.putFCMToken(context, widget.client);
+    _homeController.putFCMToken(context, widget.client, true);
     initFirebase();
     _callController.setupVoiceSDKEngine(context);
     getCurrentCall();

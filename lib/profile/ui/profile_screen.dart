@@ -8,7 +8,6 @@ import 'package:flutter_badged/flutter_badge.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:light_compressor/light_compressor.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/nft_dto.dart';
@@ -23,6 +22,7 @@ import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
+import '../../home/ui/pdf_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -204,14 +204,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   utils.showToast(context, "Story has been posted");
                                 }
                               } else {
-                                final LightCompressor _lightCompressor = LightCompressor();
-                                final dynamic response = await _lightCompressor.compressVideo(
-                                  path: value.first.pickedFile!.path,
-                                  videoQuality: VideoQuality.medium,
-                                  isMinBitrateCheckEnabled: false,
-                                  video: Video(videoName: "videoName"),
-                                  android: AndroidConfig(isSharedStorage: true, saveAt: SaveAt.Movies),
-                                  ios: IOSConfig(saveInGallery: true),);
                                 if(await _profileController.postStory(value.first.pickedFile!, value.first.type == AssetType.image ? 0 : 1)){
                                   utils.showToast(context, "Story has been posted");
                                 }
@@ -353,8 +345,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _homeController.accessToken.value = "";
           _navigationController.controller.value.jumpToTab(0);
         },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.logoutRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: (){
+          dialogMenu.dismiss();
+          pushNewScreen(context, screen: const PDFScreen(isTermsAndConditions: 2));
+        },
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text(con.legalRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..show();
   }

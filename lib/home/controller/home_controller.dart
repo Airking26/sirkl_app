@@ -152,13 +152,13 @@ class HomeController extends GetxController{
       box.write(con.USER, userToJson(signSuccess.user!));
       isConfiguring.value = true;
       // ignore: use_build_context_synchronously
-      await putFCMToken(context, StreamChat.of(context).client);
+      await putFCMToken(context, StreamChat.of(context).client, false);
       await getAllNftConfig();
       await retrieveInboxes();
     }
   }
 
-  putFCMToken(BuildContext context, StreamChatClient client) async {
+  putFCMToken(BuildContext context, StreamChatClient client,bool isLogged) async {
     retrieveAccessToken();
     if(accessToken.value.isNotEmpty) {
       final firebaseMessaging = await FirebaseMessaging.instance.getToken();
@@ -181,9 +181,10 @@ class HomeController extends GetxController{
           userMe.value = userFromJson(json.encode(request.body));
           box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
           retrieveAccessToken();
+          if(isLogged) updateAllNftConfig();
           await retrieveTokenStreamChat(client, firebaseMessaging!);
           await retrieveNicknames();
-          _commonController.showSirklUsers(id.value);
+          await _commonController.showSirklUsers(id.value);
           if(Platform.isIOS) {
             var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
             await _homeService.uploadAPNToken(accessToken, token);
@@ -194,9 +195,10 @@ class HomeController extends GetxController{
         userMe.value = userFromJson(json.encode(request.body));
         box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
         retrieveAccessToken();
+        if(isLogged) updateAllNftConfig();
         await retrieveTokenStreamChat(client, firebaseMessaging!);
         await retrieveNicknames();
-        _commonController.showSirklUsers(id.value);
+        await _commonController.showSirklUsers(id.value);
         if(Platform.isIOS) {
           var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
           await _homeService.uploadAPNToken(accessToken, token);
@@ -240,6 +242,10 @@ class HomeController extends GetxController{
 
   getAllNftConfig() async{
     await _homeService.getAllNFTConfig(accessToken.value);
+  }
+
+  updateAllNftConfig() {
+    _homeService.updateAllNFTConfig(accessToken.value);
   }
 
   getNFT(String id, bool isFav, int offset) async{
@@ -425,11 +431,16 @@ class HomeController extends GetxController{
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       req = await _chatService.walletsToMessages(accessToken);
-      if(req.isOk) isConfiguring.value = false;
-      else isConfiguring.value = false;
+      if(req.isOk) {
+        isConfiguring.value = false;
+      } else {
+        isConfiguring.value = false;
+      }
     } else if(req.isOk) {
       isConfiguring.value = false;
-    } else isConfiguring.value = false;
+    } else {
+      isConfiguring.value = false;
+    }
   }
 
 /*getNFTsTemporary(String wallet) async{
