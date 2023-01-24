@@ -17,6 +17,7 @@ class Language extends Translations{
       c.bySigningRes: "For your security, you know have to sign a message through your wallet, by signing you agree to terms and conditions and privacy policy.",
       c.getStartedRes: "Get Started",
       c.myNFTCollectionRes: "My NFT Collection",
+      c.nFTCollectionRes: "NFT Collection",
       c.editProfileRes: "• Edit profile",
       c.contactUsRes: "• Contact us",
       c.termsAndConditionsRes: "• Terms & Conditions",

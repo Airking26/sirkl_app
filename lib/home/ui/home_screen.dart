@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +24,6 @@ import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:widget_circular_animator/widget_circular_animator.dart';
 
 import '../../common/utils.dart';
-import '../../common/view/dialog/custom_dial.dart';
 import '../../profile/ui/profile_else_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -190,6 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if(value == null){
                     _navigationController.hideNavBar.value = false;
                   }
+                  // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
                   _homeController.pagingController.value.notifyListeners();
                 });
           },
@@ -396,8 +398,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget buildSirklTile(
-      BuildContext context, int index, bool isShowSuspension) {
+  Widget buildSirklTile(BuildContext context, int index, bool isShowSuspension) {
     return Padding(
       padding: EdgeInsets.only(
           right: _commonController.users.length > 20 ? 36.0 : 0),

@@ -207,14 +207,14 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
             const SizedBox(height: 10,),
             Padding(
               padding: const EdgeInsets.only(left: 24.0),
-              child: _homeController.heHasNft.value ? Align(alignment: Alignment.topLeft, child: Text(con.myNFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),)) : Container(),
+              child: _homeController.heHasNft.value ? Align(alignment: Alignment.topLeft, child: Text(con.nFTCollectionRes.tr, textAlign: TextAlign.start, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),)) : Container(),
             ),
             MediaQuery.removePadding(
               context:  context,
               removeTop: true,
               child: Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
+                  padding: const EdgeInsets.only(top: 8.0),
                   child: SafeArea(
                     child: PagedListView(
                       pagingController: pagingController,

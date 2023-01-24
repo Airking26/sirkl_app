@@ -56,8 +56,9 @@ class TrimmerViewState extends State<TrimmerView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Video Trimmer"),
-        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
+        leading: Icon(Icons.arrow_back, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),
+        title: Text("Video Trimmer", style: TextStyle(fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white,
       ),
       body: Builder(
         builder: (context) => Center(
@@ -83,10 +84,12 @@ class TrimmerViewState extends State<TrimmerView> {
                   child: TrimViewer(
                     trimmer: _trimmer,
                     viewerHeight: 50.0,
-                    viewerWidth: MediaQuery.of(context).size.width - 16,
-                    maxVideoLength: const Duration(seconds: 10),
+                    type: ViewerType.fixed,
+                    durationTextStyle: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
+                    viewerWidth: MediaQuery.of(context).size.width,
                     onChangeStart: (value) => _startValue = value,
                     onChangeEnd: (value) => _endValue = value,
+                    maxVideoLength: const Duration(seconds: 10),
                     onChangePlaybackState: (value) =>
                         setState(() => _isPlaying = value),
                   ),

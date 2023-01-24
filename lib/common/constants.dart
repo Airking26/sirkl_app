@@ -36,6 +36,7 @@ const String rulesRes = "rules";
 
 /// Profile page ///
 const String myNFTCollectionRes = "my_nft_collection";
+const String nFTCollectionRes = "nft_collection";
 const String editProfileRes = "edit_profile";
 const String contactUsRes = "contact_us";
 const String termsAndConditionsRes = "terms_and_conditions";

@@ -131,7 +131,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                       child: StreamChannelListView(
                         channelSlidableEnabled: true,
                         onChannelFavPressed: (context, channel) async{
-                          await channel.updatePartial(unset: ["${_homeController.id.value}_favorite"]);
+                          //await channel.updatePartial(unset: ["${_homeController.id.value}_favorite"]);
                           _homeController.isInFav.remove(channel.id);
                           await _profileController.updateNft(NftModificationDto(contractAddress: channel.id!, id: _homeController.id.value, isFav: false), client);
                           streamChannelListControllerGroupsFav?.refresh();
@@ -159,7 +159,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         channelSlidableEnabled: true,
                         channelFav: false,
                         onChannelFavPressed: (context, channel) async {
-                          await channel.updatePartial(set: {"${_homeController.id.value}_favorite" : true});
+                          //await channel.updatePartial(set: {"${_homeController.id.value}_favorite" : true});
                           _homeController.isInFav.add(channel.id!);
                           await _profileController.updateNft(NftModificationDto(contractAddress: channel.id!, id: _homeController.id.value, isFav: true), client);
                           streamChannelListControllerGroupsFav?.refresh();

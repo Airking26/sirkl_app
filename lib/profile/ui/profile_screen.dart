@@ -295,7 +295,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               removeTop: true,
               child: Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
+                  padding: const EdgeInsets.only(top: 8.0),
                   child: SafeArea(
                     child: PagedListView(
                       pagingController: pagingController,
