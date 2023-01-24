@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:defer_pointer/defer_pointer.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_badged/flutter_badge.dart';
@@ -16,6 +17,7 @@ import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/groups/ui/groups_screen.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
@@ -316,11 +318,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   YYDialog dialogPopMenu(BuildContext context) {
     return YYDialog().build(context)
-      ..width = 140
+      ..width = 175
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
       ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white.withOpacity(0.95)
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: (){
@@ -344,9 +346,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
           await StreamChat.of(context).client.disconnectUser();
           _homeController.accessToken.value = "";
           _navigationController.controller.value.jumpToTab(0);
+          await _profileController.deleteUser(_homeController.id.value);
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.logoutRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: () async {
+          dialogMenu.dismiss();
+          showDialog(context: context,
+              barrierDismissible: true,
+              builder: (_) => CupertinoAlertDialog(
+            title: Text("Delete Account", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+            content: Text("Are you sure? You will lost all your data.", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+            actions: [
+              CupertinoDialogAction(child: Text("No", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){ Get.back();},),
+              CupertinoDialogAction(child: Text("Yes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
+                onPressed: () async {
+                  await StreamChat.of(context).client.disconnectUser();
+                  await _profileController.deleteUser(_homeController.id.value);
+                  await GetStorage().erase();
+                  _homeController.accessToken.value = "";
+                  _navigationController.controller.value.jumpToTab(0);
+                  Get.back();
+                },)
+            ],
+          ));
+
+        },
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(alignment: Alignment.centerLeft, child: Text("• Delete account", style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(

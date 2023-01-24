@@ -28,7 +28,6 @@ class _NewCallScreenState extends State<NewCallScreen> {
 
   final _callController = Get.put(CallsController());
   final _homeController = Get.put(HomeController());
-  final _profileController = Get.put(ProfileController());
   final _commonController = Get.put(CommonController());
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
@@ -295,10 +294,8 @@ class _NewCallScreenState extends State<NewCallScreen> {
     return ListTile(
         leading: InkWell(
             onTap: (){
-              if(_profileController.isUserExists.value != null) {
                 _commonController.userClicked.value = item;
                 pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
-              }
             },
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(90.0), child:
@@ -347,7 +344,6 @@ class _NewCallScreenState extends State<NewCallScreen> {
 
   @override
   void dispose() {
-    //pagingController.itemList = [];
     _callController.focusNode.value.dispose();
     pagingController.dispose();
     _callController.callQuery.value = "";

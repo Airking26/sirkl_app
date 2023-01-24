@@ -238,7 +238,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
       ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white
+      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white.withOpacity(0.95)
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: () async{
