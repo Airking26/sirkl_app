@@ -257,7 +257,7 @@ class _GalleryView extends StatelessWidget {
             selectionMode: SelectionMode.actionBased,
             albumTitle: 'Gallery',
             enableCamera: false,
-            panelSetting: PanelSetting(thumbHandlerHeight: 0),
+            panelSetting: PanelSetting(thumbHandlerHeight: 30),
           ),
         ),
 

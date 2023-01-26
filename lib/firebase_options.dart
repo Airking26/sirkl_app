@@ -68,7 +68,7 @@ class DefaultFirebaseOptions {
     projectId: 'sirkl-e138d',
     storageBucket: 'sirkl-e138d.appspot.com',
     iosClientId: '208005039506-v8hdtf1gq1hkbs58l6hsiui8kfbprqfv.apps.googleusercontent.com',
-    iosBundleId: 'com.airking.sirkl',
+    iosBundleId: 'io.airking.sirkl',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -78,6 +78,6 @@ class DefaultFirebaseOptions {
     projectId: 'sirkl-e138d',
     storageBucket: 'sirkl-e138d.appspot.com',
     iosClientId: '208005039506-v8hdtf1gq1hkbs58l6hsiui8kfbprqfv.apps.googleusercontent.com',
-    iosBundleId: 'com.airking.sirkl',
+    iosBundleId: 'io.airking.sirkl',
   );
 }

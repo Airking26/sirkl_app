@@ -1,15 +1,13 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/chats/service/chats_service.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
-import 'package:sirkl/common/model/inbox_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/profile/controller/profile_controller.dart';
@@ -26,6 +24,8 @@ class ChatsController extends GetxController{
   final _profileController = Get.put(ProfileController());
   var messageHasBeenSent = false.obs;
   var messageSending = false.obs;
+  var isEditingProfile = false.obs;
+  var usernameElseTextEditingController = TextEditingController().obs;
 
   Rx<Channel?> channel = (null as Channel?).obs;
 
@@ -94,90 +94,18 @@ class ChatsController extends GetxController{
     return eth;
   }
 
-  /*clearUnreadMessages(String id) async{
+  deleteInbox(String id) async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var req = await _chatsService.clearUnreadMessages(accessToken, id);
-    if(req.statusCode == 401){
+    var request = await _chatService.deleteInbox(accessToken, id);
+    if(request.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken);
       var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      req = await _chatsService.clearUnreadMessages(accessToken, id);
-      if(req.isOk) return inboxDtoFromJson(json.encode(req.body));
-    } else if(req.isOk){
-      return inboxDtoFromJson(json.encode(req.body));
+      request = await _chatService.deleteInbox(accessToken, id);
     }
   }
-
-  modifyInbox(String id, InboxModificationDto inboxModificationDto) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var req = await _chatsService.modifyInbox(accessToken, id, inboxModificationDtoToJson(inboxModificationDto));
-    if(req.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      req = await _chatsService.modifyInbox(accessToken, id, inboxModificationDtoToJson(inboxModificationDto));
-      if(req.isOk) return inboxDtoFromJson(json.encode(req.body));
-    } else if(req.isOk){
-      return inboxDtoFromJson(json.encode(req.body));
-    }
-  }
-
-  retrieveInboxes(int offset) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var req = await _chatsService.retrieveInboxes(accessToken, offset.toString());
-    if(req.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      req = await _chatsService.retrieveInboxes(accessToken, offset.toString());
-      if(req.isOk) return req.body!.map<InboxDto>((inboxDto) => inboxDtoFromJson(json.encode(inboxDto))).toList();
-    } else if(req.isOk) {
-      return req.body!.map<InboxDto>((inboxDto) => inboxDtoFromJson(json.encode(inboxDto))).toList();
-    }
-  }
-
-  Future<List<InboxDto>> searchInInboxes(String search) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var req = await _chatsService.searchInInboxes(accessToken, search);
-    if(req.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      req = await _chatsService.searchInInboxes(accessToken, search);
-      if(req.isOk) {
-        return req.body!.map<InboxDto>((inboxDto) => inboxDtoFromJson(json.encode(inboxDto))).toList();
-      } else {
-        return [];
-      }
-    } else if(req.isOk){
-      return req.body!.map<InboxDto>((inboxDto) => inboxDtoFromJson(json.encode(inboxDto))).toList();
-    } else {
-      return [];
-    }
-  }
-
-  bulkPeerMessages(List<InboxCreationDto> listInboxCreationDto) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var req = await _chatsService.bulkPeerMessage(accessToken, inboxCreationListDtoToJson(listInboxCreationDto));
-    if(401 == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      req = await _chatsService.bulkPeerMessage(accessToken, inboxCreationListDtoToJson(listInboxCreationDto));
-    }
-  }
-*/
 
 
 }

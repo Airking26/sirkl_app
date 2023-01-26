@@ -1,76 +1,40 @@
 {
   "project_info": {
-    "project_number": "208005039506",
-    "project_id": "sirkl-e138d",
-    "storage_bucket": "sirkl-e138d.appspot.com"
+    "project_number": "970958813193",
+    "project_id": "sirlk-72b7e",
+    "storage_bucket": "sirlk-72b7e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:208005039506:android:eefda5a440bbf1e0892d4b",
+        "mobilesdk_app_id": "1:970958813193:android:288fbf2bfe6829731da0d8",
         "android_client_info": {
-          "package_name": "com.airking.sirkl"
+          "package_name": "io.airking.sirkl"
         }
       },
       "oauth_client": [
         {
-          "client_id": "208005039506-brp8lj802fkg891usmhv9trl2ans4ojk.apps.googleusercontent.com",
+          "client_id": "970958813193-qdke26j1b1d2i4fq9j758ivm2e50masr.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBqK0bZj-qbKDkjC2jH_RLKNfpnAI3_DP8"
+          "current_key": "AIzaSyDiwKkjkJ7QGAxpVyonybNDgdG1Vh2cXRU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "208005039506-brp8lj802fkg891usmhv9trl2ans4ojk.apps.googleusercontent.com",
+              "client_id": "970958813193-qdke26j1b1d2i4fq9j758ivm2e50masr.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "208005039506-v8hdtf1gq1hkbs58l6hsiui8kfbprqfv.apps.googleusercontent.com",
+              "client_id": "970958813193-cf5vkvdea12ntdgkmvvbq3chdtfbo52k.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.airking.sirkl"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:208005039506:android:043d322518f49448892d4b",
-        "android_client_info": {
-          "package_name": "com.airking.sirkl"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "208005039506-brp8lj802fkg891usmhv9trl2ans4ojk.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBqK0bZj-qbKDkjC2jH_RLKNfpnAI3_DP8"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "208005039506-brp8lj802fkg891usmhv9trl2ans4ojk.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "208005039506-v8hdtf1gq1hkbs58l6hsiui8kfbprqfv.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.airking.sirkl"
+                "bundle_id": "io.ariking.sirkl"
               }
             }
           ]

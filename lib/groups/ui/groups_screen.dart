@@ -100,6 +100,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+
     tabController = TabController(length: 2, vsync: this);
     tabController.index = _groupController.index.value;
     tabController.addListener(() {
@@ -113,7 +114,13 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
         backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
-        body: Obx(() => Column(children: [
+        body: Obx(() {
+          if(_groupController.refreshGroups.value){
+            streamChannelListControllerGroupsFav?.refresh();
+            streamChannelListControllerGroups?.refresh();
+            _groupController.refreshGroups.value = false;
+          }
+            return Column(children: [
           buildAppbar(context, tabController),
           _groupController.addAGroup.value ? buildSelectNFT() : MediaQuery.removePadding(
             context: context,
@@ -137,6 +144,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           streamChannelListControllerGroupsFav?.refresh();
                           streamChannelListControllerGroups?.refresh();
                         },
+                        channelConv: false,
+                        channelFriends: false,
                         channelFav: true,
                         emptyBuilder: (context){
                           return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
@@ -147,7 +156,10 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
                           if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
                           _navigationController.hideNavBar.value = true;
-                          pushNewScreen(context, screen: StreamChannel(child: const ChannelPage(), channel: channel)).then((value) => _navigationController.hideNavBar.value = false);
+                          pushNewScreen(context, screen: StreamChannel(child: const ChannelPage(), channel: channel)).then((value) {
+                            streamChannelListControllerGroups?.refresh();
+                            streamChannelListControllerGroupsFav?.refresh();
+                            _navigationController.hideNavBar.value = false;});
                       },
                       ),
                     ),
@@ -156,6 +168,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     padding: const EdgeInsets.only(top:28.0),
                     child: SafeArea(
                       child: StreamChannelListView(
+                        channelConv: false,
+                        channelFriends: false,
                         channelSlidableEnabled: true,
                         channelFav: false,
                         onChannelFavPressed: (context, channel) async {
@@ -174,7 +188,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
                           if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
                           _navigationController.hideNavBar.value = true;
-                          pushNewScreen(context, screen: StreamChannel(child: const ChannelPage(), channel: channel)).then((value) => _navigationController.hideNavBar.value = false);
+                          pushNewScreen(context, screen: StreamChannel(child: const ChannelPage(), channel: channel)).then((value){
+                            _navigationController.hideNavBar.value = false;
+                            streamChannelListControllerGroups?.refresh();
+                            streamChannelListControllerGroupsFav?.refresh();
+                          });
                       },
                       ),
                     ),
@@ -183,7 +201,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
               ),
             ),
           )
-        ])));
+        ]
+    );}));
   }
 
   YYDialog dialogPopMenu(BuildContext context) {

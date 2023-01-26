@@ -28,7 +28,11 @@ class StreamChannelListTile extends StatelessWidget {
     this.onTap,
     this.slidableEnabled,
     this.isFav,
+    this.isConv,
+    this.isFriends,
     this.onFavPressed,
+    this.onDeletePressed,
+    this.onAddPressed,
     this.onLongPress,
     this.tileColor,
     this.visualDensity = VisualDensity.compact,
@@ -61,9 +65,13 @@ class StreamChannelListTile extends StatelessWidget {
   final GestureTapCallback? onTap;
 
   final void Function(BuildContext context)? onFavPressed;
+  final void Function(BuildContext context)? onDeletePressed;
+  final void Function(BuildContext context)? onAddPressed;
 
   final bool? slidableEnabled;
   final bool? isFav;
+  final bool? isConv;
+  final bool? isFriends;
 
   /// Called when the user long-presses on this list tile.
   final GestureLongPressCallback? onLongPress;
@@ -195,17 +203,41 @@ class StreamChannelListTile extends StatelessWidget {
         child: Slidable(
           enabled: slidableEnabled ?? false,
           endActionPane: ActionPane(
-            extentRatio: 0.25,
-            motion: const ScrollMotion(), children: [
-            SlidableAction(
+            extentRatio: isConv! && !isFriends! ? 0.33 : 0.25,
+            motion: const ScrollMotion(), children:
+            !isConv! ? [SlidableAction(
               spacing: 0,
               padding: EdgeInsets.zero,
               onPressed: onFavPressed,
               backgroundColor: Colors.white,
               foregroundColor: isFav! ? const Color(0xff00CB7D) : Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
               icon: isFav! ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-            ),
-          ],
+            )] : isFriends! ? [
+              SlidableAction(
+                spacing: 0,
+                padding: EdgeInsets.zero,
+                onPressed: onDeletePressed,
+                backgroundColor: Colors.white,
+                foregroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
+                icon: Icons.delete_rounded,
+              )
+            ] : [
+              SlidableAction(
+                spacing: 0,
+                padding: EdgeInsets.zero,
+                onPressed: onDeletePressed,
+                backgroundColor: Colors.white,
+                foregroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
+                icon: Icons.delete_rounded,
+              ),
+              CustomSlidableAction(
+                padding: EdgeInsets.zero,
+                onPressed: onAddPressed,
+                backgroundColor: Colors.white,
+                foregroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
+                child: Image.asset("assets/images/add_user.png", color: const Color(0xff00CB7D), width: 20, height: 20,),
+              )
+            ],
           ),
           child: ListTile(
             onTap: onTap,

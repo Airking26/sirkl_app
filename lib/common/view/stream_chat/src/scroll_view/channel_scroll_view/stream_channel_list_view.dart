@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_error_widget.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_load_more_error.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_load_more_indicator.dart';
@@ -56,7 +59,11 @@ class StreamChannelListView extends StatelessWidget {
     this.onChannelTap,
     this.onChannelLongPress,
     this.onChannelFavPressed,
+    this.onChannelDeletePressed,
+    this.onChannelAddPressed,
     this.channelSlidableEnabled,
+    this.channelConv,
+    this.channelFriends,
     this.channelFav,
     this.loadMoreTriggerIndex = 3,
     this.scrollDirection = Axis.vertical,
@@ -103,6 +110,8 @@ class StreamChannelListView extends StatelessWidget {
   final void Function(Channel)? onChannelLongPress;
 
   final void Function(BuildContext, Channel)? onChannelFavPressed;
+  final void Function(BuildContext, Channel)? onChannelDeletePressed;
+  final void Function(BuildContext, String, StreamChatClient)? onChannelAddPressed;
 
   /// The index to take into account when triggering [controller.loadMore].
   final int loadMoreTriggerIndex;
@@ -170,6 +179,8 @@ class StreamChannelListView extends StatelessWidget {
 
   final bool? channelSlidableEnabled;
   final bool? channelFav;
+  final bool? channelConv;
+  final bool? channelFriends;
 
   /// {@template flutter.widgets.scroll_view.controller}
   /// An object that can be used to control the position to which this scroll
@@ -313,13 +324,29 @@ class StreamChannelListView extends StatelessWidget {
         final onTap = onChannelTap;
         final onLongPress = onChannelLongPress;
         final onFavPressed = onChannelFavPressed;
+        final onDeletePressed = onChannelDeletePressed;
+        final onAddPressed = onChannelAddPressed;
         final slidableEnabled = channelSlidableEnabled;
         final isFav = channelFav;
+        final isConv = channelConv;
+        final isFriends = channelFriends;
         final streamChannelListTile = StreamChannelListTile(
+          isConv: isConv,
+          isFriends: !isFriends! ? channel.id!.startsWith("!members") ? false : true : true,
           isFav: isFav,
           slidableEnabled: slidableEnabled,
           channel: channel,
           onFavPressed: onFavPressed == null ? null : (context) => onFavPressed(context, channel),
+          onDeletePressed: onDeletePressed == null ? null : (context) => onDeletePressed(context, channel),
+          onAddPressed: onAddPressed == null ? null : (context) => onAddPressed(context, userFromJson(json.encode(channel.state?.members
+              .where((element) =>
+          element.userId != StreamChat
+              .of(context)
+              .currentUser!
+              .id)
+              .first
+              .user!
+              .extraData["userDTO"])).id!, channel.client),
           onTap: onTap == null ? null : () => onTap(channel),
           onLongPress: onLongPress == null ? null : () => onLongPress(channel),
         );

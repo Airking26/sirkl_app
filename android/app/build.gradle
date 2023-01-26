@@ -42,11 +42,11 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.airking.sirkl"
+        applicationId "io.airking.sirkl"
         minSdkVersion 24
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 14
-        versionName "1.0.4"
+        versionCode 15
+        versionName "1.0.5"
         multiDexEnabled = true
     }
 

@@ -30,6 +30,7 @@ class GroupsController extends GetxController{
   var nftsAvailable = <CollectionDbDto>[].obs;
   final _chatController = Get.put(ChatsController());
   var isLoadingAvailableNFT = true.obs;
+  var refreshGroups = false.obs;
 
   createChannel(StreamChatClient streamChatClient, GroupDto groupDto, String pic) async{
     _chatController.channel.value = streamChatClient.channel("try", id: groupDto.contractAddress.toLowerCase(), extraData: {

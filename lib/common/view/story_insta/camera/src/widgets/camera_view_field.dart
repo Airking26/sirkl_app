@@ -1,13 +1,15 @@
+import 'package:get/get.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/story_insta/animations/animations.dart';
 import 'package:sirkl/common/view/story_insta/camera/src/widgets/ui_handler.dart';
 import 'package:flutter/material.dart';
+import 'package:sirkl/navigation/controller/navigation_controller.dart';
 
 ///
 /// Widget to pick media using camera
 class CameraViewField extends StatelessWidget {
   ///
-  const CameraViewField({
+   CameraViewField({
     Key? key,
     required this.child,
     this.controller,
@@ -47,11 +49,13 @@ class CameraViewField extends StatelessWidget {
   ///
   /// Triggered when picker capture media
   final void Function(List<DrishyaEntity> entities)? onCapture;
+  final _navigationController = Get.put(NavigationController());
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        _navigationController.hideNavBar.value = true;
         CameraView.pick(
           context,
           controller: controller,
@@ -60,6 +64,7 @@ class CameraViewField extends StatelessWidget {
           photoEditorSetting: photoEditorSetting,
           routeSetting: routeSetting,
         ).then((entities) {
+          _navigationController.hideNavBar.value = false;
           if (entities?.isNotEmpty ?? false) {
             onCapture?.call(entities!);
           }

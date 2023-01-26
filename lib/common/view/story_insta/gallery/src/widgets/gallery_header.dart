@@ -52,11 +52,8 @@ class _GalleryHeaderState extends State<GalleryHeader> {
     final panelSetting = _controller.panelSetting;
 
     return Container(
-      constraints: BoxConstraints(
-        minHeight: panelSetting.thumbHandlerHeight,
-        maxHeight: panelSetting.headerHeight + panelSetting.thumbHandlerHeight,
-      ),
-      color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
+      height: 87,
+      color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white,
       child: Column(
         children: [
           // Handler
@@ -66,27 +63,6 @@ class _GalleryHeaderState extends State<GalleryHeader> {
             child: Row(
               children: [
                 // Close icon
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: _IconButton(
-                      iconData: Icons.close,
-                      onPressed: widget.onClose,
-                      size: 36,
-                    ),
-                  ),
-                ),
-
-                // Album name and media receiver name
-                FittedBox(
-                  child: _AlbumDetail(
-                    subtitle: widget.headerSubtitle,
-                    controller: _controller,
-                    albums: widget.albums,
-                  ),
-                ),
-
-                // Dropdown
                 Expanded(
                   child: Row(
                     children: [
@@ -118,6 +94,30 @@ class _GalleryHeaderState extends State<GalleryHeader> {
                     ],
                   ),
                 ),
+
+                // Album name and media receiver name
+                FittedBox(
+                  child: _AlbumDetail(
+                    subtitle: widget.headerSubtitle,
+                    controller: _controller,
+                    albums: widget.albums,
+                  ),
+                ),
+
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: _IconButton(
+                        iconData: Icons.close,
+                        onPressed: widget.onClose,
+                        size: 34,
+                      ),
+                    ),
+                  ),
+                ),
+
 
                 //
               ],
@@ -203,7 +203,7 @@ class _IconButton extends StatelessWidget {
         padding: EdgeInsets.zero,
         icon: Icon(
           iconData ?? Icons.close,
-          color: const Color(0xFF00CB7D),
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.75) : Colors.black.withOpacity(0.75),
           size: size ?? 26.0,
         ),
         onPressed: onPressed,
@@ -245,23 +245,14 @@ class _AlbumDetail extends StatelessWidget {
                   ? controller.setting.albumTitle
                   : album.value.assetPathEntity?.name ?? 'Unknown',
               style: Theme.of(context).textTheme.subtitle2!.copyWith(
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.75) : Colors.black.withOpacity(0.75),
                     fontWeight: FontWeight.w600,
+                  fontFamily: 'Gilroy', fontSize: 24
                   ),
             );
           },
         ),
 
-        const SizedBox(height: 2),
-
-        // Receiver name
-        Text(
-          subtitle ?? 'Select',
-          style: Theme.of(context)
-              .textTheme
-              .caption!
-              .copyWith(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5)),
-        ),
       ],
     );
   }

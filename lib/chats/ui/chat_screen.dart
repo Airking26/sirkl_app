@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
@@ -6,6 +7,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/new_message_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
@@ -23,6 +25,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   final _chatController = Get.put(ChatsController());
   final _homeController = Get.put(HomeController());
+  final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
   StreamChannelListController? streamChannelListControllerFriends;
   StreamChannelListController? streamChannelListControllerOthers;
@@ -126,8 +129,27 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             controller: tabController,
             children: [
               Obx(() =>StreamChannelListView(
-                channelSlidableEnabled: false,
+                channelSlidableEnabled: true,
+                channelConv : true,
+                channelFriends: true,
                 channelFav: false,
+                onChannelDeletePressed: (context, channel) async{
+                  showDialog(context: context,
+                      barrierDismissible: true,
+                      builder: (_) => CupertinoAlertDialog(
+                        title: Text("Delete Conversation", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                        content: Text("Are you sure? This action is irreversible", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+                        actions: [
+                          CupertinoDialogAction(child: Text("No", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){ Get.back();},),
+                          CupertinoDialogAction(child: Text("Yes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
+                            onPressed: () async {
+                              await channel.delete();
+                              streamChannelListControllerOthers!.refresh();
+                              Get.back();
+                            },)
+                        ],
+                      ));
+                },
                 emptyBuilder: (context){
                   return noGroupUI();
                 },
@@ -136,14 +158,39 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   _navigationController.hideNavBar.value = true;
                   pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {
                     _navigationController.hideNavBar.value = false;
-                    //streamChannelListControllerFriends!.refresh();
-                    //streamChannelListControllerOthers!.refresh();
+                    streamChannelListControllerFriends!.refresh();
+                    streamChannelListControllerOthers!.refresh();
                   });
                 },
               ),
               ),
               Obx(() =>StreamChannelListView(
-                channelSlidableEnabled: false,
+                channelSlidableEnabled: true,
+                onChannelDeletePressed: (context, channel) async {
+                  showDialog(context: context,
+                      barrierDismissible: true,
+                      builder: (_) => CupertinoAlertDialog(
+                        title: Text("Delete Conversation", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                        content: Text("Are you sure? This action is irreversible", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+                        actions: [
+                          CupertinoDialogAction(child: Text("No", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){ Get.back();},),
+                          CupertinoDialogAction(child: Text("Yes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
+                            onPressed: () async {
+                              if(!channel.id!.startsWith("!members")) await _chatController.deleteInbox(channel.id!);
+                              await channel.delete();
+                              streamChannelListControllerOthers!.refresh();
+                              Get.back();
+                            },)
+                        ],
+                      ));
+                },
+                onChannelAddPressed: (context, id, client) async{
+                  await _commonController.addUserToSirkl(id, client, _homeController.id.value);
+                  streamChannelListControllerFriends!.refresh();
+                  streamChannelListControllerOthers!.refresh();
+                },
+                channelConv : true,
+                channelFriends: false,
                 channelFav: false,
                 emptyBuilder: (context){
                   return noGroupUI();
@@ -153,8 +200,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 _navigationController.hideNavBar.value = true;
                 pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {
                   _navigationController.hideNavBar.value = false;
-                  //streamChannelListControllerFriends!.refresh();
-                  //streamChannelListControllerOthers!.refresh();
+                  streamChannelListControllerFriends!.refresh();
+                  streamChannelListControllerOthers!.refresh();
                 });
               },),
               )
@@ -360,7 +407,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               child: Align(
                                   alignment: Alignment.center,
                                   child: Text(
-                                    "Friends",
+                                    "My SIRKL",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                         fontSize: 15,

@@ -181,7 +181,7 @@ class _ViewState extends State<_View> with SingleTickerProviderStateMixin {
     final unselectItems = TextButton(
       onPressed: _onSelectionClear,
       child: Text(
-        'USELECT ITEMS',
+        'UNSELECT ITEMS',
         style: Theme.of(context).textTheme.button!.copyWith(
               color: Colors.blue,
             ),
@@ -313,9 +313,9 @@ class _ViewState extends State<_View> with SingleTickerProviderStateMixin {
                   ),
 
                   // Divider
-                  const Divider(
-                    color: Color(0xFF00CB7D),
-                    thickness: 0.5,
+                   Divider(
+                    color: Colors.black.withOpacity(0.125),
+                    thickness: 2,
                     height: 0.5,
                     indent: 0,
                     endIndent: 0,

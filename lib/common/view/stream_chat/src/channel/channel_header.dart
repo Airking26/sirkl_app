@@ -1,14 +1,18 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/nft_modification_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -178,7 +182,7 @@ class StreamChannelHeader extends StatelessWidget
         return StreamInfoTile(
           showMessage: showConnectionStateTile && showStatus,
           message: statusString,
-          child: Container(
+          child: Obx(() => Container(
             height: 115,
             margin: const EdgeInsets.only(bottom: 0.25),
             decoration: BoxDecoration(
@@ -305,6 +309,22 @@ class StreamChannelHeader extends StatelessWidget
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  _chatController.isEditingProfile.value ?
+                                  SizedBox(
+                                    width: 150,
+                                    child: TextField(
+                                      autofocus: true,
+                                      maxLines: 1,
+                                      controller: _chatController.usernameElseTextEditingController.value,
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
+                                      decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          isCollapsed: true,
+                                          hintText: ""
+                                      ),
+                                    ),
+                                  ):
                                   Text(
                                   (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ?
                                   "${(channel.extraData["wallet"] as String).substring(0, 20)}..." :
@@ -341,7 +361,7 @@ class StreamChannelHeader extends StatelessWidget
                         ],
                       ),
                     ),
-                    channel.isGroup ? Container() : Transform.translate(
+                    channel.isGroup ? Container() :  _chatController.isEditingProfile.value ? Container() : Transform.translate(
                       offset: const Offset(16, 1),
                       child: IconButton(onPressed: () async {
                         _callController.userCalled.value = userFromJson(
@@ -364,7 +384,43 @@ class StreamChannelHeader extends StatelessWidget
                         MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                       )),
                     ),
-                    (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ? Container() : IconButton(
+                    (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ? Container() :
+                    _chatController.isEditingProfile.value ? InkWell(
+                      onTap: () async {
+                        if(_chatController.usernameElseTextEditingController.value.text.isNotEmpty) {
+                          await _profileController.updateMe(UpdateMeDto(
+                              nicknames: {
+                                _commonController.userClicked.value!
+                                    .wallet!: _profileController
+                                    .usernameElseTextEditingController.value
+                                    .text
+                              }), StreamChat
+                              .of(context)
+                              .client);
+                          _homeController.updateNickname(
+                              _commonController.userClicked.value!.wallet!,
+                              _profileController
+                                  .usernameElseTextEditingController.value
+                                  .text);
+                          _chatController.isEditingProfile.value = false;
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: "Field can not be empty",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0
+                          );
+                        }
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.only(top: 16.0, right: 16),
+                        child: Text("DONE", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF00CB7D))),
+                      ),
+                    ) :
+                    IconButton(
                         onPressed: () {
                           dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
                         },
@@ -377,7 +433,7 @@ class StreamChannelHeader extends StatelessWidget
                 ),
               ),
             ),
-          )
+          ))
         );
       },
     );
@@ -385,7 +441,7 @@ class StreamChannelHeader extends StatelessWidget
 
   YYDialog dialogPopMenuGroup(BuildContext context, Channel channel) {
     return YYDialog().build(context)
-      ..width = 180
+      ..width = 200
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
       ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
@@ -393,16 +449,48 @@ class StreamChannelHeader extends StatelessWidget
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
         onTap: () async {
+          dialogMenu.dismiss();
+          if(channel.extraData["${_homeController.id.value}_favorite"] == null || channel.extraData["${_homeController.id.value}_favorite"] == false ) {
+            _homeController.isInFav.add(channel.id!);
+            await _profileController.updateNft(NftModificationDto(
+                contractAddress: channel.id!,
+                id: _homeController.id.value,
+                isFav: true), channel.client);
+          } else {
+            _homeController.isInFav.remove(channel.id);
+            await _profileController.updateNft(NftModificationDto(
+                contractAddress: channel.id!,
+                id: _homeController.id.value,
+                isFav: false), channel.client);
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                channel.extraData["${_homeController.id.value}_favorite"] == null || channel.extraData["${_homeController.id.value}_favorite"] == false ? "• Add to favorites" : "• Remove from favorites",
+                style: TextStyle(
+                    fontSize: 14,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: () async {
           var creator = await _groupController.retrieveCreatorGroup(channel.id!);
           dialogMenu.dismiss();
           if(!creator.isNullOrBlank!) {
             if(creator == _homeController.userMe.value.wallet!){
-              await StreamChat.of(context).client.updateChannelPartial(channel.id!, 'try', set: {"owner": _homeController.userMe.value.wallet!});
+              await channel.client.updateChannelPartial(channel.id!, 'try', set: {"owner": _homeController.userMe.value.wallet!});
               utils.showToast(context, "You are now the owner of the group");
             } else utils.showToast(context, 'You are not the owner of the group');
           } else utils.showToast(context, 'Error. Try again later');
         },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.claimOwnershipeRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
@@ -416,18 +504,37 @@ class StreamChannelHeader extends StatelessWidget
 
   YYDialog dialogPopMenuGroupWithOwner(BuildContext context, Channel channel) {
     return YYDialog().build(context)
-      ..width = 180
+      ..width = 200
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop
       ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
       ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white.withOpacity(0.95)
       ..margin = const EdgeInsets.only(top: 90, right: 20)
       ..widget(InkWell(
+        onTap: () async {
+          dialogMenu.dismiss();
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                channel.extraData["${_homeController.id.value}_favorite"] == null || channel.extraData["${_homeController.id.value}_favorite"] == false ? "• Add to favorites" : "• Remove from favorites",
+                style: TextStyle(
+                    fontSize: 14,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) ,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
         onTap: () async{
           _commonController.userClicked.value = await _profileController.getUserByWallet(channel.extraData["owner"] as String);
           if(_commonController.userClicked.value!.wallet != channel.extraData["owner"] as String) pushNewScreen(context, screen: const DetailedChatScreen(create: true));
         },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
@@ -503,6 +610,28 @@ class StreamChannelHeader extends StatelessWidget
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: () {
+          _chatController.isEditingProfile.value = true;
+          dialogMenu.dismiss();
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "• Add a nickname",
+                style: TextStyle(
+                    fontSize: 14,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                        ? const Color(0xff9BA0A5)
+                        : const Color(0xFF828282),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: () {
           _navigationController.hideNavBar.value = false;
           pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: true));
         },
@@ -524,13 +653,53 @@ class StreamChannelHeader extends StatelessWidget
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
-        onTap: () {},
+        onTap: () {
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                con.reportRes.tr,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                        ? const Color(0xff9BA0A5)
+                        : const Color(0xFF828282),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: () async {
+          dialogMenu.dismiss();
+          showDialog(context: context,
+              barrierDismissible: true,
+              builder: (_) => CupertinoAlertDialog(
+                title: Text("Delete Conversation", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                content: Text("Are you sure? This action is irreversible", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+                actions: [
+                  CupertinoDialogAction(child: Text("No", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){
+                    Get.back();},),
+                  CupertinoDialogAction(child: Text("Yes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
+                    onPressed: () async {
+                      if(!channel.id!.startsWith("!members")) await _chatController.deleteInbox(channel.id!);
+                      await channel.delete();
+                      Get.back();
+                      Navigator.pop(context);
+                    },)
+                ],
+              )
+          );
+        },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
           child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                con.reportRes.tr,
+                "• Delete the chat",
                 style: TextStyle(
                     fontSize: 14,
                     color: MediaQuery.of(context).platformBrightness == Brightness.dark
