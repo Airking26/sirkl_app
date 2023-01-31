@@ -5,8 +5,11 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -118,7 +121,14 @@ class HomeController extends GetxController{
           try{
             await launchUrl(Uri.parse(uri), mode: LaunchMode.externalApplication);
           } on PlatformException {
-            await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
+            Fluttertoast.showToast(
+                msg: "Not wallet was found, please create one in order to continue",
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.TOP,
+                backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
+                textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
+                fontSize: 16.0
+            );
           }
         },
       );

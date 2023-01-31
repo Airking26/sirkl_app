@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:launch_review/launch_review.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
@@ -662,7 +663,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
          SizedBox(
-          height: MediaQuery.of(context).size.height / 7.5,
+          height: MediaQuery.of(context).size.height / 8.5,
         ),
         Image.asset(
           "assets/images/wallet.png",
@@ -715,24 +716,29 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: (finish) async {
               await _homeController.connectWallet(context);
             },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 24.0, right: 8),
-                  child: Image.asset("assets/images/metamask.png", width: 36,height: 36,),
-                ),
-                const Text(
-                  "Metamask",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontFamily: "Gilroy",
-                      fontWeight: FontWeight.w700),
-                ),
-              ],
+            child: const Text(
+              "Connect",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w700),
             )),
         const SizedBox(height: 18,),
+        InkWell(
+          onTap: ()async{
+            await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
+          },
+          child: Text("OR Create a wallet", style: TextStyle(
+              color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
+              fontSize: 13,
+              fontFamily: "Gilroy",
+              fontWeight: FontWeight.w500)),
+        ),
+        const SizedBox(height: 24,),
+
         InkWell(
           onTap: (){
             showDialog(
@@ -747,26 +753,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                  Column(children: [
-                    const Icon(Icons.flash_on_rounded, color: Color(0xFF00CB7D),),
-                    const SizedBox(height: 4,),
-                    Text("FAST", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w400),)
-                  ],),
                     Column(children: [
-                      const Icon(Icons.person_off_rounded, color: Color(0xFF00CB7D),),
+                      const Icon(Icons.lock_outline_rounded, color: Color(0xFF00CB7D), size: 36,),
                       const SizedBox(height: 4,),
-                      Text("ANONYMOUS", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w400),)
-                    ],),
-                    Column(children: [
-                      const Icon(Icons.lock_rounded, color: Color(0xFF00CB7D),),
-                      const SizedBox(height: 4,),
-                      Text("SECURE", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w400),)
+                      Text("PRIVATE AND SECURE LOGIN", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w400),)
                     ],),
                 ],),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text("Connecting your Wallet to the app allows you to customize your experience",
+                    Text("Connecting your Wallet to the app allows you to customize the way you experience SIRKL.io",
               textAlign: TextAlign.start,
               style: TextStyle(
               color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
@@ -774,7 +770,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fontFamily: "Gilroy",
               fontWeight: FontWeight.w500)
                     ),
-                    Text("\n Once connected, our system will analyze the assets in your Wallet to give you access to your NFTs",
+                    Text("\nOnce connected, our system will analyze the assets in your Wallet to give you access to your NFTs and cryptos",
               textAlign: TextAlign.start,
               style: TextStyle(
               color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
@@ -782,7 +778,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fontFamily: "Gilroy",
               fontWeight: FontWeight.w400)
                     ),
-                    Text("\n No personal information is required to access SIRKL, ensuring your anonymity",
+                    Text("\nNo personal information is required, guaranteeing your anonymity",
               textAlign: TextAlign.start,
               style: TextStyle(
               color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
@@ -790,7 +786,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fontFamily: "Gilroy",
               fontWeight: FontWeight.w400)
                     ),
-                    Text("\n The authorization requested during sign in is ONLY for READING",
+                    Text("\nThe authorization request requested during sign in is ONLY for READING. This does not grant SIRKL.io permission to make transactions with your Wallet",
                         textAlign: TextAlign.start,
                         style: TextStyle(
                             color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
@@ -798,15 +794,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontFamily: "Gilroy",
                             fontWeight: FontWeight.w500)
                     ),
-                    Text("\n This does not give SIRKL permission to make transactions with your Wallet",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                            fontSize: 13,
-                            fontFamily: "Gilroy",
-                            fontWeight: FontWeight.w400)
-                    ),
-                    Text("\n CAUTION: SIRKL will never ask for your private key",
+                    Text("\nCAUTION: SIRKL.io will never ask for your private key",
                         textAlign: TextAlign.start,
                         style: TextStyle(
                             color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
