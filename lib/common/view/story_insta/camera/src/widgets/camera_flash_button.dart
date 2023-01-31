@@ -29,8 +29,8 @@ class CameraFlashButton extends StatelessWidget {
         return InkWell(
           onTap: controller.changeFlashMode,
           child: Container(
-            height: 36,
-            width: 36,
+            height: 48,
+            width: 48,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.black26,

@@ -5,10 +5,12 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:launch_review/launch_review.dart';
 import 'package:sirkl/chats/service/chats_service.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
@@ -102,7 +104,8 @@ class HomeController extends GetxController{
       signPage.value = true;
     });
 
-    connector.on('session_request', (payload) {});
+    connector.on('session_request', (payload) {
+    });
 
     connector.on('disconnect', (session) {
     });
@@ -112,11 +115,16 @@ class HomeController extends GetxController{
         chainId: 4160,
         onDisplayUri: (uri) async {
           _uri = uri;
-          await launchUrl(Uri.parse(uri), mode: LaunchMode.externalApplication);
+          try{
+            await launchUrl(Uri.parse(uri), mode: LaunchMode.externalApplication);
+          } on PlatformException {
+            await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
+          }
         },
       );
     }
   }
+
   String generateSessionMessage(String accountAddress) {
     String message =
         'Hello $accountAddress, welcome to our app. By signing this message you agree to learn and have fun with blockchain';

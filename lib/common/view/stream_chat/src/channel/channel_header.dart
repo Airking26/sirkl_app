@@ -391,7 +391,7 @@ class StreamChannelHeader extends StatelessWidget
                           await _profileController.updateMe(UpdateMeDto(
                               nicknames: {
                                 _commonController.userClicked.value!
-                                    .wallet!: _profileController
+                                    .wallet!: _chatController
                                     .usernameElseTextEditingController.value
                                     .text
                               }), StreamChat
@@ -399,7 +399,7 @@ class StreamChannelHeader extends StatelessWidget
                               .client);
                           _homeController.updateNickname(
                               _commonController.userClicked.value!.wallet!,
-                              _profileController
+                              _chatController
                                   .usernameElseTextEditingController.value
                                   .text);
                           _chatController.isEditingProfile.value = false;

@@ -30,31 +30,32 @@ class CameraOverlay extends StatelessWidget {
       children: [
         // preview, input type page view and camera
         Positioned(
-          bottom: 0,
+          bottom: 24,
           left: 0,
           right: 0,
-          child: CameraFooter(controller: controller),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: CameraFooter(controller: controller),
+          ),
         ),
-
-        // Close button
-        Positioned(
-          left: 16,
-          top: _top,
-          child: CameraCloseButton(controller: controller),
-        ),
-
         // Flash Light
         Positioned(
-          right: 16,
-          top: _top,
+          left: 16,
+          top: 48,
           child: CameraFlashButton(controller: controller),
+        ),
+        // Close button
+        Positioned(
+          right: 16,
+          top: 48,
+          child: CameraCloseButton(controller: controller),
         ),
 
         // Shutter view
         Positioned(
           left: 0,
           right: 0,
-          bottom: 64,
+          bottom: 88,
           child: CameraShutterButton(controller: controller),
         ),
 

@@ -661,8 +661,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Column buildConnectWalletUI() {
     return Column(
       children: [
-        const SizedBox(
-          height: 100,
+         SizedBox(
+          height: MediaQuery.of(context).size.height / 7.5,
         ),
         Image.asset(
           "assets/images/wallet.png",
@@ -675,7 +675,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
-            con.connectYourWalletRes.tr,
+            "Let's Start",
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
@@ -690,7 +690,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
-            con.talkWithRes.tr,
+            "Connect or create your metamask wallet by clicking below",
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark
@@ -702,7 +702,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(
-          height: 50,
+          height: 40,
         ),
         NiceButtons(
             stretch: false,
@@ -715,14 +715,135 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: (finish) async {
               await _homeController.connectWallet(context);
             },
-            child: Text(
-              con.getStartedRes.tr,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w700),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 24.0, right: 8),
+                  child: Image.asset("assets/images/metamask.png", width: 36,height: 36,),
+                ),
+                const Text(
+                  "Metamask",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontFamily: "Gilroy",
+                      fontWeight: FontWeight.w700),
+                ),
+              ],
             )),
+        const SizedBox(height: 18,),
+        InkWell(
+          onTap: (){
+            showDialog(
+              barrierDismissible: true,
+                context: context, builder: (context){
+              return AlertDialog(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
+                    ? const Color(0xFF102437)
+                    : const Color.fromARGB(255, 247, 253, 255),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                  Column(children: [
+                    const Icon(Icons.flash_on_rounded, color: Color(0xFF00CB7D),),
+                    const SizedBox(height: 4,),
+                    Text("FAST", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w400),)
+                  ],),
+                    Column(children: [
+                      const Icon(Icons.person_off_rounded, color: Color(0xFF00CB7D),),
+                      const SizedBox(height: 4,),
+                      Text("ANONYMOUS", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w400),)
+                    ],),
+                    Column(children: [
+                      const Icon(Icons.lock_rounded, color: Color(0xFF00CB7D),),
+                      const SizedBox(height: 4,),
+                      Text("SECURE", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w400),)
+                    ],),
+                ],),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Connecting your Wallet to the app allows you to customize your experience",
+              textAlign: TextAlign.start,
+              style: TextStyle(
+              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+              fontSize: 13,
+              fontFamily: "Gilroy",
+              fontWeight: FontWeight.w500)
+                    ),
+                    Text("\n Once connected, our system will analyze the assets in your Wallet to give you access to your NFTs",
+              textAlign: TextAlign.start,
+              style: TextStyle(
+              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+              fontSize: 13,
+              fontFamily: "Gilroy",
+              fontWeight: FontWeight.w400)
+                    ),
+                    Text("\n No personal information is required to access SIRKL, ensuring your anonymity",
+              textAlign: TextAlign.start,
+              style: TextStyle(
+              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+              fontSize: 13,
+              fontFamily: "Gilroy",
+              fontWeight: FontWeight.w400)
+                    ),
+                    Text("\n The authorization requested during sign in is ONLY for READING",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                            fontSize: 13,
+                            fontFamily: "Gilroy",
+                            fontWeight: FontWeight.w500)
+                    ),
+                    Text("\n This does not give SIRKL permission to make transactions with your Wallet",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                            fontSize: 13,
+                            fontFamily: "Gilroy",
+                            fontWeight: FontWeight.w400)
+                    ),
+                    Text("\n CAUTION: SIRKL will never ask for your private key",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                            fontSize: 13,
+                            fontFamily: "Gilroy",
+                            fontWeight: FontWeight.w400)
+                    ),
+                    const SizedBox(height: 12,),
+                    TextButton(onPressed: (){
+                      Navigator.pop(context);
+                    }, child: const Text("I UNDERSTAND", style: TextStyle(color: Color(0xFF00CB7D), fontFamily: "Gilroy", fontWeight: FontWeight.w600),))
+                  ],
+                ),
+              );
+            });
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Icon(Icons.info_outline_rounded, size: 18, color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                    ? const Color(0xFF9BA0A5)
+                    : const Color(0xFF828282),),
+              ),
+              Text("Why connecting my wallet?", style: TextStyle(
+    color: MediaQuery.of(context).platformBrightness == Brightness.dark
+    ? const Color(0xFF9BA0A5)
+            : const Color(0xFF828282),
+    fontSize: 13,
+    fontFamily: "Gilroy",
+    fontWeight: FontWeight.w500))
+            ],),
+          ),
+        )
       ],
     );
   }

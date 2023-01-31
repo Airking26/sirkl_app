@@ -26,8 +26,8 @@ class CameraCloseButton extends StatelessWidget {
       child: InkWell(
         onTap: UIHandler.of(context).pop,
         child: Container(
-          height: 36,
-          width: 36,
+          height: 48,
+          width: 48,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.black26,
@@ -35,7 +35,7 @@ class CameraCloseButton extends StatelessWidget {
           child: const Icon(
             Icons.close_rounded,
             color: Colors.white,
-            size: 16,
+            size: 24,
           ),
         ),
       ),

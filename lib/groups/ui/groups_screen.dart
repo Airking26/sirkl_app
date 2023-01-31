@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -138,11 +140,9 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                       child: StreamChannelListView(
                         channelSlidableEnabled: true,
                         onChannelFavPressed: (context, channel) async{
-                          //await channel.updatePartial(unset: ["${_homeController.id.value}_favorite"]);
                           _homeController.isInFav.remove(channel.id);
                           await _profileController.updateNft(NftModificationDto(contractAddress: channel.id!, id: _homeController.id.value, isFav: false), client);
-                          streamChannelListControllerGroupsFav?.refresh();
-                          streamChannelListControllerGroups?.refresh();
+                          _groupController.refreshGroups.value = true;
                         },
                         channelConv: false,
                         channelFriends: false,
@@ -156,9 +156,9 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
                           if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
                           _navigationController.hideNavBar.value = true;
-                          pushNewScreen(context, screen: StreamChannel(child: const ChannelPage(), channel: channel)).then((value) {
-                            streamChannelListControllerGroups?.refresh();
-                            streamChannelListControllerGroupsFav?.refresh();
+                          pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {
+                            //streamChannelListControllerGroups?.refresh();
+                            //streamChannelListControllerGroupsFav?.refresh();
                             _navigationController.hideNavBar.value = false;});
                       },
                       ),
@@ -168,16 +168,15 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     padding: const EdgeInsets.only(top:28.0),
                     child: SafeArea(
                       child: StreamChannelListView(
+
                         channelConv: false,
                         channelFriends: false,
                         channelSlidableEnabled: true,
                         channelFav: false,
                         onChannelFavPressed: (context, channel) async {
-                          //await channel.updatePartial(set: {"${_homeController.id.value}_favorite" : true});
                           _homeController.isInFav.add(channel.id!);
                           await _profileController.updateNft(NftModificationDto(contractAddress: channel.id!, id: _homeController.id.value, isFav: true), client);
-                          streamChannelListControllerGroupsFav?.refresh();
-                          streamChannelListControllerGroups?.refresh();
+                          _groupController.refreshGroups.value = true;
                         },
                         emptyBuilder: (context){
                           return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
@@ -188,10 +187,10 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
                           if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
                           _navigationController.hideNavBar.value = true;
-                          pushNewScreen(context, screen: StreamChannel(child: const ChannelPage(), channel: channel)).then((value){
+                          pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value){
                             _navigationController.hideNavBar.value = false;
-                            streamChannelListControllerGroups?.refresh();
-                            streamChannelListControllerGroupsFav?.refresh();
+                            //streamChannelListControllerGroups?.refresh();
+                            //streamChannelListControllerGroupsFav?.refresh();
                           });
                       },
                       ),
@@ -411,7 +410,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
           padding: const EdgeInsets.only(top: 8.0),
           child: SafeArea(
             child: ListView.builder(
-              itemCount: _groupController.nftsAvailable.value.length,
+              itemCount: _groupController.nftsAvailable.length,
               itemBuilder: (context, index){
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 6),
@@ -430,17 +429,16 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     ),
                     child: ListTile(
                       onTap: ()async{
-                        await _groupController.createGroup(StreamChat.of(context).client, _groupController.nftsAvailable.value[index].collectionName, _groupController.nftsAvailable.value[index].collectionImage , _groupController.nftsAvailable.value[index].contractAddress);
+                        await _groupController.createGroup(StreamChat.of(context).client, _groupController.nftsAvailable[index].collectionName, _groupController.nftsAvailable[index].collectionImage , _groupController.nftsAvailable[index].contractAddress);
                         _navigationController.hideNavBar.value = true;
                         pushNewScreen(context, screen: const DetailedChatScreen(create: false)).then((value) => _navigationController.hideNavBar.value = false);
                       },
                       leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftsAvailable[index].collectionImage, width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
 
-                      title: Text(_groupController.nftsAvailable.value[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
-                      //subtitle: Transform.translate(offset: const Offset(-8, 0), child: Text("${_homeController.nfts.value[index].collectionImages.length} available", style: TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282)))),
+                      title: Text(_groupController.nftsAvailable[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
                     ),
                   ),
-                );;
+                );
               },
             ),
           ),
@@ -518,7 +516,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                   ),
                   IconButton(
                       onPressed: () {
-                        if(!_groupController.addAGroup.value && _groupController.nftsAvailable.value.isEmpty) _groupController.retrieveGroups(_homeController.userMe.value.wallet!);
+                        if(!_groupController.addAGroup.value && _groupController.nftsAvailable.isEmpty) _groupController.retrieveGroups(_homeController.userMe.value.wallet!);
                         _groupController.addAGroup.value = !_groupController.addAGroup.value;
                       },
                       icon: Image.asset(

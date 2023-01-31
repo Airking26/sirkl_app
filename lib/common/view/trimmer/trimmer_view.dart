@@ -56,15 +56,26 @@ class TrimmerViewState extends State<TrimmerView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(Icons.arrow_back, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),
-        title: Text("Video Trimmer", style: TextStyle(fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
-        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white,
+        toolbarHeight: 90,
+        leading: IconButton(
+          onPressed: (){
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back, size: 34,), color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.75) : Colors.black.withOpacity(0.75),),
+        title: Text("Video Trimmer", style: TextStyle(fontFamily: "Gilroy", fontSize: 24, fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.75) : Colors.black.withOpacity(0.75)),),
+        backgroundColor:
+        MediaQuery.of(context).platformBrightness == Brightness.dark ?
+        const Color(0xFF102437)
+            : Colors.white,
       ),
       body: Builder(
         builder: (context) => Center(
           child: Container(
             padding: const EdgeInsets.only(bottom: 12.0),
-            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
+            color:
+            MediaQuery.of(context).platformBrightness == Brightness.dark ?
+            const Color(0xFF102437) :
+            const Color.fromARGB(255, 247, 253, 255),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore, invalid_use_of_visible_for_testing_member
 
 import 'dart:io';
 
@@ -411,7 +411,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 90,
+                  height: 100,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 48.0),
@@ -419,7 +419,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: () async {
                       await Clipboard.setData(ClipboardData(
                           text: _homeController.userMe.value.wallet!));
-                      // ignore: use_build_context_synchronously
                       utils.showToast(context, con.walletCopiedRes.tr);
                     },
                     child: Row(
@@ -434,7 +433,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fontFamily: "Gilroy",
                               fontWeight: FontWeight.w500,
                               color: Color(0xFF00CB7D),
-                              fontSize: 15),
+                              fontSize: 16),
                         ),
                         const SizedBox(
                           width: 4,
@@ -449,9 +448,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                _homeController.userMe.value.description == "" ? const SizedBox(height: 0,) : const SizedBox(height: 0,),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 48.0),
                   child: _profileController.isEditingProfile.value
@@ -470,15 +467,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           Brightness.dark
                                       ? const Color(0xFF9BA0A5)
                                       : const Color(0xFF828282)),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                               border: InputBorder.none,
                               isCollapsed: true,
-                              hintText: ""),
+                              hintText: con.noDescYetRes.tr),
                         )
-                      : Text(
-                          _homeController.userMe.value.description == ""
-                              ? con.noDescYetRes.tr
-                              : _homeController.userMe.value.description!,
+                      : _homeController.userMe.value.description == "" ? Container(): Text(
+                               _homeController.userMe.value.description!,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                               height: 1.5,
@@ -853,7 +848,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                               ? Colors.white.withOpacity(0.5)
                               : Colors.black.withOpacity(0.5)),
                   onPressed: () async {
-                    var fav;
+                    bool fav;
                     if (homeController.isInFav
                         .contains(widget.nftDto.contractAddress)) {
                       homeController.isInFav
@@ -864,6 +859,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                           .add(widget.nftDto.contractAddress!);
                       fav = true;
                     }
+                    // ignore: invalid_use_of_protected_member
                     widget.pagingController.notifyListeners();
                     await profileController.updateNft(
                         NftModificationDto(
@@ -901,9 +897,10 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
                         child: InkWell(
                           onTap: () {
-                            if (profileController.isEditingProfile.value)
+                            if (profileController.isEditingProfile.value) {
                               profileController.urlPicture.value =
                                   widget.nftDto.images![i];
+                            }
                           },
                           child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),

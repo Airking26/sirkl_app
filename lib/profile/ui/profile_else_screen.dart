@@ -187,17 +187,17 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${_commonController.userClicked.value!.wallet!.substring(0,6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}",overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF00CB7D), fontSize: 15),),
+                    Text("${_commonController.userClicked.value!.wallet!.substring(0,6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}",overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF00CB7D), fontSize: 16),),
                     const SizedBox(width: 4,),
                     Image.asset("assets/images/copy.png", height: 18, width: 18, color: const Color(0xFF00CB7D),)
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 10,),
-            Padding(
+            _commonController.userClicked.value!.description ==  "" ? const SizedBox(height: 0,) : const SizedBox(height: 10,),
+            _commonController.userClicked.value!.description ==  "" ? Container() : Padding(
               padding: const EdgeInsets.symmetric(horizontal: 48.0),
-              child: Text(_commonController.userClicked.value!.description ==  "" ? con.noDescYetRes.tr : _commonController.userClicked.value!.description!,  textAlign: TextAlign.center, style: const TextStyle(height: 1.5, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282), fontSize: 15),),
+              child: Text(_commonController.userClicked.value!.description!,  textAlign: TextAlign.center, style: const TextStyle(height: 1.5, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282), fontSize: 15),),
             ),
             const SizedBox(height: 20,),
             const Padding(
