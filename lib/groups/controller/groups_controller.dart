@@ -10,6 +10,7 @@ import 'package:simple_s3/simple_s3.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/contract_creator_dto.dart';
+import 'package:sirkl/common/model/group_creation_dto.dart';
 import 'package:sirkl/common/model/group_dto.dart';
 import 'package:sirkl/common/model/nft_alchemy_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
@@ -33,7 +34,9 @@ class GroupsController extends GetxController{
   var refreshGroups = false.obs;
 
   createChannel(StreamChatClient streamChatClient, GroupDto groupDto, String pic) async{
-    _chatController.channel.value = streamChatClient.channel("try", id: groupDto.contractAddress.toLowerCase(), extraData: {
+    _chatController.channel.value = streamChatClient.channel("try",
+        id: groupDto.contractAddress.toLowerCase(),
+        extraData: {
       "members": ["bot_one", "bot_two", "bot_three"],
       "contractAddress" : groupDto.contractAddress.toLowerCase(),
       "image": pic,
@@ -140,43 +143,23 @@ class GroupsController extends GetxController{
     }
   }
 
-  createGroup(StreamChatClient streamChatClient, String name, String image, String contractAddress)async{
+  createGroup(StreamChatClient streamChatClient, GroupCreationDto groupCreationDto)async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _groupService.createGroup(accessToken, name, image, contractAddress);
+    var request = await _groupService.createGroup(accessToken, groupCreationDtoToJson(groupCreationDto));
     if(request.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken!);
       var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _groupService.createGroup(accessToken, name, image, contractAddress);
+      request = await _groupService.createGroup(accessToken, groupCreationDtoToJson(groupCreationDto));
       if(request.isOk){
-        await createChannel(streamChatClient, GroupDto(name: name, image: image, contractAddress: contractAddress), image);
+        await createChannel(streamChatClient, GroupDto(name: groupCreationDto.name, image: groupCreationDto.picture, contractAddress: groupCreationDto.contractAddress), groupCreationDto.picture);
       }
     } else if(request.isOk){
-      await createChannel(streamChatClient, GroupDto(name: name, image: image, contractAddress: contractAddress), image);
+      await createChannel(streamChatClient, GroupDto(name: groupCreationDto.name, image: groupCreationDto.picture, contractAddress: groupCreationDto.contractAddress), groupCreationDto.picture);
     }
   }
-
-
-  createHiro(StreamChatClient streamChatClient)async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _groupService.createGroup(accessToken, "SamuraiCats by Hiro Ando", "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384", "0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911");
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _groupService.createGroup(accessToken, "SamuraiCats by Hiro Ando", "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384", "0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911");
-      if(request.isOk){
-        await createChannel(streamChatClient, GroupDto(name: "SamuraiCats by Hiro Ando", image: "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384", contractAddress: "0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911"), "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384");
-      }
-    } else if(request.isOk){
-      await createChannel(streamChatClient, GroupDto(name: "SamuraiCats by Hiro Ando", image: "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384", contractAddress: "0xc8d2bf842b9f0b601043fb4fd5f23d22b9483911"), "https://i.seadn.io/gae/1vG98EN2sNCzVMoSk8WVnLQy9BDCC8q1aQOZi2YkVK7IzO0ShN_wxX09b44b2sszfRAyPZqNHwF9TlBA7jE8ylUkvdESCDoi_32wyg?auto=format&w=384");
-    }
-  }
-
 
 
 }

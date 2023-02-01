@@ -10,6 +10,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/model/group_creation_dto.dart';
 import 'package:sirkl/common/model/nft_modification_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -429,7 +430,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     ),
                     child: ListTile(
                       onTap: ()async{
-                        await _groupController.createGroup(StreamChat.of(context).client, _groupController.nftsAvailable[index].collectionName, _groupController.nftsAvailable[index].collectionImage , _groupController.nftsAvailable[index].contractAddress);
+                        await _groupController.createGroup(StreamChat.of(context).client, GroupCreationDto(name: _groupController.nftsAvailable[index].collectionName, picture: _groupController.nftsAvailable[index].collectionImage, contractAddress: _groupController.nftsAvailable[index].contractAddress));
                         _navigationController.hideNavBar.value = true;
                         pushNewScreen(context, screen: const DetailedChatScreen(create: false)).then((value) => _navigationController.hideNavBar.value = false);
                       },
