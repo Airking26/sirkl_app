@@ -20,6 +20,7 @@ import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/moralis_nft_contract_addresse.dart';
 import 'package:sirkl/common/model/nft_alchemy_dto.dart';
 import 'package:sirkl/common/model/nft_dto.dart';
+import 'package:sirkl/common/model/nickname_creation_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
@@ -344,14 +345,14 @@ class HomeController extends GetxController{
       var accessToken = box.read(con.ACCESS_TOKEN);
       var refreshToken = box.read(con.REFRESH_TOKEN);
       var request = await _homeService.updateNicknames(
-          accessToken, wallet, nickname);
+          accessToken, wallet, nicknameCreationDtoToJson(NicknameCreationDto(nickname: nickname)));
       if (request.statusCode == 401) {
         var requestToken = await _homeService.refreshToken(refreshToken);
         var refreshTokenDTO = refreshTokenDtoFromJson(
             json.encode(requestToken.body));
         accessToken = refreshTokenDTO.accessToken!;
         box.write(con.ACCESS_TOKEN, accessToken);
-        await _homeService.updateNicknames(accessToken, wallet, nickname);
+        await _homeService.updateNicknames(accessToken, wallet, nicknameCreationDtoToJson(NicknameCreationDto(nickname: nickname)));
       }
     }
   }
@@ -460,31 +461,5 @@ class HomeController extends GetxController{
       isConfiguring.value = false;
     }
   }
-
-/*getNFTsTemporary(String wallet) async{
-    nfts.value.clear();
-    var req = await _homeService.getNextNFTByAlchemy(wallet, cursor.value);
-    var res = nftAlchemyDtoFromJson(json.encode(req.body));
-    res.pageKey == null || res.pageKey!.isEmpty ? cursor.value = "" : cursor.value = res.pageKey!;
-    res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty || element.contractMetadata!.openSea!.collectionName == null ||  element.contractMetadata!.openSea!.collectionName!.isEmpty ||  element.contractMetadata!.openSea!.collectionName! == "Secret FLClub Pass");
-    var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
-    gc?.forEach((key, value) {
-      nfts.add(CollectionDbDto(collectionName: value.first.contractMetadata!.openSea!.collectionName!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
-    });
-    return nfts;
-  }
-
-  getNFTsTemporaryForOthers(String wallet) async{
-    nfts.value.clear();
-    var req = await _homeService.getNextNFTByAlchemy(wallet, cursorElse.value);
-    var res = nftAlchemyDtoFromJson(json.encode(req.body));
-    res.pageKey == null || res.pageKey!.isEmpty ? cursorElse.value = "" : cursorElse.value = res.pageKey!;
-    res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty || element.contractMetadata!.openSea!.collectionName == null ||  element.contractMetadata!.openSea!.collectionName!.isEmpty ||  element.contractMetadata!.openSea!.collectionName! == "Secret FLClub Pass");
-    var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
-    gc?.forEach((key, value) {
-      nfts.add(CollectionDbDto(collectionName: value.first.contractMetadata!.openSea!.collectionName!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
-    });
-    return nfts;
-  }*/
 
 }

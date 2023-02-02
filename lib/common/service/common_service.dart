@@ -7,6 +7,4 @@ class CommonService extends GetConnect{
   Future<Response<String>> checkUserIsInFollowing(String accessToken, String id) => get('${con.URL_SERVER}follow/isInFollowing/$id', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<List<dynamic>>> getSirklUsers(String accessToken, String id) => get('${con.URL_SERVER}follow/$id/following', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<List<dynamic>>> searchSirklUsers(String accessToken, String name, String offset) => get('${con.URL_SERVER}follow/search/following/$name/$offset', headers: {'Authorization':'Bearer $accessToken'});
-  Future<Response<Map<String, dynamic>>> retrieveNicknames(String accessToken) => get('${con.URL_SERVER}nicknames/retrieve', headers: {'Authorization':'Bearer $accessToken'});
-  Future<Response<Map<String, dynamic>>> addNickname(String accessToken, String wallet, String nickname) => put('${con.URL_SERVER}nicknames/$wallet/$nickname', null,  headers: {'Authorization':'Bearer $accessToken'});
 }
