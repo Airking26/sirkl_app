@@ -8,7 +8,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
@@ -83,7 +82,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                     boxShadow: const [
                       BoxShadow(
                         color: Colors.grey,
-                        offset: Offset(0.0, 0.01), //(x,y)
+                        offset: Offset(0.0, 0.01),
                         blurRadius: 0.01,
                       ),
                     ],
@@ -291,7 +290,7 @@ class CardNFT extends StatefulWidget {
   final NftDto nftDto;
   final CommonController profileController;
   final int index;
-  CardNFT(this.nftDto, this.profileController, this.index, {Key? key}) : super(key: key);
+  const CardNFT(this.nftDto, this.profileController, this.index, {Key? key}) : super(key: key);
 
   @override
   State<CardNFT> createState() => _CardNFTState();
@@ -325,9 +324,9 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             subtitle: Text("${widget.nftDto.images!.length} available", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
             onExpansionChanged: (expanded){
               if(expanded) {
-                widget.profileController.isCardExpandedList.value.assign(widget.index);
+                widget.profileController.isCardExpandedList.assign(widget.index);
               } else {
-                widget.profileController.isCardExpandedList.value.remove(widget.index);
+                widget.profileController.isCardExpandedList.remove(widget.index);
               }
               widget.profileController.isCardExpandedList.refresh();
             },
@@ -338,7 +337,14 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
                     child: ListView.builder(
                   itemCount: widget.nftDto.images!.length,
                   itemBuilder: (context, i){
-                    return buildCard(i, widget.nftDto);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: SizedBox.fromSize(
+                              child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: widget.nftDto.images![i], width: 80, height: 70,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                                  errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
+                    );
                   }, scrollDirection: Axis.horizontal,)),
               )
             ],
@@ -346,23 +352,6 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
         ),
       );
     }
-
-    Padding buildCard(int i, NftDto nftDto) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: InkWell(
-          onTap: (){
-            //if(widget.profileController.isEditingProfile.value) widget.profileController.urlPicture.value = collectionDbDTO.collectionImages[i];
-            },
-          child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: SizedBox.fromSize(
-                  child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: nftDto.images![i], width: 80, height: 70,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
-                      errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
-        ),
-      );
-    }
-
 
 }
 

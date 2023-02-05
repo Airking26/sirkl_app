@@ -177,6 +177,23 @@ class HomeController extends GetxController{
     }
   }
 
+  /*createWallet(BuildContext context) async{
+    var request = await _homeService.createWallet();
+    if(request.isOk){
+      _navigationController.hideNavBar.value = false;
+      var signSuccess = signInSuccessDtoFromJson(json.encode(request.body));
+      userMe.value = signSuccess.user!;
+      box.write(con.ACCESS_TOKEN, signSuccess.accessToken!);
+      accessToken.value = signSuccess.accessToken!;
+      box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
+      box.write(con.USER, userToJson(signSuccess.user!));
+      isConfiguring.value = true;
+      await putFCMToken(context, StreamChat.of(context).client, false);
+      await getAllNftConfig();
+      await retrieveInboxes();
+    }
+  }*/
+
   putFCMToken(BuildContext context, StreamChatClient client,bool isLogged) async {
     retrieveAccessToken();
     if(accessToken.value.isNotEmpty) {
@@ -262,7 +279,6 @@ class HomeController extends GetxController{
   getAllNftConfig() async{
     await _homeService.getAllNFTConfig(accessToken.value);
   }
-
   updateAllNftConfig() {
     _homeService.updateAllNFTConfig(accessToken.value);
   }

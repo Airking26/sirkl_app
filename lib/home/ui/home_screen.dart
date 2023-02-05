@@ -17,6 +17,7 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/home/ui/pdf_screen.dart';
 import 'package:sirkl/home/ui/story_viewer_screen.dart';
+import 'package:sirkl/home/utils/QRCodeScreen.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:slider_button/slider_button.dart';
 import 'package:story_view/controller/story_controller.dart';
@@ -663,7 +664,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
          SizedBox(
-          height: MediaQuery.of(context).size.height / 8.5,
+          height: MediaQuery.of(context).size.height / 12.5,
         ),
         Image.asset(
           "assets/images/wallet.png",
@@ -724,9 +725,32 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontFamily: "Gilroy",
                   fontWeight: FontWeight.w700),
             )),
+        const SizedBox(height: 12,),
+
+        NiceButtons(
+            stretch: false,
+            borderThickness: 5,
+            progress: false,
+            borderColor: const Color(0xff0063FB).withOpacity(0.5),
+            startColor: const Color(0xff1DE99B),
+            endColor: const Color(0xff0063FB),
+            gradientOrientation: GradientOrientation.Horizontal,
+            onTap: (finish) async {
+              _navigationController.hideNavBar.value = true;
+              pushNewScreen(context, screen: QRCodeScreen()).then((value) => _navigationController.hideNavBar.value = false);
+            },
+            child: const Text(
+              "Scan",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w700),
+            )),
         const SizedBox(height: 18,),
         InkWell(
           onTap: ()async{
+            //await _homeController.createWallet(context);
             await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
           },
           child: Text("OR Create a wallet", style: TextStyle(

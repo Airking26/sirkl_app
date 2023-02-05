@@ -76,6 +76,10 @@ dependencies:
   ndialog: ^4.2.3
   path: ^1.8.0
   launch_review: ^3.0.1
+  bip39: ^1.0.6
+  ed25519_hd_key: ^2.2.0
+  hex: ^0.2.0
+  qr_code_scanner: ^1.0.1
 
 dev_dependencies:
   flutter_test:
