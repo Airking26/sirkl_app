@@ -1,7 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:io';
+
 import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:highlight_text/highlight_text.dart';
@@ -9,15 +12,16 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/model/story_dto.dart';
+import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/home/ui/pdf_screen.dart';
 import 'package:sirkl/home/ui/story_viewer_screen.dart';
-import 'package:sirkl/home/utils/QRCodeScreen.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:slider_button/slider_button.dart';
 import 'package:story_view/controller/story_controller.dart';
@@ -42,6 +46,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final _navigationController = Get.put(NavigationController());
   final utils = Utils();
   final storyController = StoryController();
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  var result;
+  QRViewController? controller;
 
   @override
   void initState() {
@@ -69,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? buildListOfStories()
                             : Container()
                     : _homeController.address.value.isEmpty
-                        ? buildConnectWalletUI()
+                        ? _homeController.qrActive.value ? buildQRCodeWidget() : buildConnectWalletUI()
                         : buildSignWalletUI(),
                 _homeController.accessToken.value.isNotEmpty
                     ? _commonController.gettingStoryAndContacts.value &&
@@ -118,12 +125,17 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    if(_homeController.qrActive.value) {
+                      _homeController.qrActive.value = false;
+                      _navigationController.hideNavBar.value = false;
+                    }
+                  },
                   icon: Image.asset(
                     "assets/images/arrow_left.png",
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? Colors.transparent
-                        : Colors.transparent,
+                    color: _homeController.qrActive.value ? MediaQuery.of(context).platformBrightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black : Colors.transparent,
                   )),
               Padding(
                 padding: const EdgeInsets.only(top: 18.0),
@@ -737,7 +749,8 @@ class _HomeScreenState extends State<HomeScreen> {
             gradientOrientation: GradientOrientation.Horizontal,
             onTap: (finish) async {
               _navigationController.hideNavBar.value = true;
-              pushNewScreen(context, screen: QRCodeScreen()).then((value) => _navigationController.hideNavBar.value = false);
+              _homeController.qrActive.value = true;
+              //pushNewScreen(context, screen: const QRCodeScreen()).then((value) => _navigationController.hideNavBar.value = false);
             },
             child: const Text(
               "Scan",
@@ -953,12 +966,62 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Widget buildQRCodeWidget(){
+    return Flexible(
+      child: Column(
+        children: <Widget>[
+          Expanded(
+            flex: 5,
+            child: QRView(
+              key: qrKey,
+              onQRViewCreated: _onQRViewCreated,
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Center(
+              child: (result != null)
+                  ? Text(
+                  'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
+                  : const Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Text("Generate your QR code from app.sirkl.io by accessing the 'device connect' section from the login page or the settings page",
+                  textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, fontFamily: "Gilroy"),),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    this.controller = controller;
+    controller.scannedDataStream.listen((scanData) async {
+      var walletConnectDTO = walletConnectDtoFromJson(scanData.code!);
+      //_homeController.address.value = walletConnectDTO.wallet!;
+      _homeController.qrActive.value = false;
+      await _homeController.loginWithWallet(context, walletConnectDTO.wallet!, walletConnectDTO.message!, walletConnectDTO.signature!);
+    });
+  }
+
   @override
   void dispose() {
+    controller?.dispose();
     _homeController.loadingStories.value = true;
     _homeController.stories.value = [];
     _homeController.pagingController.value.dispose();
     super.dispose();
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      controller?.pauseCamera();
+    } else if (Platform.isIOS) {
+      controller?.resumeCamera();
+    }
   }
 
 }

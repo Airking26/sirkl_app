@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -265,218 +266,222 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  Stack buildAppbar(BuildContext context, TabController tabController) {
-    return Stack(
-          clipBehavior: Clip.none,
-          alignment: AlignmentDirectional.topCenter,
-          fit: StackFit.loose,
-          children: [
-            Container(
-              height: 140,
-              margin: const EdgeInsets.only(bottom: 0.25),
-              decoration: BoxDecoration(
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.grey,
-                    offset: Offset(0.0, 0.01),
-                    blurRadius: 0.01,
-                  ),
-                ],
-                borderRadius:
-                    const BorderRadius.vertical(bottom: Radius.circular(35)),
-                gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
-                      MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
-                    ]),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 44.0),
+  Widget buildAppbar(BuildContext context, TabController tabController) {
+    return DeferredPointerHandler(
+      child: Stack(
+            clipBehavior: Clip.none,
+            alignment: AlignmentDirectional.topCenter,
+            fit: StackFit.loose,
+            children: [
+              Container(
+                height: 140,
+                margin: const EdgeInsets.only(bottom: 0.25),
+                decoration: BoxDecoration(
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      offset: Offset(0.0, 0.01),
+                      blurRadius: 0.01,
+                    ),
+                  ],
+                  borderRadius:
+                      const BorderRadius.vertical(bottom: Radius.circular(35)),
+                  gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+                        MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
+                      ]),
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Obx(()=>IconButton(
-                          onPressed: () {
-                            _chatController.searchIsActive.value = !_chatController.searchIsActive.value;
-                            if(_chatController.searchIsActive.value) {
-                              _chatController.query.value = "";
-                              _floatingSearchBarController.clear();
-                              _floatingSearchBarController.close();
-                            }
-                          },
-                          icon: Image.asset(
-                            _chatController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
-                            color:
-                            MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                          ))),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
-                        child: Obx(() =>Text(
-                          _chatController.searchIsActive.value ? _chatController.index.value == 0 ? "Friends" : "Others" :
-                          con.chatsTabRes.tr,
-                          style: TextStyle(
-                              color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: "Gilroy",
-                              fontSize: 20),
-                        )),
-                      ),
-                      IconButton(
-                          onPressed: () {
-                            _navigationController.hideNavBar.value = true;
-                            pushNewScreen(context, screen: const NewMessageScreen()).then((value) {
-                              _navigationController.hideNavBar.value = false;
-                              if(_chatController.messageHasBeenSent.value) {
-                                _chatController.index.value = 1;
-                                tabController.index = 1;
-                                _chatController.messageHasBeenSent.value = false;
+                  padding: const EdgeInsets.only(top: 44.0),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Obx(()=>IconButton(
+                            onPressed: () {
+                              _chatController.searchIsActive.value = !_chatController.searchIsActive.value;
+                              if(_chatController.searchIsActive.value) {
+                                _chatController.query.value = "";
+                                _floatingSearchBarController.clear();
+                                _floatingSearchBarController.close();
                               }
-                            });
-                          },
-                          icon: Image.asset(
-                            "assets/images/edit.png",
-                            color:
-                            MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                            },
+                            icon: Image.asset(
+                              _chatController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
+                              color:
+                              MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                            ))),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12.0),
+                          child: Obx(() =>Text(
+                            _chatController.searchIsActive.value ? _chatController.index.value == 0 ? "Friends" : "Others" :
+                            con.chatsTabRes.tr,
+                            style: TextStyle(
+                                color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: "Gilroy",
+                                fontSize: 20),
                           )),
-                    ],
+                        ),
+                        IconButton(
+                            onPressed: () {
+                              _navigationController.hideNavBar.value = true;
+                              pushNewScreen(context, screen: const NewMessageScreen()).then((value) {
+                                _navigationController.hideNavBar.value = false;
+                                if(_chatController.messageHasBeenSent.value) {
+                                  _chatController.index.value = 1;
+                                  tabController.index = 1;
+                                  _chatController.messageHasBeenSent.value = false;
+                                }
+                              });
+                            },
+                            icon: Image.asset(
+                              "assets/images/edit.png",
+                              color:
+                              MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                            )),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Obx(()=>Positioned(
-                top: _chatController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
-                child: _chatController.searchIsActive.value ? SizedBox(
-                    height: 110,
-                    width: MediaQuery.of(context).size.width,
-                    child:buildFloatingSearchBar()): Container(
-                    height: 50,
-                    width: 350,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.grey,
-                            offset: Offset(0.0, 0.01),
-                            blurRadius: 0.01,
-                          ),
-                        ],
-                        color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                            ? const Color(0xFF2D465E).withOpacity(1)
-                            : Colors.white),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 4.0, bottom: 2, left: 4, right: 4),
-                      child: Obx(
-                        () => TabBar(
-                          labelPadding: EdgeInsets.zero,
-                          indicatorPadding: EdgeInsets.zero,
-                          indicatorColor: Colors.transparent,
-                          controller: tabController,
-                          padding: EdgeInsets.zero,
-                          tabs: [
-                            Container(
-                              height: 50,
-                              width: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                gradient: _chatController.index.value == 0
-                                    ? const LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [
-                                            Color(0xFF1DE99B),
-                                            Color(0xFF0063FB)
-                                          ])
-                                    : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                        ? const LinearGradient(
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                            colors: [
-                                                Color(0xFF2D465E),
-                                                Color(0xFF2D465E)
-                                              ])
-                                        : const LinearGradient(
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                            colors: [
-                                                Colors.white,
-                                                Colors.white
-                                              ]),
-                              ),
-                              child: Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "My SIRKL",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: "Gilroy",
-                                        fontWeight: FontWeight.w700,
-                                        color: _chatController.index.value == 0
-                                            ? Colors.white
-                                            : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                                ? const Color(0xFF9BA0A5)
-                                                : const Color(0xFF828282)),
-                                  )),
+              Obx(()=>Positioned(
+                  top: _chatController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
+                  child: _chatController.searchIsActive.value ? DeferPointer(
+                    child: SizedBox(
+                        height: 110,
+                        width: MediaQuery.of(context).size.width,
+                        child:buildFloatingSearchBar()),
+                  ): Container(
+                      height: 50,
+                      width: 350,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.grey,
+                              offset: Offset(0.0, 0.01),
+                              blurRadius: 0.01,
                             ),
-                            Container(
-                              height: 50,
-                              width: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                gradient: _chatController.index.value == 1
-                                    ? const LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [
-                                            Color(0xFF1DE99B),
-                                            Color(0xFF0063FB)
-                                          ])
-                                    : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                        ? const LinearGradient(
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                            colors: [
-                                                Color(0xFF2D465E),
-                                                Color(0xFF2D465E)
-                                              ])
-                                        : const LinearGradient(
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                            colors: [
-                                                Colors.white,
-                                                Colors.white
-                                              ]),
-                              ),
-                              child: Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "Others",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: "Gilroy",
-                                        fontWeight: FontWeight.w700,
-                                        color: _chatController.index.value == 1
-                                            ? Colors.white
-                                            : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                                ? const Color(0xFF9BA0A5)
-                                                : const Color(0xFF828282)),
-                                  )),
-                            )
                           ],
+                          color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                              ? const Color(0xFF2D465E).withOpacity(1)
+                              : Colors.white),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 4.0, bottom: 2, left: 4, right: 4),
+                        child: Obx(
+                          () => TabBar(
+                            labelPadding: EdgeInsets.zero,
+                            indicatorPadding: EdgeInsets.zero,
+                            indicatorColor: Colors.transparent,
+                            controller: tabController,
+                            padding: EdgeInsets.zero,
+                            tabs: [
+                              Container(
+                                height: 50,
+                                width: 200,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  gradient: _chatController.index.value == 0
+                                      ? const LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                              Color(0xFF1DE99B),
+                                              Color(0xFF0063FB)
+                                            ])
+                                      : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                          ? const LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [
+                                                  Color(0xFF2D465E),
+                                                  Color(0xFF2D465E)
+                                                ])
+                                          : const LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [
+                                                  Colors.white,
+                                                  Colors.white
+                                                ]),
+                                ),
+                                child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      "My SIRKL",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontFamily: "Gilroy",
+                                          fontWeight: FontWeight.w700,
+                                          color: _chatController.index.value == 0
+                                              ? Colors.white
+                                              : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                                  ? const Color(0xFF9BA0A5)
+                                                  : const Color(0xFF828282)),
+                                    )),
+                              ),
+                              Container(
+                                height: 50,
+                                width: 200,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  gradient: _chatController.index.value == 1
+                                      ? const LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                              Color(0xFF1DE99B),
+                                              Color(0xFF0063FB)
+                                            ])
+                                      : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                          ? const LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [
+                                                  Color(0xFF2D465E),
+                                                  Color(0xFF2D465E)
+                                                ])
+                                          : const LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [
+                                                  Colors.white,
+                                                  Colors.white
+                                                ]),
+                                ),
+                                child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      "Others",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontFamily: "Gilroy",
+                                          fontWeight: FontWeight.w700,
+                                          color: _chatController.index.value == 1
+                                              ? Colors.white
+                                              : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                                  ? const Color(0xFF9BA0A5)
+                                                  : const Color(0xFF828282)),
+                                    )),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                    ))))
-          ],
-        );
+                      ))))
+            ],
+          ),
+    );
   }
 
   Widget buildFloatingSearchBar() {

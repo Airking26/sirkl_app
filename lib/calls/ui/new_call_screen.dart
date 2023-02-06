@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -36,7 +37,6 @@ class _NewCallScreenState extends State<NewCallScreen> {
 
   @override
   void initState() {
-    _callController.focusNode.value;
     pagingController.addPageRequestListener((pageKey) {
        if(_callController.callQuery.value.isEmpty){
         pagingController.refresh();
@@ -72,19 +72,23 @@ class _NewCallScreenState extends State<NewCallScreen> {
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Column(children: [
-          Stack(
-            clipBehavior: Clip.none,
-            alignment: AlignmentDirectional.topCenter,
-            fit: StackFit.loose,
-            children: [
-              buildAppBar(),
-              Positioned(
-                  top: Platform.isAndroid ? 80 : 60,
-                  child: SizedBox(
-                      height: 110,
-                      width: MediaQuery.of(context).size.width,
-                      child: buildFloatingSearchBar())),
-            ],
+          DeferredPointerHandler(
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: AlignmentDirectional.topCenter,
+              fit: StackFit.loose,
+              children: [
+                buildAppBar(),
+                Positioned(
+                    top: Platform.isAndroid ? 80 : 60,
+                    child: DeferPointer(
+                      child: SizedBox(
+                          height: 110,
+                          width: MediaQuery.of(context).size.width,
+                          child: buildFloatingSearchBar()),
+                    )),
+              ],
+            ),
           ),
           Expanded(
             child: Padding(
@@ -278,7 +282,9 @@ class _NewCallScreenState extends State<NewCallScreen> {
           ),
           showIfClosed: true,
           showIfOpened: true,
-          onTap: () {},
+          onTap: () {
+            _searchController.open();
+          },
         ),
       ],
       actions: const [],
@@ -344,7 +350,6 @@ class _NewCallScreenState extends State<NewCallScreen> {
 
   @override
   void dispose() {
-    _callController.focusNode.value.dispose();
     pagingController.dispose();
     _callController.callQuery.value = "";
     super.dispose();

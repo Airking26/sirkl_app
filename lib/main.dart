@@ -240,7 +240,7 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
     textCallback: 'Call back',
     extra: <String, dynamic>{'userCalling': data["caller_id"], "userCalled": data['called_id'], "callId": data["call_id"], "channel": data["channel"]},
     android: const entities.AndroidParams(
-      isCustomNotification: true,
+      isCustomNotification: false,
       isCustomSmallExNotification: true,
       isShowLogo: false,
       isShowCallback: false,

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
@@ -83,84 +84,88 @@ class _CallsScreenState extends State<CallsScreen> {
         ])));
   }
 
-  Stack buildAppbar(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: AlignmentDirectional.topCenter,
-      fit: StackFit.loose,
-      children: [
-        Container(
-          height: _callController.callList.value == null || _callController.callList.value!.isEmpty ? 115 : 140,
-          margin: const EdgeInsets.only(bottom: 0.25),
-          decoration: BoxDecoration(
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.grey,
-                offset: Offset(0.0, 0.01), //(x,y)
-                blurRadius: 0.01,
-              ),
-            ],
-            borderRadius:
-            const BorderRadius.vertical(bottom: Radius.circular(35)),
-            gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
-                  MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
-                ]),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 44.0),
+  Widget buildAppbar(BuildContext context) {
+    return DeferredPointerHandler(
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: AlignmentDirectional.topCenter,
+        fit: StackFit.loose,
+        children: [
+          Container(
+            height: _callController.callList.value == null || _callController.callList.value!.isEmpty ? 115 : 140,
+            margin: const EdgeInsets.only(bottom: 0.25),
+            decoration: BoxDecoration(
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.grey,
+                  offset: Offset(0.0, 0.01), //(x,y)
+                  blurRadius: 0.01,
+                ),
+              ],
+              borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(35)),
+              gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+                    MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
+                  ]),
+            ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                      onPressed: () {},
-                      icon: Image.asset(
-                        "assets/images/arrow_left.png",
-                        color:
-                        MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.transparent,
-                      )),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12.0),
-                    child: Text(
-                      con.callsTabRes.tr,
-                      style: TextStyle(
-                          color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: "Gilroy",
-                          fontSize: 20),
+              padding: const EdgeInsets.only(top: 44.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                        onPressed: () {},
+                        icon: Image.asset(
+                          "assets/images/arrow_left.png",
+                          color:
+                          MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.transparent,
+                        )),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: Text(
+                        con.callsTabRes.tr,
+                        style: TextStyle(
+                            color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: "Gilroy",
+                            fontSize: 20),
+                      ),
                     ),
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        pushNewScreen(context, screen: const NewCallScreen()).then((value) => _callController.focusNode.value.dispose());
-                      },
-                      icon: Image.asset(
-                        "assets/images/call_tab.png",
-                        width: 24,
-                        height: 24,
-                        color:
-                        MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                      )),
-                ],
+                    IconButton(
+                        onPressed: () {
+                          pushNewScreen(context, screen: const NewCallScreen());
+                        },
+                        icon: Image.asset(
+                          "assets/images/call_tab.png",
+                          width: 24,
+                          height: 24,
+                          color:
+                          MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                        )),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        _callController.callList.value == null || _callController.callList.value!.isEmpty ? Container() : Positioned(
-            top: Platform.isAndroid? 80 : 60,
-            child: SizedBox(
-                height: 110,
-                width: MediaQuery.of(context).size.width,
-                child: buildFloatingSearchBar()))
-      ],
+          _callController.callList.value == null || _callController.callList.value!.isEmpty ? Container() : Positioned(
+              top: Platform.isAndroid? 80 : 60,
+              child: DeferPointer(
+                child: SizedBox(
+                    height: 110,
+                    width: MediaQuery.of(context).size.width,
+                    child: buildFloatingSearchBar()),
+              ))
+        ],
+      ),
     );
   }
 
@@ -218,7 +223,9 @@ class _CallsScreenState extends State<CallsScreen> {
           ),
           showIfClosed: true,
           showIfOpened: true,
-          onTap: () {},
+          onTap: () {
+
+          },
         ),
       ],
       actions: [],

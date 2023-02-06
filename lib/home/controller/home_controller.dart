@@ -63,7 +63,6 @@ class HomeController extends GetxController{
   var userMe = UserDTO().obs;
   var isLoadingNfts = true.obs;
   var address = "".obs;
-  var signPage = false.obs;
   var indexStory = 0.obs;
   var actualStoryIndex = 0.obs;
   var controllerConnected = false.obs;
@@ -74,6 +73,7 @@ class HomeController extends GetxController{
   var heHasNft = false.obs;
   var isInFav = <String>[].obs;
   var isFavNftSelected = false.obs;
+  var qrActive = false.obs;
 
   final connector = WalletConnect(
     bridge: 'https://bridge.walletconnect.org',
@@ -105,7 +105,6 @@ class HomeController extends GetxController{
 
     connector.on('connect', (session) async{
       address.value = sessionStatus?.accounts[0];
-      signPage.value = true;
     });
 
     connector.on('session_request', (payload) {
@@ -137,13 +136,13 @@ class HomeController extends GetxController{
   }
 
   String generateSessionMessage(String accountAddress) {
-    String message =
-        'Hello $accountAddress, welcome to our app. By signing this message you agree to learn and have fun with blockchain';
+    String message = 'Hello $accountAddress, welcome to our app. By signing this message you agree to learn and have fun with blockchain';
     var hash = keccakUtf8(message);
     final hashString = '0x${bytesToHex(hash).toString()}';
 
     return hashString;
   }
+
   signMessageWithMetamask(BuildContext context) async {
     if (connector.connected) {
       try {
@@ -387,7 +386,7 @@ class HomeController extends GetxController{
         box.write(con.ACCESS_TOKEN, accessToken);
         request = await _profileService.retrieveTokenStreamChat(accessToken);
         if (request.isOk) {
-          await client.connectUser(User(id: id.value,
+          var l = await client.connectUser(User(id: id.value,
               name: userMe.value.userName.isNullOrBlank!
                   ? userMe.value.wallet
                   : userMe.value.userName!,
@@ -400,7 +399,7 @@ class HomeController extends GetxController{
           }
         }
       } else if (request.isOk) {
-        await client.connectUser(User(id: id.value,
+        var l = await client.connectUser(User(id: id.value,
             name: userMe.value.userName.isNullOrBlank!
                 ? userMe.value.wallet
                 : userMe.value.userName!,

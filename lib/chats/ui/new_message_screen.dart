@@ -1,5 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:defer_pointer/defer_pointer.dart';
 import 'package:ethereum_addresses/ethereum_addresses.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -40,13 +43,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   YYDialog dialogMenu = YYDialog();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
-  FocusNode? _focusNode;
   final StreamMessageInputController _messageInputController = StreamMessageInputController();
   final _searchController = FloatingSearchBarController();
 
   @override
   void initState() {
-    _focusNode = FocusNode();
     pagingController.addPageRequestListener((pageKey) {
        if(_commonController.query.value.isEmpty){
         pagingController.refresh();
@@ -64,19 +65,23 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() =>Column(children: [
-          Stack(
-            clipBehavior: Clip.none,
-            alignment: AlignmentDirectional.topCenter,
-            fit: StackFit.loose,
-            children: [
-              buildAppBar(),
-              Positioned(
-                  top: Platform.isAndroid ? 80 : 60,
-                  child: SizedBox(
-                      height: 110,
-                      width: MediaQuery.of(context).size.width,
-                      child: buildFloatingSearchBar())),
-            ],
+          DeferredPointerHandler(
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: AlignmentDirectional.topCenter,
+              fit: StackFit.loose,
+              children: [
+                buildAppBar(),
+                Positioned(
+                    top: Platform.isAndroid ? 80 : 60,
+                    child: DeferPointer(
+                      child: SizedBox(
+                          height: 110,
+                          width: MediaQuery.of(context).size.width,
+                          child: buildFloatingSearchBar()),
+                    )),
+              ],
+            ),
           ),
           Expanded(
             child: Padding(
@@ -297,7 +302,9 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           ),
           showIfClosed: true,
           showIfOpened: true,
-          onTap: () {},
+          onTap: () {
+            _searchController.open();
+          },
         ),
       ],
       actions: const [],
@@ -498,7 +505,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               },
               child:
                   _chatController.messageSending.value ?
-                      Container(width: 55, height: 55, child: const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D),),)) :
+                      SizedBox(width: 55, height: 55, child: const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D),),)) :
               Container(
                 width: 55,
                 height: 55,
@@ -526,7 +533,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
 
   @override
   void dispose() {
-    _focusNode!.dispose();
     _chatController.chipsList.clear();
     pagingController.dispose();
     _commonController.query.value = "";

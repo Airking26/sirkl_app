@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 
 class QRCodeScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class QRCodeScreen extends StatefulWidget {
 class _QRCodeScreenState extends State<QRCodeScreen> {
 
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  Barcode? result;
+  var result;
   QRViewController? controller;
   final _homeController = Get.put(HomeController());
 
@@ -33,42 +34,43 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            flex: 5,
-            child: QRView(
-              key: qrKey,
-              onQRViewCreated: _onQRViewCreated,
+    return Flexible(
+      child: Scaffold(
+        body: Column(
+          children: <Widget>[
+            Expanded(
+              flex: 5,
+              child: QRView(
+                key: qrKey,
+                onQRViewCreated: _onQRViewCreated,
+              ),
             ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Center(
-              child: (result != null)
-                  ? Text(
-                  'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
-                  : const Padding(
-                    padding: EdgeInsets.all(24.0),
-                    child: Text("Generate your QR code from app.sirkl.io by accessing the 'device connect' section from the login page or the settings page",
-              textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, fontFamily: "Gilroy"),),
-                  ),
-            ),
-          )
-        ],
+            Expanded(
+              flex: 1,
+              child: Center(
+                child: (result != null)
+                    ? Text(
+                    'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
+                    : const Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: Text("Generate your QR code from app.sirkl.io by accessing the 'device connect' section from the login page or the settings page",
+                textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, fontFamily: "Gilroy"),),
+                    ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
-    controller.scannedDataStream.listen((scanData) {
-      setState(() async {
-        result = scanData;
-        //await _homeController.loginWithWallet(context, wallet, message, signature);
-        Get.back();
-      });
+    controller.scannedDataStream.listen((scanData) async {
+        var walletConnectDTO = walletConnectDtoFromJson(scanData.code!);
+        _homeController.address.value = walletConnectDTO.wallet!;
+        await _homeController.loginWithWallet(context, walletConnectDTO.wallet!, walletConnectDTO.message!, walletConnectDTO.signature!);
+
     });
   }
 

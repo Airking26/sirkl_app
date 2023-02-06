@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
@@ -92,6 +93,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
     client = StreamChat.of(context).client;
     streamChannelListControllerGroups = buildStreamChannelListController(false);
     streamChannelListControllerGroupsFav = buildStreamChannelListController(true);
+    _groupController.index.value = _homeController.isInFav.isEmpty ? 1 : 0;
     super.initState();
   }
 
@@ -448,217 +450,221 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
     );
   }
 
-  Stack buildAppbar(BuildContext context, TabController tabController) {
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: AlignmentDirectional.topCenter,
-      fit: StackFit.loose,
-      children: [
-        Container(
-          height: _groupController.addAGroup.value ? 115 : 140,
-          margin: const EdgeInsets.only(bottom: 0.25),
-          decoration: BoxDecoration(
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.grey,
-                offset: Offset(0.0, 0.01), //(x,y)
-                blurRadius: 0.01,
-              ),
-            ],
-            borderRadius:
-            const BorderRadius.vertical(bottom: Radius.circular(35)),
-            gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
-                  MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xFF1E2032) : Colors.white
-                ]),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 44.0),
+  Widget buildAppbar(BuildContext context, TabController tabController) {
+    return DeferredPointerHandler(
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: AlignmentDirectional.topCenter,
+        fit: StackFit.loose,
+        children: [
+          Container(
+            height: _groupController.addAGroup.value ? 115 : 140,
+            margin: const EdgeInsets.only(bottom: 0.25),
+            decoration: BoxDecoration(
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.grey,
+                  offset: Offset(0.0, 0.01), //(x,y)
+                  blurRadius: 0.01,
+                ),
+              ],
+              borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(35)),
+              gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
+                    MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xFF1E2032) : Colors.white
+                  ]),
+            ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Obx(()=>IconButton(
-                      onPressed: () async{
-                        if(!_groupController.addAGroup.value) {
-                          _groupController.searchIsActive.value =
-                          !_groupController.searchIsActive.value;
-                          if (_groupController.searchIsActive.value) {
-                            _groupController.query.value = "";
-                            _floatingSearchBarController.clear();
-                            _floatingSearchBarController.close();
+              padding: const EdgeInsets.only(top: 44.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Obx(()=>IconButton(
+                        onPressed: () async{
+                          if(!_groupController.addAGroup.value) {
+                            _groupController.searchIsActive.value =
+                            !_groupController.searchIsActive.value;
+                            if (_groupController.searchIsActive.value) {
+                              _groupController.query.value = "";
+                              _floatingSearchBarController.clear();
+                              _floatingSearchBarController.close();
+                            }
                           }
-                        }
-                      },
-                      icon: Image.asset(
-                        _groupController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
-                        color:
-                        _groupController.addAGroup.value ? Colors.transparent : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                      ))),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12.0),
-                    child: Obx(() =>Text(
-                      _groupController.addAGroup.value ? "New Group" :
-                      _groupController.searchIsActive.value ? _groupController.index.value == 0 ? "Favorites" : "Others" :
-                      con.groupsTabRes.tr,
-                      style: TextStyle(
-                          color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: "Gilroy",
-                          fontSize: 20),
-                    )),
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        if(!_groupController.addAGroup.value && _groupController.nftsAvailable.isEmpty) _groupController.retrieveGroups(_homeController.userMe.value.wallet!);
-                        _groupController.addAGroup.value = !_groupController.addAGroup.value;
-                      },
-                      icon: Image.asset(
-                        _groupController.addAGroup.value ?
-                        "assets/images/close_big.png" :
-                        "assets/images/plus.png",
-                        color:
-                        MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                        },
+                        icon: Image.asset(
+                          _groupController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
+                          color:
+                          _groupController.addAGroup.value ? Colors.transparent : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                        ))),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: Obx(() =>Text(
+                        _groupController.addAGroup.value ? "New Group" :
+                        _groupController.searchIsActive.value ? _groupController.index.value == 0 ? "Favorites" : "Others" :
+                        con.groupsTabRes.tr,
+                        style: TextStyle(
+                            color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: "Gilroy",
+                            fontSize: 20),
                       )),
-                ],
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          if(!_groupController.addAGroup.value && _groupController.nftsAvailable.isEmpty) _groupController.retrieveGroups(_homeController.userMe.value.wallet!);
+                          _groupController.addAGroup.value = !_groupController.addAGroup.value;
+                        },
+                        icon: Image.asset(
+                          _groupController.addAGroup.value ?
+                          "assets/images/close_big.png" :
+                          "assets/images/plus.png",
+                          color:
+                          MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                        )),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        Obx(()=>Positioned(
-            top: _groupController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
-            child: _groupController.searchIsActive.value ? SizedBox(
-                height: 110,
-                width: MediaQuery.of(context).size.width,
-                child:buildFloatingSearchBar()):
-            _groupController.addAGroup.value ? Container() : Container(
-                height: 50,
-                width: 350,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.grey,
-                        offset: Offset(0.0, 0.01), //(x,y)
-                        blurRadius: 0.01,
-                      ),
-                    ],
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? const Color(0xFF2D465E).withOpacity(1)
-                        : Colors.white),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 4.0, bottom: 2, left: 4, right: 4),
-                  child: Obx(
-                        () => TabBar(
-                      labelPadding: EdgeInsets.zero,
-                      indicatorPadding: EdgeInsets.zero,
-                      indicatorColor: Colors.transparent,
-                      controller: tabController,
-                      padding: EdgeInsets.zero,
-                      tabs: [
-                        Container(
-                          height: 50,
-                          width: 200,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            gradient: _groupController.index.value == 0
-                                ? const LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Color(0xFF1DE99B),
-                                  Color(0xFF0063FB)
-                                ])
-                                : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                ? const LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Color(0xFF2D465E),
-                                  Color(0xFF2D465E)
-                                ])
-                                : const LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Colors.white,
-                                  Colors.white
-                                ]),
-                          ),
-                          child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Favorites",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontFamily: "Gilroy",
-                                    fontWeight: FontWeight.w700,
-                                    color: _groupController.index.value == 0
-                                        ? Colors.white
-                                        : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                        ? const Color(0xFF9BA0A5)
-                                        : const Color(0xFF828282)),
-                              )),
+          Obx(()=>Positioned(
+              top: _groupController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
+              child: _groupController.searchIsActive.value ? DeferPointer(
+                child: SizedBox(
+                    height: 110,
+                    width: MediaQuery.of(context).size.width,
+                    child:buildFloatingSearchBar()),
+              ):
+              _groupController.addAGroup.value ? Container() : Container(
+                  height: 50,
+                  width: 350,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.grey,
+                          offset: Offset(0.0, 0.01), //(x,y)
+                          blurRadius: 0.01,
                         ),
-                        Container(
-                          height: 50,
-                          width: 200,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            gradient: _groupController.index.value == 1
-                                ? const LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Color(0xFF1DE99B),
-                                  Color(0xFF0063FB)
-                                ])
-                                : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                ? const LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Color(0xFF2D465E),
-                                  Color(0xFF2D465E)
-                                ])
-                                : const LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Colors.white,
-                                  Colors.white
-                                ]),
-                          ),
-                          child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Others",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontFamily: "Gilroy",
-                                    fontWeight: FontWeight.w700,
-                                    color: _groupController.index.value == 1
-                                        ? Colors.white
-                                        : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                        ? const Color(0xFF9BA0A5)
-                                        : const Color(0xFF828282)),
-                              )),
-                        )
                       ],
+                      color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                          ? const Color(0xFF2D465E).withOpacity(1)
+                          : Colors.white),
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 4.0, bottom: 2, left: 4, right: 4),
+                    child: Obx(
+                          () => TabBar(
+                        labelPadding: EdgeInsets.zero,
+                        indicatorPadding: EdgeInsets.zero,
+                        indicatorColor: Colors.transparent,
+                        controller: tabController,
+                        padding: EdgeInsets.zero,
+                        tabs: [
+                          Container(
+                            height: 50,
+                            width: 200,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              gradient: _groupController.index.value == 0
+                                  ? const LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Color(0xFF1DE99B),
+                                    Color(0xFF0063FB)
+                                  ])
+                                  : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                  ? const LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Color(0xFF2D465E),
+                                    Color(0xFF2D465E)
+                                  ])
+                                  : const LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Colors.white,
+                                    Colors.white
+                                  ]),
+                            ),
+                            child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "Favorites",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontFamily: "Gilroy",
+                                      fontWeight: FontWeight.w700,
+                                      color: _groupController.index.value == 0
+                                          ? Colors.white
+                                          : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                          ? const Color(0xFF9BA0A5)
+                                          : const Color(0xFF828282)),
+                                )),
+                          ),
+                          Container(
+                            height: 50,
+                            width: 200,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              gradient: _groupController.index.value == 1
+                                  ? const LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Color(0xFF1DE99B),
+                                    Color(0xFF0063FB)
+                                  ])
+                                  : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                  ? const LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Color(0xFF2D465E),
+                                    Color(0xFF2D465E)
+                                  ])
+                                  : const LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Colors.white,
+                                    Colors.white
+                                  ]),
+                            ),
+                            child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "Others",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontFamily: "Gilroy",
+                                      fontWeight: FontWeight.w700,
+                                      color: _groupController.index.value == 1
+                                          ? Colors.white
+                                          : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                          ? const Color(0xFF9BA0A5)
+                                          : const Color(0xFF828282)),
+                                )),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                ))))
-      ],
+                  ))))
+        ],
+      ),
     );
   }
 
@@ -712,6 +718,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
           showIfClosed: true,
           showIfOpened: true,
           onTap: () {
+            _floatingSearchBarController.open();
           },
         ),
       ],

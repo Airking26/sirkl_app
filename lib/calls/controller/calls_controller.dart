@@ -44,7 +44,6 @@ class CallsController extends GetxController{
   var callQuery = "".obs;
   Rx<PagingController<int, CallDto>> pagingController = PagingController<int, CallDto>(firstPageKey: 0).obs;
   var pageKey = 0.obs;
-  var focusNode = FocusNode().obs;
   var isFromConv = false.obs;
 
   Future<void> setupVoiceSDKEngine(BuildContext context) async {
