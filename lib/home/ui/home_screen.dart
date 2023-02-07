@@ -237,15 +237,16 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Text(
           _homeController.stories.value![index]!.first!.createdBy.nickname.isNullOrBlank! ?
-              (_homeController.stories.value![index]!.first!.createdBy.userName
-                      .isNullOrBlank!
+              (_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
                   ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 5)}..."
-                  : _homeController.stories.value![index]!.first!.createdBy
-                              .userName!.length >
-                          6
+                  : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 6
                       ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 7)}..."
-                      : _homeController
-                          .stories.value![index]!.first!.createdBy.userName!) : _homeController.stories.value![index]!.first!.createdBy.nickname!,
+                      : _homeController.stories.value![index]!.first!.createdBy.userName!) :
+          "${_homeController.stories.value![index]!.first!.createdBy.nickname!} (${_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
+              ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 3)}..."
+              : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 3
+              ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 4)}..."
+              : _homeController.stories.value![index]!.first!.createdBy.userName!})",
           style: TextStyle(
               fontFamily: "Gilroy",
               fontWeight: FontWeight.w600,
@@ -529,12 +530,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     offset: const Offset(-8, 0),
                     child: Text(
                         _commonController.users[index].nickname.isNullOrBlank! ?
-                            (_commonController
-                                    .users[index].userName.isNullOrBlank!
+                            (_commonController.users[index].userName.isNullOrBlank!
                                 ? _commonController.users[index].wallet!
                                 : _commonController.users[index].userName!) :
-                        _commonController.users[index].nickname!,
-                        maxLines: 1,
+                        _commonController.users[index].nickname!  + (_commonController.users[index].userName.isNullOrBlank! ? "" : " (${_commonController.users[index].userName!})"),
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                             fontSize: 16,
@@ -543,7 +543,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color:MediaQuery.of(context).platformBrightness == Brightness.dark
                                 ? Colors.white
                                 : Colors.black)))),
-            subtitle: !_commonController.users[index].userName.isNullOrBlank!
+            subtitle: !_commonController.users[index].userName.isNullOrBlank! || !_commonController.users[index].nickname.isNullOrBlank!
                 ? InkWell(
                     onTap: () {
                       _commonController.userClicked.value =
@@ -555,8 +555,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: Transform.translate(
                         offset: const Offset(-8, 0),
-                        child: Text(_commonController.users[index].wallet!,
-                            maxLines: 1,
+                        child: Text("${_commonController.users[index].wallet!.substring(0, 6)}...${_commonController.users[index].wallet!.substring(_commonController.users[index].wallet!.length - 4)}",
+                            //maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                                 fontSize: 13,

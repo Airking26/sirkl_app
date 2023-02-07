@@ -270,6 +270,7 @@ class _CallsScreenState extends State<CallsScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ListTile(
+
         leading: callDto.called.picture.isNullOrBlank! ?
         InkWell(
           onTap: (){
@@ -320,9 +321,12 @@ class _CallsScreenState extends State<CallsScreen> {
           ],
         ),
         title: Transform.translate(offset: const Offset(-4, 0),child: Text(
-            callDto.called.nickname.isNullOrBlank! ? (callDto.called.userName.isNullOrBlank! ? "${callDto.called.wallet!.substring(0, 15)}..." : callDto.called.userName!.length > 15 ? "${callDto.called.userName!.substring(0,15)}..." : callDto.called.userName!): callDto.called.nickname!, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black))),
-        subtitle:
-            Transform.translate(
+            callDto.called.nickname.isNullOrBlank! ?
+            (callDto.called.userName.isNullOrBlank! ? "${callDto.called.wallet!.substring(0, 6)}...${callDto.called.wallet!.substring(callDto.called.wallet!.length - 4)}" : callDto.called.userName!.length > 15 ? "${callDto.called.userName!.substring(0,15)}..." : callDto.called.userName!):
+            "${callDto.called.nickname!} (${callDto.called.userName.isNullOrBlank! ? "${callDto.called.wallet!.substring(0, 6)}...${callDto.called.wallet!.substring(callDto.called.wallet!.length - 4)}" : callDto.called.userName!.length > 10 ? "${callDto.called.userName!.substring(0,10)}..." : callDto.called.userName!}"")",
+            maxLines: 2, overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black))),
+        subtitle: Transform.translate(
               offset: const Offset(-4, 0),
               child: Row(children: [
                 if(callDto.status == 0)Image.asset("assets/images/outgoing.png", width: 10, height: 10,)

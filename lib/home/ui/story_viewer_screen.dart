@@ -120,7 +120,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
               children: [
                 Text(
                   story.createdBy.nickname.isNullOrBlank! ?
-    (story.createdBy.userName.isNullOrBlank! ? "${story.createdBy.wallet!.substring(0, 10)}..." : story.createdBy.userName!) :story.createdBy.nickname! ,
+    (story.createdBy.userName.isNullOrBlank! ? "${story.createdBy.wallet!.substring(0, 6)}...${story.createdBy.wallet!.substring(story.createdBy.wallet!.length - 4)}" : story.createdBy.userName!) :"${story.createdBy.nickname!} (${story.createdBy.userName.isNullOrBlank! ? "${story.createdBy.wallet!.substring(0, 10)}..." : story.createdBy.userName!})",
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontFamily: "Gilroy",

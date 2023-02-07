@@ -323,7 +323,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
         ),
         title: Transform.translate(
           offset: const Offset(-8, 0),
-          child: Text(item.userName.isNullOrBlank! ? item.wallet! : item.userName!,
+          child: Text(item.nickname != null ? item.nickname! + (item.userName.isNullOrBlank! ? "" : " (${item.userName!})") : item.userName.isNullOrBlank! ? item.wallet! : item.userName!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -332,9 +332,9 @@ class _NewCallScreenState extends State<NewCallScreen> {
                   fontWeight: FontWeight.w600,
                   color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
         ),
-        subtitle: !item.userName.isNullOrBlank! ? Transform.translate(
+        subtitle: !item.userName.isNullOrBlank! || !item.nickname.isNullOrBlank! ? Transform.translate(
           offset: const Offset(-8, 0),
-          child: Text(item.wallet!,
+          child: Text("${item.wallet!.substring(0,6)}...${item.wallet!.substring(item.wallet!.length - 4)}",
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(

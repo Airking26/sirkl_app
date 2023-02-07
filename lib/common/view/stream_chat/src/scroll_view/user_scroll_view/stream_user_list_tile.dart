@@ -144,8 +144,9 @@ class StreamUserListTile extends StatelessWidget {
 
     final title = this.title ??
         Text(
-          _homeController.nicknames[userFromJson(json.encode(user.extraData["userDTO"])).wallet!] ??
-              (userFromJson(json.encode(user.extraData["userDTO"])).userName.isNullOrBlank! ? "${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(0,25)}...": userFromJson(json.encode(user.extraData["userDTO"])).userName!),
+          _homeController.nicknames[userFromJson(json.encode(user.extraData["userDTO"])).wallet!] != null ?
+          _homeController.nicknames[userFromJson(json.encode(user.extraData["userDTO"])).wallet!] + " (" + (userFromJson(json.encode(user.extraData["userDTO"])).userName.isNullOrBlank! ? "${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(0,6)}...${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(user.extraData["userDTO"])).wallet!.length -4)}": userFromJson(json.encode(user.extraData["userDTO"])).userName!) + ")"
+              : (userFromJson(json.encode(user.extraData["userDTO"])).userName.isNullOrBlank! ? "${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(0,10)}...${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(user.extraData["userDTO"])).wallet!.length - 4)}": userFromJson(json.encode(user.extraData["userDTO"])).userName!),
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, fontFamily: "Gilroy",color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
         );
 
