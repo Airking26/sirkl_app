@@ -156,6 +156,7 @@ flutter:
      - assets/images/volume.svg
      - assets/images/call_end.svg
      - assets/images/metamask.png
+     - assets/images/qrcode.png
      - assets/pdf/tc.pdf
      - assets/pdf/pp.pdf
      - assets/pdf/all.pdf

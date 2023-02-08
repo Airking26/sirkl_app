@@ -28,7 +28,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
   final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
-  final _navigationScreen = Get.put(NavigationController());
   final PagingController<int, NotificationDto> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
 

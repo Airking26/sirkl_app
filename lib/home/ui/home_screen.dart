@@ -6,6 +6,8 @@ import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -18,6 +20,7 @@ import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
+import 'package:sirkl/common/model/web_wallet_connect_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/home/ui/pdf_screen.dart';
@@ -52,6 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      if(_homeController.accessToken.value.isEmpty) await _displayDialog(context);
+    });
     _homeController.pagingController.value.addPageRequestListener((pageKey) {
       _homeController.pagingController.value.itemList = [];
       fetchPageStories();
@@ -107,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
             blurRadius: 0.01,
           ),
         ],
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(35)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(_homeController.qrActive.value ? 0 : 35)),
         gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -741,24 +747,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
         NiceButtons(
             stretch: false,
-            borderThickness: 5,
+            borderThickness: 2,
             progress: false,
-            borderColor: const Color(0xff0063FB).withOpacity(0.5),
-            startColor: const Color(0xff1DE99B),
-            endColor: const Color(0xff0063FB),
+            height: 55,
+            borderColor: Colors.transparent,
+            startColor: const Color(0xff1DE99B).withOpacity(0.5),
+            endColor: const Color(0xff0063FB).withOpacity(0.5),
             gradientOrientation: GradientOrientation.Horizontal,
             onTap: (finish) async {
               _navigationController.hideNavBar.value = true;
               _homeController.qrActive.value = true;
               //pushNewScreen(context, screen: const QRCodeScreen()).then((value) => _navigationController.hideNavBar.value = false);
             },
-            child: const Text(
-              "Scan",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w700),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset("assets/images/qrcode.png", color: Colors.white, width: 28, height: 28,),
+                const Text(
+                  "Scan",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontFamily: "Gilroy",
+                      fontWeight: FontWeight.w700),
+                ),
+              ],
             )),
         const SizedBox(height: 18,),
         InkWell(
@@ -977,15 +990,12 @@ class _HomeScreenState extends State<HomeScreen> {
               onQRViewCreated: _onQRViewCreated,
             ),
           ),
-          Expanded(
+           const Expanded(
             flex: 1,
             child: Center(
-              child: (result != null)
-                  ? Text(
-                  'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
-                  : const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(24.0),
-                child: Text("Generate your QR code from app.sirkl.io by accessing the 'device connect' section from the login page or the settings page",
+                child: Text("Generate your QR code from the website 'app.sirkl.io' either from the login page or the header once you are logged in.",
                   textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, fontFamily: "Gilroy"),),
               ),
             ),
@@ -998,10 +1008,23 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) async {
-      var walletConnectDTO = walletConnectDtoFromJson(scanData.code!);
-      //_homeController.address.value = walletConnectDTO.wallet!;
+      var webWalletConnectDTO = webWalletConnectDtoFromJson(scanData.code!);
       _homeController.qrActive.value = false;
-      await _homeController.loginWithWallet(context, walletConnectDTO.wallet!, walletConnectDTO.message!, walletConnectDTO.signature!);
+      if(DateTime.now().isBefore(DateTime.fromMillisecondsSinceEpoch(int.parse(webWalletConnectDTO.timestamp!) * 1000))) {
+        await _homeController.loginWithWallet(
+            context, webWalletConnectDTO.wallet!, webWalletConnectDTO.message!,
+            webWalletConnectDTO.signature!);
+      } else {
+        Fluttertoast.showToast(
+            msg: "Error, the QR Code is no longer valid",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
+            textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
+            fontSize: 16.0
+        );
+      }
     });
   }
 
@@ -1024,4 +1047,54 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+
+  final TextEditingController _textFieldController = TextEditingController();
+  _displayDialog(BuildContext context) async {
+    return showDialog(
+      barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.white.withOpacity(0.85),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            title: const Text('Beta Version Access Code', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: "Gilroy"),),
+            content: TextField(
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
+              cursorColor: const Color(0xFF00CB7D),
+              controller: _textFieldController,
+              decoration: const InputDecoration(hintText: "Enter Code", hintStyle: TextStyle(fontWeight: FontWeight.w500, fontFamily: "Gilroy"), focusColor: Color(0xFF00CB7D), hoverColor: Color(0xFF00CB7D), fillColor: Color(0xFF00CB7D),enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFF00CB7D)),
+              ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFF00CB7D)),
+                ),),
+            ),
+            actions: [
+              TextButton(
+                child: const Text('SUBMIT', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: Color(0xFF00CB7D)),),
+                onPressed: () {
+                  if(_textFieldController.text == "BETAKING2023") {
+                    Navigator.of(context).pop();
+                  } else {
+                    Fluttertoast.showToast(
+                      msg: "Wrong Access Code",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
+                      textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
+                      fontSize: 16.0
+                  );
+                  }
+                },
+              )
+            ],
+          );
+        }
+    );
+  }
 }
