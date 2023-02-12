@@ -13,11 +13,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:launch_review/launch_review.dart';
 import 'package:sirkl/chats/service/chats_service.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/model/collection_dto.dart';
-import 'package:sirkl/common/model/moralis_nft_contract_addresse.dart';
+import 'package:sirkl/common/model/contract_address_dto.dart';
 import 'package:sirkl/common/model/nft_alchemy_dto.dart';
 import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/model/nickname_creation_dto.dart';
@@ -119,12 +117,25 @@ class HomeController extends GetxController{
         onDisplayUri: (uri) async {
           _uri = uri;
           try{
-            await launchUrl(Uri.parse(uri), mode: LaunchMode.externalApplication);
-          } on PlatformException {
+            var t = await launchUrl(Uri.parse(uri), mode: LaunchMode.externalApplication);
+            if(t == false) {
+              Fluttertoast.showToast(
+                msg: "Not wallet was found, please create one in order to continue",
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 2,
+                backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
+                textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
+                fontSize: 16.0
+            );
+            }
+          } on Exception {
+            debugPrint("II");
             Fluttertoast.showToast(
                 msg: "Not wallet was found, please create one in order to continue",
                 toastLength: Toast.LENGTH_LONG,
                 gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 10,
                 backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
                 textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
                 fontSize: 16.0
@@ -248,20 +259,22 @@ class HomeController extends GetxController{
 
   getNFTsContractAddresses(StreamChatClient? client, String wallet) async{
     var stockedContractAddresses = box.read(con.contractAddresses) ?? [];
-    var req = await _homeService.getNFTsContractAddresses(wallet);
+    var req = await _homeService.getContractAddressesWithAlchemy(wallet, "");
     if(req.body != null){
-    var initialArray = moralisNftContractAdressesFromJson(json.encode(req.body)).result!;
-    if(moralisNftContractAdressesFromJson(json.encode(req.body)).cursor != null) {
-      var cursor = moralisNftContractAdressesFromJson(json.encode(req.body)).cursor;
+    var initialArray = contractAddressDtoFromJson(json.encode(req.body)).contracts!;
+    if(contractAddressDtoFromJson(json.encode(req.body)).pageKey != null) {
+      var cursor = contractAddressDtoFromJson(json.encode(req.body)).pageKey;
       while (cursor != null) {
-        var newReq = await _homeService.getNextNFTsContractAddresses(wallet, cursor);
-        initialArray.addAll(moralisNftContractAdressesFromJson(json.encode(newReq.body)).result!);
-        cursor = moralisNftContractAdressesFromJson(json.encode(newReq.body)).cursor;
+        var newReq = await _homeService.getContractAddressesWithAlchemy(wallet, "&pageKey=$cursor");
+        initialArray.addAll(contractAddressDtoFromJson(json.encode(newReq.body)).contracts!);
+        cursor = contractAddressDtoFromJson(json.encode(newReq.body)).pageKey;
       }
     }
 
+    initialArray.removeWhere((element) => element.title == null || element.title!.isEmpty || element.opensea == null || element.opensea!.imageUrl == null || element.opensea!.imageUrl!.isEmpty  ||  element.opensea!.collectionName == null || element.opensea!.collectionName!.isEmpty || element.tokenType == TokenType.UNKNOWN || (element.tokenType == TokenType.ERC1155 && element.opensea?.safelistRequestStatus == SafelistRequestStatus.NOT_REQUESTED));
+
      for (var element in initialArray) {
-       if(!contractAddresses.contains(element.tokenAddress)) contractAddresses.add(element.tokenAddress!.toLowerCase());
+       if(!contractAddresses.contains(element.address?.toLowerCase())) contractAddresses.add(element.address!.toLowerCase());
      }
 
       var addressesAbsent = stockedContractAddresses.toSet().difference(contractAddresses.toSet()).toList();

@@ -54,22 +54,16 @@ class GroupsController extends GetxController{
       var req = await _homeService.getNextNFTByAlchemyForGroup(wallet, cursor);
       var res = nftAlchemyDtoFromJson(json.encode(req.body));
       res.pageKey == null || res.pageKey!.isEmpty ? cursor = "" : cursor = res.pageKey!;
-      res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty  ||  element.contractMetadata!.openSea!.collectionName! == "Secret FLClub Pass");
+      res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty  ||  element.contractMetadata!.openSea!.collectionName == null || element.contractMetadata!.openSea!.collectionName!.isEmpty || element.contractMetadata?.tokenType == TokenType.UNKNOWN ||
+          (element.contractMetadata?.tokenType == TokenType.ERC1155 && element.contractMetadata?.openSea?.safelistRequestStatus == SafelistRequestStatus.NOT_REQUESTED));
       var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
       gc?.forEach((key, value) {
-        nfts.add(CollectionDbDto(collectionName: value.first.title!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
+        nfts.add(CollectionDbDto(collectionName: value.first.contractMetadata!.openSea!.collectionName!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
       });
       cursorInitialized = false;
     }
 
     return nfts;
-  }
-
-  Future<String?> retrieveCreatorGroup(String contract) async {
-    var request = await _groupService.retrieveCreatorGroup(contract);
-    if(request.isOk) {
-      return contractCreatorDtoFromJson(json.encode(request.body))?.result?.first?.contractCreator;
-    }
   }
 
   retrieveGroups(String wallet) async{
@@ -85,13 +79,20 @@ class GroupsController extends GetxController{
       req = await _groupService.retrieveGroups(accessToken);
       if(req.isOk){
         var groups = groupDtoFromJson(json.encode(req.body));
-        nftsAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress).contains(element.contractAddress)).toList();
+        nftsAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress.toLowerCase()).contains(element.contractAddress.toLowerCase())).toList().cast<CollectionDbDto>();
         isLoadingAvailableNFT.value = false;
       }
     } else if(req.isOk){
       var groups = groupDtoFromJson(json.encode(req.body));
-      nftsAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress).contains(element.contractAddress)).toList().cast<CollectionDbDto>() ;
+      nftsAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress.toLowerCase()).contains(element.contractAddress.toLowerCase())).toList().cast<CollectionDbDto>() ;
       isLoadingAvailableNFT.value = false;
+    }
+  }
+
+  Future<String?> retrieveCreatorGroup(String contract) async {
+    var request = await _groupService.retrieveCreatorGroup(contract);
+    if(request.isOk) {
+      return contractCreatorDtoFromJson(json.encode(request.body))?.result?.first?.contractCreator;
     }
   }
 

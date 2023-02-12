@@ -55,9 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+    /*WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       if(_homeController.accessToken.value.isEmpty) await _displayDialog(context);
-    });
+    });*/
     _homeController.pagingController.value.addPageRequestListener((pageKey) {
       _homeController.pagingController.value.itemList = [];
       fetchPageStories();
@@ -616,8 +616,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Image.asset(
           "assets/images/wallet.png",
-          width: 150,
-          height: 150,
+          width: MediaQuery.of(context).size.height / 5,
+          height: MediaQuery.of(context).size.height / 5,
         ),
         const SizedBox(
           height: 30,
@@ -686,8 +686,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Image.asset(
           "assets/images/wallet.png",
-          width: 150,
-          height: 150,
+          width: MediaQuery.of(context).size.height / 5,
+          height:  MediaQuery.of(context).size.height / 5,
         ),
         const SizedBox(
           height: 30,

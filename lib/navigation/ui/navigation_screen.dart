@@ -65,7 +65,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
       ),
       PersistentBottomNavBarItem(
-
         icon: const ImageIcon(AssetImage("assets/images/chat_tab.png"), size: 18,),
         title: (con.chatsTabRes.tr),
         activeColorPrimary: const Color(0xFF00CB7D),
@@ -77,7 +76,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
         title: (con.profileTabRes.tr),
         activeColorPrimary: const Color(0xFF00CB7D),
         inactiveColorPrimary: const Color(0xFF9BA0A5),
-        contentPadding: 10,
         textStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 12)
       ),
 
@@ -95,7 +93,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
           items: _navBarsItems(),
           confineInSafeArea: true,
           handleAndroidBackButtonPress: true,
-          decoration: NavBarDecoration(gradient: LinearGradient(
+
+          decoration: NavBarDecoration(
+            gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
