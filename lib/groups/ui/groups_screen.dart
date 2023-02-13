@@ -520,7 +520,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     ),
                     IconButton(
                         onPressed: () {
-                          if(!_groupController.addAGroup.value && _groupController.nftsAvailable.isEmpty) _groupController.retrieveGroups(_homeController.userMe.value.wallet!);
+                          if(!_groupController.addAGroup.value && _groupController.nftsAvailable.isEmpty) _groupController.retrieveGroups("r0nny.eth");
                           _groupController.addAGroup.value = !_groupController.addAGroup.value;
                         },
                         icon: Image.asset(

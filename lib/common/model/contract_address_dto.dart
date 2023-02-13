@@ -102,19 +102,23 @@ class Media {
   Media({
     this.raw,
     this.gateway,
+    this.thumbnail
   });
 
   String? raw;
   String? gateway;
+  String? thumbnail;
 
   factory Media.fromJson(Map<String, dynamic> json) => Media(
     raw: json["raw"],
     gateway: json["gateway"],
+    thumbnail: json["thumbnail"]
   );
 
   Map<String, dynamic> toJson() => {
     "raw": raw,
     "gateway": gateway,
+    "thumbnail": thumbnail,
   };
 }
 

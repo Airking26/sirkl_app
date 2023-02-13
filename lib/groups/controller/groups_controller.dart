@@ -9,6 +9,7 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:simple_s3/simple_s3.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
+import 'package:sirkl/common/model/contract_address_dto.dart';
 import 'package:sirkl/common/model/contract_creator_dto.dart';
 import 'package:sirkl/common/model/group_creation_dto.dart';
 import 'package:sirkl/common/model/group_dto.dart';
@@ -51,14 +52,12 @@ class GroupsController extends GetxController{
     var cursor = "";
     var cursorInitialized = true;
     while(cursorInitialized || cursor.isNotEmpty){
-      var req = await _homeService.getNextNFTByAlchemyForGroup(wallet, cursor);
-      var res = nftAlchemyDtoFromJson(json.encode(req.body));
-      res.pageKey == null || res.pageKey!.isEmpty ? cursor = "" : cursor = res.pageKey!;
-      res.ownedNfts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.contractMetadata == null || element.contractMetadata!.openSea == null || element.contractMetadata!.openSea!.imageUrl == null || element.contractMetadata!.openSea!.imageUrl!.isEmpty  ||  element.contractMetadata!.openSea!.collectionName == null || element.contractMetadata!.openSea!.collectionName!.isEmpty || element.contractMetadata?.tokenType == TokenType.UNKNOWN ||
-          (element.contractMetadata?.tokenType == TokenType.ERC1155 && element.contractMetadata?.openSea?.safelistRequestStatus == SafelistRequestStatus.NOT_REQUESTED));
-      var gc = res.ownedNfts?.groupBy((el) => el.contract?.address);
-      gc?.forEach((key, value) {
-        nfts.add(CollectionDbDto(collectionName: value.first.contractMetadata!.openSea!.collectionName!, contractAddress: value.first.contract!.address!, collectionImage: value.first.contractMetadata!.openSea!.imageUrl!, collectionImages: value.map((e) => e.media!.first.thumbnail ?? e.media!.first.gateway!).toList()));
+      var req = await _homeService.getContractAddressesWithAlchemy(wallet, cursor);
+      var res = contractAddressDtoFromJson(json.encode(req.body));
+      res.pageKey == null || res.pageKey!.isEmpty ? cursor = "" : cursor = "&pageKey=${res.pageKey}";
+      res.contracts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.opensea == null || element.opensea!.imageUrl == null || element.opensea!.imageUrl!.isEmpty  ||  element.opensea!.collectionName == null || element.opensea!.collectionName!.isEmpty || element.tokenType == TokenType.UNKNOWN || (element.tokenType == TokenType.ERC1155 && element.opensea?.safelistRequestStatus == SafelistRequestStatus.NOT_REQUESTED));
+      res.contracts?.forEach((element) {
+        nfts.add(CollectionDbDto(collectionName: element.opensea!.collectionName!, contractAddress: element.address!, collectionImage: element.opensea!.imageUrl!, collectionImages: element.media?.first.thumbnail == null ? [element.media!.first.gateway!] : [element.media!.first.thumbnail!]));
       });
       cursorInitialized = false;
     }
