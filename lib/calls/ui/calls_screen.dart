@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/calls/ui/new_call_screen.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';

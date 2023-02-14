@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/calls/ui/calls_screen.dart';
 import 'package:sirkl/chats/ui/chat_screen.dart';
@@ -106,7 +106,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
           resizeToAvoidBottomInset: true,
           hideNavigationBarWhenKeyboardShows: true,
           popAllScreensOnTapOfSelectedTab: true,
-          navBarStyle: NavBarStyle.style3,
+          navBarStyle: NavBarStyle.simple,
           onItemSelected: (index){
             if(index == 0) {
               if(_homeController.accessToken.value.isNotEmpty) {

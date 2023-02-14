@@ -68,7 +68,6 @@ dependencies:
   flutter_slidable: ^2.0.0
   story_view: ^0.14.0
   stop_watch_timer: ^2.0.0
-  persistent_bottom_nav_bar_v2: ^4.2.6
   syncfusion_flutter_pdfviewer: ^20.4.43
   highlight_text: ^1.6.0
   camera: ^0.10.1
@@ -80,6 +79,8 @@ dependencies:
   ed25519_hd_key: ^2.2.0
   hex: ^0.2.0
   qr_code_scanner: ^1.0.1
+  record: ^4.4.4
+  just_audio: ^0.9.31
 
 dev_dependencies:
   flutter_test:

@@ -10,6 +10,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
   flutter_native_view
   permission_handler_windows
+  record_windows
   screen_retriever
   syncfusion_pdfviewer_windows
   thumblr_windows

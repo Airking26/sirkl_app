@@ -1,10 +1,15 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/view/stream_chat/src/utils/audio_loading_message.dart';
+import 'package:sirkl/common/view/stream_chat/src/utils/audio_player_message.dart';
+import 'package:sirkl/common/view/stream_chat/src/utils/record_button.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 
 class ChannelPage extends StatefulWidget {
   const ChannelPage({Key? key}) : super(key: key);
@@ -47,6 +52,25 @@ class _ChannelPageState extends State<ChannelPage> {
               messageBuilder: (context, details, messages, defaultMessageWidget) {
                 return defaultMessageWidget.copyWith(
                   onReplyTap: _reply,
+                  customAttachmentBuilders: {
+                    'voicenote': (context, defaultMessage, attachments) {
+                      final url = attachments.first.assetUrl;
+                      late final Widget widget;
+                      if (url == null) {
+                        widget = const AudioLoadingMessage();
+                      } else {
+                        widget = AudioPlayerMessage(
+                          source: AudioSource.uri(Uri.parse(url)),
+                          id: defaultMessage.id,
+                        );
+                      }
+                      return SizedBox(
+                        width: 250,
+                        height: 50,
+                        child: widget,
+                      );
+                    }
+                  },
                   deletedBottomRowBuilder: (context, message){
                     return const StreamVisibleFootnote();
                   },
@@ -55,9 +79,33 @@ class _ChannelPageState extends State<ChannelPage> {
             ),
           ),
           const StreamTypingIndicator(),
-          StreamMessageInput(messageInputController: _messageInputController, focusNode: _focusNode,),
+          StreamMessageInput(messageInputController: _messageInputController, focusNode: _focusNode, actions: [
+            RecordButton(recordingFinishedCallback: _recordingFinishedCallback,)
+          ],),
         ],
       ),
+    );
+  }
+
+  void _recordingFinishedCallback(String path) {
+    final uri = Uri.parse(path);
+    File file = File(uri.path);
+    file.length().then(
+          (fileSize) {
+        StreamChannel.of(context).channel.sendMessage(
+          Message(
+            attachments: [
+              Attachment(
+                type: 'voicenote',
+                file: AttachmentFile(
+                  size: fileSize,
+                  path: uri.path,
+                ),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 
