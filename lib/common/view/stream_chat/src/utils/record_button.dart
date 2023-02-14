@@ -49,7 +49,7 @@ class _RecordButtonState extends State<RecordButton> {
     late final Color? color;
     if (_isRecording) {
       icon = Icons.stop;
-      color = Colors.red.withOpacity(0.3);
+      color = Color(0xff00CB7D);
     } else {
       color = StreamChatTheme.of(context).primaryIconTheme.color;
       icon = Icons.mic;

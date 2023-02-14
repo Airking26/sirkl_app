@@ -17,6 +17,7 @@ class AudioLoadingMessage extends StatelessWidget {
             height: 20,
             width: 20,
             child: CircularProgressIndicator(
+              color: Color(0xff00CB7D),
               strokeWidth: 3,
             ),
           ),

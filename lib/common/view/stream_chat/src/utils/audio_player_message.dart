@@ -72,7 +72,7 @@ class AudioPlayerMessageState extends State<AudioPlayerMessage> {
       stream: _audioPlayer.playingStream,
       builder: (context, _) {
         final color =
-        _audioPlayer.playerState.playing ? Colors.red : Colors.blue;
+        _audioPlayer.playerState.playing ? const Color(0xff00CB7D) : const Color(0xff00CB7D);
         final icon =
         _audioPlayer.playerState.playing ? Icons.pause : Icons.play_arrow;
         return Padding(
@@ -101,7 +101,10 @@ class AudioPlayerMessageState extends State<AudioPlayerMessage> {
       stream: _audioPlayer.positionStream,
       builder: (context, snapshot) {
         if (snapshot.hasData && duration != null) {
-          return CupertinoSlider(
+          return Slider(
+            activeColor: const Color(0xff00CB7D),
+            thumbColor: Colors.grey,
+            inactiveColor: Colors.grey,
             value: snapshot.data!.inMicroseconds / duration.inMicroseconds,
             onChanged: (val) {
               _audioPlayer.seek(duration * val);
