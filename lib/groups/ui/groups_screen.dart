@@ -154,10 +154,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
                         },
                         controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerGroupsFav!,
-                        onChannelTap: (channel) async{
+                        onChannelTap: (channel) {
                           _chatController.channel.value = channel;
-                          var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
-                          if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
+                          channel.queryMembers(filter: Filter.equal("id", _homeController.id.value)).then((value) {
+                            if(value.members.isEmpty) channel.addMembers([_homeController.id.value]);}
+                          );
                           _navigationController.hideNavBar.value = true;
                           pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {
                             //streamChannelListControllerGroups?.refresh();
@@ -185,10 +186,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();
                         },
                         controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerGroups!,
-                        onChannelTap: (channel) async{
+                        onChannelTap: (channel) {
                           _chatController.channel.value = channel;
-                          var isMember = await channel.queryMembers(filter: Filter.equal("id", _homeController.id.value));
-                          if(isMember.members.isEmpty) await channel.addMembers([_homeController.id.value]);
+                          channel.queryMembers(filter: Filter.equal("id", _homeController.id.value)).then((value) {
+                            if(value.members.isEmpty) channel.addMembers([_homeController.id.value]);}
+                          );
                           _navigationController.hideNavBar.value = true;
                           pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value){
                             _navigationController.hideNavBar.value = false;
@@ -205,40 +207,6 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
           )
         ]
     );}));
-  }
-
-  YYDialog dialogPopMenu(BuildContext context) {
-    return YYDialog().build(context)
-      ..width = 180
-      ..borderRadius = 10.0
-      ..gravity = Gravity.rightTop
-      ..barrierColor =MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white.withOpacity(0.95)
-      ..margin = const EdgeInsets.only(top: 90, right: 20)
-      ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.notificationsOffRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.claimOwnershipeRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..show();
   }
 
   Column noGroupUI() {

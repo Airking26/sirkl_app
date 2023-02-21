@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
@@ -80,6 +82,16 @@ class _NavigationScreenState extends State<NavigationScreen> {
       ),
 
     ];
+  }
+
+  @override
+  void initState() {
+    if(_homeController.accessToken.value.isNotEmpty) {
+      _navigationController.hideNavBar.value = false;
+    } else {
+      _navigationController.hideNavBar.value = true;
+    }
+    super.initState();
   }
 
   @override

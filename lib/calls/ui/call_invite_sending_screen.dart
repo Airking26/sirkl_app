@@ -20,7 +20,6 @@ class CallInviteSendingScreen extends StatefulWidget {
 class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
 
   final _callController = Get.put(CallsController());
-  final _commonController = Get.put(CommonController());
   late Timer timer ;
 
   @override
