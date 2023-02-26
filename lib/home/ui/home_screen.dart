@@ -537,7 +537,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                         _commonController.users[index].nickname.isNullOrBlank! ?
                             (_commonController.users[index].userName.isNullOrBlank!
-                                ? _commonController.users[index].wallet!
+                                ? "${_commonController.users[index].wallet!.substring(0, 6)}...${_commonController.users[index].wallet!.substring(_commonController.users[index].wallet!.length)}"
                                 : _commonController.users[index].userName!) :
                         _commonController.users[index].nickname!  + (_commonController.users[index].userName.isNullOrBlank! ? "" : " (${_commonController.users[index].userName!})"),
                         maxLines: 2,

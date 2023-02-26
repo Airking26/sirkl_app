@@ -155,10 +155,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                               .value
                                                               .text
                                                               .isEmpty
-                                                          ? _homeController
+                                                          ? "${_homeController
                                                               .userMe
                                                               .value
-                                                              .wallet!
+                                                              .wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
                                                           : _profileController
                                                               .usernameTextEditingController
                                                               .value

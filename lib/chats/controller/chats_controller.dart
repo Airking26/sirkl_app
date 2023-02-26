@@ -68,7 +68,7 @@ class ChatsController extends GetxController{
     await channel.value!.watch();
   }
 
-  Future<String?> getEthFromEns(String ens) async{
+  Future<String?> getEthFromEns(String ens, String wallet) async{
     String? eth = "";
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
@@ -81,13 +81,13 @@ class ChatsController extends GetxController{
       request = await _chatService.ethFromEns(accessToken, ens);
       if(request.isOk){
         eth = request.body;
-        if(request.body != '0' && request.body != ""){
+        if(request.body != '0' && request.body != "" && request.body!.toLowerCase() != wallet.toLowerCase()){
           _profileController.isUserExists.value = await _profileController.getUserByWallet(request.body!);
         }
       }
     } else if(request.isOk){
       eth = request.body;
-      if(request.body != '0' && request.body != ""){
+      if(request.body != '0' && request.body != "" && request.body!.toLowerCase() != wallet.toLowerCase()){
         _profileController.isUserExists.value = await _profileController.getUserByWallet(request.body!);
       }
     }

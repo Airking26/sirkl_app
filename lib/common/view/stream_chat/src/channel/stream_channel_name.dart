@@ -65,7 +65,7 @@ class StreamChannelName extends StatelessWidget {
                 var userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
                 channelName = _homeController.nicknames[userDTO.wallet!] != null ?
                 _homeController.nicknames[userDTO.wallet!] + " (" + (userDTO.userName.isNullOrBlank! ? "${userDTO.wallet!.substring(0, 6)}...${userDTO.wallet!.substring(userDTO.wallet!.length - 4)}" : userDTO.userName!) + ")"
-                    : (userDTO.userName.isNullOrBlank! ? userDTO.wallet! : userDTO.userName!);
+                    : (userDTO.userName.isNullOrBlank! ? "${userDTO.wallet!.substring(0, 6)}...${userDTO.wallet!.substring(userDTO.wallet!.length - 4)}": userDTO.userName!);
               }
             } else {
               final maxWidth = constraints.maxWidth;
@@ -88,7 +88,7 @@ class StreamChannelName extends StatelessWidget {
                   '${exceedingMembers > 0 ? '+ $exceedingMembers' : ''}';
             }
           } else {
-            channelName = channel.extraData['wallet'] as String;
+            channelName = "${(channel.extraData['wallet'] as String).substring(0, 6)}...${(channel.extraData['wallet'] as String).substring((channel.extraData['wallet'] as String).length - 4)}";
           }
 
           return Text(

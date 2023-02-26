@@ -268,7 +268,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async{
         if(query.isNotEmpty && query.contains('.eth')){
-          String? ethFromEns = await _chatController.getEthFromEns(query);
+          String? ethFromEns = await _chatController.getEthFromEns(query, _homeController.userMe.value.wallet!);
           if(_profileController.isUserExists.value == null && ethFromEns != "" && ethFromEns != "0") {
             pagingController.itemList = [UserDTO(id: '', userName: query, picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: ethFromEns, following: 0, isInFollowing: false)];
           } else if(_profileController.isUserExists.value != null){
@@ -277,14 +277,16 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           else {
             pagingController.itemList = [];
           }
-        } else if(query.isNotEmpty && isValidEthereumAddress(query.toLowerCase())){
+        }
+        else if(query.isNotEmpty && isValidEthereumAddress(query.toLowerCase()) && query.toLowerCase() != _homeController.userMe.value.wallet!.toLowerCase()){
           _profileController.isUserExists.value = await _profileController.getUserByWallet(query.toLowerCase());
           if(_profileController.isUserExists.value == null) {
             pagingController.itemList = [UserDTO(id: '', userName: "", picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: query.toLowerCase(), following: 0, isInFollowing: false)];
           } else {
             pagingController.itemList = [_profileController.isUserExists.value!];
           }
-        } else {
+        }
+        else {
           if(query.isNotEmpty) {
             pagingController.itemList = [];
           } else {
@@ -321,15 +323,16 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         leading: InkWell(
             onTap: (){
               if(_profileController.isUserExists.value != null) {
+                _navigationController.hideNavBar.value = false;
                 _commonController.userClicked.value = item;
-                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
+                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
               }
             },
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(90.0), child:
             item.picture == null ?
             SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
-            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         trailing: Checkbox(
           onChanged: (selected) {
@@ -355,7 +358,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         ),
         title: Transform.translate(
           offset: const Offset(-8, 0),
-          child: Text(item.nickname != null ? item.nickname! + (item.userName.isNullOrBlank! ? "" : " (${item.userName!})") : item.userName.isNullOrBlank! ? item.wallet! : item.userName!,
+          child: Text(item.nickname != null ? item.nickname! + (item.userName.isNullOrBlank! ? "" : " (${item.userName!})") : item.userName.isNullOrBlank! ? "${item.wallet!.substring(0, 6)}...${item.wallet!.substring(item.wallet!.length - 4)}" : item.userName!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -505,7 +508,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               },
               child:
                   _chatController.messageSending.value ?
-                      SizedBox(width: 55, height: 55, child: const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D),),)) :
+                      const SizedBox(width: 55, height: 55, child: Center(child: CircularProgressIndicator(color: Color(0xff00CB7D),),)) :
               Container(
                 width: 55,
                 height: 55,

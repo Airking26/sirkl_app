@@ -327,7 +327,7 @@ class StreamChannelHeader extends StatelessWidget
                                   ):
                                   Text(
                                   (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ?
-                                  "${(channel.extraData["wallet"] as String).substring(0, 20)}..." :
+                                  "${(channel.extraData["wallet"] as String).substring(0, 6)}...${(channel.extraData["wallet"] as String).substring((channel.extraData["wallet"] as String).length - 4)}" :
                                     channel.memberCount != null && channel.memberCount! > 2 ?
                                         channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
                                     _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] != null ?
