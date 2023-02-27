@@ -241,7 +241,8 @@ class StreamChannelHeader extends StatelessWidget
                                             .extraData["userDTO"]));
                                 _navigationController.hideNavBar.value = false;
                                 pushNewScreen(context,screen: const ProfileElseScreen(fromConversation: true)).then((value) => _navigationController.hideNavBar.value = true);
-                              } else if(channel.isGroup){
+                              }
+                              else if(channel.isGroup){
                                 _chatController.channel.value = channel;
                                 _navigationController.hideNavBar.value = false;
                                 pushNewScreen(context,screen: const GroupParticipantScreen()).then((value) => _navigationController.hideNavBar.value = true).then((value) => _navigationController.hideNavBar.value = true);
@@ -327,7 +328,9 @@ class StreamChannelHeader extends StatelessWidget
                                   ):
                                   Text(
                                   (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ?
-                                  "${(channel.extraData["wallet"] as String).substring(0, 6)}...${(channel.extraData["wallet"] as String).substring((channel.extraData["wallet"] as String).length - 4)}" :
+                                      (channel.extraData['ens'] == null || channel.extraData['ens'] == "0") ?
+                                  "${(channel.extraData["wallet"] as String).substring(0, 6)}...${(channel.extraData["wallet"] as String).substring((channel.extraData["wallet"] as String).length - 4)}":
+                                      channel.extraData['ens']:
                                     channel.memberCount != null && channel.memberCount! > 2 ?
                                         channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
                                     _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] != null ?

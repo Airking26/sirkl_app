@@ -454,12 +454,13 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                 if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!) {
                   _chatController.messageSending.value = true;
                   for (UserDTO element in _chatController.chipsList) {
+                    var idChannelCreated;
                     var idChannel = DateTime
                         .now()
                         .millisecondsSinceEpoch
                         .toString();
                     if (element.id.isNullOrBlank!) {
-                      await _chatController.createInbox(InboxCreationDto(
+                      idChannelCreated = await _chatController.createInbox(InboxCreationDto(
                           createdBy: _homeController.id.value,
                           wallets: [
                             _homeController.userMe.value.wallet!,
@@ -489,7 +490,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                         if (element.id.isNullOrBlank!) {
                           _navigationController.hideNavBar.value = true;
                           pushNewScreen(context, screen: DetailedChatScreen(
-                              create: false, channelId: idChannel)).then((value) => _navigationController.hideNavBar.value = false);
+                              create: false, channelId: idChannelCreated)).then((value) => _navigationController.hideNavBar.value = false);
                         } else {
                           _commonController.userClicked.value =
                           _chatController.chipsList[0];

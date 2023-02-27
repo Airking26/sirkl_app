@@ -33,7 +33,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
   @override
   void initState() {
     _navigationController.hideNavBar.value = true;
-    _commonController.checkUserIsInFollowing();
+    if(_commonController.userClicked.value != null) _commonController.checkUserIsInFollowing();
     if(widget.create) {
       _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value);
     } else if(widget.channelId != null) {

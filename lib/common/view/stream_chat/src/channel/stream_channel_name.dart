@@ -88,7 +88,11 @@ class StreamChannelName extends StatelessWidget {
                   '${exceedingMembers > 0 ? '+ $exceedingMembers' : ''}';
             }
           } else {
-            channelName = "${(channel.extraData['wallet'] as String).substring(0, 6)}...${(channel.extraData['wallet'] as String).substring((channel.extraData['wallet'] as String).length - 4)}";
+            if(channel.extraData['ens'] == null || channel.extraData['ens'] == "0") {
+              channelName = "${(channel.extraData['wallet'] as String).substring(0, 6)}...${(channel.extraData['wallet'] as String).substring((channel.extraData['wallet'] as String).length - 4)}";
+            } else {
+              channelName = channel.extraData["ens"] as String;
+            }
           }
 
           return Text(
