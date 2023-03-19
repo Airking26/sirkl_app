@@ -1,2 +1,1 @@
--keep class **.zego.** { *; }
 -keep class com.hiennv.flutter_callkit_incoming.** { *; }

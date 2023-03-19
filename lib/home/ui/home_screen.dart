@@ -55,9 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    /*WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      if(_homeController.accessToken.value.isEmpty) await _displayDialog(context);
-    });*/
     _homeController.pagingController.value.addPageRequestListener((pageKey) {
       _homeController.pagingController.value.itemList = [];
       fetchPageStories();

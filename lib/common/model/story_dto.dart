@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 
 List<List<StoryDto>> storyDtoFromJson(String str) => List<List<StoryDto>>.from(json.decode(str).map((x) => List<StoryDto>.from(x.map((x) => StoryDto.fromJson(x)))));
+List<StoryDto> myStoryDtoFromJson(String str) => List<StoryDto>.from(json.decode(str).map((x) => StoryDto.fromJson(x)));
 
 String storyDtoToJson(List<List<StoryDto>> data) => json.encode(List<dynamic>.from(data.map((x) => List<dynamic>.from(x.map((x) => x.toJson())))));
+String myStoryDtoToJson(List<StoryDto> data) =>  json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class StoryDto {
   StoryDto({

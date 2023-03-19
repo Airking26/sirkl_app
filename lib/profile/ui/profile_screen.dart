@@ -11,6 +11,7 @@ import 'package:flutter_badged/flutter_badge.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/nft_dto.dart';
@@ -23,6 +24,7 @@ import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/profile/ui/my_story_viewer_screen.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
@@ -50,6 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     controller = GalleryController();
     _profileController.checkIfHasUnreadNotif(_homeController.id.value);
+    _profileController.retrieveMyStories();
     pagingController.addPageRequestListener((pageKey) {
       fetchNFTs();
     });
@@ -303,11 +306,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Container(
                             decoration: BoxDecoration(
                                 border: Border.all(
-                                    color: MediaQuery.of(context)
+                                    color: _profileController.myStories.value == null || _profileController.myStories.value!.isEmpty ? MediaQuery.of(context)
                                                 .platformBrightness ==
                                             Brightness.dark
                                         ? const Color(0xFF122034)
-                                        : Colors.white,
+                                        : Colors.white :
+                                    const Color(0xff00CB7D),
                                     width: 5),
                                 borderRadius: BorderRadius.circular(90)),
                             child: DeferPointer(
@@ -319,6 +323,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         if (_profileController
                                             .isEditingProfile.value) {
                                           await _profileController.getImage();
+                                        } else if(_profileController.myStories.value != null && _profileController.myStories.value!.isNotEmpty){
+                                          _navigationController.hideNavBar.value = true;
+                                          pushNewScreen(context, screen: const MyStoryViewerScreen()).then((value) {
+                                                if(value == null){
+                                                  _navigationController.hideNavBar.value = false;
+                                                }
+                                                // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+                                                _homeController.pagingController.value.notifyListeners();
+                                              });
                                         }
                                       },
                                       child: _profileController.urlPicture.value.isEmpty
@@ -361,22 +374,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   onCapture: (value) async {
                                     if (!value.first.isFavorite) {
                                       final file = await value.first.file;
-                                      if (await _profileController.postStory(
-                                          file!,
-                                          value.first.type == AssetType.image
-                                              ? 0
-                                              : 1)) {
-                                        utils.showToast(
-                                            context, "Story has been posted");
+                                      if (await _profileController.postStory(file!, value.first.type == AssetType.image ? 0 : 1)) {
+                                        utils.showToast(context, "Story has been posted");
+                                        _profileController.retrieveMyStories();
                                       }
                                     } else {
-                                      if (await _profileController.postStory(
-                                          value.first.pickedFile!,
-                                          value.first.type == AssetType.image
-                                              ? 0
-                                              : 1)) {
-                                        utils.showToast(
-                                            context, "Story has been posted");
+                                      if (await _profileController.postStory(value.first.pickedFile!, value.first.type == AssetType.image ? 0 : 1)) {
+                                        utils.showToast(context, "Story has been posted");
+                                        _profileController.retrieveMyStories();
                                       }
                                     }
                                   },

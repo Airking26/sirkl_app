@@ -17,6 +17,7 @@ import 'package:sirkl/common/model/notification_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/story_creation_dto.dart';
+import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/controller/groups_controller.dart';
@@ -32,6 +33,8 @@ class ProfileController extends GetxController{
   final _homeController = Get.put(HomeController());
 
   Rx<UserDTO?> isUserExists = (null as UserDTO?).obs;
+  Rx<List<StoryDto>?> myStories = (null as List<StoryDto>?).obs;
+  Rx<List<UserDTO>?> readers = (null as List<UserDTO>?).obs;
   var isCardExpanded = false.obs;
   Rx<Uint8List?> videoThumbnail = Uint8List(0).obs;
   var isEditingProfile = false.obs;
@@ -214,6 +217,44 @@ class ProfileController extends GetxController{
       } else {
         await client.updateChannelPartial(nftModificationDto.contractAddress, 'try', unset: ["${_homeController.id.value}_favorite"]);
       }
+    }
+  }
+
+  retrieveMyStories() async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.retrieveMyStories(accessToken);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _profileService.retrieveMyStories(accessToken);
+      if(request.isOk){
+        myStories.value = myStoryDtoFromJson(json.encode(request.body));
+      }
+    } else if(request.isOk){
+      myStories.value = myStoryDtoFromJson(json.encode(request.body));
+    }
+  }
+
+  retrieveUsersForAStory(String id) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.retrieveReadersForAStory(accessToken, id);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _profileService.retrieveReadersForAStory(accessToken, id);
+      if(request.isOk){
+        readers.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
+      }
+    } else if(request.isOk){
+      readers.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
     }
   }
 

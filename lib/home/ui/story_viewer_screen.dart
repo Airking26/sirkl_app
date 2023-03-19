@@ -7,6 +7,7 @@ import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -20,6 +21,7 @@ class StoryViewerScreen extends StatefulWidget {
 }
 
 class _StoryViewerScreenState extends State<StoryViewerScreen> {
+
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
@@ -28,11 +30,17 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
 
   @override
   void initState() {
-    storyItems = _homeController.stories.value![_homeController.indexStory.value]!.map((e) =>
-    e!.type == 0 ?
-        StoryItem.pageImage(url: e.url, controller: controller, imageFit: BoxFit.cover, duration: const Duration(seconds: 5)) :
-        StoryItem.pageVideo(e.url, controller: controller, imageFit: BoxFit.cover)
-    ).toList();
+      storyItems =
+          _homeController.stories.value![_homeController.indexStory.value]!
+              .map((e) =>
+          e!.type == 0 ?
+          StoryItem.pageImage(url: e.url,
+              controller: controller,
+              imageFit: BoxFit.cover,
+              duration: const Duration(seconds: 5)) :
+          StoryItem.pageVideo(
+              e.url, controller: controller, imageFit: BoxFit.cover)
+          ).toList();
     super.initState();
   }
 

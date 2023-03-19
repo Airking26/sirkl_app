@@ -11,7 +11,7 @@ class HomeService extends GetConnect{
   Future<Response<Map<String, dynamic>>> updateStory(String accessToken, String storyModificationDTO) => patch('${con.URL_SERVER}story/modify', storyModificationDTO, headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> updateNicknames(String accessToken, String wallet, String nicknameCreationDTO) => put('${con.URL_SERVER}nicknames/$wallet', nicknameCreationDTO, headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> retrieveNicknames(String accessToken) => get('${con.URL_SERVER}nicknames/retrieve', headers: {'Authorization':'Bearer $accessToken'});
-  Future<Response<List<dynamic>>> retrieveStories(String accessToken, String offset) => get('${con.URL_SERVER}story/$offset', headers: {'Authorization':'Bearer $accessToken'});
+  Future<Response<List<dynamic>>> retrieveStories(String accessToken, String offset) => get('${con.URL_SERVER}story/others/$offset', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<List<dynamic>>> retrieveNFTs(String accessToken, String id, bool isFav, String offset) => get('${con.URL_SERVER}nft/retrieve/$id/$isFav/$offset', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> getAllNFTConfig(String accessToken) => get('${con.URL_SERVER}nft/retrieveAll', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> updateAllNFTConfig(String accessToken) => get('${con.URL_SERVER}nft/updateAll', headers: {'Authorization':'Bearer $accessToken'});
