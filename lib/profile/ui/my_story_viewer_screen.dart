@@ -66,143 +66,7 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
                   return _profileController.readers.value == null || _profileController.readers.value?.length == 0 ? const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 48),
                     child: Text("No one has seen your story yet", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, fontFamily: 'Gilroy', color: Colors.black),),
-                  ) : ListView.builder(
-                    itemCount: _profileController.readers.value?.length ?? 0,
-                    itemBuilder: (context, index){
-                      return ListTile(
-                        leading: InkWell(
-                          onTap: () {
-                            _commonController.userClicked.value =
-                            _profileController.readers.value?[index];
-                            pushNewScreen(context,
-                                screen: const ProfileElseScreen(fromConversation: false));
-                          },
-                          child: _profileController.readers.value?[index].picture == null
-                              ? SizedBox(
-                              width: 56,
-                              height: 56,
-                              child: TinyAvatar(
-                                baseString: _profileController.readers.value![index].wallet!,
-                                dimension: 56,
-                                circular: true,
-                                colourScheme: TinyAvatarColourScheme.seascape,
-                              ))
-                              : ClipRRect(
-                              borderRadius: BorderRadius.circular(90.0),
-                              child: CachedNetworkImage(
-                                  imageUrl: _profileController.readers.value![index].picture!,
-                                  width: 56,
-                                  height: 56,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => const Center(
-                                      child: CircularProgressIndicator(
-                                          color: Color(0xff00CB7D))),
-                                  errorWidget: (context, url, error) => Image.asset(
-                                      "assets/images/app_icon_rounded.png"))),
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            SizedBox(
-                              width: 100,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  InkWell(
-                                    onTap: () async {
-                                      _callController.userCalled.value =
-                                      _profileController.readers.value![index];
-                                      await _callController.inviteCall(
-                                          _profileController.readers.value![index],
-                                          DateTime.now().toString(),
-                                          _homeController.id.value);
-                                    },
-                                    child: Image.asset(
-                                      "assets/images/call_tab.png",
-                                      color: const Color(0xFF00CB7D),
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  InkWell(
-                                      onTap: () {
-                                        _commonController.userClicked.value =
-                                        _profileController.readers.value?[index];
-                                        _navigationController.hideNavBar.value = true;
-                                        pushNewScreen(context,
-                                            screen:
-                                            const DetailedChatScreen(create: true))
-                                            .then((value) => _navigationController
-                                            .hideNavBar.value = false);
-                                      },
-                                      child: Image.asset(
-                                        "assets/images/chat_tab.png",
-                                        width: 20,
-                                        height: 20,
-                                        color: const Color(0xFF9BA0A5),
-                                      )),
-                                  const SizedBox(
-                                    width: 8,
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                        title: InkWell(
-                            onTap: () {
-                              _commonController.userClicked.value =
-                              _profileController.readers.value?[index];
-                              pushNewScreen(context,
-                                  screen:
-                                  const ProfileElseScreen(fromConversation: false));
-                            },
-                            child: Transform.translate(
-                                offset: const Offset(-8, 0),
-                                child: Text(
-                                    _profileController.readers.value![index].nickname.isNullOrBlank! ?
-                                    (_profileController.readers.value![index].userName.isNullOrBlank!
-                                        ? "${_profileController.readers.value![index].wallet!.substring(0, 6)}...${_profileController.readers.value![index].wallet!.substring(_profileController.readers.value![index].wallet!.length)}"
-                                        : _profileController.readers.value![index].userName!) :
-                                    _profileController.readers.value![index].nickname!  + (_profileController.readers.value![index].userName.isNullOrBlank! ? "" : " (${_profileController.readers.value![index].userName!})"),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontFamily: "Gilroy",
-                                        fontWeight: FontWeight.w600,
-                                        color:MediaQuery.of(context).platformBrightness == Brightness.dark
-                                            ? Colors.white
-                                            : Colors.black)))),
-                        subtitle: !_profileController.readers.value![index].userName.isNullOrBlank! || !_profileController.readers.value![index].nickname.isNullOrBlank!
-                            ? InkWell(
-                            onTap: () {
-                              _commonController.userClicked.value =
-                              _profileController.readers.value![index];
-                              pushNewScreen(context,
-                                  screen: const ProfileElseScreen(
-                                      fromConversation: false));
-                            },
-                            child: Transform.translate(
-                                offset: const Offset(-8, 0),
-                                child: Text("${_profileController.readers.value![index].wallet!.substring(0, 6)}...${_profileController.readers.value![index].wallet!.substring(_profileController.readers.value![index].wallet!.length - 4)}",
-                                    //maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        fontFamily: "Gilroy",
-                                        fontWeight: FontWeight.w500,
-                                        color:MediaQuery.of(context).platformBrightness == Brightness.dark
-                                            ? const Color(0xFF9BA0A5)
-                                            : const Color(0xFF828282)))))
-                            : null,
-                      );
-                    },
-                  );
+                  ) : buildListViewReaders();
                 }).then((value) {
                   _profileController.readers.value = [];
                   controller.play();});
@@ -233,143 +97,7 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
                   return _profileController.readers.value == null || _profileController.readers.value?.length == 0 ? const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 48),
                     child: Text("No one has seen your story yet", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, fontFamily: 'Gilroy', color: Colors.black),),
-                  ) : ListView.builder(
-                    itemCount: _profileController.readers.value?.length ?? 0,
-                    itemBuilder: (context, index){
-                      return ListTile(
-                        leading: InkWell(
-                          onTap: () {
-                            _commonController.userClicked.value =
-                            _profileController.readers.value?[index];
-                            pushNewScreen(context,
-                                screen: const ProfileElseScreen(fromConversation: false));
-                          },
-                          child: _profileController.readers.value?[index].picture == null
-                              ? SizedBox(
-                              width: 56,
-                              height: 56,
-                              child: TinyAvatar(
-                                baseString: _profileController.readers.value![index].wallet!,
-                                dimension: 56,
-                                circular: true,
-                                colourScheme: TinyAvatarColourScheme.seascape,
-                              ))
-                              : ClipRRect(
-                              borderRadius: BorderRadius.circular(90.0),
-                              child: CachedNetworkImage(
-                                  imageUrl: _profileController.readers.value![index].picture!,
-                                  width: 56,
-                                  height: 56,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => const Center(
-                                      child: CircularProgressIndicator(
-                                          color: Color(0xff00CB7D))),
-                                  errorWidget: (context, url, error) => Image.asset(
-                                      "assets/images/app_icon_rounded.png"))),
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            SizedBox(
-                              width: 100,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  InkWell(
-                                    onTap: () async {
-                                      _callController.userCalled.value =
-                                      _profileController.readers.value![index];
-                                      await _callController.inviteCall(
-                                          _profileController.readers.value![index],
-                                          DateTime.now().toString(),
-                                          _homeController.id.value);
-                                    },
-                                    child: Image.asset(
-                                      "assets/images/call_tab.png",
-                                      color: const Color(0xFF00CB7D),
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  InkWell(
-                                      onTap: () {
-                                        _commonController.userClicked.value =
-                                        _profileController.readers.value?[index];
-                                        _navigationController.hideNavBar.value = true;
-                                        pushNewScreen(context,
-                                            screen:
-                                            const DetailedChatScreen(create: true))
-                                            .then((value) => _navigationController
-                                            .hideNavBar.value = false);
-                                      },
-                                      child: Image.asset(
-                                        "assets/images/chat_tab.png",
-                                        width: 20,
-                                        height: 20,
-                                        color: const Color(0xFF9BA0A5),
-                                      )),
-                                  const SizedBox(
-                                    width: 8,
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                        title: InkWell(
-                            onTap: () {
-                              _commonController.userClicked.value =
-                              _profileController.readers.value?[index];
-                              pushNewScreen(context,
-                                  screen:
-                                  const ProfileElseScreen(fromConversation: false));
-                            },
-                            child: Transform.translate(
-                                offset: const Offset(-8, 0),
-                                child: Text(
-                                    _profileController.readers.value![index].nickname.isNullOrBlank! ?
-                                    (_profileController.readers.value![index].userName.isNullOrBlank!
-                                        ? "${_profileController.readers.value![index].wallet!.substring(0, 6)}...${_profileController.readers.value![index].wallet!.substring(_profileController.readers.value![index].wallet!.length)}"
-                                        : _profileController.readers.value![index].userName!) :
-                                    _profileController.readers.value![index].nickname!  + (_profileController.readers.value![index].userName.isNullOrBlank! ? "" : " (${_profileController.readers.value![index].userName!})"),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontFamily: "Gilroy",
-                                        fontWeight: FontWeight.w600,
-                                        color:MediaQuery.of(context).platformBrightness == Brightness.dark
-                                            ? Colors.white
-                                            : Colors.black)))),
-                        subtitle: !_profileController.readers.value![index].userName.isNullOrBlank! || !_profileController.readers.value![index].nickname.isNullOrBlank!
-                            ? InkWell(
-                            onTap: () {
-                              _commonController.userClicked.value =
-                              _profileController.readers.value![index];
-                              pushNewScreen(context,
-                                  screen: const ProfileElseScreen(
-                                      fromConversation: false));
-                            },
-                            child: Transform.translate(
-                                offset: const Offset(-8, 0),
-                                child: Text("${_profileController.readers.value![index].wallet!.substring(0, 6)}...${_profileController.readers.value![index].wallet!.substring(_profileController.readers.value![index].wallet!.length - 4)}",
-                                    //maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        fontFamily: "Gilroy",
-                                        fontWeight: FontWeight.w500,
-                                        color:MediaQuery.of(context).platformBrightness == Brightness.dark
-                                            ? const Color(0xFF9BA0A5)
-                                            : const Color(0xFF828282)))))
-                            : null,
-                      );
-                    },
-                  );
+                  ) : buildListViewReaders();
                 }).then((value) {
                   _profileController.readers.value = [];
                   controller.play();});
@@ -387,71 +115,149 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
     );
   }
 
-  Widget _buildProfileView(StoryDto story) {
-
-    var nowMilli = DateTime.now().millisecondsSinceEpoch;
-    var updatedAtMilli =  DateTime.parse(story.createdAt.toIso8601String()).millisecondsSinceEpoch;
-    var diffMilli = nowMilli - updatedAtMilli;
-    var timeSince = DateTime.now().subtract(Duration(milliseconds: diffMilli));
-
-    return InkWell(
-      onTap: (){
-        //_commonController.userClicked.value = story.createdBy;
-        _navigationController.hideNavBar.value = false;
-        pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            story.createdBy.picture.isNullOrBlank! ?
-            Wrap(
-              children: [
-                TinyAvatar(baseString: _homeController.userMe.value.wallet!, dimension: 46, circular: true, colourScheme: TinyAvatarColourScheme.seascape),
-              ],
-            ) :
-            CircleAvatar(
-              radius: 24,
-              backgroundImage: CachedNetworkImageProvider(
-                  story.createdBy.picture!
-              ),
-            ),
-            const SizedBox(
-              width: 16,
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  story.createdBy.nickname.isNullOrBlank! ?
-                  (story.createdBy.userName.isNullOrBlank! ? "${story.createdBy.wallet!.substring(0, 6)}...${story.createdBy.wallet!.substring(story.createdBy.wallet!.length - 4)}" : story.createdBy.userName!) :"${story.createdBy.nickname!} (${story.createdBy.userName.isNullOrBlank! ? "${story.createdBy.wallet!.substring(0, 10)}..." : story.createdBy.userName!})",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontFamily: "Gilroy",
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-                Text(
-                  timeago.format(timeSince),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontFamily: "Gilroy",
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withOpacity(0.7)),
-                )
-
-              ],
-            )
-          ],
-        ),
-      ),
-    );
+  Widget buildListViewReaders() {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+                  separatorBuilder: (BuildContext context, int index) { return const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Divider(),
+                  ); },
+                  itemCount: _profileController.readers.value?.length ?? 0,
+                  itemBuilder: (context, index){
+                    return ListTile(
+                      leading: InkWell(
+                        onTap: () {
+                          _commonController.userClicked.value =
+                          _profileController.readers.value?[index];
+                          _navigationController.hideNavBar.value = false;
+                          pushNewScreen(context,
+                              screen: const ProfileElseScreen(fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
+                        },
+                        child: _profileController.readers.value?[index].picture == null
+                            ? SizedBox(
+                            width: 56,
+                            height: 56,
+                            child: TinyAvatar(
+                              baseString: _profileController.readers.value![index].wallet!,
+                              dimension: 56,
+                              circular: true,
+                              colourScheme: TinyAvatarColourScheme.seascape,
+                            ))
+                            : ClipRRect(
+                            borderRadius: BorderRadius.circular(90.0),
+                            child: CachedNetworkImage(
+                                imageUrl: _profileController.readers.value![index].picture!,
+                                width: 56,
+                                height: 56,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const Center(
+                                    child: CircularProgressIndicator(
+                                        color: Color(0xff00CB7D))),
+                                errorWidget: (context, url, error) => Image.asset(
+                                    "assets/images/app_icon_rounded.png"))),
+                      ),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          SizedBox(
+                            width: 100,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                InkWell(
+                                  onTap: () async {
+                                    _callController.userCalled.value =
+                                    _profileController.readers.value![index];
+                                    await _callController.inviteCall(
+                                        _profileController.readers.value![index],
+                                        DateTime.now().toString(),
+                                        _homeController.id.value);
+                                  },
+                                  child: Image.asset(
+                                    "assets/images/call_tab.png",
+                                    color: const Color(0xFF00CB7D),
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                InkWell(
+                                    onTap: () {
+                                      _commonController.userClicked.value =
+                                      _profileController.readers.value?[index];
+                                      pushNewScreen(context,
+                                          screen:
+                                          const DetailedChatScreen(create: true));
+                                    },
+                                    child: Image.asset(
+                                      "assets/images/chat_tab.png",
+                                      width: 20,
+                                      height: 20,
+                                      color: const Color(0xFF9BA0A5),
+                                    )),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      title: InkWell(
+                          onTap: () {
+                            _commonController.userClicked.value =
+                            _profileController.readers.value?[index];
+                            _navigationController.hideNavBar.value = false;
+                            pushNewScreen(context,
+                                screen:
+                                const ProfileElseScreen(fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
+                          },
+                          child: Transform.translate(
+                              offset: const Offset(-8, 0),
+                              child: Text(
+                                  _profileController.readers.value![index].nickname.isNullOrBlank! ?
+                                  (_profileController.readers.value![index].userName.isNullOrBlank!
+                                      ? "${_profileController.readers.value![index].wallet!.substring(0, 6)}...${_profileController.readers.value![index].wallet!.substring(_profileController.readers.value![index].wallet!.length)}"
+                                      : _profileController.readers.value![index].userName!) :
+                                  _profileController.readers.value![index].nickname!  + (_profileController.readers.value![index].userName.isNullOrBlank! ? "" : " (${_profileController.readers.value![index].userName!})"),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: "Gilroy",
+                                      fontWeight: FontWeight.w600,
+                                      color:MediaQuery.of(context).platformBrightness == Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black)))),
+                      subtitle: !_profileController.readers.value![index].userName.isNullOrBlank! || !_profileController.readers.value![index].nickname.isNullOrBlank!
+                          ? InkWell(
+                          onTap: () {
+                            _commonController.userClicked.value =
+                            _profileController.readers.value![index];
+                            _navigationController.hideNavBar.value = false;
+                            pushNewScreen(context,
+                                screen: const ProfileElseScreen(
+                                    fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
+                          },
+                          child: Transform.translate(
+                              offset: const Offset(-8, 0),
+                              child: Text("${_profileController.readers.value![index].wallet!.substring(0, 6)}...${_profileController.readers.value![index].wallet!.substring(_profileController.readers.value![index].wallet!.length - 4)}",
+                                  //maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontFamily: "Gilroy",
+                                      fontWeight: FontWeight.w500,
+                                      color:MediaQuery.of(context).platformBrightness == Brightness.dark
+                                          ? const Color(0xFF9BA0A5)
+                                          : const Color(0xFF828282)))))
+                          : null,
+                    );
+                  },
+                );
   }
 
 }
