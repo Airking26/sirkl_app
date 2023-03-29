@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/chats/ui/chat_screen.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
@@ -45,6 +44,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   final utils = Utils();
   final StreamMessageInputController _messageInputController = StreamMessageInputController();
   final _searchController = FloatingSearchBarController();
+  final _groupNameController = TextEditingController();
 
   @override
   void initState() {
@@ -339,15 +339,14 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             if (_chatController.chipsList.value.length == 3) {
               utils.showToast(context, con.maxUserSelectedRes.tr);
             }
-            else {
-              if (selected!) {
+
+            if (selected!) {
                 _chatController.chipsList.add(item);
               } else {
                 _chatController.chipsList.removeWhere((element) =>
                 element.wallet == item.wallet);
               }
               _chatController.chipsList.refresh();
-            }
           },
           value: _chatController.chipsList.map((element) => element.wallet).contains(item.wallet),
           checkColor: const Color(0xFF00CB7D),
@@ -451,60 +450,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           Flexible(
             child: InkWell(
               onTap: () async {
-                if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!) {
-                  _chatController.messageSending.value = true;
-                  for (UserDTO element in _chatController.chipsList) {
-                    var idChannelCreated;
-                    var idChannel = DateTime
-                        .now()
-                        .millisecondsSinceEpoch
-                        .toString();
-                    if (element.id.isNullOrBlank!) {
-                      idChannelCreated = await _chatController.createInbox(InboxCreationDto(
-                          createdBy: _homeController.id.value,
-                          wallets: [
-                            _homeController.userMe.value.wallet!,
-                            element.wallet!
-                          ],
-                          idChannel: idChannel,
-                          message: _messageInputController.text));
-                    } else {
-                      await _chatController.createInbox(InboxCreationDto(
-                          createdBy: _homeController.id.value,
-                          wallets: [
-                            _homeController.userMe.value.wallet!,
-                            element.wallet!
-                          ],
-                          idChannel: idChannel,
-                          message: _messageInputController.text,
-                          members: [_homeController.id.value, element.id!]));
-                    }
-                    if (_chatController.chipsList.value.indexOf(element) ==
-                        _chatController.chipsList.length - 1) {
-                      _messageInputController.clear();
-                      _searchController.clear();
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      _chatController.messageSending.value = false;
-                      if (_chatController.chipsList.value.length == 1) {
-                        Navigator.pop(context);
-                        if (element.id.isNullOrBlank!) {
-                          _navigationController.hideNavBar.value = true;
-                          pushNewScreen(context, screen: DetailedChatScreen(
-                              create: false, channelId: idChannelCreated)).then((value) => _navigationController.hideNavBar.value = false);
-                        } else {
-                          _commonController.userClicked.value =
-                          _chatController.chipsList[0];
-                          _navigationController.hideNavBar.value = true;
-                          pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
-                        }
-                      }
-                      else {
-                        _chatController.messageHasBeenSent.value = true;
-                        Navigator.pop(context);
-                      }
-                    }
-                  }
-                  _chatController.chipsList.clear();
+                if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank! && _chatController.chipsList.length <= 3) {
+                  _dialogBuilderSendAs(context);
+                }
+                else if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank! && _chatController.isBroadcastList.value){
+                  _dialogBuilderCreateGroup(context);
                 }
               },
               child:
@@ -534,6 +484,182 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     );
   }
 
+  Future<void> sendMessageAsGroup() async{
+    _chatController.messageSending.value = true;
+    var idChannel = DateTime
+        .now()
+        .millisecondsSinceEpoch
+        .toString();
+    var wallets = _chatController.chipsList.map((element) => element.wallet!).toList();
+    wallets.add(_homeController.userMe.value.wallet!);
+    var members = _chatController.chipsList.map((element) => element.id!).toList();
+    members.add(_homeController.id.value);
+    final idChannelCreated = await _chatController.createInbox(InboxCreationDto(
+        isConv: false,
+        createdBy: _homeController.id.value,
+        wallets:  wallets,
+        nameOfGroup: _groupNameController.text,
+        picOfGroup: _profileController.urlPictureGroup.value,
+        idChannel: idChannel,
+        message: _messageInputController.text,
+        members: members));
+    _messageInputController.clear();
+    _searchController.clear();
+    FocusManager.instance.primaryFocus?.unfocus();
+    _chatController.messageSending.value = false;
+    Navigator.pop(context);
+    _navigationController.hideNavBar.value = true;
+    pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: idChannelCreated,)).then((value) => _navigationController.hideNavBar.value = false);
+  }
+
+  Future<void> sendMessageAsBroadcastList() async {
+    _chatController.messageSending.value = true;
+    for (UserDTO element in _chatController.chipsList) {
+      String? idChannelCreated;
+      var idChannel = DateTime
+          .now()
+          .millisecondsSinceEpoch
+          .toString();
+      if (element.id.isNullOrBlank!) {
+        idChannelCreated = await _chatController.createInbox(InboxCreationDto(
+          isConv: true,
+            createdBy: _homeController.id.value,
+            wallets: [
+              _homeController.userMe.value.wallet!,
+              element.wallet!
+            ],
+            idChannel: idChannel,
+            message: _messageInputController.text));
+      } else {
+        await _chatController.createInbox(InboxCreationDto(
+          isConv: true,
+            createdBy: _homeController.id.value,
+            wallets: [
+              _homeController.userMe.value.wallet!,
+              element.wallet!
+            ],
+            idChannel: idChannel,
+            message: _messageInputController.text,
+            members: [_homeController.id.value, element.id!]));
+      }
+      if (_chatController.chipsList.value.indexOf(element) ==
+          _chatController.chipsList.length - 1) {
+        _messageInputController.clear();
+        _searchController.clear();
+        FocusManager.instance.primaryFocus?.unfocus();
+        _chatController.messageSending.value = false;
+        if (_chatController.chipsList.value.length == 1) {
+          Navigator.pop(context);
+          if (element.id.isNullOrBlank!) {
+            _navigationController.hideNavBar.value = true;
+            pushNewScreen(context, screen: DetailedChatScreen(
+                create: false, channelId: idChannelCreated)).then((value) => _navigationController.hideNavBar.value = false);
+          } else {
+            _commonController.userClicked.value =
+            _chatController.chipsList[0];
+            _navigationController.hideNavBar.value = true;
+            pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
+          }
+        }
+        else {
+          _chatController.messageHasBeenSent.value = true;
+          Navigator.pop(context);
+        }
+      }
+    }
+    _chatController.chipsList.clear();
+  }
+
+  Future<void> _dialogBuilderCreateGroup(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Create a group', style: TextStyle(fontFamily: "Gilroy"),),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xFF122034) : Colors.white, width: 5),
+                      borderRadius: BorderRadius.circular(90)),
+                  child:
+                  ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(40),
+                    child: GestureDetector(onTap: () async {
+                      await _profileController.getImage(false);
+                    },
+                        child:
+                        Obx(() => CachedNetworkImage(imageUrl: _profileController.urlPictureGroup.value, color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                            errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))))
+                    ,),)
+              ),
+               TextField(
+                controller: _groupNameController,
+                style: const TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.w500),
+                cursorColor: const Color(0xff00CB7D),
+                decoration: const InputDecoration(hintText: "Name of the group", hintStyle: TextStyle(fontFamily: "Gilroy"),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xff00CB7D)),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xff00CB7D)),
+                  ), ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Create', style: TextStyle(color: Color(0xff00CB7D), fontFamily: 'Gilroy'),),
+              onPressed: () async{
+                if(_groupNameController.text.isNotEmpty) {
+                  Navigator.of(context).pop();
+                  await sendMessageAsGroup();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _dialogBuilderSendAs(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Send As...', style: TextStyle(fontFamily: "Gilroy"),),
+          content: const Text('Do you prefer to send your message as a broadcast list or to create a group with the users selected and send it there ?', style: TextStyle(fontFamily: "Gilroy")),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Broadcast List', style: TextStyle(color: Color(0xff00CB7D), fontFamily: 'Gilroy'),),
+              onPressed: () async{
+                Navigator.of(context).pop();
+                await sendMessageAsBroadcastList();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Group', style: TextStyle(color: Color(0xff00CB7D), fontFamily: 'Gilroy',),),
+              onPressed: () {
+                Navigator.of(context).pop();
+                FocusManager.instance.primaryFocus?.unfocus();
+                _dialogBuilderCreateGroup(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   void dispose() {

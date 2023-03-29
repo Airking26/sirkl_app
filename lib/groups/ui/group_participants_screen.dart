@@ -8,6 +8,7 @@ import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/member_scroll_view/stream_member_list_view.dart';
 import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
@@ -22,6 +23,7 @@ class GroupParticipantScreen extends StatefulWidget {
 class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
 
   final _chatController = Get.put(ChatsController());
+  final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
 
   late final StreamMemberListController _memberListController =
@@ -116,13 +118,15 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                       fontSize: 20),
                 ),
               ),
-              IconButton(
+              _chatController.channel.value?.createdBy?.id == _homeController.id.value ? IconButton(
                   onPressed: () {
+
                   },
                   icon: Image.asset(
-                    "assets/images/more.png",
-                    color:Colors.transparent,
-                  )),
+                    "assets/images/add_user.png",
+                    width: 20, height: 20,
+                    color:Colors.black,
+                  )) : Container(),
             ],
           ),
         ),

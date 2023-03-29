@@ -85,7 +85,7 @@ class Language extends Translations{
       c.claimOwnershipeRes: "• Claim ownership",
       c.messageSuccessfullySentRes: "Message successfully sent",
       c.profileMenuTabRes: "• Profile",
-      c.maxUserSelectedRes: "You have reached the maximum number of users selected"
+      c.maxUserSelectedRes: "Maximum number of users selected for broadcast list. You are now in creating a group mode"
     }
   };
 

@@ -285,7 +285,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 IconButton(
                                     onPressed: () async {
-                                      //_groupController.retrieveGroupsToCreate(StreamChat.of(context).client);
                                       dialogMenu = dialogPopMenu(context);
                                     },
                                     icon: Image.asset(
@@ -322,7 +321,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       onTap: () async {
                                         if (_profileController
                                             .isEditingProfile.value) {
-                                          await _profileController.getImage();
+                                          await _profileController.getImage(true);
                                         } else if(_profileController.myStories.value != null && _profileController.myStories.value!.isNotEmpty){
                                           _navigationController.hideNavBar.value = true;
                                           pushNewScreen(context, screen: const MyStoryViewerScreen()).then((value) {

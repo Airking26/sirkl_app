@@ -68,24 +68,7 @@ class StreamChannelName extends StatelessWidget {
                     : (userDTO.userName.isNullOrBlank! ? "${userDTO.wallet!.substring(0, 6)}...${userDTO.wallet!.substring(userDTO.wallet!.length - 4)}": userDTO.userName!);
               }
             } else {
-              final maxWidth = constraints.maxWidth;
-              final maxChars = maxWidth / (textStyle?.fontSize ?? 1);
-              var currentChars = 0;
-              final currentMembers = <Member>[];
-              otherMembers.forEach((element) {
-                final newLength =
-                    currentChars + (element.user?.name.length ?? 0);
-                if (newLength < maxChars) {
-                  currentChars = newLength;
-                  currentMembers.add(element);
-                }
-              });
-
-              final exceedingMembers =
-                  otherMembers.length - currentMembers.length;
-              channelName =
-                  '${currentMembers.map((e) => e.user?.name).join(', ')} '
-                  '${exceedingMembers > 0 ? '+ $exceedingMembers' : ''}';
+              channelName = channel.extraData['nameOfGroup'] as String;
             }
           } else {
             if(channel.extraData['ens'] == null || channel.extraData['ens'] == "0") {

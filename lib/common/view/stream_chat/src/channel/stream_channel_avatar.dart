@@ -152,7 +152,6 @@ class StreamChannelAvatar extends StatelessWidget {
         }
 
         // 1-1 Conversation
-        if (otherMembers.length == 1) {
           final member = otherMembers.first;
           return BetterStreamBuilder<Member>(
             stream: channel.state!.membersStream.map(
@@ -165,6 +164,7 @@ class StreamChannelAvatar extends StatelessWidget {
             builder: (context, member) => StreamUserAvatar(
               borderRadius: borderRadius ?? previewTheme?.borderRadius,
               user: member.user!,
+              channel: channel,
               constraints: constraints ?? previewTheme?.constraints,
               onTap: onTap != null ? (_) => onTap!() : null,
               selected: selected,
@@ -172,10 +172,9 @@ class StreamChannelAvatar extends StatelessWidget {
               selectionThickness: selectionThickness,
             ),
           );
-        }
 
         // Group conversation
-        return StreamGroupAvatar(
+        /*return StreamGroupAvatar(
           channel: channel,
           members: otherMembers,
           borderRadius: borderRadius ?? previewTheme?.borderRadius,
@@ -184,7 +183,7 @@ class StreamChannelAvatar extends StatelessWidget {
           selected: selected,
           selectionColor: selectionColor ?? colorTheme.accentPrimary,
           selectionThickness: selectionThickness,
-        );
+        );*/
       },
     );
   }

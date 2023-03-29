@@ -255,6 +255,18 @@ class StreamChannelHeader extends StatelessWidget
                                   child:
                                   (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ?
                                       Image.asset("assets/images/app_icon_rounded.png") :
+                                  channel.extraData['isConv'] !=null && !(channel.extraData['isConv'] as bool) ?
+                                      channel.extraData["picOfGroup"] == null ?
+                                  TinyAvatar(baseString: userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!, dimension: 40, circular: true,
+                                      colourScheme: TinyAvatarColourScheme.seascape) :
+                                  CachedNetworkImage(
+                                      imageUrl: channel.extraData["picOfGroup"] as String,
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                                      errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
+                                  ) :
                                   channel.extraData['isConv'] !=null && channel.extraData['isConv'] as bool ?
                                   userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).picture == null ?
                                   TinyAvatar(baseString: userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!, dimension: 40, circular: true,
@@ -332,7 +344,10 @@ class StreamChannelHeader extends StatelessWidget
                                   "${(channel.extraData["wallet"] as String).substring(0, 6)}...${(channel.extraData["wallet"] as String).substring((channel.extraData["wallet"] as String).length - 4)}":
                                       channel.extraData['ens']:
                                     channel.memberCount != null && channel.memberCount! > 2 ?
+                                        channel.extraData['nameOfGroup'] == null ?
                                         channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
+                                        channel.extraData["nameOfGroup"]
+                                            :
                                     _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] != null ?
                                     _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] + " (" + (!userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
                                           userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName! : "${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(0,6)}...${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.length - 4)}") + ")"
@@ -428,7 +443,7 @@ class StreamChannelHeader extends StatelessWidget
                     ) :
                     IconButton(
                         onPressed: () {
-                          dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
+                          dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["isConv"] == false ? dialogPopMenuPrivateGroup(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
                         },
                         icon: Image.asset(
                           "assets/images/more.png",
@@ -493,15 +508,21 @@ class StreamChannelHeader extends StatelessWidget
             if(creator == _homeController.userMe.value.wallet!){
               await channel.client.updateChannelPartial(channel.id!, 'try', set: {"owner": _homeController.userMe.value.wallet!});
               utils.showToast(context, "You are now the owner of the group");
-            } else utils.showToast(context, 'You are not the owner of the group');
-          } else utils.showToast(context, 'Error. Try again later');
+            } else {
+              utils.showToast(context, 'You are not the owner of the group');
+            }
+          } else {
+            utils.showToast(context, 'Error. Try again later');
+          }
         },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.claimOwnershipeRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
-        onTap: (){},
+        onTap: (){
+          dialogMenu.dismiss();
+        },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
@@ -545,7 +566,9 @@ class StreamChannelHeader extends StatelessWidget
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
-        onTap: (){},
+        onTap: (){
+          dialogMenu.dismiss();
+        },
         child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
           child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
       ))
@@ -660,6 +683,7 @@ class StreamChannelHeader extends StatelessWidget
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
         onTap: () {
+          dialogMenu.dismiss();
         },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
@@ -719,6 +743,194 @@ class StreamChannelHeader extends StatelessWidget
       ..show();
   }
 
+  YYDialog dialogPopMenuPrivateGroup(BuildContext context, Channel channel) {
+    commonController.userClicked.value = userFromJson(
+        json.encode(channel.state?.members
+            .where((element) =>
+        element.userId != StreamChat
+            .of(context)
+            .currentUser!
+            .id)
+            .first
+            .user!
+            .extraData["userDTO"]));
+    return YYDialog().build(context)
+      ..width = 180
+      ..borderRadius = 10.0
+      ..gravity = Gravity.rightTop
+      ..barrierColor =
+      MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
+      ..backgroundColor =
+      MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white.withOpacity(0.95)
+      ..margin = const EdgeInsets.only(top: 90, right: 20)
+      ..widget(InkWell(
+        onTap: () async {
+          dialogMenu.dismiss();
+          showDialog(context: context,
+              barrierDismissible: true,
+              builder: (_) =>
+                  CupertinoAlertDialog(
+                    title: Text("Quit Group", style: TextStyle(fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: "Gilroy",
+                        color: MediaQuery
+                            .of(context)
+                            .platformBrightness == Brightness.dark ? Colors
+                            .white : Colors.black),),
+                    content: Text("Are you sure?",
+                        style: TextStyle(fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: "Gilroy",
+                            color: MediaQuery
+                                .of(context)
+                                .platformBrightness == Brightness.dark
+                                ? Colors.white.withOpacity(0.5)
+                                : Colors.black.withOpacity(0.5))),
+                    actions: [
+                      CupertinoDialogAction(child: Text("No",
+                          style: TextStyle(fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: "Gilroy",
+                              color: MediaQuery
+                                  .of(context)
+                                  .platformBrightness == Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black)), onPressed: () {
+                        Get.back();
+                      },),
+                      CupertinoDialogAction(child: Text("Yes",
+                          style: TextStyle(fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: "Gilroy",
+                              color: MediaQuery
+                                  .of(context)
+                                  .platformBrightness == Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black)),
+                        onPressed: () async {
+                          await channel.removeMembers([_homeController.id.value]);
+                          Navigator.pop(context);
+                        },)
+                    ],
+                  )
+          );
+
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text("• Quit the group",
+                style: TextStyle(
+                    fontSize: 14,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) ,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: () {
+          dialogMenu.dismiss();
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                con.reportRes.tr,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                        ? const Color(0xff9BA0A5)
+                        : const Color(0xFF828282),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
+        onTap: () async {
+          if(channel.createdBy?.id == _homeController.id.value) {
+            dialogMenu.dismiss();
+            showDialog(context: context,
+                barrierDismissible: true,
+                builder: (_) =>
+                    CupertinoAlertDialog(
+                      title: Text("Delete Group", style: TextStyle(fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: "Gilroy",
+                          color: MediaQuery
+                              .of(context)
+                              .platformBrightness == Brightness.dark ? Colors
+                              .white : Colors.black),),
+                      content: Text("Are you sure? This action is irreversible",
+                          style: TextStyle(fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: "Gilroy",
+                              color: MediaQuery
+                                  .of(context)
+                                  .platformBrightness == Brightness.dark
+                                  ? Colors.white.withOpacity(0.5)
+                                  : Colors.black.withOpacity(0.5))),
+                      actions: [
+                        CupertinoDialogAction(child: Text("No",
+                            style: TextStyle(fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: "Gilroy",
+                                color: MediaQuery
+                                    .of(context)
+                                    .platformBrightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black)), onPressed: () {
+                          Get.back();
+                        },),
+                        CupertinoDialogAction(child: Text("Yes",
+                            style: TextStyle(fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: "Gilroy",
+                                color: MediaQuery
+                                    .of(context)
+                                    .platformBrightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black)),
+                          onPressed: () async {
+                            if (!channel.id!.startsWith(
+                                "!members")) {
+                              await _chatController.deleteInbox(
+                                channel.id!);
+                            }
+                            await channel.delete();
+                            Get.back();
+                            Navigator.pop(context);
+                          },)
+                      ],
+                    )
+            );
+          } else {
+            utils.showToast(context, "Only the creator of the group can delete it");
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "• Delete the group",
+                style: TextStyle(
+                    fontSize: 14,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                        ? const Color(0xff9BA0A5)
+                        : const Color(0xFF828282),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..show();
+  }
 
 
 }

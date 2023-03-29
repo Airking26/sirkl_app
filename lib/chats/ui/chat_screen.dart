@@ -49,17 +49,26 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ?
       Filter.and([
         Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
-        Filter.autoComplete('member.user.name', _chatController.query.value),
-        Filter.in_("members", [_homeController.id.value]),
-        Filter.equal('isConv', true),
         if(searchFriends)
           Filter.and([
             Filter.in_("members", [_homeController.id.value]),
-            Filter.exists("${_homeController.id.value}_follow_channel"),
-            Filter.equal("${_homeController.id.value}_follow_channel", true)
+            Filter.or([
+              Filter.and([
+                Filter.autoComplete('member.user.name', _chatController.query.value),
+                Filter.exists("${_homeController.id.value}_follow_channel"),
+                Filter.equal("${_homeController.id.value}_follow_channel", true),
+                Filter.equal('isConv', true),
+              ]),
+              Filter.and([
+                Filter.autoComplete('nameOfGroup', _chatController.query.value),
+                Filter.equal('isConv', false),
+              ])
+            ])
           ])
         else
           Filter.and([
+            Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
+            Filter.equal('isConv', true),
             Filter.or([
               Filter.equal("created_by_id", _homeController.id.value),
               Filter.in_("members", [_homeController.id.value]),
@@ -68,19 +77,26 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               Filter.notExists("${_homeController.id.value}_follow_channel"),
               Filter.equal("${_homeController.id.value}_follow_channel", false)
             ])
-          ]),
-      ]) :
+          ])
+    ])
+        :
           Filter.and([
-            Filter.equal('isConv', true),
             Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
             if(searchFriends)
               Filter.and([
                 Filter.in_("members", [_homeController.id.value]),
-                Filter.exists("${_homeController.id.value}_follow_channel"),
-                Filter.equal("${_homeController.id.value}_follow_channel", true)
+                Filter.or([
+                  Filter.and([
+                    Filter.exists("${_homeController.id.value}_follow_channel"),
+                    Filter.equal("${_homeController.id.value}_follow_channel", true),
+                    Filter.equal('isConv', true),
+                  ]),
+                  Filter.equal('isConv', false),
+                ]),
               ])
             else
               Filter.and([
+                Filter.equal('isConv', true),
                 Filter.or([
                   Filter.equal("created_by_id", _homeController.id.value),
                   Filter.in_("members", [_homeController.id.value]),

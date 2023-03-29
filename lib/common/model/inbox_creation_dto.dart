@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
@@ -14,12 +16,18 @@ class InboxCreationDto {
     required this.wallets,
     required this.idChannel,
     required this.message,
+    required this.isConv,
+    this.nameOfGroup,
+    this.picOfGroup,
     this.members
   });
 
   String createdBy;
   String idChannel;
   String message;
+  bool isConv;
+  String? nameOfGroup;
+  String? picOfGroup;
   List<String>? members;
   List<String> wallets;
 
@@ -27,6 +35,9 @@ class InboxCreationDto {
     createdBy: json["createdBy"],
     idChannel: json["idChannel"],
     message: json["message"],
+    isConv: json["isConv"],
+    nameOfGroup: json["nameOfGroup"],
+    picOfGroup: json["picOfGroup"],
     members: json["members"] == null ? null : List<String>.from(json["members"].map((x) => x)),
     wallets: List<String>.from(json["wallets"].map((x) => x)),
   );
@@ -35,6 +46,9 @@ class InboxCreationDto {
     "createdBy": createdBy,
     "idChannel": idChannel,
     "message": message,
+    "isConv": isConv,
+    "picOfGroup": picOfGroup,
+    "nameOfGroup": nameOfGroup,
     "wallets": List<dynamic>.from(wallets.map((x) => x)),
     "members": members == null ? null : List<dynamic>.from(members!.map((x) => x)),
   };
