@@ -453,7 +453,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                 if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank! && _chatController.chipsList.length <= 3) {
                   _dialogBuilderSendAs(context);
                 }
-                else if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank! && _chatController.isBroadcastList.value){
+                else if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank! &&  _chatController.chipsList.length > 3){
                   _dialogBuilderCreateGroup(context);
                 }
               },
