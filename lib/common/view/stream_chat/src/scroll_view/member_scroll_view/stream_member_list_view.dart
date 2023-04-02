@@ -2,6 +2,8 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_error_widget.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_load_more_error.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_load_more_indicator.dart';
@@ -46,7 +48,7 @@ typedef StreamMemberListTile = StreamUserListTile;
 /// * [StreamMemberListController]
 class StreamMemberListView extends StatelessWidget {
   /// Creates a new instance of [StreamMemberListView].
-  const StreamMemberListView({
+  StreamMemberListView({
     super.key,
     required this.controller,
     this.itemBuilder,
@@ -62,6 +64,8 @@ class StreamMemberListView extends StatelessWidget {
     this.scrollController,
     this.primary,
     this.physics,
+    this.userSlidableEnabled,
+    this.onUserDeletePressed,
     this.shrinkWrap = false,
     this.padding,
     this.addAutomaticKeepAlives = true,
@@ -73,6 +77,9 @@ class StreamMemberListView extends StatelessWidget {
     this.restorationId,
     this.clipBehavior = Clip.hardEdge,
   });
+
+  final bool? userSlidableEnabled;
+  final void Function(BuildContext, String)? onUserDeletePressed;
 
   /// The [StreamMemberListController] used to control the list of members.
   final StreamMemberListController controller;
@@ -278,6 +285,8 @@ class StreamMemberListView extends StatelessWidget {
   /// Defaults to [Clip.hardEdge].
   final Clip clipBehavior;
 
+  final _chatController = Get.put(ChatsController());
+
   @override
   Widget build(BuildContext context) => PagedValueListView<int, Member>(
         scrollDirection: scrollDirection,
@@ -299,11 +308,15 @@ class StreamMemberListView extends StatelessWidget {
         loadMoreTriggerIndex: loadMoreTriggerIndex,
         separatorBuilder: separatorBuilder,
         itemBuilder: (context, members, index) {
+          final userSlidableEnabledBool = userSlidableEnabled;
+          final onUserDeletedPressed = onUserDeletePressed;
           final member = members[index];
           final onTap = onMemberTap;
           final onLongPress = onMemberLongPress;
 
           final streamUserListTile = StreamMemberListTile(
+            slidableEnabled: userSlidableEnabledBool,
+            onDeletePressed: onUserDeletedPressed == null ? null : (context) => onUserDeletedPressed(context, member.userId!),
             user: member.user!,
             onTap: onTap == null ? null : () => onTap(member),
             onLongPress: onLongPress == null ? null : () => onLongPress(member),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -23,6 +24,8 @@ class StreamUserListTile extends StatelessWidget {
     required this.user,
     this.leading,
     this.title,
+    this.slidableEnabled,
+    this.onDeletePressed,
     this.subtitle,
     this.selected = false,
     this.selectedWidget,
@@ -32,6 +35,10 @@ class StreamUserListTile extends StatelessWidget {
     this.visualDensity = VisualDensity.compact,
     this.contentPadding = const EdgeInsets.symmetric(horizontal: 8),
   });
+
+  final void Function(BuildContext context)? onDeletePressed;
+
+  final bool? slidableEnabled;
 
   /// The user to display.
   final User user;
@@ -160,14 +167,27 @@ class StreamUserListTile extends StatelessWidget {
           color: chatThemeData.colorTheme.accentPrimary,
         );
 
-    return ListTile(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      leading: leading,
-      trailing: selected ? selectedWidget : null,
-      title: title,
-      subtitle: subtitle,
-      dense: false,
+    return Slidable(
+      enabled: slidableEnabled ?? false,
+      endActionPane: ActionPane(
+        extentRatio: 0.25,
+        motion: const ScrollMotion(), children: [SlidableAction(
+        spacing: 0,
+        padding: EdgeInsets.zero,
+        onPressed: onDeletePressed,
+        backgroundColor: Colors.white,
+        foregroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
+        icon: Icons.person_remove_rounded,
+      )],),
+      child: ListTile(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        leading: leading,
+        trailing: selected ? selectedWidget : null,
+        title: title,
+        subtitle: subtitle,
+        dense: false,
+      ),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/chats/ui/add_user_to_group_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
@@ -14,7 +15,8 @@ import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 
 class GroupParticipantScreen extends StatefulWidget {
-  const GroupParticipantScreen({Key? key}) : super(key: key);
+  bool fromChat;
+  GroupParticipantScreen({Key? key, required this.fromChat}) : super(key: key);
 
   @override
   State<GroupParticipantScreen> createState() => _GroupParticipantScreenState();
@@ -57,7 +59,13 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
           child: Expanded(
             child: Padding(
               padding: const EdgeInsets.only(top: 8.0),
-              child: StreamMemberListView(controller: _memberListController, onMemberTap: (member){
+              child: StreamMemberListView(
+                userSlidableEnabled: widget.fromChat,
+                onUserDeletePressed: (context, memberId) async {
+                  await _chatController.channel.value?.removeMembers([memberId]);
+                  await _memberListController.refresh();
+                },
+                controller: _memberListController, onMemberTap: (member){
                 _commonController.userClicked.value = userFromJson(json.encode(member.user?.extraData['userDTO']));
                 pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
               },),
@@ -98,12 +106,14 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                   icon: Image.asset(
                     "assets/images/arrow_left.png",
                     color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? Colors.transparent
-                        : Colors.transparent,
+                        ? Colors.white
+                        : Colors.black,
                   )),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
@@ -118,9 +128,9 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                       fontSize: 20),
                 ),
               ),
-              _chatController.channel.value?.createdBy?.id == _homeController.id.value ? IconButton(
+              _chatController.channel.value?.createdBy?.id == _homeController.id.value && widget.fromChat ? IconButton(
                   onPressed: () {
-
+                    pushNewScreen(context, screen: const AddUserToGroupScreen());
                   },
                   icon: Image.asset(
                     "assets/images/add_user.png",

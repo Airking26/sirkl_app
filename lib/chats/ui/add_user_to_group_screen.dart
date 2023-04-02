@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -18,17 +19,17 @@ import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../common/view/dialog/custom_dial.dart';
 
-class NewCallScreen extends StatefulWidget {
-  const NewCallScreen({Key? key}) : super(key: key);
+class AddUserToGroupScreen extends StatefulWidget {
+  const AddUserToGroupScreen({Key? key}) : super(key: key);
 
   @override
-  State<NewCallScreen> createState() => _NewCallScreenState();
+  State<AddUserToGroupScreen> createState() => _AddUserToGroupScreenState();
 }
 
-class _NewCallScreenState extends State<NewCallScreen> {
+class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
 
   final _callController = Get.put(CallsController());
-  final _homeController = Get.put(HomeController());
+  final _chatController = Get.put(ChatsController());
   final _commonController = Get.put(CommonController());
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
@@ -38,7 +39,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
   @override
   void initState() {
     pagingController.addPageRequestListener((pageKey) {
-       if(_callController.callQuery.value.isEmpty){
+       if(_chatController.addUserQuery.value.isEmpty){
         pagingController.refresh();
         pagingController.appendLastPage(_commonController.users);
       }
@@ -50,7 +51,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
     try {
       List<UserDTO> newItems;
       if(pageKey == 0) newItems = [];
-        newItems = await _callController.retrieveUsers(_callController.callQuery.value, pageKey);
+        newItems = await _callController.retrieveUsers(_chatController.addUserQuery.value, pageKey);
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
         pagingController.appendLastPage(newItems);
@@ -176,7 +177,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Text(
-                  con.newCallRes.tr,
+                  "Add User",
                   style: TextStyle(
                       color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                       fontWeight: FontWeight.w600,
@@ -207,7 +208,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
       controller: _searchController,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      hint: 'Paste a wallet address or a username',
+      hint: 'Search for a user',
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 0),
@@ -239,38 +240,12 @@ class _NewCallScreenState extends State<NewCallScreen> {
       onQueryChanged: (query) async{
         if(query.isNotEmpty) {
           pagingController.itemList = [];
-          _callController.callQuery.value = query;
+          _chatController.addUserQuery.value = query;
           fetchPageUsers();
         } else {
           pagingController.refresh();
           pagingController.appendLastPage(_commonController.users);
         }
-        /*if(query.isNotEmpty && query.contains('.eth')){
-          String? ethFromEns = await _chatController.getEthFromEns(query);
-          if(_profileController.isUserExists.value == null && ethFromEns != "" && ethFromEns != "0") {
-            pagingController.itemList = [UserDTO(id: '', userName: query, picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: ethFromEns, following: 0, isInFollowing: false)];
-          } else if(_profileController.isUserExists.value != null){
-            pagingController.itemList = [_profileController.isUserExists.value!];
-          }
-          else {
-            pagingController.itemList = [];
-          }
-        }
-        else if(query.isNotEmpty && isValidEthereumAddress(query.toLowerCase())){
-          _profileController.isUserExists.value = await _profileController.getUserByWallet(query.toLowerCase());
-          if(_profileController.isUserExists.value == null) {
-            pagingController.itemList = [UserDTO(id: '', userName: "", picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: query.toLowerCase(), following: 0, isInFollowing: false)];
-          } else {
-            pagingController.itemList = [_profileController.isUserExists.value!];
-          }
-        }
-        else {
-          if(query.isNotEmpty) {
-            pagingController.itemList = [];
-          } else {
-            pagingController.refresh();
-          }
-        }*/
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
@@ -311,13 +286,12 @@ class _NewCallScreenState extends State<NewCallScreen> {
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         trailing: InkWell(
           onTap: () async {
-            _callController.userCalled.value = item;
-            await _callController.inviteCall(item, DateTime.now().toString(), _homeController.id.value);
+            await _chatController.channel.value?.addMembers([item.id!]);
           },
           child: Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: Image.asset(
-              "assets/images/call_tab.png",
+              "assets/images/add_user.png",
               color: const Color(0xFF00CB7D),
               width: 20,
               height: 20,
@@ -354,7 +328,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
   @override
   void dispose() {
     pagingController.dispose();
-    _callController.callQuery.value = "";
+    _chatController.addUserQuery.value = "";
     super.dispose();
   }
 

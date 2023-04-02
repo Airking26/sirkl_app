@@ -454,7 +454,12 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   _dialogBuilderSendAs(context);
                 }
                 else if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank! &&  _chatController.chipsList.length > 3){
-                  _dialogBuilderCreateGroup(context);
+                  if(_chatController.chipsList.any((element) => element.id.isNullOrBlank!)) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    utils.showToast(context, "The list of users selected contains a wallet or an ENS that is not registered as a user of SIRKL");
+                  } else {
+                    _dialogBuilderCreateGroup(context);
+                  }
                 }
               },
               child:
@@ -485,31 +490,36 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   }
 
   Future<void> sendMessageAsGroup() async{
-    _chatController.messageSending.value = true;
-    var idChannel = DateTime
-        .now()
-        .millisecondsSinceEpoch
-        .toString();
-    var wallets = _chatController.chipsList.map((element) => element.wallet!).toList();
-    wallets.add(_homeController.userMe.value.wallet!);
-    var members = _chatController.chipsList.map((element) => element.id!).toList();
-    members.add(_homeController.id.value);
-    final idChannelCreated = await _chatController.createInbox(InboxCreationDto(
-        isConv: false,
-        createdBy: _homeController.id.value,
-        wallets:  wallets,
-        nameOfGroup: _groupNameController.text,
-        picOfGroup: _profileController.urlPictureGroup.value,
-        idChannel: idChannel,
-        message: _messageInputController.text,
-        members: members));
-    _messageInputController.clear();
-    _searchController.clear();
-    FocusManager.instance.primaryFocus?.unfocus();
-    _chatController.messageSending.value = false;
-    Navigator.pop(context);
-    _navigationController.hideNavBar.value = true;
-    pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: idChannelCreated,)).then((value) => _navigationController.hideNavBar.value = false);
+      _chatController.messageSending.value = true;
+      var idChannel = DateTime
+          .now()
+          .millisecondsSinceEpoch
+          .toString();
+      var wallets = _chatController.chipsList.map((element) => element.wallet!)
+          .toList();
+      wallets.add(_homeController.userMe.value.wallet!);
+      var members = _chatController.chipsList.map((element) => element.id!)
+          .toList();
+      members.add(_homeController.id.value);
+      final idChannelCreated = await _chatController.createInbox(
+          InboxCreationDto(
+              isConv: false,
+              createdBy: _homeController.id.value,
+              wallets: wallets,
+              nameOfGroup: _groupNameController.text,
+              picOfGroup: _profileController.urlPictureGroup.value,
+              idChannel: idChannel,
+              message: _messageInputController.text,
+              members: members));
+      _messageInputController.clear();
+      _searchController.clear();
+      FocusManager.instance.primaryFocus?.unfocus();
+      _chatController.messageSending.value = false;
+      Navigator.pop(context);
+      _navigationController.hideNavBar.value = true;
+      pushNewScreen(context, screen: DetailedChatScreen(
+        create: false, channelId: idChannelCreated,)).then((value) =>
+      _navigationController.hideNavBar.value = false);
   }
 
   Future<void> sendMessageAsBroadcastList() async {
@@ -650,9 +660,15 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               ),
               child: const Text('Group', style: TextStyle(color: Color(0xff00CB7D), fontFamily: 'Gilroy',),),
               onPressed: () {
-                Navigator.of(context).pop();
-                FocusManager.instance.primaryFocus?.unfocus();
-                _dialogBuilderCreateGroup(context);
+                if(_chatController.chipsList.any((element) => element.id.isNullOrBlank!)) {
+                  Navigator.of(context).pop();
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  utils.showToast(context, "The list of users selected contains a wallet or an ENS that is not registered as a user of SIRKL");
+                } else {
+                  Navigator.of(context).pop();
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  _dialogBuilderCreateGroup(context);
+                }
               },
             ),
           ],

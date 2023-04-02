@@ -245,7 +245,7 @@ class StreamChannelHeader extends StatelessWidget
                               else if(channel.isGroup){
                                 _chatController.channel.value = channel;
                                 _navigationController.hideNavBar.value = false;
-                                pushNewScreen(context,screen: const GroupParticipantScreen()).then((value) => _navigationController.hideNavBar.value = true).then((value) => _navigationController.hideNavBar.value = true);
+                                pushNewScreen(context,screen: GroupParticipantScreen(fromChat: (channel.extraData['isConv'] != null && channel.extraData['isConv'] == false))).then((value) => _navigationController.hideNavBar.value = true).then((value) => _navigationController.hideNavBar.value = true);
                               }
                             },
                             child: Padding(
@@ -313,7 +313,7 @@ class StreamChannelHeader extends StatelessWidget
                               } else if(channel.isGroup){
                                 _navigationController.hideNavBar.value = false;
                                 _chatController.channel.value = channel;
-                                pushNewScreen(context,screen: const GroupParticipantScreen()).then((value) => _navigationController.hideNavBar.value = true);
+                                pushNewScreen(context,screen: GroupParticipantScreen(fromChat: (channel.extraData['isConv'] != null && channel.extraData['isConv'] == false))).then((value) => _navigationController.hideNavBar.value = true);
                               }
                             },
                             child: Padding(

@@ -27,6 +27,7 @@ class ChatsController extends GetxController{
   var isEditingProfile = false.obs;
   var usernameElseTextEditingController = TextEditingController().obs;
   var isBroadcastList = false.obs;
+  var addUserQuery = "".obs;
 
   Rx<Channel?> channel = (null as Channel?).obs;
 
