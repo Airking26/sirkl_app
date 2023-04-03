@@ -60,6 +60,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
             child: Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: StreamMemberListView(
+                memberPage: true,
                 userSlidableEnabled: widget.fromChat,
                 onUserDeletePressed: (context, memberId) async {
                   await _chatController.channel.value?.removeMembers([memberId]);
@@ -130,7 +131,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
               ),
               _chatController.channel.value?.createdBy?.id == _homeController.id.value && widget.fromChat ? IconButton(
                   onPressed: () {
-                    pushNewScreen(context, screen: const AddUserToGroupScreen());
+                    pushNewScreen(context, screen: const AddUserToGroupScreen()).then((value) => _memberListController.refresh());
                   },
                   icon: Image.asset(
                     "assets/images/add_user.png",

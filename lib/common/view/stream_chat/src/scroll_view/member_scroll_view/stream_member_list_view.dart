@@ -57,6 +57,7 @@ class StreamMemberListView extends StatelessWidget {
     this.loadingBuilder,
     this.errorBuilder,
     this.onMemberTap,
+    this.memberPage = false,
     this.onMemberLongPress,
     this.loadMoreTriggerIndex = 3,
     this.scrollDirection = Axis.vertical,
@@ -78,6 +79,7 @@ class StreamMemberListView extends StatelessWidget {
     this.clipBehavior = Clip.hardEdge,
   });
 
+  final bool memberPage;
   final bool? userSlidableEnabled;
   final void Function(BuildContext, String)? onUserDeletePressed;
 
@@ -315,6 +317,7 @@ class StreamMemberListView extends StatelessWidget {
           final onLongPress = onMemberLongPress;
 
           final streamUserListTile = StreamMemberListTile(
+            memberPage: memberPage,
             slidableEnabled: userSlidableEnabledBool,
             onDeletePressed: onUserDeletedPressed == null ? null : (context) => onUserDeletedPressed(context, member.userId!),
             user: member.user!,

@@ -22,6 +22,7 @@ class StreamUserListTile extends StatelessWidget {
   StreamUserListTile({
     super.key,
     required this.user,
+    this.memberPage = false,
     this.leading,
     this.title,
     this.slidableEnabled,
@@ -38,6 +39,7 @@ class StreamUserListTile extends StatelessWidget {
 
   final void Function(BuildContext context)? onDeletePressed;
 
+  final bool memberPage;
   final bool? slidableEnabled;
 
   /// The user to display.
@@ -143,6 +145,7 @@ class StreamUserListTile extends StatelessWidget {
     final leading = this.leading ??
         StreamUserAvatar(
           user: user,
+          memberPage: memberPage,
           constraints: const BoxConstraints.tightFor(
             height: 30,
             width: 30,

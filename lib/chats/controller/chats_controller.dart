@@ -18,6 +18,7 @@ class ChatsController extends GetxController{
   var index = 0.obs;
   var searchIsActive = false.obs;
   var chipsList = <UserDTO>[].obs;
+  var chipsListAddUsers = <UserDTO>[].obs;
   var query = "".obs;
   final _chatService = ChatsService();
   final _homeService = HomeService();

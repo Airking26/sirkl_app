@@ -20,6 +20,7 @@ class StreamUserAvatar extends StatelessWidget {
     this.onlineIndicatorConstraints,
     this.onTap,
     this.onLongPress,
+    this.memberPage = false,
     this.showOnlineStatus = true,
     this.borderRadius,
     this.onlineIndicatorAlignment = Alignment.topRight,
@@ -31,6 +32,8 @@ class StreamUserAvatar extends StatelessWidget {
   });
 
   final _homeController = Get.put(HomeController());
+
+  final bool memberPage;
 
   /// User whose avatar is to be displayed
   final User user;
@@ -81,7 +84,7 @@ class StreamUserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
-    final hasPicture = userDTO.picture.isNullOrBlank!;
+    final haveNotPicture = userDTO.picture.isNullOrBlank!;
     final notYetUser = userDTO.id == _homeController.id.value;
     final isGroup = channel?.extraData["isConv"];
     final picOfGroup = channel?.extraData["picOfGroup"];
@@ -100,11 +103,11 @@ class StreamUserAvatar extends StatelessWidget {
         constraints: const BoxConstraints(minWidth: 56, maxHeight: 56, maxWidth: 56, minHeight: 56),
         child: notYetUser ?
         Image.asset("assets/images/app_icon_rounded.png", width: 56, height: 56, fit: BoxFit.cover,) :
-        !hasPicture
+        (!haveNotPicture && isGroup != null && (isGroup as bool)) || (isGroup != null && picOfGroup != null && !(isGroup as bool)) || (!haveNotPicture && memberPage)
             ? CachedNetworkImage(
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.high,
-                imageUrl: isGroup != null && picOfGroup != null && !(isGroup as bool) ? picOfGroup as String :userDTO.picture!,
+                imageUrl: picOfGroup != null ? picOfGroup as String :userDTO.picture!,
                 errorWidget: (context, __, ___) => backupGradientAvatar,
                 placeholder:(context, _) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                 imageBuilder: (context, imageProvider) => DecoratedBox(
@@ -170,4 +173,5 @@ class StreamUserAvatar extends StatelessWidget {
       ),
     );
   }
+
 }

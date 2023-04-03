@@ -12,6 +12,7 @@ import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
@@ -94,9 +95,23 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
           Expanded(
             child: Padding(
                 padding: const EdgeInsets.only(top: 45),
-                child: Column(
+                child: Obx(() => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _chatController.chipsListAddUsers.isEmpty  ? Container() : Column(
+                      children: [
+                        Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 0),
+                            height: 50,
+                            child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _chatController.chipsListAddUsers.length,
+                            itemBuilder: buildToSendChip),
+                            ),
+                        SizedBox(height: 24,)
+                      ],
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
@@ -132,7 +147,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                       ),
                     )
                   ],
-                )),
+                ))),
           ),
         ]));
   }
@@ -185,15 +200,14 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                       fontSize: 20),
                 ),
               ),
-              IconButton(
-                  onPressed: () {
-                  },
-                  icon: Image.asset(
-                    "assets/images/plus.png",
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? Colors.transparent
-                        : Colors.transparent,
-                  )),
+              TextButton(
+                  onPressed: () async{
+                    for (var element in _chatController.chipsListAddUsers) {
+                      await _chatController.channel.value?.addMembers([element.id!]);
+                    }
+                    Navigator.pop(context);
+                  }, child: Text("DONE", style: TextStyle(fontWeight: FontWeight.w700, fontFamily: "Gilroy", color: Color(0xFF00CB7D)),),
+                  ),
             ],
           ),
         ),
@@ -271,6 +285,32 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
     );
   }
 
+  Widget buildToSendChip(BuildContext context, int index) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: InputChip(
+          deleteIconColor: Colors.white,
+          deleteIcon: Image.asset(
+            'assets/images/close.png',
+            color: Colors.white,
+          ),
+          padding: const EdgeInsets.all(12),
+          onDeleted: () {
+            _chatController.chipsListAddUsers.removeAt(index);
+            _chatController.chipsListAddUsers.refresh();
+          },
+          backgroundColor: const Color(0xFF00CB7D),
+          label: Text(
+            _chatController.chipsListAddUsers[index].userName.isNullOrBlank! ? "${_chatController.chipsListAddUsers[index].wallet!.substring(0, 10)}..." : _chatController.chipsListAddUsers[index].userName!,
+            style: const TextStyle(
+                fontFamily: "Gilroy",
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.white),
+          )),
+    );
+  }
+
   Widget buildNewMessageTile(BuildContext context, int index, UserDTO item) {
     return ListTile(
         leading: InkWell(
@@ -286,7 +326,12 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         trailing: InkWell(
           onTap: () async {
-            await _chatController.channel.value?.addMembers([item.id!]);
+            var isPresent = await _chatController.channel.value?.queryMembers(filter: Filter.equal("id", item.id!));
+            if(isPresent!.members.isEmpty) {
+              _chatController.chipsListAddUsers.add(item);
+            } else {
+              utils.showToast(context, "This user is already present in this group");
+            }
           },
           child: Padding(
             padding: const EdgeInsets.only(right: 8.0),
@@ -327,6 +372,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
 
   @override
   void dispose() {
+    _chatController.chipsListAddUsers.clear();
     pagingController.dispose();
     _chatController.addUserQuery.value = "";
     super.dispose();
