@@ -450,15 +450,25 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           Flexible(
             child: InkWell(
               onTap: () async {
-                if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank! && _chatController.chipsList.length <= 3) {
-                  _dialogBuilderSendAs(context);
-                }
-                else if(_messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank! &&  _chatController.chipsList.length > 3){
-                  if(_chatController.chipsList.any((element) => element.id.isNullOrBlank!)) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    utils.showToast(context, "The list of users selected contains a wallet or an ENS that is not registered as a user of SIRKL");
-                  } else {
-                    _dialogBuilderCreateGroup(context);
+                if(_chatController.chipsList.every((element) => element.id.isNullOrBlank!)) {
+                  await sendMessageAsBroadcastList();
+                } else {
+                  if (_messageInputController.text.isNotEmpty &&
+                      !_messageInputController.text.isBlank! &&
+                      _chatController.chipsList.length <= 3) {
+                    _dialogBuilderSendAs(context);
+                  }
+                  else if (_messageInputController.text.isNotEmpty &&
+                      !_messageInputController.text.isBlank! &&
+                      _chatController.chipsList.length > 3) {
+                    if (_chatController.chipsList.any((element) =>
+                    element.id.isNullOrBlank!)) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      utils.showToast(context,
+                          "The list of users selected contains a wallet or an ENS that is not registered as a user of SIRKL");
+                    } else {
+                      _dialogBuilderCreateGroup(context);
+                    }
                   }
                 }
               },
