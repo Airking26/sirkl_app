@@ -474,7 +474,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     Padding(
                       padding: const EdgeInsets.only(top: 12.0),
                       child: Obx(() =>Text(
-                        _groupController.addAGroup.value ? "New Group" :
+                        _groupController.addAGroup.value ? "Add a community" :
                         _groupController.searchIsActive.value ? _groupController.index.value == 0 ? "Favorites" : "Others" :
                         con.groupsTabRes.tr,
                         style: TextStyle(

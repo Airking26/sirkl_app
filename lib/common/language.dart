@@ -78,7 +78,7 @@ class Language extends Translations{
       c.configurationSentenceRes: "We are configuring your account.",
       c.noCallsSentenceRes: "You don't have a call history yet.",
       c.noFriendsSentenceRes: "You don't have any conversation, start to connect with people",
-      c.addUsersToSirklRes: "Add users to your sirkl to start following them",
+      c.addUsersToSirklRes: "Add users to your sirkl to start seeing their stories",
       c.rulesRes : "• Rules",
       c.notificationsOffRes : "• Notifications OFF",
       c.contactOwnerRes: "• Contact owner",

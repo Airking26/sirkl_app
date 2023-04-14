@@ -85,11 +85,18 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           ),
           Expanded(
             child: Padding(
-                padding: const EdgeInsets.only(top: 45),
+                padding: const EdgeInsets.only(top: 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _chatController.chipsList.isNotEmpty ? Column(
+                    ListTile(leading: IconButton(icon :const Icon(Icons.groups, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("New group", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),onTap: (){_chatController.sendingMessageMode.value = 1;}),
+                    const SizedBox(height: 4,),
+                    ListTile(leading: IconButton(icon :const Icon(Icons.volume_up_rounded, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("New broadcast list", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24,vertical: 2), onTap: (){_chatController.sendingMessageMode.value = 2;},),
+                    const SizedBox(height: 4,),
+                    ListTile(leading: IconButton(icon :const Icon(Icons.person_add_alt_1_rounded, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("Add to my SIRKL", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2), onTap: (){_chatController.sendingMessageMode.value = 3;},),
+                    const SizedBox(height: 16,),
+                    _chatController.chipsList.isNotEmpty ?
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
@@ -122,7 +129,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                         ),
                       ],
                     ) : Container(),
-
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
@@ -317,71 +323,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       },
     );
   }
-
-  Widget buildNewMessageTile(BuildContext context, int index, UserDTO item) {
-    return ListTile(
-        leading: InkWell(
-            onTap: (){
-              if(_profileController.isUserExists.value != null) {
-                _navigationController.hideNavBar.value = false;
-                _commonController.userClicked.value = item;
-                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
-              }
-            },
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(90.0), child:
-            item.picture == null ?
-            SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
-            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
-                errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
-        trailing: Checkbox(
-          onChanged: (selected) {
-            if (_chatController.chipsList.value.length == 3) {
-              utils.showToast(context, con.maxUserSelectedRes.tr);
-            }
-
-            if (selected!) {
-                _chatController.chipsList.add(item);
-              } else {
-                _chatController.chipsList.removeWhere((element) =>
-                element.wallet == item.wallet);
-              }
-              _chatController.chipsList.refresh();
-          },
-          value: _chatController.chipsList.map((element) => element.wallet).contains(item.wallet),
-          checkColor: const Color(0xFF00CB7D),
-          fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
-          side: MaterialStateBorderSide.resolveWith(
-            (states) => const BorderSide(width: 1.0, color: Color(0xFF00CB7D)),
-          ),
-        ),
-        title: Transform.translate(
-          offset: const Offset(-8, 0),
-          child: Text(item.nickname != null ? item.nickname! + (item.userName.isNullOrBlank! ? "" : " (${item.userName!})") : item.userName.isNullOrBlank! ? "${item.wallet!.substring(0, 6)}...${item.wallet!.substring(item.wallet!.length - 4)}" : item.userName!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontSize: 18,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w600,
-                  color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
-        ),
-        subtitle: !item.userName.isNullOrBlank! || !item.nickname.isNullOrBlank! ? Transform.translate(
-          offset: const Offset(-8, 0),
-          child: Text("${item.wallet!.substring(0,6)}...${item.wallet!.substring(item.wallet!.length - 4)}",
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontSize: 15,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w500,
-                  color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                      ? const Color(0xFF9BA0A5)
-                      : const Color(0xFF828282))),
-        ) : null
-    );
-  }
-
   Widget buildToSendChip(BuildContext context, int index) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
@@ -407,6 +348,73 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           )),
     );
   }
+  Widget buildNewMessageTile(BuildContext context, int index, UserDTO item) {
+    return Obx(() =>ListTile(
+        leading: InkWell(
+            onTap: (){
+              if(_profileController.isUserExists.value != null) {
+                _navigationController.hideNavBar.value = false;
+                _commonController.userClicked.value = item;
+                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
+              }
+            },
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(90.0), child:
+            item.picture == null ?
+            SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
+            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
+        trailing: _chatController.sendingMessageMode.value == 1 || _chatController.sendingMessageMode.value == 2 ?Checkbox(
+          onChanged: (selected) {
+            if (_chatController.chipsList.value.length == 3) {
+              utils.showToast(context, con.maxUserSelectedRes.tr);
+            }
+
+            if (selected!) {
+                _chatController.chipsList.add(item);
+              } else {
+                _chatController.chipsList.removeWhere((element) =>
+                element.wallet == item.wallet);
+              }
+              _chatController.chipsList.refresh();
+          },
+          value: _chatController.chipsList.map((element) => element.wallet).contains(item.wallet),
+          checkColor: const Color(0xFF00CB7D),
+          fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
+          side: MaterialStateBorderSide.resolveWith(
+            (states) => const BorderSide(width: 1.0, color: Color(0xFF00CB7D)),
+          ),
+        ) : _chatController.sendingMessageMode.value == 3 ? const Padding(
+          padding: EdgeInsets.only(right: 8.0),
+          child: Icon(Icons.person_add_alt_1_rounded, color: Color(0xFF00CB7D), size: 28,),
+        ) :const SizedBox(height: 0, width: 0,),
+        title: Transform.translate(
+          offset: const Offset(-8, 0),
+          child: Text(item.nickname != null ? item.nickname! + (item.userName.isNullOrBlank! ? "" : " (${item.userName!})") : item.userName.isNullOrBlank! ? "${item.wallet!.substring(0, 6)}...${item.wallet!.substring(item.wallet!.length - 4)}" : item.userName!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w600,
+                  color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
+        ),
+        subtitle: !item.userName.isNullOrBlank! || !item.nickname.isNullOrBlank! ? Transform.translate(
+          offset: const Offset(-8, 0),
+          child: Text("${item.wallet!.substring(0,6)}...${item.wallet!.substring(item.wallet!.length - 4)}",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontSize: 15,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w500,
+                  color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                      ? const Color(0xFF9BA0A5)
+                      : const Color(0xFF828282))),
+        ) : null
+    ));
+  }
+
 
   Container buildBottomBar() {
     return Container(
