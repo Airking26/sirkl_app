@@ -13,6 +13,8 @@ import 'package:highlight_text/highlight_text.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:nice_buttons/nice_buttons.dart';
+import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/chats/ui/new_message_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
@@ -46,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
   final _callController = Get.put(CallsController());
+  final _chatController = Get.put(ChatsController());
   final _navigationController = Get.put(NavigationController());
   final utils = Utils();
   final storyController = StoryController();
@@ -149,14 +152,21 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                   onPressed: () {
+                    _navigationController.hideNavBar.value = true;
+                    pushNewScreen(context, screen: const NewMessageScreen()).then((value) {
+                      _navigationController.hideNavBar.value = false;
+                      if(_chatController.messageHasBeenSent.value) {
+                        _chatController.messageHasBeenSent.value = false;
+                      }
+                    });
                   },
                   icon: Image.asset(
-                    "assets/images/more.png",
+                    "assets/images/edit.png",
                     color: _homeController.accessToken.value.isEmpty
                         ? Colors.transparent
                         : MediaQuery.of(context).platformBrightness == Brightness.dark
-                            ? Colors.transparent
-                            : Colors.transparent,
+                            ? Colors.white
+                            : Colors.black,
                   )),
             ],
           ),

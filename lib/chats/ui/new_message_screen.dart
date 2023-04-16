@@ -89,12 +89,28 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ListTile(leading: IconButton(icon :const Icon(Icons.groups, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("New group", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),onTap: (){_chatController.sendingMessageMode.value = 1;}),
-                    const SizedBox(height: 4,),
-                    ListTile(leading: IconButton(icon :const Icon(Icons.volume_up_rounded, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("New broadcast list", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24,vertical: 2), onTap: (){_chatController.sendingMessageMode.value = 2;},),
-                    const SizedBox(height: 4,),
-                    ListTile(leading: IconButton(icon :const Icon(Icons.person_add_alt_1_rounded, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("Add to my SIRKL", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2), onTap: (){_chatController.sendingMessageMode.value = 3;},),
-                    const SizedBox(height: 16,),
+                    _chatController.searchIsActive.value ?const SizedBox(height: 0, width: 0,) :  Column(
+                      children: [
+                        ListTile(leading: IconButton(icon :const Icon(Icons.groups, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("New group", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),onTap: (){
+                          _chatController.sendingMessageMode.value = 1;
+                          _chatController.chipsList.clear();
+                        }),
+                        const SizedBox(height: 4,),
+                        ListTile(leading: IconButton(icon :const Icon(Icons.volume_up_rounded, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("New broadcast list", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24,vertical: 2), onTap: (){
+                          _chatController.sendingMessageMode.value = 2;
+                          _chatController.chipsList.clear();
+                        },),
+                        const SizedBox(height: 4,),
+                        ListTile(leading: IconButton(icon :const Icon(Icons.person_add_alt_1_rounded, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("Add to my SIRKL", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2), onTap: (){
+                          _searchController.open();
+                          _chatController.searchIsActive.value = true;
+                          pagingController.itemList = [];
+                          _chatController.sendingMessageMode.value = 3;
+                          _chatController.chipsList.clear();
+                        },),
+                        const SizedBox(height: 16,),
+                      ],
+                    ),
                     _chatController.chipsList.isNotEmpty ?
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,14 +138,14 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               scrollDirection: Axis.horizontal,
                               itemCount: _chatController.chipsList.length,
-                              itemBuilder: buildToSendChip),
+                              itemBuilder: buildChip),
                         ),
                         const SizedBox(
                           height: 25,
                         ),
                       ],
                     ) : Container(),
-                    Padding(
+                    _chatController.searchIsActive.value ? const SizedBox(height: 0, width: 0,) : Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
                         con.contactsRes.tr,
@@ -159,14 +175,14 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                                   pagingController: pagingController,
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   builderDelegate: PagedChildBuilderDelegate<UserDTO>(
-                                      itemBuilder: (context, item, index) => buildNewMessageTile(context, index, item)
+                                      itemBuilder: (context, item, index) => buildUserTile(context, index, item)
                                   ))
                       ),
                     )
                   ],
                 )),
           ),
-          buildBottomBar(),
+          _chatController.sendingMessageMode.value == 1 || _chatController.sendingMessageMode.value == 2 ?buildBottomBar() : SizedBox(height: 0, width: 0,),
         ])));
   }
 
@@ -236,10 +252,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     );
   }
 
-  Widget buildFloatingSearchBar() {
+  FloatingSearchBar buildFloatingSearchBar() {
     return FloatingSearchBar(
       automaticallyImplyBackButton: false,
-      clearQueryOnClose: false,
+      clearQueryOnClose: true,
       controller: _searchController,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -251,6 +267,14 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       physics: const BouncingScrollPhysics(),
       axisAlignment: 0.0,
       openAxisAlignment: 0.0,
+      onFocusChanged: (focus){
+        if(focus) {
+          _chatController.searchIsActive.value = true;
+          pagingController.itemList = [];
+        } else {
+          _chatController.searchIsActive.value = false;
+        }
+      },
       queryStyle: TextStyle(
           color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
           fontSize: 15,
@@ -304,14 +328,24 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       leadingActions: [
         FloatingSearchBarAction.icon(
           icon: Image.asset(
+            _chatController.searchIsActive.value ? "assets/images/arrow_left.png" :
             "assets/images/search.png",
             width: 24,
             height: 24,
+            color: Colors.grey,
           ),
           showIfClosed: true,
           showIfOpened: true,
           onTap: () {
-            _searchController.open();
+            if(_chatController.searchIsActive.value) {
+              _chatController.searchIsActive.value = false;
+              _searchController.close();
+              _chatController.sendingMessageMode.value = 0;
+              pagingController.refresh();
+            } else {
+              _chatController.searchIsActive.value = true;
+              _searchController.open();
+            }
           },
         ),
       ],
@@ -323,7 +357,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       },
     );
   }
-  Widget buildToSendChip(BuildContext context, int index) {
+
+  Widget buildChip(BuildContext context, int index) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: InputChip(
@@ -348,29 +383,49 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           )),
     );
   }
-  Widget buildNewMessageTile(BuildContext context, int index, UserDTO item) {
-    return Obx(() =>ListTile(
-        leading: InkWell(
-            onTap: (){
-              if(_profileController.isUserExists.value != null) {
-                _navigationController.hideNavBar.value = false;
-                _commonController.userClicked.value = item;
-                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
-              }
-            },
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(90.0), child:
-            item.picture == null ?
-            SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
-            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
-                errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
-        trailing: _chatController.sendingMessageMode.value == 1 || _chatController.sendingMessageMode.value == 2 ?Checkbox(
-          onChanged: (selected) {
-            if (_chatController.chipsList.value.length == 3) {
-              utils.showToast(context, con.maxUserSelectedRes.tr);
-            }
 
-            if (selected!) {
+  Widget buildUserTile(BuildContext context, int index, UserDTO item) {
+    return Obx(() =>ListTile(
+      onTap: () async {
+        if(_chatController.sendingMessageMode.value == 0 || _chatController.sendingMessageMode.value == 3){
+          if(item.id.isNullOrBlank!) {
+            var idChannel = DateTime
+                .now()
+                .millisecondsSinceEpoch
+                .toString();
+           var idChannelCreated = await _chatController.createInbox(InboxCreationDto(
+                isConv: true,
+                createdBy: _homeController.id.value,
+                wallets: [
+                  _homeController.userMe.value.wallet!,
+                  item.wallet!
+                ],
+                idChannel: idChannel));
+           _navigationController.hideNavBar.value = true;
+            pushNewScreen(context, screen: DetailedChatScreen(
+                create: false, channelId: idChannelCreated)).then((value) => _navigationController.hideNavBar.value = true);
+          } else {
+            _navigationController.hideNavBar.value = true;
+            _commonController.userClicked.value = item;
+            pushNewScreen(
+                context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = true);
+          }
+        }
+      },
+        leading: ClipRRect(
+            borderRadius: BorderRadius.circular(90.0), child:
+        item.picture == null ?
+        SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
+        CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+            errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))),
+        trailing: _chatController.sendingMessageMode.value == 1 || _chatController.sendingMessageMode.value == 2 ? Checkbox(
+          onChanged: (selected) {
+            if (_chatController.chipsList.value.length == 3 && _chatController.sendingMessageMode.value == 2) {
+              utils.showToast(context, con.maxUserSelectedRes.tr);
+            } else if(_chatController.sendingMessageMode.value == 1 && item.id.isNullOrBlank!){
+              utils.showToast(context, "Only user registered on SIRKL can be added in a group");
+            }
+            else if (selected!) {
                 _chatController.chipsList.add(item);
               } else {
                 _chatController.chipsList.removeWhere((element) =>
@@ -384,9 +439,40 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           side: MaterialStateBorderSide.resolveWith(
             (states) => const BorderSide(width: 1.0, color: Color(0xFF00CB7D)),
           ),
-        ) : _chatController.sendingMessageMode.value == 3 ? const Padding(
-          padding: EdgeInsets.only(right: 8.0),
-          child: Icon(Icons.person_add_alt_1_rounded, color: Color(0xFF00CB7D), size: 28,),
+        ) : _chatController.sendingMessageMode.value == 3 ? Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: IconButton(icon : item.id.isNullOrBlank! ? Image.asset("assets/images/chat_tab.png", color:  const Color(0xFF00CB7D),) : const Icon(Icons.person_add_alt_1_rounded, size: 28,), onPressed: () async {
+            if(item.id.isNullOrBlank!){
+              var idChannel = DateTime
+                  .now()
+                  .millisecondsSinceEpoch
+                  .toString();
+              var idChannelCreated = await _chatController.createInbox(InboxCreationDto(
+                  isConv: true,
+                  createdBy: _homeController.id.value,
+                  wallets: [
+                    _homeController.userMe.value.wallet!,
+                    item.wallet!
+                  ],
+                  idChannel: idChannel));
+              _navigationController.hideNavBar.value = true;
+              pushNewScreen(context, screen: DetailedChatScreen(
+                  create: false, channelId: idChannelCreated)).then((value) => _navigationController.hideNavBar.value = true);
+            } else {
+              _commonController.userClicked.value = item;
+              if (await _commonController.addUserToSirkl(
+                  _commonController.userClicked.value!.id!, StreamChat
+                  .of(context)
+                  .client, _homeController.id.value)) {
+                utils.showToast(context,
+                    con.userAddedToSirklRes.trParams({"user": _commonController
+                        .userClicked.value!.userName ?? _commonController
+                        .userClicked.value!.wallet!}));
+              } else {
+                utils.showToast(context, "This user is already in your SIRKL");
+              }
+            }
+          }, color: const Color(0xFF00CB7D),),
         ) :const SizedBox(height: 0, width: 0,),
         title: Transform.translate(
           offset: const Offset(-8, 0),
@@ -458,26 +544,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           Flexible(
             child: InkWell(
               onTap: () async {
-                if(_chatController.chipsList.every((element) => element.id.isNullOrBlank!)) {
+                if(_chatController.sendingMessageMode.value == 1 && _messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!){
+                  _dialogBuilderCreateGroup(context);
+                } else if(_chatController.sendingMessageMode.value == 2 && _messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!){
                   await sendMessageAsBroadcastList();
-                } else {
-                  if (_messageInputController.text.isNotEmpty &&
-                      !_messageInputController.text.isBlank! &&
-                      _chatController.chipsList.length <= 3) {
-                    _dialogBuilderSendAs(context);
-                  }
-                  else if (_messageInputController.text.isNotEmpty &&
-                      !_messageInputController.text.isBlank! &&
-                      _chatController.chipsList.length > 3) {
-                    if (_chatController.chipsList.any((element) =>
-                    element.id.isNullOrBlank!)) {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      utils.showToast(context,
-                          "The list of users selected contains a wallet or an ENS that is not registered as a user of SIRKL");
-                    } else {
-                      _dialogBuilderCreateGroup(context);
-                    }
-                  }
                 }
               },
               child:
@@ -507,38 +577,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     );
   }
 
-  Future<void> sendMessageAsGroup() async{
-      _chatController.messageSending.value = true;
-      var idChannel = DateTime
-          .now()
-          .millisecondsSinceEpoch
-          .toString();
-      var wallets = _chatController.chipsList.map((element) => element.wallet!)
-          .toList();
-      wallets.add(_homeController.userMe.value.wallet!);
-      var members = _chatController.chipsList.map((element) => element.id!)
-          .toList();
-      members.add(_homeController.id.value);
-      final idChannelCreated = await _chatController.createInbox(
-          InboxCreationDto(
-              isConv: false,
-              createdBy: _homeController.id.value,
-              wallets: wallets,
-              nameOfGroup: _groupNameController.text,
-              picOfGroup: _profileController.urlPictureGroup.value,
-              idChannel: idChannel,
-              message: _messageInputController.text,
-              members: members));
-      _messageInputController.clear();
-      _searchController.clear();
-      FocusManager.instance.primaryFocus?.unfocus();
-      _chatController.messageSending.value = false;
-      Navigator.pop(context);
-      _navigationController.hideNavBar.value = true;
-      pushNewScreen(context, screen: DetailedChatScreen(
-        create: false, channelId: idChannelCreated,)).then((value) =>
-      _navigationController.hideNavBar.value = false);
-  }
 
   Future<void> sendMessageAsBroadcastList() async {
     _chatController.messageSending.value = true;
@@ -653,50 +691,43 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       },
     );
   }
-
-  Future<void> _dialogBuilderSendAs(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Send As...', style: TextStyle(fontFamily: "Gilroy"),),
-          content: const Text('Do you prefer to send your message as a broadcast list or to create a group with the users selected and send it there ?', style: TextStyle(fontFamily: "Gilroy")),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Broadcast List', style: TextStyle(color: Color(0xff00CB7D), fontFamily: 'Gilroy'),),
-              onPressed: () async{
-                Navigator.of(context).pop();
-                await sendMessageAsBroadcastList();
-              },
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Group', style: TextStyle(color: Color(0xff00CB7D), fontFamily: 'Gilroy',),),
-              onPressed: () {
-                if(_chatController.chipsList.any((element) => element.id.isNullOrBlank!)) {
-                  Navigator.of(context).pop();
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  utils.showToast(context, "The list of users selected contains a wallet or an ENS that is not registered as a user of SIRKL");
-                } else {
-                  Navigator.of(context).pop();
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  _dialogBuilderCreateGroup(context);
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
+  Future<void> sendMessageAsGroup() async{
+    _chatController.messageSending.value = true;
+    var idChannel = DateTime
+        .now()
+        .millisecondsSinceEpoch
+        .toString();
+    var wallets = _chatController.chipsList.map((element) => element.wallet!)
+        .toList();
+    wallets.add(_homeController.userMe.value.wallet!);
+    var members = _chatController.chipsList.map((element) => element.id!)
+        .toList();
+    members.add(_homeController.id.value);
+    final idChannelCreated = await _chatController.createInbox(
+        InboxCreationDto(
+            isConv: false,
+            createdBy: _homeController.id.value,
+            wallets: wallets,
+            nameOfGroup: _groupNameController.text,
+            picOfGroup: _profileController.urlPictureGroup.value,
+            idChannel: idChannel,
+            message: _messageInputController.text,
+            members: members));
+    _messageInputController.clear();
+    _searchController.clear();
+    FocusManager.instance.primaryFocus?.unfocus();
+    _chatController.messageSending.value = false;
+    Navigator.pop(context);
+    _navigationController.hideNavBar.value = true;
+    pushNewScreen(context, screen: DetailedChatScreen(
+      create: false, channelId: idChannelCreated,)).then((value) =>
+    _navigationController.hideNavBar.value = false);
   }
 
   @override
   void dispose() {
+    _chatController.searchIsActive.value = false;
+    _chatController.sendingMessageMode.value = 0;
     _chatController.chipsList.clear();
     pagingController.dispose();
     _commonController.query.value = "";

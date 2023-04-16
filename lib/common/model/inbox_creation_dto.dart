@@ -15,7 +15,7 @@ class InboxCreationDto {
     required this.createdBy,
     required this.wallets,
     required this.idChannel,
-    required this.message,
+    this.message,
     required this.isConv,
     this.nameOfGroup,
     this.picOfGroup,
@@ -24,7 +24,7 @@ class InboxCreationDto {
 
   String createdBy;
   String idChannel;
-  String message;
+  String? message;
   bool isConv;
   String? nameOfGroup;
   String? picOfGroup;

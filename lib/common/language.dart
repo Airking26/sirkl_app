@@ -28,7 +28,7 @@ class Language extends Translations{
       c.errorFindingCollection: "You don't find your collection here and you own the NFT",
       c.errorGroupCollection: "You don't have NFT related group",
       c.addGroupRes: "+ Add a group chat to the list",
-      c.newMessageRes: "New Message",
+      c.newMessageRes: "Compose",
       c.newCallRes: "New Call",
       c.toRes: "To",
       c.contactsRes: "Contacts",
@@ -85,7 +85,7 @@ class Language extends Translations{
       c.claimOwnershipeRes: "• Claim ownership",
       c.messageSuccessfullySentRes: "Message successfully sent",
       c.profileMenuTabRes: "• Profile",
-      c.maxUserSelectedRes: "Maximum number of users selected for broadcast list. You are now in creating a group mode"
+      c.maxUserSelectedRes: "Maximum number of users selected for broadcast list"
     }
   };
 

@@ -127,6 +127,15 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
           }
             return Column(children: [
           buildAppbar(context, tabController),
+              _groupController.nftsAvailable.isNotEmpty && _groupController.addAGroup.value ? const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text("Add a community from your collectibles and tokens", textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Color(0xFF9BA0A5),
+                      fontSize: 16,
+                      fontFamily: "Gilroy",
+                      fontWeight: FontWeight.w500),),
+              ) : const SizedBox(height: 0, width: 0,),
           _groupController.addAGroup.value ? buildSelectNFT() : MediaQuery.removePadding(
             context: context,
             removeTop: true,
