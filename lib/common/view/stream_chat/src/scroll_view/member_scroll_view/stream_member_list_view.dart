@@ -67,6 +67,7 @@ class StreamMemberListView extends StatelessWidget {
     this.physics,
     this.userSlidableEnabled,
     this.onUserDeletePressed,
+    this.onAdminPressed,
     this.shrinkWrap = false,
     this.padding,
     this.addAutomaticKeepAlives = true,
@@ -82,6 +83,7 @@ class StreamMemberListView extends StatelessWidget {
   final bool memberPage;
   final bool? userSlidableEnabled;
   final void Function(BuildContext, String)? onUserDeletePressed;
+  final void Function(BuildContext, String, bool)? onAdminPressed;
 
   /// The [StreamMemberListController] used to control the list of members.
   final StreamMemberListController controller;
@@ -312,6 +314,7 @@ class StreamMemberListView extends StatelessWidget {
         itemBuilder: (context, members, index) {
           final userSlidableEnabledBool = userSlidableEnabled;
           final onUserDeletedPressed = onUserDeletePressed;
+          final onAdminPressed = this.onAdminPressed;
           final member = members[index];
           final onTap = onMemberTap;
           final onLongPress = onMemberLongPress;
@@ -320,7 +323,9 @@ class StreamMemberListView extends StatelessWidget {
             memberPage: memberPage,
             slidableEnabled: userSlidableEnabledBool,
             onDeletePressed: onUserDeletedPressed == null ? null : (context) => onUserDeletedPressed(context, member.userId!),
+            onAdminPressed:  onAdminPressed == null ? null : (context) => onAdminPressed(context, member.userId!, member.channelRole == "channel_moderator"),
             user: member.user!,
+            channelRole : member.channelRole,
             onTap: onTap == null ? null : () => onTap(member),
             onLongPress: onLongPress == null ? null : () => onLongPress(member),
           );

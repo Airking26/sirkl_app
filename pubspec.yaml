@@ -159,6 +159,7 @@ flutter:
      - assets/images/call_end.svg
      - assets/images/metamask.png
      - assets/images/qrcode.png
+     - assets/images/admin.png
      - assets/pdf/tc.pdf
      - assets/pdf/pp.pdf
      - assets/pdf/all.pdf

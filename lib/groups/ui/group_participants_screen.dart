@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/chats/ui/add_user_to_group_screen.dart';
+import 'package:sirkl/common/model/admin_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/member_scroll_view/stream_member_list_view.dart';
 import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
+import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
@@ -25,6 +27,7 @@ class GroupParticipantScreen extends StatefulWidget {
 class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
 
   final _chatController = Get.put(ChatsController());
+  final _groupController = Get.put(GroupsController());
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
 
@@ -64,6 +67,10 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                 userSlidableEnabled: widget.fromChat,
                 onUserDeletePressed: (context, memberId) async {
                   await _chatController.channel.value?.removeMembers([memberId]);
+                  await _memberListController.refresh();
+                },
+                onAdminPressed: (context, memberId, isAdmin) async {
+                  await _groupController.changeAdminRole(AdminDto(idChannel: _chatController.channel.value!.id!, userToUpdate: memberId, makeAdmin: !isAdmin));
                   await _memberListController.refresh();
                 },
                 controller: _memberListController, onMemberTap: (member){
@@ -130,7 +137,8 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                       fontSize: 20),
                 ),
               ),
-              _chatController.channel.value?.createdBy?.id == _homeController.id.value && widget.fromChat ? IconButton(
+              _chatController.channel.value?.createdBy?.id == _homeController.id.value && widget.fromChat ||
+                  _chatController.channel.value?.membership?.channelRole == "channel_moderator" ? IconButton(
                   onPressed: () {
                     pushNewScreen(context, screen: const AddUserToGroupScreen()).then((value) => _memberListController.refresh());
                   },

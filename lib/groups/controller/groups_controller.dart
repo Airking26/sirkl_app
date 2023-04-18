@@ -8,6 +8,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:simple_s3/simple_s3.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/common/model/admin_dto.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/contract_address_dto.dart';
 import 'package:sirkl/common/model/contract_creator_dto.dart';
@@ -158,6 +159,19 @@ class GroupsController extends GetxController{
       }
     } else if(request.isOk){
       await createChannel(streamChatClient, GroupDto(name: groupCreationDto.name, image: groupCreationDto.picture, contractAddress: groupCreationDto.contractAddress), groupCreationDto.picture);
+    }
+  }
+
+  changeAdminRole(AdminDto adminDTO) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _groupService.changeAdminRole(accessToken, adminDtoToJson(adminDTO));
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken!);
+      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDto.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      await _groupService.changeAdminRole(accessToken, adminDtoToJson(adminDTO));
     }
   }
 

@@ -27,6 +27,7 @@ class StreamUserListTile extends StatelessWidget {
     this.title,
     this.slidableEnabled,
     this.onDeletePressed,
+    this.onAdminPressed,
     this.subtitle,
     this.selected = false,
     this.selectedWidget,
@@ -34,11 +35,12 @@ class StreamUserListTile extends StatelessWidget {
     this.onLongPress,
     this.tileColor,
     this.visualDensity = VisualDensity.compact,
-    this.contentPadding = const EdgeInsets.symmetric(horizontal: 8),
+    this.contentPadding = const EdgeInsets.symmetric(horizontal: 8), this.channelRole,
   });
 
   final void Function(BuildContext context)? onDeletePressed;
-
+  final void Function(BuildContext context)? onAdminPressed;
+  final String? channelRole;
   final bool memberPage;
   final bool? slidableEnabled;
 
@@ -173,15 +175,25 @@ class StreamUserListTile extends StatelessWidget {
     return Slidable(
       enabled: slidableEnabled ?? false,
       endActionPane: ActionPane(
-        extentRatio: 0.25,
-        motion: const ScrollMotion(), children: [SlidableAction(
+        extentRatio: 0.33,
+        motion: const ScrollMotion(), children: [
+          SlidableAction(
         spacing: 0,
         padding: EdgeInsets.zero,
         onPressed: onDeletePressed,
         backgroundColor: Colors.white,
         foregroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
         icon: Icons.person_remove_rounded,
-      )],),
+      ),
+        SlidableAction(
+          spacing: 0,
+          padding: EdgeInsets.zero,
+          onPressed: onAdminPressed,
+          backgroundColor: Colors.white,
+          foregroundColor: channelRole == "channel_moderator" ?  Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282) : const Color(0xFF00CB7D),
+          icon: Icons.diamond_outlined,
+        )
+      ],),
       child: ListTile(
         onTap: onTap,
         onLongPress: onLongPress,
