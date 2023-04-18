@@ -216,15 +216,17 @@ class StreamChannelHeader extends StatelessWidget
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          IconButton(
-                              onPressed: () {
-                                //_chatController.channel.value = null;
-                                Navigator.pop(context);
-                              },
-                              icon: Image.asset(
+                          InkWell(
+                            onTap: (){Navigator.pop(context);},
+                            child: SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: ImageIcon(const AssetImage(
                                 "assets/images/arrow_left.png",
-                                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                              )),
+                              ),color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                              ),
+                            ),
+                          ),
                           InkWell(
                             onTap: () async {
                               if(channel.extraData['isConv'] !=null && channel.extraData['isConv'] as bool) {
@@ -441,15 +443,9 @@ class StreamChannelHeader extends StatelessWidget
                         child: Text("DONE", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF00CB7D))),
                       ),
                     ) :
-                    IconButton(
-                        onPressed: () {
-                          dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["isConv"] == false ? dialogPopMenuPrivateGroup(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
-                        },
-                        icon: Image.asset(
-                          "assets/images/more.png",
-
-                          color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                        )),
+                        Container(
+                          //dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["isConv"] == false ? dialogPopMenuPrivateGroup(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
+                        )
                   ],
                 ),
               ),

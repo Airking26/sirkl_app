@@ -165,14 +165,17 @@ class _NewCallScreenState extends State<NewCallScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Image.asset(
+              InkWell(
+                onTap: (){Navigator.pop(context);},
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: ImageIcon(const AssetImage(
                     "assets/images/arrow_left.png",
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                  )),
+                  ),color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                  ),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Text(

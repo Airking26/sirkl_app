@@ -332,9 +332,9 @@ class _CallsScreenState extends State<CallsScreen> {
                 if(callDto.status == 0)Image.asset("assets/images/outgoing.png", width: 10, height: 10,)
                 else if(callDto.status == 1)Image.asset("assets/images/incoming.png", width: 10, height: 10,)
                 else Image.asset("assets/images/missed.png", width: 10, height: 10,),
-                if(callDto.status == 0) Text( "  Outgoing call - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
-                else if(callDto.status == 1) Text( "  Incoming call - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
-                else Text( "  Missed call - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Colors.red))
+                if(callDto.status == 0) Text( "  Outgoing - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
+                else if(callDto.status == 1) Text( "  Incoming - $dateSubstring", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF9BA0A5) : const Color(0xFF828282)))
+                else Text( "  Missed - $dateSubstring", style: const TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Colors.red))
               ],),
             )
       ),

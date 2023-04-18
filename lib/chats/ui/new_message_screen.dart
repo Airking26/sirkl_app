@@ -74,11 +74,12 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                 buildAppBar(),
                 Positioned(
                     top: Platform.isAndroid ? 80 : 60,
-                    child: DeferPointer(
-                      child: SizedBox(
-                          height: 110,
-                          width: MediaQuery.of(context).size.width,
-                          child: buildFloatingSearchBar()),
+                    child: SizedBox(
+                      height: 110,
+                      width: MediaQuery.of(context).size.width,
+                      child: DeferPointer(
+                        child: buildFloatingSearchBar(),
+                      ),
                     )),
               ],
             ),
@@ -91,17 +92,17 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   children: [
                     _chatController.searchIsActive.value ?const SizedBox(height: 0, width: 0,) :  Column(
                       children: [
-                        ListTile(leading: IconButton(icon :const Icon(Icons.groups, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("New group", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),onTap: (){
+                        ListTile(leading: IconButton(icon : Icon(Icons.groups, size: 28, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,), onPressed: (){}, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),tileColor: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF113751) : Colors.white, title: Text("New group", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),), contentPadding: const EdgeInsets.symmetric(horizontal: 16,),onTap: (){
                           _chatController.sendingMessageMode.value = 1;
                           _chatController.chipsList.clear();
                         }),
                         const SizedBox(height: 4,),
-                        ListTile(leading: IconButton(icon :const Icon(Icons.volume_up_rounded, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("New broadcast list", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24,vertical: 2), onTap: (){
+                        ListTile(leading: IconButton(icon : Icon(Icons.volume_up_rounded, size: 28, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,), onPressed: (){}, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),tileColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white , title: Text("New broadcast list", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),), contentPadding: const EdgeInsets.symmetric(horizontal: 16), onTap: (){
                           _chatController.sendingMessageMode.value = 2;
                           _chatController.chipsList.clear();
                         },),
                         const SizedBox(height: 4,),
-                        ListTile(leading: IconButton(icon :const Icon(Icons.person_add_alt_1_rounded, size: 28,), onPressed: (){}, color: Colors.black,),tileColor: Colors.white, title: const Text("Add to my SIRKL", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),), contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2), onTap: (){
+                        ListTile(leading: IconButton(icon : Image.asset("assets/images/chat_tab.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, width: 28, height: 28,), onPressed: (){}, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),tileColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white, title: Text("Send a message to wallet or ENS", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),), contentPadding: const EdgeInsets.symmetric(horizontal: 16), onTap: (){
                           _searchController.open();
                           _chatController.searchIsActive.value = true;
                           pagingController.itemList = [];
@@ -182,7 +183,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   ],
                 )),
           ),
-          _chatController.sendingMessageMode.value == 1 || _chatController.sendingMessageMode.value == 2 ?buildBottomBar() : SizedBox(height: 0, width: 0,),
+          _chatController.sendingMessageMode.value == 1 || _chatController.sendingMessageMode.value == 2 ?buildBottomBar() : const SizedBox(height: 0, width: 0,),
         ])));
   }
 
@@ -215,14 +216,17 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Image.asset(
+              InkWell(
+                onTap: (){Navigator.pop(context);},
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: ImageIcon(const AssetImage(
                     "assets/images/arrow_left.png",
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                  )),
+                  ),color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                  ),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Text(
@@ -261,7 +265,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       hint: 'Paste a wallet address or an ENS',
       backdropColor: Colors.transparent,
-      scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+      scrollPadding: const EdgeInsets.only(top: 0, bottom: 0),
       transitionDuration: const Duration(milliseconds: 0),
       transitionCurve: Curves.easeInOut,
       physics: const BouncingScrollPhysics(),
@@ -277,14 +281,14 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       },
       queryStyle: TextStyle(
           color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-          fontSize: 15,
+          fontSize: 16,
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
       hintStyle: TextStyle(
           color: MediaQuery.of(context).platformBrightness == Brightness.dark
               ? const Color(0xff9BA0A5)
               : const Color(0xFF828282),
-          fontSize: 15,
+          fontSize: 16,
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
       elevation: 5,
@@ -327,13 +331,12 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
         FloatingSearchBarAction.icon(
-          icon: Image.asset(
-            _chatController.searchIsActive.value ? "assets/images/arrow_left.png" :
+          icon: !_chatController.searchIsActive.value ? Image.asset(
             "assets/images/search.png",
             width: 24,
             height: 24,
             color: Colors.grey,
-          ),
+          ) : const Icon(Icons.subdirectory_arrow_left_rounded, size: 24, color: Colors.grey,),
           showIfClosed: true,
           showIfOpened: true,
           onTap: () {
@@ -439,9 +442,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           side: MaterialStateBorderSide.resolveWith(
             (states) => const BorderSide(width: 1.0, color: Color(0xFF00CB7D)),
           ),
-        ) : _chatController.sendingMessageMode.value == 3 ? Padding(
+        ) :
+        /*_chatController.sendingMessageMode.value == 3 ? Padding(
           padding: const EdgeInsets.only(right: 8.0),
-          child: IconButton(icon : item.id.isNullOrBlank! ? Image.asset("assets/images/chat_tab.png", color:  const Color(0xFF00CB7D),) : const Icon(Icons.person_add_alt_1_rounded, size: 28,), onPressed: () async {
+          child: IconButton(icon : item.id.isNullOrBlank! ? Image.asset("assets/images/chat_tab.png", color:  const Color(0xFF00CB7D),) :
+          const Icon(Icons.person_add_alt_1_rounded, size: 28,), onPressed: () async {
             if(item.id.isNullOrBlank!){
               var idChannel = DateTime
                   .now()
@@ -473,7 +478,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               }
             }
           }, color: const Color(0xFF00CB7D),),
-        ) :const SizedBox(height: 0, width: 0,),
+        ) :*/
+        const SizedBox(height: 0, width: 0,),
         title: Transform.translate(
           offset: const Offset(-8, 0),
           child: Text(item.nickname != null ? item.nickname! + (item.userName.isNullOrBlank! ? "" : " (${item.userName!})") : item.userName.isNullOrBlank! ? "${item.wallet!.substring(0, 6)}...${item.wallet!.substring(item.wallet!.length - 4)}" : item.userName!,

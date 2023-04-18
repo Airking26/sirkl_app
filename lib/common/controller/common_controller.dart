@@ -161,32 +161,6 @@ class CommonController extends GetxController{
     }
   }
 
-  searchInSirklUsers(String substring, String offset) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.searchSirklUsers(accessToken, substring, offset);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _commonService.searchSirklUsers(accessToken, substring, offset);
-      if(request.isOk) return request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
-    } else if(request.isOk){
-      return request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
-    }
-  }
-
-
-  defineUserFromChannel(String? userId, StreamChatClient streamChatClient) async {
-    if(userId != null) {
-      var users = await streamChatClient.queryUsers(
-          filter: Filter.in_("id", [userId]));
-      userClicked.value =
-          userFromJson(json.encode(users.users.first.extraData['userDTO']));
-    }
-  }
-
   getUserById(String id) async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);

@@ -14,14 +14,12 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
-import 'package:sirkl/chats/ui/new_message_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/model/story_dto.dart';
-import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/model/web_wallet_connect_dto.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -130,19 +128,24 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                  onPressed: () {
-                    if(_homeController.qrActive.value) {
-                      _homeController.qrActive.value = false;
-                      _navigationController.hideNavBar.value = false;
-                    }
-                  },
-                  icon: Image.asset(
+              InkWell(
+                onTap: (){
+                  if(_homeController.qrActive.value) {
+                    _homeController.qrActive.value = false;
+                    _navigationController.hideNavBar.value = false;
+                  }
+                },
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: ImageIcon(const AssetImage(
                     "assets/images/arrow_left.png",
-                    color: _homeController.qrActive.value ? MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black : Colors.transparent,
-                  )),
+                  ),color: _homeController.qrActive.value ? MediaQuery.of(context).platformBrightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black : Colors.transparent,
+                  ),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.only(top: 18.0),
                 child: Image.asset(
@@ -152,21 +155,21 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                   onPressed: () {
-                    _navigationController.hideNavBar.value = true;
+                    /*_navigationController.hideNavBar.value = true;
                     pushNewScreen(context, screen: const NewMessageScreen()).then((value) {
                       _navigationController.hideNavBar.value = false;
                       if(_chatController.messageHasBeenSent.value) {
                         _chatController.messageHasBeenSent.value = false;
                       }
-                    });
+                    });*/
                   },
                   icon: Image.asset(
                     "assets/images/edit.png",
                     color: _homeController.accessToken.value.isEmpty
                         ? Colors.transparent
                         : MediaQuery.of(context).platformBrightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
+                            ? Colors.transparent
+                            : Colors.transparent,
                   )),
             ],
           ),

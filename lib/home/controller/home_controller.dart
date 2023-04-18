@@ -169,7 +169,8 @@ class HomeController extends GetxController{
     }
   }
   loginWithWallet(BuildContext context, String wallet, String message, String signature) async{
-    var request = await _homeService.verifySignature(walletConnectDtoToJson(WalletConnectDto(wallet: wallet, message: message, signature: signature)));
+    var request = await _homeService.verifySignature(walletConnectDtoToJson(WalletConnectDto(wallet: wallet, message: message, signature: signature, platform: defaultTargetPlatform == TargetPlatform.android
+        ? "android": "iOS")));
     if(request.isOk){
       _navigationController.hideNavBar.value = false;
       var signSuccess = signInSuccessDtoFromJson(json.encode(request.body));
@@ -184,23 +185,6 @@ class HomeController extends GetxController{
       await retrieveInboxes();
     }
   }
-
-  /*createWallet(BuildContext context) async{
-    var request = await _homeService.createWallet();
-    if(request.isOk){
-      _navigationController.hideNavBar.value = false;
-      var signSuccess = signInSuccessDtoFromJson(json.encode(request.body));
-      userMe.value = signSuccess.user!;
-      box.write(con.ACCESS_TOKEN, signSuccess.accessToken!);
-      accessToken.value = signSuccess.accessToken!;
-      box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
-      box.write(con.USER, userToJson(signSuccess.user!));
-      isConfiguring.value = true;
-      await putFCMToken(context, StreamChat.of(context).client, false);
-      await getAllNftConfig();
-      await retrieveInboxes();
-    }
-  }*/
 
   putFCMToken(BuildContext context, StreamChatClient client,bool isLogged) async {
     retrieveAccessToken();
@@ -383,6 +367,20 @@ class HomeController extends GetxController{
     }
   }
 
+  getWelcomeMessage() async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _homeService.receiveWelcomeMessage(accessToken);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _homeService.receiveWelcomeMessage(accessToken);
+    }
+  }
+
   Future<void> retrieveTokenStreamChat(StreamChatClient client, String? firebaseMessaging) async{
     if(client.wsConnectionStatus != ConnectionStatus.connected) {
       var accessToken = box.read(con.ACCESS_TOKEN);
@@ -397,7 +395,7 @@ class HomeController extends GetxController{
         box.write(con.ACCESS_TOKEN, accessToken);
         request = await _profileService.retrieveTokenStreamChat(accessToken);
         if (request.isOk) {
-          var l = await client.connectUser(User(id: id.value,
+          await client.connectUser(User(id: id.value,
               name: userMe.value.userName.isNullOrBlank!
                   ? userMe.value.wallet
                   : userMe.value.userName!,
@@ -408,9 +406,13 @@ class HomeController extends GetxController{
                 firebaseMessaging, PushProvider.firebase,
                 pushProviderName: "Firebase_Config");
           }
+          if(DateTime.now().difference(userMe.value.createdAt!) < const Duration(minutes: 1)){
+            await _commonController.addUserToSirkl("63f78a6188f7d4001f68699a", client, id.value);
+            await getWelcomeMessage();
+          }
         }
       } else if (request.isOk) {
-        var l = await client.connectUser(User(id: id.value,
+        await client.connectUser(User(id: id.value,
             name: userMe.value.userName.isNullOrBlank!
                 ? userMe.value.wallet
                 : userMe.value.userName!,
@@ -420,6 +422,10 @@ class HomeController extends GetxController{
           await client.addDevice(
               firebaseMessaging, PushProvider.firebase,
               pushProviderName: "Firebase_Config");
+        }
+        if(DateTime.now().difference(userMe.value.createdAt!) < const Duration(minutes: 1)){
+          await _commonController.addUserToSirkl("63f78a6188f7d4001f68699a", client, id.value);
+          await getWelcomeMessage();
         }
       }
     }

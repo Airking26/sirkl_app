@@ -16,11 +16,5 @@ class HomeService extends GetConnect{
   Future<Response<Map<String, dynamic>>> getAllNFTConfig(String accessToken) => get('${con.URL_SERVER}nft/retrieveAll', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> updateAllNFTConfig(String accessToken) => get('${con.URL_SERVER}nft/updateAll', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> updateNFTStatus(String accessToken, String nFTModificationDTO) => patch('${con.URL_SERVER}nft/update', nFTModificationDTO , headers: {'Authorization':'Bearer $accessToken'});
-
-
-  /// Not in used ///
-  Future<Response<Map<String, dynamic>>> signUp(String signUpDTO) => post('${con.URL_SERVER}auth/signUp', signUpDTO);
-  Future<Response<Map<String, dynamic>>> signIn(String signInDTO) => post('${con.URL_SERVER}auth/signIn', signInDTO);
-  Future<Response<Map<String, dynamic>>> signInSeedPhrase(String signInDTO) => post('${con.URL_SERVER}auth/signIn/seedPhrase', signInDTO);
-  Future<Response<Map<String, dynamic>>> getNextNFTByAlchemy(String wallet, String cursor) => get("https://eth-mainnet.g.alchemy.com/v2/${con.alchemyApiKey}/getNFTs?owner=$wallet&omitMetadata=false&filters[]=AIRDROPS&filters[]=SPAM&pageSize=25&pageKey=$cursor",  headers: {"accept": 'application/json'});
+  Future<Response<Map<String, dynamic>>> receiveWelcomeMessage(String accessToken) => get('${con.URL_SERVER}user/me/welcome_message' , headers: {'Authorization':'Bearer $accessToken'});
 }

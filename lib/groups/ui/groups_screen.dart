@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
@@ -47,24 +48,10 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       client: client,
       filter:
       _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ?
-      isFav ?
       Filter.and([
         Filter.autoComplete('name', _groupController.query.value),
-        if(_homeController.contractAddresses.isNotEmpty) Filter.in_("contractAddress", _homeController.contractAddresses)
-        else Filter.equal("contractAddress", ""),
         Filter.greater("member_count", 2),
-        Filter.exists("${_homeController.id.value}_favorite"),
-        Filter.equal("${_homeController.id.value}_favorite", true),
-      ]):
-      Filter.and([
-        Filter.autoComplete('name', _groupController.query.value),
-        if(_homeController.contractAddresses.isNotEmpty) Filter.in_("contractAddress", _homeController.contractAddresses)
-        else Filter.equal("contractAddress", ""),
-        Filter.greater("member_count", 2),
-        Filter.or([
-          Filter.notExists("${_homeController.id.value}_favorite"),
-          Filter.equal("${_homeController.id.value}_favorite", false)
-        ])
+        Filter.notExists("isConv"),
       ]) :
           isFav ?
                   Filter.and([
@@ -164,16 +151,29 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         },
                         controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerGroupsFav!,
                         onChannelTap: (channel) {
-                          _chatController.channel.value = channel;
-                          channel.queryMembers(filter: Filter.equal("id", _homeController.id.value)).then((value) {
-                            if(value.members.isEmpty) channel.addMembers([_homeController.id.value]);}
-                          );
-                          _navigationController.hideNavBar.value = true;
-                          pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {
-                            //streamChannelListControllerGroups?.refresh();
-                            //streamChannelListControllerGroupsFav?.refresh();
-                            _navigationController.hideNavBar.value = false;});
-                      },
+                          if (!_homeController.contractAddresses.contains(
+                              channel.id)) {
+                            Utils().showToast(context, "This is a private chat for holders of ${channel.name}");
+                          } else {
+                            _chatController.channel.value = channel;
+                            channel.queryMembers(filter: Filter.equal(
+                                "id", _homeController.id.value)).then((value) {
+                              if (value.members.isEmpty) {
+                                channel.addMembers(
+                                  [_homeController.id.value]);
+                              }
+                            }
+                            );
+                            _navigationController.hideNavBar.value = true;
+                            pushNewScreen(context, screen: StreamChannel(
+                                channel: channel, child: const ChannelPage()))
+                                .then((value) {
+                              //streamChannelListControllerGroups?.refresh();
+                              //streamChannelListControllerGroupsFav?.refresh();
+                              _navigationController.hideNavBar.value = false;
+                            });
+                          }
+                        },
                       ),
                     ),
                   ),
@@ -196,6 +196,10 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         },
                         controller: _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? buildStreamChannelListController(false) : streamChannelListControllerGroups!,
                         onChannelTap: (channel) {
+                          if (!_homeController.contractAddresses.contains(
+                              channel.id)) {
+                            Utils().showToast(context, "This is a private chat for holders of ${channel.name}");
+                          } else {
                           _chatController.channel.value = channel;
                           channel.queryMembers(filter: Filter.equal("id", _homeController.id.value)).then((value) {
                             if(value.members.isEmpty) channel.addMembers([_homeController.id.value]);}
@@ -206,7 +210,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                             //streamChannelListControllerGroups?.refresh();
                             //streamChannelListControllerGroupsFav?.refresh();
                           });
-                      },
+                      }},
                       ),
                     ),
                   ),
@@ -378,9 +382,15 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   Widget buildSelectNFT(){
     return _groupController.isLoadingAvailableNFT.value ?
-         const Padding(
-           padding: EdgeInsets.only(top: 24.0),
-           child: CircularProgressIndicator(color: Color(0xff00CB7D)),
+    Padding(
+           padding: const EdgeInsets.only(top: 24.0, left: 24, right: 24),
+           child: Column(
+             children: [
+               const CircularProgressIndicator(color: Color(0xff00CB7D)),
+               const SizedBox(height: 8,),
+               Text("Please wait while we are loading your NFTs...",textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black),)
+             ],
+           ),
          ) : _groupController.nftsAvailable.isEmpty ? noNFTFound() :
      MediaQuery.removePadding(
       context: context,
@@ -497,7 +507,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     ),
                     IconButton(
                         onPressed: () {
-                          if(!_groupController.addAGroup.value && _groupController.nftsAvailable.isEmpty) _groupController.retrieveGroups(_homeController.userMe.value.wallet!);
+                          if(_groupController.addAGroup.value == false) _groupController.searchIsActive.value = false;
+                            if(!_groupController.addAGroup.value && _groupController.nftsAvailable.isEmpty) _groupController.retrieveGroups(_homeController.userMe.value.wallet!);
                           _groupController.addAGroup.value = !_groupController.addAGroup.value;
                         },
                         icon: Image.asset(

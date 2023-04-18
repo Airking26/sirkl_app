@@ -12,6 +12,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/nft_dto.dart';
@@ -41,6 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late final GalleryController controller;
   final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
+  final _commonController = Get.put(CommonController());
   final PagingController<int, NftDto> pagingController =
       PagingController(firstPageKey: 0);
   final _navigationController = Get.put(NavigationController());
@@ -58,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
     _profileController.usernameTextEditingController.value.text =
         _homeController.userMe.value.userName!.isEmpty
-            ? _homeController.userMe.value.wallet!.substring(0, 20)
+            ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
             : _homeController.userMe.value.userName!;
     _profileController.descriptionTextEditingController.value.text =
         _homeController.userMe.value.description == ""
@@ -268,7 +271,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           .userName ==
                                                       _homeController
                                                           .userMe.value.wallet
-                                              ? "${_homeController.userMe.value.wallet!.substring(0, 20)}..."
+                                              ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
                                               : _homeController
                                                   .userMe.value.userName!,
                                           textAlign: TextAlign.center,
@@ -287,14 +290,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     onPressed: () async {
                                       dialogMenu = dialogPopMenu(context);
                                     },
-                                    icon: Image.asset(
-                                      "assets/images/more.png",
-                                      color: MediaQuery.of(context)
-                                                  .platformBrightness ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : Colors.black,
-                                    )),
+                                    icon:  Icon(Icons.settings_rounded, size: 30, color: MediaQuery.of(context)
+                                        .platformBrightness ==
+                                        Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black)),
                               ],
                             ),
                           ),
@@ -618,7 +618,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
-        onTap: () {},
+        onTap: () async{
+          dialogMenu.dismiss();
+          _navigationController.hideNavBar.value = true;
+          await _commonController.getUserById("63f78a6188f7d4001f68699a");
+          pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
+        },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
           child: Align(
