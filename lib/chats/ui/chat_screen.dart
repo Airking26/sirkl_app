@@ -48,37 +48,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       filter:
       _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ?
       Filter.and([
-        Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
-        if(searchFriends)
-          Filter.and([
-            Filter.in_("members", [_homeController.id.value]),
-            Filter.or([
-              Filter.and([
-                Filter.autoComplete('member.user.name', _chatController.query.value),
-                Filter.exists("${_homeController.id.value}_follow_channel"),
-                Filter.equal("${_homeController.id.value}_follow_channel", true),
-                Filter.equal('isConv', true),
-              ]),
-              Filter.and([
-                Filter.autoComplete('nameOfGroup', _chatController.query.value),
-                Filter.equal('isConv', false),
-              ])
-            ])
-          ])
-        else
-          Filter.and([
-            Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
-            Filter.equal('isConv', true),
-            Filter.or([
-              Filter.equal("created_by_id", _homeController.id.value),
-              Filter.in_("members", [_homeController.id.value]),
-            ]),
-            Filter.or([
-              Filter.notExists("${_homeController.id.value}_follow_channel"),
-              Filter.equal("${_homeController.id.value}_follow_channel", false)
-            ])
-          ])
-    ])
+        Filter.autoComplete('nameOfGroup', _chatController.query.value),
+        Filter.equal('isConv', false),
+        Filter.equal('isGroupVisible', true)
+      ])
         :
           Filter.and([
             if(searchFriends)
@@ -96,6 +69,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ])
             else
               Filter.and([
+                Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
                 Filter.equal('isConv', true),
                 Filter.or([
                   Filter.equal("created_by_id", _homeController.id.value),
@@ -179,14 +153,17 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 emptyBuilder: (context){
                   return noGroupUI();
                 },
-                controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel){
+                controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel) async{
                   _chatController.channel.value = channel;
                   _navigationController.hideNavBar.value = true;
-                  pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {
-                    _navigationController.hideNavBar.value = false;
-                    //streamChannelListControllerFriends?.refresh();
-                    //streamChannelListControllerOthers?.refresh();
-                  });
+                  if(channel.extraData["isConv"] != null && channel.extraData["isConv"] == false && channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == false){
+                    await channel.addMembers([ _homeController.id.value ]);
+                    pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {_navigationController.hideNavBar.value = false;});
+                  } else if(channel.extraData["isConv"] != null && channel.extraData["isConv"] == false && channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == true){
+                    //await channel.a
+                  } else {
+                    pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {_navigationController.hideNavBar.value = false;});
+                  }
                 },
               ),
               ),

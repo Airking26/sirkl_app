@@ -11,6 +11,7 @@ import 'package:flutter_badged/flutter_badge.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
@@ -646,7 +647,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         onTap: () async{
           dialogMenu.dismiss();
           var uri = await _profileController.createDynamicLink("/profileShared?id=${_homeController.id.value}");
-          await launchURL(context, uri.toString());
+          Share.share("Check out my profile on SIRKL ${uri.toString()}");
         },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
@@ -673,6 +674,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           await StreamChat.of(context).client.disconnectUser();
           _homeController.accessToken.value = "";
           _navigationController.controller.value.jumpToTab(0);
+          _navigationController.hideNavBar.value = true;
           await _profileController.deleteUser(_homeController.id.value);
         },
         child: Padding(

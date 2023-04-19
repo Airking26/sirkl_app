@@ -259,6 +259,8 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
         InboxCreationDto(
             isConv: false,
             createdBy: _homeController.id.value,
+            isGroupPrivate: _chatController.groupType.value == 0 ? false : true,
+            isGroupVisible: _chatController.groupVisibility.value == 0 ? true : false,
             wallets: wallets,
             nameOfGroup: _chatController.groupTextController.value.text,
             picOfGroup: _profileController.urlPictureGroup.value,

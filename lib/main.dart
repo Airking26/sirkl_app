@@ -36,6 +36,7 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.instance.subscribeToTopic("all");
   await GetStorage.init();
   AnalyticService().getAnalyticObserver();
   runApp(MyApp(client: client));

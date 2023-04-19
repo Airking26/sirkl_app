@@ -92,9 +92,9 @@ class HomeController extends GetxController{
     } else {
       contractAddresses.value = [];
     }
-    var d = box.read(con.USER);
-    userMe.value = d != null ? userFromJson(box.read(con.USER) ?? "") : UserDTO();
-    id.value = d != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
+    var user = box.read(con.USER);
+    userMe.value = user != null ? userFromJson(box.read(con.USER) ?? "") : UserDTO();
+    id.value = user != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
   }
 
   connectWallet(BuildContext context) async {

@@ -77,20 +77,12 @@ class _PDFScreenState extends State<PDFScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 18.0),
                 child: Image.asset(
-                  "assets/images/logo.png",
-                  height: 20,
+                  MediaQuery.of(context).platformBrightness == Brightness.dark ? "assets/images/logo_dark_theme.png" : "assets/images/logo_light_theme.png",
+                  height: 25,
                 ),
               ),
               IconButton(
-                  onPressed: () {
-                    /*_navigationController.hideNavBar.value = true;
-                    pushNewScreen(context, screen: const NewMessageScreen()).then((value) {
-                      _navigationController.hideNavBar.value = false;
-                      if(_chatController.messageHasBeenSent.value) {
-                        _chatController.messageHasBeenSent.value = false;
-                      }
-                    });*/
-                  },
+                  onPressed: () {},
                   icon: Image.asset(
                     "assets/images/edit.png",
                     color:MediaQuery.of(context).platformBrightness == Brightness.dark

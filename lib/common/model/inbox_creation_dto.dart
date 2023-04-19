@@ -19,7 +19,9 @@ class InboxCreationDto {
     required this.isConv,
     this.nameOfGroup,
     this.picOfGroup,
-    this.members
+    this.members,
+    this.isGroupPrivate,
+    this.isGroupVisible
   });
 
   String createdBy;
@@ -30,6 +32,8 @@ class InboxCreationDto {
   String? picOfGroup;
   List<String>? members;
   List<String> wallets;
+  bool? isGroupPrivate;
+  bool? isGroupVisible;
 
   factory InboxCreationDto.fromJson(Map<String, dynamic> json) => InboxCreationDto(
     createdBy: json["createdBy"],
@@ -37,6 +41,8 @@ class InboxCreationDto {
     message: json["message"],
     isConv: json["isConv"],
     nameOfGroup: json["nameOfGroup"],
+    isGroupPrivate: json["isGroupPrivate"],
+    isGroupVisible: json["isGroupVisible"],
     picOfGroup: json["picOfGroup"],
     members: json["members"] == null ? null : List<String>.from(json["members"].map((x) => x)),
     wallets: List<String>.from(json["wallets"].map((x) => x)),
@@ -47,6 +53,8 @@ class InboxCreationDto {
     "idChannel": idChannel,
     "message": message,
     "isConv": isConv,
+    "isGroupPrivate": isGroupPrivate,
+    "isGroupVisible": isGroupVisible,
     "picOfGroup": picOfGroup,
     "nameOfGroup": nameOfGroup,
     "wallets": List<dynamic>.from(wallets.map((x) => x)),

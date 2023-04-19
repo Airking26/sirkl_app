@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
@@ -445,13 +446,13 @@ class StreamChannelHeader extends StatelessWidget
                     ) :
                         InkWell(
                           onTap: ()async{
-                            //var uri  = await _profileController.createDynamicLink("/joinGroup?id=${channel.id}");
-                            //await launchURL(context, uri.toString());
+                            var uri  = await _profileController.createDynamicLink("/joinGroup?id=${channel.id}");
+                            Share.share("Join the group on SIRKL ${uri.toString()}");
                           },
                           child: Container(
-                            width: 0,
-                            height: 0,
-                            color: Colors.transparent,
+                            width: 25,
+                            height: 25,
+                            color: Colors.redAccent,
                             //dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["isConv"] == false ? dialogPopMenuPrivateGroup(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
                           ),
                         )

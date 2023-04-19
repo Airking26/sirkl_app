@@ -46,7 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
   final _callController = Get.put(CallsController());
-  final _chatController = Get.put(ChatsController());
   final _navigationController = Get.put(NavigationController());
   final utils = Utils();
   final storyController = StoryController();
@@ -96,8 +95,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             )));
   }
-
-
 
   Container buildAppbar(BuildContext context) {
     return Container(
@@ -149,8 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 18.0),
                 child: Image.asset(
-                  "assets/images/logo.png",
-                  height: 20,
+                  MediaQuery.of(context).platformBrightness == Brightness.dark ? "assets/images/logo_dark_theme.png" : "assets/images/logo_light_theme.png",
+                  height: 25,
                 ),
               ),
               IconButton(

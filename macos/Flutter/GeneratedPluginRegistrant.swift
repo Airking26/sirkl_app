@@ -19,7 +19,7 @@ import just_audio
 import path_provider_macos
 import photo_manager
 import record_macos
-import share_plus_macos
+import share_plus
 import sqflite
 import syncfusion_pdfviewer_macos
 import thumblr_macos
