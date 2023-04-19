@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -271,6 +272,13 @@ class ProfileController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _profileService.deleteUser(accessToken, id);
     }
+  }
+
+  Future<Uri> createDynamicLink(String link) async{
+    FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
+    final DynamicLinkParameters parameters = DynamicLinkParameters(link: Uri.parse("${con.urlPrefix.tr}$link"), uriPrefix: con.urlPrefix.tr, androidParameters: const AndroidParameters(packageName: "io.airking.sirkl", minimumVersion: 0));
+    final ShortDynamicLink shortLink = await dynamicLinks.buildShortLink(parameters);
+    return shortLink.shortUrl;
   }
 
 }

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:sirkl/chats/ui/create_group_first_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -93,6 +94,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                     _chatController.searchIsActive.value ?const SizedBox(height: 0, width: 0,) :  Column(
                       children: [
                         ListTile(leading: IconButton(icon : Icon(Icons.groups, size: 28, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,), onPressed: (){}, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),tileColor: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF113751) : Colors.white, title: Text("New group", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),), contentPadding: const EdgeInsets.symmetric(horizontal: 16,),onTap: (){
+                          _navigationController.hideNavBar.value = true;
+                          pushNewScreen(context, screen: const CreateGroupFirstScreen()).then((value) => _navigationController.hideNavBar.value = true);
                           _chatController.sendingMessageMode.value = 1;
                           _chatController.chipsList.clear();
                         }),
@@ -102,7 +105,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                           _chatController.chipsList.clear();
                         },),
                         const SizedBox(height: 4,),
-                        ListTile(leading: IconButton(icon : Image.asset("assets/images/chat_tab.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, width: 28, height: 28,), onPressed: (){}, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),tileColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white, title: Text("Send a message to wallet or ENS", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),), contentPadding: const EdgeInsets.symmetric(horizontal: 16), onTap: (){
+                        ListTile(leading: IconButton(icon : Image.asset("assets/images/add_user.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, width: 22, height: 22,), onPressed: (){}, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),tileColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white, title: Text("Add a user to my SIRKL", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),), contentPadding: const EdgeInsets.symmetric(horizontal: 16), onTap: (){
                           _searchController.open();
                           _chatController.searchIsActive.value = true;
                           pagingController.itemList = [];
@@ -183,7 +186,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   ],
                 )),
           ),
-          _chatController.sendingMessageMode.value == 1 || _chatController.sendingMessageMode.value == 2 ?buildBottomBar() : const SizedBox(height: 0, width: 0,),
+          _chatController.sendingMessageMode.value == 2 ?buildBottomBar() : const SizedBox(height: 0, width: 0,),
         ])));
   }
 
@@ -271,14 +274,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       physics: const BouncingScrollPhysics(),
       axisAlignment: 0.0,
       openAxisAlignment: 0.0,
-      onFocusChanged: (focus){
-        if(focus) {
-          _chatController.searchIsActive.value = true;
-          pagingController.itemList = [];
-        } else {
-          _chatController.searchIsActive.value = false;
-        }
-      },
       queryStyle: TextStyle(
           color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
           fontSize: 16,
@@ -322,8 +317,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         }
         else {
           if(query.isNotEmpty) {
+            _chatController.searchIsActive.value = true;
             pagingController.itemList = [];
           } else {
+            _chatController.searchIsActive.value = false;
             pagingController.refresh();
           }
         }
@@ -331,12 +328,12 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
         FloatingSearchBarAction.icon(
-          icon: !_chatController.searchIsActive.value ? Image.asset(
+          icon:  Image.asset(
             "assets/images/search.png",
             width: 24,
             height: 24,
             color: Colors.grey,
-          ) : const Icon(Icons.subdirectory_arrow_left_rounded, size: 24, color: Colors.grey,),
+          ),
           showIfClosed: true,
           showIfOpened: true,
           onTap: () {
@@ -421,12 +418,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
         CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
             errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))),
-        trailing: _chatController.sendingMessageMode.value == 1 || _chatController.sendingMessageMode.value == 2 ? Checkbox(
+        trailing: _chatController.sendingMessageMode.value == 2 ? Checkbox(
           onChanged: (selected) {
             if (_chatController.chipsList.value.length == 3 && _chatController.sendingMessageMode.value == 2) {
               utils.showToast(context, con.maxUserSelectedRes.tr);
-            } else if(_chatController.sendingMessageMode.value == 1 && item.id.isNullOrBlank!){
-              utils.showToast(context, "Only user registered on SIRKL can be added in a group");
             }
             else if (selected!) {
                 _chatController.chipsList.add(item);
@@ -550,9 +545,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           Flexible(
             child: InkWell(
               onTap: () async {
-                if(_chatController.sendingMessageMode.value == 1 && _messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!){
-                  _dialogBuilderCreateGroup(context);
-                } else if(_chatController.sendingMessageMode.value == 2 && _messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!){
+                 if(_chatController.sendingMessageMode.value == 2 && _messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!){
                   await sendMessageAsBroadcastList();
                 }
               },
@@ -717,10 +710,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             nameOfGroup: _groupNameController.text,
             picOfGroup: _profileController.urlPictureGroup.value,
             idChannel: idChannel,
-            message: _messageInputController.text,
             members: members));
     _messageInputController.clear();
     _searchController.clear();
+    _chatController.chipsList.clear();
     FocusManager.instance.primaryFocus?.unfocus();
     _chatController.messageSending.value = false;
     Navigator.pop(context);

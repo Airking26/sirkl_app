@@ -443,8 +443,17 @@ class StreamChannelHeader extends StatelessWidget
                         child: Text("DONE", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF00CB7D))),
                       ),
                     ) :
-                        Container(
-                          //dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["isConv"] == false ? dialogPopMenuPrivateGroup(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
+                        InkWell(
+                          onTap: ()async{
+                            //var uri  = await _profileController.createDynamicLink("/joinGroup?id=${channel.id}");
+                            //await launchURL(context, uri.toString());
+                          },
+                          child: Container(
+                            width: 0,
+                            height: 0,
+                            color: Colors.transparent,
+                            //dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["isConv"] == false ? dialogPopMenuPrivateGroup(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
+                          ),
                         )
                   ],
                 ),

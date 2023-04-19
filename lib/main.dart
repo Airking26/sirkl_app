@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart' as entities;
@@ -24,6 +27,7 @@ import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/home/utils/analyticService.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
+import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'navigation/ui/navigation_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
@@ -79,8 +83,34 @@ class _MyHomePageState extends State<MyHomePage>{
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
+  FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
+
+  Future<void> initDynamicLinks() async {
+    dynamicLinks.onLink.listen((event) async{
+      final Uri uri = event.link;
+      final queryParams = uri.queryParameters;
+      if(queryParams.isNotEmpty){
+        var path = event.link.path;
+        var id = queryParams["id"];
+        if(path == "/profileShared") {
+          await _commonController.getUserById(id!);
+          pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
+        } else if(path == "/joinGroup"){
+          var stream = widget.client.queryChannels();
+          var channels = await stream.first;
+          var channel = channels.first;
+          await channel.addMembers([_homeController.id.value]);
+          pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: id));
+        }
+      }
+    }).onError((error){
+      print(error);
+    });
+  }
+
   @override
   void initState() {
+    initDynamicLinks();
     _homeController.putFCMToken(context, widget.client, true);
     initFirebase();
     _callController.setupVoiceSDKEngine(context);

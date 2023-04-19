@@ -81,12 +81,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     ])
         :
           Filter.and([
-            Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
             if(searchFriends)
               Filter.and([
                 Filter.in_("members", [_homeController.id.value]),
                 Filter.or([
                   Filter.and([
+                    Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
                     Filter.exists("${_homeController.id.value}_follow_channel"),
                     Filter.equal("${_homeController.id.value}_follow_channel", true),
                     Filter.equal('isConv', true),
@@ -350,7 +350,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             onPressed: () {
                               _navigationController.hideNavBar.value = true;
                               pushNewScreen(context, screen: const NewMessageScreen()).then((value) {
-                                _navigationController.hideNavBar.value = false;
+                                _navigationController.hideNavBar.value = _chatController.fromGroupCreation.value;
+                                _chatController.fromGroupCreation.value = false;
                                 if(_chatController.messageHasBeenSent.value) {
                                   _chatController.index.value = 1;
                                   tabController.index = 1;

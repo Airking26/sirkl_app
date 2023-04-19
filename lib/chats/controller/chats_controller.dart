@@ -30,7 +30,13 @@ class ChatsController extends GetxController{
   var isBroadcastList = false.obs;
   var addUserQuery = "".obs;
   var sendingMessageMode = 0.obs;
-
+  var groupType = 0.obs;
+  var groupVisibility = 0.obs;
+  var groupTypeCollapsed = true.obs;
+  var groupVisibilityCollapsed = true.obs;
+  var groupNameIsEmpty = true.obs;
+  var groupTextController = TextEditingController().obs;
+  var fromGroupCreation = false.obs;
   Rx<Channel?> channel = (null as Channel?).obs;
 
   Future<String?> createInbox(InboxCreationDto inboxCreationDto) async{

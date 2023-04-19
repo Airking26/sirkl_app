@@ -643,6 +643,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ))
       ..divider(color: const Color(0xFF828282), padding: 20.0)
       ..widget(InkWell(
+        onTap: () async{
+          dialogMenu.dismiss();
+          var uri = await _profileController.createDynamicLink("/profileShared?id=${_homeController.id.value}");
+          await launchURL(context, uri.toString());
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "• Share profile",
+                style: TextStyle(
+                    fontSize: 14,
+                    color: MediaQuery.of(context).platformBrightness ==
+                        Brightness.dark
+                        ? const Color(0xff9BA0A5)
+                        : const Color(0xFF828282),
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600),
+              )),
+        ),
+      ))
+      ..divider(color: const Color(0xFF828282), padding: 20.0)
+      ..widget(InkWell(
         onTap: () async {
           dialogMenu.dismiss();
           await GetStorage().erase();
