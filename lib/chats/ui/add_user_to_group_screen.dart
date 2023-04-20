@@ -208,7 +208,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                   onPressed: () async{
                     for (var element in _chatController.chipsListAddUsers) {
                       await _chatController.channel.value?.addMembers([element.id!]);
-                      await _commonController.notifyAddedInGroup(NotificationAddedAdminDto(idUser: element.id!, idChannel: _chatController.channel.value!.id!, channelName: _chatController.channel.value!.name!));
+                      await _commonController.notifyAddedInGroup(NotificationAddedAdminDto(idUser: element.id!, idChannel: _chatController.channel.value!.id!, channelName: _chatController.channel.value!.extraData["nameOfGroup"] as String));
                     }
                     Navigator.pop(context);
                   }, child: Text("DONE", style: TextStyle(fontWeight: FontWeight.w700, fontFamily: "Gilroy", color: Color(0xFF00CB7D)),),

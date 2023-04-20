@@ -329,11 +329,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               pushNewScreen(context, screen: const NewMessageScreen()).then((value) {
                                 _navigationController.hideNavBar.value = _chatController.fromGroupCreation.value;
                                 _chatController.fromGroupCreation.value = false;
-                                if(_chatController.messageHasBeenSent.value) {
-                                  _chatController.index.value = 1;
-                                  tabController.index = 1;
-                                  _chatController.messageHasBeenSent.value = false;
-                                }
                               });
                             },
                             icon: Image.asset(

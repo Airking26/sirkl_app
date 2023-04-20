@@ -151,7 +151,10 @@ class _MyHomePageState extends State<MyHomePage>{
       } else if(message.data['type'] == "4"){
         LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"],  flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
         await _homeController.registerNotification(NotificationRegisterDto(message: message.data["body"]));
-      } else if(message.data['type'] == "message.new" && message.data['channel_id'] != _chatController.channel.value?.id){
+      } else if(message.data['type'] == 5 || message.data['type'] == 6){
+
+      }
+      else if(message.data['type'] == "message.new" && message.data['channel_id'] != _chatController.channel.value?.id){
         final client = StreamChat.of(context).client;
         final response = await client.getMessage(message.data['id']);
         final respChannel = await client.queryChannel("try", channelId: (message.data["cid"] as String).replaceFirst('try:', ''));
@@ -267,6 +270,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     } on Error {
       var t = '';
     }
+  } else if(message.data['type'] == 5 || message.data['type'] == 6){
+
   } else if(message.data["uuid"] != null) {
     showCallNotification(message.data);
     }

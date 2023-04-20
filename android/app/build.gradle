@@ -46,8 +46,8 @@ android {
         applicationId "io.airking.sirkl"
         minSdkVersion 24
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 28
-        versionName "1.1.8"
+        versionCode 29
+        versionName "1.1.9"
         multiDexEnabled = true
     }
 

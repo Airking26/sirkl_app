@@ -73,7 +73,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                 onAdminPressed: (context, memberId, isAdmin) async {
                   await _groupController.changeAdminRole(AdminDto(idChannel: _chatController.channel.value!.id!, userToUpdate: memberId, makeAdmin: !isAdmin));
                   await _memberListController.refresh();
-                  if(!isAdmin) await _commonController.notifyUserAsAdmin(NotificationAddedAdminDto(idUser: memberId, idChannel: _chatController.channel.value!.id!, channelName: _chatController.channel.value!.name!));
+                  if(!isAdmin) await _commonController.notifyUserAsAdmin(NotificationAddedAdminDto(idUser: memberId, idChannel: _chatController.channel.value!.id!, channelName: _chatController.channel.value!.extraData["nameOfGroup"] as String));
                 },
                 controller: _memberListController, onMemberTap: (member){
                 _commonController.userClicked.value = userFromJson(json.encode(member.user?.extraData['userDTO']));
@@ -147,7 +147,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                   icon: Image.asset(
                     "assets/images/add_user.png",
                     width: 20, height: 20,
-                    color:Colors.black,
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                   )) : Container(),
             ],
           ),

@@ -23,7 +23,6 @@ class ChatsController extends GetxController{
   final _chatService = ChatsService();
   final _homeService = HomeService();
   final _profileController = Get.put(ProfileController());
-  var messageHasBeenSent = false.obs;
   var messageSending = false.obs;
   var isEditingProfile = false.obs;
   var usernameElseTextEditingController = TextEditingController().obs;

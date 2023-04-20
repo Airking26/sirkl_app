@@ -325,7 +325,7 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
                 } else {
                   await sendMessageAsGroup();
                 }
-              }, child: Text("Done", style: TextStyle(color: _chatController.chipsList.isNotEmpty ? Color(0xff00CB7D) : Colors.grey, fontFamily: "Gilroy"),),),
+              }, child: Text("Done", style: TextStyle(color: _chatController.chipsList.isNotEmpty && _chatController.chipsList.length >= 2 ? Color(0xff00CB7D) : Colors.grey, fontFamily: "Gilroy"),),),
             ],
           ),
         ),

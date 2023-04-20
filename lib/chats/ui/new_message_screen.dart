@@ -545,7 +545,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           Flexible(
             child: InkWell(
               onTap: () async {
-                 if(_chatController.sendingMessageMode.value == 2 && _messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!){
+                if(_chatController.chipsList.length <2){
+                  utils.showToast(context, "Please, choose at least 2 participants");
+                }
+                 else if(_chatController.sendingMessageMode.value == 2 && _messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!){
                   await sendMessageAsBroadcastList();
                 }
               },
@@ -627,7 +630,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           }
         }
         else {
-          _chatController.messageHasBeenSent.value = true;
           Navigator.pop(context);
         }
       }
