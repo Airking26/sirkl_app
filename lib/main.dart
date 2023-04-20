@@ -12,6 +12,8 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sirkl/common/model/notification_dto.dart';
+import 'package:sirkl/common/model/notification_register_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
@@ -146,8 +148,10 @@ class _MyHomePageState extends State<MyHomePage>{
       } else if(message.data['type'] == "3"){
         await FlutterCallkitIncoming.endAllCalls();
         LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-      }
-      else if(message.data['type'] == "message.new" && message.data['channel_id'] != _chatController.channel.value?.id){
+      } else if(message.data['type'] == "4"){
+        LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"],  flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+        await _homeController.registerNotification(NotificationRegisterDto(message: message.data["body"]));
+      } else if(message.data['type'] == "message.new" && message.data['channel_id'] != _chatController.channel.value?.id){
         final client = StreamChat.of(context).client;
         final response = await client.getMessage(message.data['id']);
         final respChannel = await client.queryChannel("try", channelId: (message.data["cid"] as String).replaceFirst('try:', ''));
@@ -254,6 +258,15 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     await FlutterCallkitIncoming.endAllCalls();
   } else if(message.data['type'] == "3"){
     LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+  } else if(message.data['type'] == "4"){
+    try {
+      await GetStorage().initStorage;
+      var notificationSaved = GetStorage().read(con.notificationSaved) ?? [];
+      (notificationSaved as List<dynamic>).add(message.data["body"]);
+      await GetStorage().write(con.notificationSaved, notificationSaved);
+    } on Error {
+      var t = '';
+    }
   } else if(message.data["uuid"] != null) {
     showCallNotification(message.data);
     }

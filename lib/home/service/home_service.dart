@@ -15,6 +15,7 @@ class HomeService extends GetConnect{
   Future<Response<List<dynamic>>> retrieveNFTs(String accessToken, String id, bool isFav, String offset) => get('${con.URL_SERVER}nft/retrieve/$id/$isFav/$offset', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> getAllNFTConfig(String accessToken) => get('${con.URL_SERVER}nft/retrieveAll', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> updateAllNFTConfig(String accessToken) => get('${con.URL_SERVER}nft/updateAll', headers: {'Authorization':'Bearer $accessToken'});
+  Future<Response<Map<String, dynamic>>> registerNotification(String accessToken, String notification) => post('${con.URL_SERVER}notification/register', notification, headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> updateNFTStatus(String accessToken, String nFTModificationDTO) => patch('${con.URL_SERVER}nft/update', nFTModificationDTO , headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> receiveWelcomeMessage(String accessToken) => get('${con.URL_SERVER}user/me/welcome_message' , headers: {'Authorization':'Bearer $accessToken'});
 }

@@ -16,6 +16,8 @@ class NotificationDto {
     this.wallet,
     required this.idData,
     this.eventName,
+    this.title,
+    this.message
   });
 
   String id;
@@ -28,6 +30,8 @@ class NotificationDto {
   String? wallet;
   String idData;
   String? eventName;
+  String? title;
+  String? message;
 
   factory NotificationDto.fromJson(Map<String, dynamic> json) => NotificationDto(
     id: json["id"],
@@ -40,6 +44,8 @@ class NotificationDto {
     wallet: json["wallet"],
     idData: json["idData"],
     eventName: json["eventName"],
+    title: json["title"],
+    message: json["message"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -53,5 +59,7 @@ class NotificationDto {
     "wallet": wallet,
     "idData": idData,
     "eventName": eventName,
+    "title": title,
+    "message": message
   };
 }

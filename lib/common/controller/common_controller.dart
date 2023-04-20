@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/model/inbox_dto.dart';
+import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/service/common_service.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -177,4 +178,30 @@ class CommonController extends GetxController{
       userClicked.value = userFromJson(json.encode(request.body));
     }
   }
+
+  notifyAddedInGroup(NotificationAddedAdminDto notificationAddedAdminDto) async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _commonService.notifyAddedInGroup(accessToken, notificationAddedAdminDtoToJson(notificationAddedAdminDto));
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      request = await _commonService.notifyAddedInGroup(accessToken, notificationAddedAdminDtoToJson(notificationAddedAdminDto));
+    }
+  }
+
+  notifyUserAsAdmin(NotificationAddedAdminDto notificationAddedAdminDto) async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _commonService.notifyUserAsAdmin(accessToken, notificationAddedAdminDtoToJson(notificationAddedAdminDto));
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      request = await _commonService.notifyUserAsAdmin(accessToken, notificationAddedAdminDtoToJson(notificationAddedAdminDto));
+    }
+  }
+
+
 }

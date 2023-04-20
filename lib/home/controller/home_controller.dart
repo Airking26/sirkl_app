@@ -17,6 +17,7 @@ import 'package:sirkl/common/model/contract_address_dto.dart';
 import 'package:sirkl/common/model/nft_alchemy_dto.dart';
 import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/model/nickname_creation_dto.dart';
+import 'package:sirkl/common/model/notification_register_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
@@ -65,6 +66,7 @@ class HomeController extends GetxController{
   var loadingStories = true.obs;
   var pageKey = 0.obs;
   var nicknames = {}.obs;
+  var notificationsSaved = [].obs;
   var iHaveNft = false.obs;
   var heHasNft = false.obs;
   var isInFav = <String>[].obs;
@@ -492,6 +494,29 @@ class HomeController extends GetxController{
     } else {
       isConfiguring.value = false;
     }
+  }
+
+  registerNotification(NotificationRegisterDto notificationRegisterDto) async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _homeService.registerNotification(accessToken, notificationRegisterDtoToJson(notificationRegisterDto));
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      request = await _homeService.registerNotification(accessToken, notificationRegisterDtoToJson(notificationRegisterDto));
+    }
+  }
+
+  checkOfflineNotifAndRegister() async {
+    var notifications = GetStorage().read(con.notificationSaved) ?? [];
+    var notificationsToDelete = [];
+    for (var notification in (notifications as List<dynamic>)) {
+      await registerNotification(NotificationRegisterDto(message: notification));
+      notificationsToDelete.add(notification);
+    }
+    var notificationsToSave = notifications.toSet().difference(notificationsToDelete.toSet()).toList();
+    await GetStorage().write(con.notificationSaved, notificationsToSave);
   }
 
 }

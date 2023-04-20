@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
@@ -10,6 +8,7 @@ import 'package:sirkl/calls/ui/calls_screen.dart';
 import 'package:sirkl/chats/ui/chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/profile/controller/profile_controller.dart';
 import '../../groups/ui/groups_screen.dart';
 import '../../home/ui/home_screen.dart';
 import '../../profile/ui/profile_screen.dart';
@@ -29,6 +28,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   final _callController = Get.put(CallsController());
   final _commonController = Get.put(CommonController());
   final _homeController = Get.put(HomeController());
+  final _profileController = Get.put(ProfileController());
 
 
   final List<Widget> _pages = [
@@ -119,7 +119,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
           hideNavigationBarWhenKeyboardShows: true,
           popAllScreensOnTapOfSelectedTab: true,
           navBarStyle: NavBarStyle.simple,
-          onItemSelected: (index){
+          onItemSelected: (index) async{
             if(index == 0) {
               if(_homeController.accessToken.value.isNotEmpty) {
                 _commonController.gettingStoryAndContacts.value = true;
@@ -144,6 +144,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 _navigationController.controller.value.index = 0;
               }
             } else if(index == 4){
+              _homeController.checkOfflineNotifAndRegister();
+              _profileController.checkIfHasUnreadNotif(_homeController.id.value);
               if(_homeController.accessToken.value.isEmpty || _homeController.isConfiguring.value){
                 _navigationController.controller.value.index = 0;
               }

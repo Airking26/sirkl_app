@@ -10,6 +10,7 @@ const String errorWalletAlreadyUsedRes = "error_wallet_already_used";
 const String moralisApiKey = "i9AyfrkBTZQg3gUEXqANDoGAY4h3W7zjUhpoPNtO69sCAFvSVO7ICpZSEdCsYxIj";
 const String alchemyApiKey =  "ELrNU9K6I9RNfXbIkJqq6H6NeoXNbF10";
 const String urlPrefix = "https://sirkl.page.link";
+const String notificationSaved = "notification_saved";
 
 /// Navigation page ///
 const String homeTabRes = "home";

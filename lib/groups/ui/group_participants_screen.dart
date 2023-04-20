@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/chats/ui/add_user_to_group_screen.dart';
 import 'package:sirkl/common/model/admin_dto.dart';
+import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
@@ -72,6 +73,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                 onAdminPressed: (context, memberId, isAdmin) async {
                   await _groupController.changeAdminRole(AdminDto(idChannel: _chatController.channel.value!.id!, userToUpdate: memberId, makeAdmin: !isAdmin));
                   await _memberListController.refresh();
+                  if(!isAdmin) await _commonController.notifyUserAsAdmin(NotificationAddedAdminDto(idUser: memberId, idChannel: _chatController.channel.value!.id!, channelName: _chatController.channel.value!.name!));
                 },
                 controller: _memberListController, onMemberTap: (member){
                 _commonController.userClicked.value = userFromJson(json.encode(member.user?.extraData['userDTO']));

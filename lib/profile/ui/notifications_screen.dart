@@ -128,7 +128,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
           },
           leading:
-              item.type != 0 && item.type != 1 ?
+              item.type != 0 && item.type != 1 && item.type != 5 && item.type != 6 ?
                   Container(
                     width: 50, height: 50,
                       decoration: const BoxDecoration(
@@ -153,7 +153,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 
-  Widget buildTextNotif(NotificationDto item){
+  Widget? buildTextNotif(NotificationDto item){
     var nowMilli = DateTime.now().millisecondsSinceEpoch;
     var updatedAtMilli =  DateTime.parse(item.createdAt.toIso8601String()).millisecondsSinceEpoch;
     var diffMilli = nowMilli - updatedAtMilli;
@@ -179,6 +179,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ]
         ),
       );
+    } else if(item.type == 4 || item.type == 5 || item.type == 6){
+      return Text(item.message!, style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color:MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.6)));
     } else {
       return Container();
     }

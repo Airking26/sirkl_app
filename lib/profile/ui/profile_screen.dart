@@ -55,11 +55,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     controller = GalleryController();
-    _profileController.checkIfHasUnreadNotif(_homeController.id.value);
     _profileController.retrieveMyStories();
-    pagingController.addPageRequestListener((pageKey) {
-      fetchNFTs();
-    });
+    pagingController.addPageRequestListener((pageKey) {fetchNFTs();});
     _profileController.usernameTextEditingController.value.text =
         _homeController.userMe.value.userName!.isEmpty
             ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"

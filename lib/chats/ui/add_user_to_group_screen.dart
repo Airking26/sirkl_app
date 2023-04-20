@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -207,6 +208,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                   onPressed: () async{
                     for (var element in _chatController.chipsListAddUsers) {
                       await _chatController.channel.value?.addMembers([element.id!]);
+                      await _commonController.notifyAddedInGroup(NotificationAddedAdminDto(idUser: element.id!, idChannel: _chatController.channel.value!.id!, channelName: _chatController.channel.value!.name!));
                     }
                     Navigator.pop(context);
                   }, child: Text("DONE", style: TextStyle(fontWeight: FontWeight.w700, fontFamily: "Gilroy", color: Color(0xFF00CB7D)),),
