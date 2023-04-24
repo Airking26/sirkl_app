@@ -157,12 +157,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel) async{
                   _chatController.channel.value = channel;
                   _navigationController.hideNavBar.value = true;
-                  if(channel.extraData["isConv"] != null && channel.extraData["isConv"] == false && channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == false && (channel.membership!.channelRole != 'channel_member' && channel.membership!.channelRole != 'channel_moderator')){
-                    //await channel.addMembers([ _homeController.id.value ]);
+                  var k = channel.membership;
+                  if(channel.extraData["isConv"] != null && channel.extraData["isConv"] == false && channel.membership == null){
                     _navigationController.hideNavBar.value = true;
-                    pushNewScreen(context, screen: const SettingsGroupScreen()).then((value) => _navigationController.hideNavBar.value = false);
-                  } else if(channel.extraData["isConv"] != null && channel.extraData["isConv"] == false && channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == true){
-                    //await channel.a
+                    pushNewScreen(context, screen: const SettingsGroupScreen()).then((value) {
+                      streamChannelListControllerFriends?.doInitialLoad();
+                        _navigationController.hideNavBar.value = false;
+                    });
                   } else {
                     pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {_navigationController.hideNavBar.value = false;});
                   }

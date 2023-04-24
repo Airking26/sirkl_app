@@ -14,6 +14,7 @@ import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/groups/ui/group_participants_screen.dart';
+import 'package:sirkl/groups/ui/pinned_messages_screen.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
@@ -119,26 +120,48 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                     ? Colors.white : Colors.black,),
                 InkWell(
                   onTap: () async {
-                    if(_chatController.channel.value!.extraData["owner"] == null){
-                      var creator = await _groupController.retrieveCreatorGroup(_chatController.channel.value!.id!);
-                      if(!creator.isNullOrBlank!) {
-                        if(creator == _homeController.userMe.value.wallet!){
-                          await _chatController.channel.value!.client.updateChannelPartial(_chatController.channel.value!.id!, 'try', set: {"owner": _homeController.userMe.value.wallet!});
-                          utils.showToast(context, "You are now the owner of the group");
+                    if(_chatController.channel.value!.extraData["owner"] == _homeController.userMe.value.wallet!){
+                      pushNewScreen(context, screen: const PinnedMessageScreen());
+                    } else {
+                      if (_chatController.channel.value!.extraData["owner"] ==
+                          null) {
+                        var creator = await _groupController
+                            .retrieveCreatorGroup(
+                            _chatController.channel.value!.id!);
+                        if (!creator.isNullOrBlank!) {
+                          if (creator == _homeController.userMe.value.wallet!) {
+                            await _chatController.channel.value!.client
+                                .updateChannelPartial(
+                                _chatController.channel.value!.id!, 'try',
+                                set: {
+                                  "owner": _homeController.userMe.value.wallet!
+                                });
+                            utils.showToast(
+                                context, "You are now the owner of the group");
+                          } else {
+                            utils.showToast(
+                                context, 'You are not the owner of the group');
+                          }
                         } else {
-                          utils.showToast(context, 'You are not the owner of the group');
+                          utils.showToast(context, 'Error. Try again later');
                         }
                       } else {
-                        utils.showToast(context, 'Error. Try again later');
+                        _commonController.userClicked.value =
+                        await _profileController.getUserByWallet(
+                            _chatController.channel.value!
+                                .extraData["owner"] as String);
+                        if (_commonController.userClicked.value!.wallet !=
+                            _homeController.userMe.value.wallet!) {
+                          pushNewScreen(
+                            context, screen: const NestedDetailedChatScreen(
+                            create: true));
+                        }
                       }
-                    } else {
-                      _commonController.userClicked.value = await _profileController.getUserByWallet(_chatController.channel.value!.extraData["owner"] as String);
-                      if(_commonController.userClicked.value!.wallet != _homeController.userMe.value.wallet!) pushNewScreen(context, screen: const DetailedChatScreen(create: true));
                     }
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(_chatController.channel.value!.extraData["owner"] == null ? "Claim ownership" : "Contact owner", style: const TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
+                    child: Text(_chatController.channel.value!.extraData["owner"] == _homeController.userMe.value.wallet! ? "Announcements" :_chatController.channel.value!.extraData["owner"] == null ? "Claim ownership" : "Contact owner", style: const TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
                   ),
                 ),
                 Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
@@ -174,9 +197,8 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                     ],
                   ),
                 ),
-                Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                    ? Colors.white : Colors.black,),
-                InkWell(
+                _chatController.channel.value!.extraData["owner"] == _homeController.userMe.value.wallet! ? const SizedBox() : Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),
+                _chatController.channel.value!.extraData["owner"] == _homeController.userMe.value.wallet! ? const SizedBox() :InkWell(
                   onTap: () async {
                   },
                   child: const Padding(
@@ -184,9 +206,9 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                     child: Text("Report", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
                   ),
                 ),
-                Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                _chatController.channel.value!.extraData["owner"] == _homeController.userMe.value.wallet! ? const SizedBox() :Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                     ? Colors.white : Colors.black,),
-                InkWell(
+                _chatController.channel.value!.extraData["owner"] == _homeController.userMe.value.wallet! ? const SizedBox() :InkWell(
                   onTap: () async {
                     showDialog(context: context,
                         barrierDismissible: true,
