@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
@@ -149,9 +150,9 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                     _navigationController.hideNavBar.value = true;
                     widget.fromConversation ? Navigator.pop(context) : pushNewScreen(context,
                         screen:
-                        const DetailedChatScreen(create: true))
-                        .then((value) => _navigationController
-                        .hideNavBar.value = false);
+                        const NestedDetailedChatScreen(
+                            create: true, fromProfile: true,))
+                        .then((value) => _navigationController.hideNavBar.value = true);
                   },
                   child: Material(
                     borderRadius: BorderRadius.circular(10),
@@ -245,7 +246,8 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                                     .client
                                     .muteUser(
                                     _commonController.userClicked.value!.id!);
-                              } else {
+                              }
+                              else {
                                 _homeController.userBlocked.remove(
                                     _commonController.userClicked.value!.id!);
                                 _homeController.refresh();

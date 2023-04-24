@@ -19,6 +19,7 @@ import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/controller/groups_controller.dart';
+import 'package:sirkl/groups/ui/community_settings_screen.dart';
 import 'package:sirkl/groups/ui/group_participants_screen.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
@@ -94,9 +95,11 @@ class StreamChannelHeader extends StatelessWidget
     this.actions,
     this.backgroundColor,
     this.elevation = 1,
+    this.fromProfile = false,
     required this.commonController,
   }) : preferredSize = const Size.fromHeight(kToolbarHeight);
 
+  final bool fromProfile;
   final CommonController commonController;
 
   /// Whether to show the leading back button
@@ -220,7 +223,9 @@ class StreamChannelHeader extends StatelessWidget
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           InkWell(
-                            onTap: (){Navigator.pop(context);},
+                            onTap: (){
+                              Navigator.pop(context);
+                              },
                             child: SizedBox(
                               width: 50,
                               height: 50,
@@ -232,30 +237,37 @@ class StreamChannelHeader extends StatelessWidget
                           ),
                           InkWell(
                             onTap: () async {
-                              if(channel.extraData['isConv'] !=null && channel.extraData['isConv'] as bool) {
-                                commonController.userClicked.value =
-                                    userFromJson(
-                                        json.encode(channel.state?.members
-                                            .where((element) =>
-                                        element.userId != StreamChat
-                                            .of(context)
-                                            .currentUser!
-                                            .id)
-                                            .first
-                                            .user!
-                                            .extraData["userDTO"]));
-                                pushNewScreen(context,screen: const SettingsProfileElseScreen(fromConversation: true, fromProfile: false));
-                              }
-                              else if(channel.isGroup){
-                                _chatController.channel.value = channel;
-                                if(channel.extraData['isConv'] !=null && !(channel.extraData['isConv'] as bool)){
-                                  pushNewScreen(context, screen: const SettingsGroupScreen());
-                                } else {
-
+                              if(fromProfile){
+                              } else {
+                                if (channel.extraData['isConv'] != null &&
+                                    channel.extraData['isConv'] as bool) {
+                                  commonController.userClicked.value =
+                                      userFromJson(
+                                          json.encode(channel.state?.members
+                                              .where((element) =>
+                                          element.userId != StreamChat
+                                              .of(context)
+                                              .currentUser!
+                                              .id)
+                                              .first
+                                              .user!
+                                              .extraData["userDTO"]));
+                                  pushNewScreen(context,
+                                      screen: const SettingsProfileElseScreen(
+                                          fromConversation: true,
+                                          fromProfile: false));
                                 }
-                                //_chatController.channel.value = channel;
-                                //_navigationController.hideNavBar.value = false;
-                                //pushNewScreen(context,screen: GroupParticipantScreen(fromChat: (channel.extraData['isConv'] != null && channel.extraData['isConv'] == false))).then((value) => _navigationController.hideNavBar.value = true).then((value) => _navigationController.hideNavBar.value = true);
+                                else if (channel.isGroup) {
+                                  _chatController.channel.value = channel;
+                                  if (channel.extraData['isConv'] != null &&
+                                      !(channel.extraData['isConv'] as bool)) {
+                                    pushNewScreen(context,
+                                        screen: const SettingsGroupScreen());
+                                  } else {
+                                    pushNewScreen(context,
+                                        screen: const CommunitySettingScreen());
+                                  }
+                                }
                               }
                             },
                             child: Padding(
@@ -306,25 +318,35 @@ class StreamChannelHeader extends StatelessWidget
                           ),
                           InkWell(
                             onTap: () async{
-                              if(channel.extraData['isConv'] !=null && channel.extraData['isConv'] as bool) {
-                                commonController.userClicked.value =
-                                    userFromJson(
-                                        json.encode(channel.state?.members
-                                            .where((element) =>
-                                        element.userId != StreamChat
-                                            .of(context)
-                                            .currentUser!
-                                            .id)
-                                            .first
-                                            .user!
-                                            .extraData["userDTO"]));
-                                pushNewScreen(context,screen: const SettingsProfileElseScreen(fromConversation: true, fromProfile: false));
-                              } else if(channel.isGroup){
-                                _chatController.channel.value = channel;
-                                if(channel.extraData['isConv'] !=null && !(channel.extraData['isConv'] as bool)){
-                                  pushNewScreen(context, screen: const SettingsGroupScreen());
-                                } else {
-
+                              if(fromProfile){
+                              } else {
+                                if (channel.extraData['isConv'] != null &&
+                                    channel.extraData['isConv'] as bool) {
+                                  commonController.userClicked.value =
+                                      userFromJson(
+                                          json.encode(channel.state?.members
+                                              .where((element) =>
+                                          element.userId != StreamChat
+                                              .of(context)
+                                              .currentUser!
+                                              .id)
+                                              .first
+                                              .user!
+                                              .extraData["userDTO"]));
+                                  pushNewScreen(context,
+                                      screen: const SettingsProfileElseScreen(
+                                          fromConversation: true,
+                                          fromProfile: false));
+                                } else if (channel.isGroup) {
+                                  _chatController.channel.value = channel;
+                                  if (channel.extraData['isConv'] != null &&
+                                      !(channel.extraData['isConv'] as bool)) {
+                                    pushNewScreen(context,
+                                        screen: const SettingsGroupScreen());
+                                  } else {
+                                    pushNewScreen(context,
+                                        screen: const CommunitySettingScreen());
+                                  }
                                 }
                               }
                             },
@@ -455,14 +477,11 @@ class StreamChannelHeader extends StatelessWidget
                     ) :
                         InkWell(
                           onTap: ()async{
-                            var uri  = await _profileController.createDynamicLink("/joinGroup?id=${channel.id}");
-                            Share.share("Join the group on SIRKL ${uri.toString()}");
                           },
                           child: Container(
                             width: 0,
                             height: 0,
                             color: Colors.transparent,
-                            //dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["isConv"] == false ? dialogPopMenuPrivateGroup(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
                           ),
                         )
                   ],
@@ -473,121 +492,6 @@ class StreamChannelHeader extends StatelessWidget
         );
       },
     );
-  }
-
-  YYDialog dialogPopMenuGroup(BuildContext context, Channel channel) {
-    return YYDialog().build(context)
-      ..width = 200
-      ..borderRadius = 10.0
-      ..gravity = Gravity.rightTop
-      ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white.withOpacity(0.95)
-      ..margin = const EdgeInsets.only(top: 90, right: 20)
-      ..widget(InkWell(
-        onTap: () async {
-          dialogMenu.dismiss();
-          if(channel.extraData["${_homeController.id.value}_favorite"] == null || channel.extraData["${_homeController.id.value}_favorite"] == false ) {
-            _homeController.isInFav.add(channel.id!);
-            await _profileController.updateNft(NftModificationDto(
-                contractAddress: channel.id!,
-                id: _homeController.id.value,
-                isFav: true), channel.client);
-          } else {
-            _homeController.isInFav.remove(channel.id);
-            await _profileController.updateNft(NftModificationDto(
-                contractAddress: channel.id!,
-                id: _homeController.id.value,
-                isFav: false), channel.client);
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                channel.extraData["${_homeController.id.value}_favorite"] == null || channel.extraData["${_homeController.id.value}_favorite"] == false ? "• Add to favorites" : "• Remove from favorites",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () async {
-          var creator = await _groupController.retrieveCreatorGroup(channel.id!);
-          dialogMenu.dismiss();
-          if(!creator.isNullOrBlank!) {
-            if(creator == _homeController.userMe.value.wallet!){
-              await channel.client.updateChannelPartial(channel.id!, 'try', set: {"owner": _homeController.userMe.value.wallet!});
-              utils.showToast(context, "You are now the owner of the group");
-            } else {
-              utils.showToast(context, 'You are not the owner of the group');
-            }
-          } else {
-            utils.showToast(context, 'Error. Try again later');
-          }
-        },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.claimOwnershipeRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){
-          dialogMenu.dismiss();
-        },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..show();
-  }
-
-  YYDialog dialogPopMenuGroupWithOwner(BuildContext context, Channel channel) {
-    return YYDialog().build(context)
-      ..width = 200
-      ..borderRadius = 10.0
-      ..gravity = Gravity.rightTop
-      ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white.withOpacity(0.95)
-      ..margin = const EdgeInsets.only(top: 90, right: 20)
-      ..widget(InkWell(
-        onTap: () async {
-          dialogMenu.dismiss();
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                channel.extraData["${_homeController.id.value}_favorite"] == null || channel.extraData["${_homeController.id.value}_favorite"] == false ? "• Add to favorites" : "• Remove from favorites",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) ,
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () async{
-          _commonController.userClicked.value = await _profileController.getUserByWallet(channel.extraData["owner"] as String);
-          if(_commonController.userClicked.value!.wallet != channel.extraData["owner"] as String) pushNewScreen(context, screen: const DetailedChatScreen(create: true));
-        },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.contactOwnerRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){
-          dialogMenu.dismiss();
-        },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..show();
   }
 
 }

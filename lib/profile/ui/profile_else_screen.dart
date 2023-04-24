@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
@@ -18,8 +18,9 @@ import 'package:sirkl/profile/ui/settings_profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 class ProfileElseScreen extends StatefulWidget {
-  const ProfileElseScreen({Key? key, required this.fromConversation}) : super(key: key);
+  const ProfileElseScreen({Key? key, required this.fromConversation, this.fromNested = false}) : super(key: key);
   final bool fromConversation;
+  final bool fromNested;
 
   @override
   State<ProfileElseScreen> createState() => _ProfileElseScreenState();
@@ -108,7 +109,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                             } else {
                               widget.fromConversation ? Navigator.of(context).pop():
                               _navigationController.hideNavBar.value = true;
-                              pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
+                              pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true, fromProfile: true,)).then((value) => _navigationController.hideNavBar.value = true);
                             }
                             }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :const Color(0xff00CB7D), height: 28, width: 28,)),
                           Padding(
@@ -118,7 +119,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                           ),
                           IconButton(onPressed: (){
                             _navigationController.hideNavBar.value = true;
-                            pushNewScreen(context, screen: const SettingsProfileElseScreen(fromConversation: false, fromProfile: true,)).then((value) => _navigationController.hideNavBar.value = false);
+                            pushNewScreen(context, screen: const SettingsProfileElseScreen(fromConversation: false, fromProfile: true,)).then((value) => _navigationController.hideNavBar.value = widget.fromNested);
                             //dialogMenu = dialogPopMenu(context);
                             }, icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
                         ],),

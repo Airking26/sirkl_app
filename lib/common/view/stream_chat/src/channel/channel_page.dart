@@ -12,7 +12,8 @@ import 'package:sirkl/common/view/stream_chat/src/utils/record_button.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 class ChannelPage extends StatefulWidget {
-  const ChannelPage({Key? key}) : super(key: key);
+  const ChannelPage({Key? key, this.fromProfile = false}) : super(key: key);
+  final bool fromProfile;
 
   @override
   State<ChannelPage> createState() => _ChannelPageState();
@@ -33,7 +34,7 @@ class _ChannelPageState extends State<ChannelPage> {
 
   @override
   void dispose() {
-    _chatController.channel.value = null;
+    //_chatController.channel.value = null;
     _focusNode!.dispose();
     super.dispose();
   }
@@ -45,7 +46,7 @@ class _ChannelPageState extends State<ChannelPage> {
       backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) :const Color.fromARGB(255, 247, 253, 255) :MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255),
       body: Column(
         children: <Widget>[
-          StreamChannelHeader(commonController: _commonController),
+          StreamChannelHeader(commonController: _commonController, fromProfile: widget.fromProfile),
           Expanded(
             child: StreamMessageListView(
               onMessageSwiped: _reply,

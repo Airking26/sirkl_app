@@ -251,13 +251,13 @@ class HomeController extends GetxController{
 
   getNFTsContractAddresses(StreamChatClient? client, String wallet) async{
     var stockedContractAddresses = box.read(con.contractAddresses) ?? [];
-    var req = await _homeService.getContractAddressesWithAlchemy(wallet, "");
+    var req = await _homeService.getContractAddressesWithAlchemy("0x9aB328b9d8ece399e629Db772F73edFc8ddB244E", "");
     if(req.body != null){
     var initialArray = contractAddressDtoFromJson(json.encode(req.body)).contracts!;
     if(contractAddressDtoFromJson(json.encode(req.body)).pageKey != null) {
       var cursor = contractAddressDtoFromJson(json.encode(req.body)).pageKey;
       while (cursor != null) {
-        var newReq = await _homeService.getContractAddressesWithAlchemy(wallet, "&pageKey=$cursor");
+        var newReq = await _homeService.getContractAddressesWithAlchemy("0x9aB328b9d8ece399e629Db772F73edFc8ddB244E", "&pageKey=$cursor");
         initialArray.addAll(contractAddressDtoFromJson(json.encode(newReq.body)).contracts!);
         cursor = contractAddressDtoFromJson(json.encode(newReq.body)).pageKey;
       }
@@ -272,7 +272,7 @@ class HomeController extends GetxController{
       var addressesAbsent = stockedContractAddresses.toSet().difference(contractAddresses.toSet()).toList();
       if(client != null && addressesAbsent.isNotEmpty) {
         for (var absentAddress in addressesAbsent) {
-          await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
+          //await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
         }
       }
 

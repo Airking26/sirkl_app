@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
@@ -92,7 +93,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                 await _chatController.channel.value!.addMembers([_homeController.id.value]);
                 Navigator.pop(context);
                 _navigationController.hideNavBar.value = true;
-                pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: _chatController.channel.value!.id,));
+                pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: _chatController.channel.value!.id,)).then((value) => _navigationController.hideNavBar.value = true);
               }
             },
             child: Material(
@@ -191,7 +192,8 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
             _chatController.channel.value?.createdBy?.id != _homeController.id.value ? InkWell(
               onTap: () async {
                 await _commonController.getUserById(_chatController.channel.value!.createdBy!.id);
-                pushNewScreen(context, screen: const DetailedChatScreen(create: true));
+                _navigationController.hideNavBar.value = true;
+                pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = true);
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),

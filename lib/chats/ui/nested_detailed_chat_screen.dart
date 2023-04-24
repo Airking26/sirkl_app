@@ -11,19 +11,19 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 
-class DetailedChatScreen extends StatefulWidget {
+class NestedDetailedChatScreen extends StatefulWidget {
 
-  const DetailedChatScreen({Key? key, required this.create, this.fromProfile = false, this.channelId}) : super(key: key);
+  const NestedDetailedChatScreen({Key? key, required this.create, this.fromProfile = false, this.channelId}) : super(key: key);
   final bool create;
   final String? channelId;
   final bool fromProfile;
 
   @override
-  State<DetailedChatScreen> createState() =>
-      _DetailedChatScreenState();
+  State<NestedDetailedChatScreen> createState() =>
+      _NestedDetailedChatScreenState();
 }
 
-class _DetailedChatScreenState extends State<DetailedChatScreen> {
+class _NestedDetailedChatScreenState extends State<NestedDetailedChatScreen> {
   final utils = Utils();
   YYDialog dialogMenu = YYDialog();
   final _commonController = Get.put(CommonController());
@@ -36,9 +36,9 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
     _navigationController.hideNavBar.value = true;
     if(_commonController.userClicked.value != null) _commonController.checkUserIsInFollowing();
     if(widget.create) {
-      _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value, false);
+      _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value, true);
     } else if(widget.channelId != null) {
-      _chatController.checkOrCreateChannelWithId(StreamChat.of(context).client, widget.channelId!, false);
+      _chatController.checkOrCreateChannelWithId(StreamChat.of(context).client, widget.channelId!, true);
     }
     super.initState();
   }
@@ -51,8 +51,8 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
             : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() => StreamChat(
           client: StreamChat.of(context).client,
-          child: StreamChannel(channel: _chatController.channel.value!,
-          child: ChannelPage(fromProfile: widget.fromProfile))
+          child: StreamChannel(channel: _chatController.nestedChannel.value!,
+          child: ChannelPage(fromProfile: widget.fromProfile,))
         )
         ));
   }

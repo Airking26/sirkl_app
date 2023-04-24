@@ -38,6 +38,7 @@ class ChatsController extends GetxController{
   var fromGroupCreation = false.obs;
   var isEditingGroup = false.obs;
   Rx<Channel?> channel = (null as Channel?).obs;
+  Rx<Channel?> nestedChannel = (null as Channel?).obs;
 
   Future<String?> createInbox(InboxCreationDto inboxCreationDto) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
@@ -54,29 +55,56 @@ class ChatsController extends GetxController{
   }
 
 
-  checkOrCreateChannel(String himId, StreamChatClient client, String myId) async{
-    channel.value = client.channel(
-      'try',
-      extraData: {
-        'members': [
-          myId,
-          himId,
-        ],
-        "isConv" : true
-      },
-    );
-    await channel.value!.watch();
+  checkOrCreateChannel(String himId, StreamChatClient client, String myId, bool nested) async{
+    if(nested){
+      nestedChannel.value = client.channel(
+        'try',
+        extraData: {
+          'members': [
+            myId,
+            himId,
+          ],
+          "isConv" : true
+        },
+      );
+      await nestedChannel.value!.watch();
+    } else {
+      channel.value = client.channel(
+        'try',
+        extraData: {
+          'members': [
+            myId,
+            himId,
+          ],
+          "isConv" : true
+        },
+      );
+       await channel.value!.watch();
+    }
+
   }
 
-  checkOrCreateChannelWithId(StreamChatClient client, String channelId) async{
-    channel.value = client.channel(
-      'try',
-      id: channelId,
-      extraData: {
-        "isConv" : true
-      }
-    );
-    await channel.value!.watch();
+  checkOrCreateChannelWithId(StreamChatClient client, String channelId, bool nested) async{
+    if(nested){
+      nestedChannel.value = client.channel(
+          'try',
+          id: channelId,
+          extraData: {
+            "isConv" : true
+          }
+      );
+      await nestedChannel.value!.watch();
+    } else {
+      channel.value = client.channel(
+          'try',
+          id: channelId,
+          extraData: {
+            "isConv" : true
+          }
+      );
+      await channel.value!.watch();
+    }
+
   }
 
   Future<String?> getEthFromEns(String ens, String wallet) async{
