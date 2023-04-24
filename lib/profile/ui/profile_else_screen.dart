@@ -9,15 +9,13 @@ import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/nft_dto.dart';
-import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/profile/ui/settings_profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
-import '../../common/view/dialog/custom_dial.dart';
 
 class ProfileElseScreen extends StatefulWidget {
   const ProfileElseScreen({Key? key, required this.fromConversation}) : super(key: key);
@@ -31,10 +29,8 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
-  final _profileController = Get.put(ProfileController());
   final _navigationController = Get.put(NavigationController());
   final utils = Utils();
-  YYDialog dialogMenu = YYDialog();
   final PagingController<int, NftDto> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
 
@@ -104,17 +100,6 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _profileController.isEditingProfileElse.value ? InkWell(
-                            onTap: () async {
-                              await _profileController.updateMe(UpdateMeDto(nicknames: {_commonController.userClicked.value!.wallet! : _profileController.usernameElseTextEditingController.value.text}), StreamChat.of(context).client);
-                              _homeController.updateNickname(_commonController.userClicked.value!.wallet!, _profileController.usernameElseTextEditingController.value.text);
-                              _profileController.isEditingProfileElse.value = false;
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.only(top: 16.0, left: 16),
-                              child: Text("DONE", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF00CB7D))),
-                            ),
-                          ) :
                           IconButton(onPressed: () async{
                             if(!_commonController.userClickedFollowStatus.value) {
                               if( await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)){
@@ -128,29 +113,13 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                             }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :const Color(0xff00CB7D), height: 28, width: 28,)),
                           Padding(
                             padding: const EdgeInsets.only(top: 12.0),
-                            child:
-                                _profileController.isEditingProfileElse.value ?
-                                SizedBox(
-                                  width: 200,
-                                  child: TextField(
-                                    autofocus: true,
-                                    maxLines: 1,
-                                    controller: _profileController.usernameElseTextEditingController.value,
-                                    maxLength: 10,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
-                                    decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        isCollapsed: true,
-                                        hintText: ""
-                                    ),
-                                  ),
-                                ):
-                                Text(_homeController.nicknames[_commonController.userClicked.value!.wallet!] != null ?
+                            child: Text(_homeController.nicknames[_commonController.userClicked.value!.wallet!] != null ?
                                 _homeController.nicknames[_commonController.userClicked.value!.wallet!] + (_commonController.userClicked.value!.userName!.isEmpty ? "" : " (${_commonController.userClicked.value!.userName!})") : (_commonController.userClicked.value!.userName!.isEmpty ? "${_commonController.userClicked.value!.wallet!.substring(0, 6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}" : _commonController.userClicked.value!.userName!), textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
                           ),
                           IconButton(onPressed: (){
-                            dialogMenu = dialogPopMenu(context);
+                            _navigationController.hideNavBar.value = true;
+                            pushNewScreen(context, screen: const SettingsProfileElseScreen(fromConversation: false, fromProfile: true,)).then((value) => _navigationController.hideNavBar.value = false);
+                            //dialogMenu = dialogPopMenu(context);
                             }, icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
                         ],),
                     ),
@@ -232,58 +201,6 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
         )));
   }
 
-  YYDialog dialogPopMenu(BuildContext context) {
-    return YYDialog().build(context)
-      ..width = 180
-      ..borderRadius = 10.0
-      ..gravity = Gravity.rightTop
-      ..barrierColor = MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor = MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white.withOpacity(0.95)
-      ..margin = const EdgeInsets.only(top: 90, right: 20)
-      ..widget(InkWell(
-        onTap: () async{
-          dialogMenu.dismiss();
-          if(_commonController.userClickedFollowStatus.value) {
-            if(await _commonController.removeUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)) {
-              utils.showToast(context, con.userRemovedofSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
-            }
-          } else {
-            if(await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)){
-              utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
-            }
-          }
-        },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(_commonController.userClickedFollowStatus.value ? con.removeOfMySirklRes.tr : con.addToMySirklRes.tr, style: TextStyle(fontSize: 14,
-              color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) :const Color(0xff00CB7D),
-              fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () async {
-          _profileController.isEditingProfileElse.value = true;
-          dialogMenu.dismiss();
-        },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.renameRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){
-          _navigationController.hideNavBar.value = true;
-          pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
-        },
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.sendAMessageRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: (){},
-        child: Padding(padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(alignment: Alignment.centerLeft, child: Text(con.reportRes.tr, style: TextStyle(fontSize: 14, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282), fontFamily: "Gilroy", fontWeight: FontWeight.w600),)),),
-      ))
-      ..show();
-  }
 
 }
 

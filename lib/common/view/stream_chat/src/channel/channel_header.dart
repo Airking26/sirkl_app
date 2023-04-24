@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/chats/ui/settings_group_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/nft_modification_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -23,6 +24,7 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:sirkl/profile/ui/settings_profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
@@ -242,13 +244,18 @@ class StreamChannelHeader extends StatelessWidget
                                             .first
                                             .user!
                                             .extraData["userDTO"]));
-                                _navigationController.hideNavBar.value = false;
-                                pushNewScreen(context,screen: const ProfileElseScreen(fromConversation: true)).then((value) => _navigationController.hideNavBar.value = true);
+                                pushNewScreen(context,screen: const SettingsProfileElseScreen(fromConversation: true, fromProfile: false));
                               }
                               else if(channel.isGroup){
                                 _chatController.channel.value = channel;
-                                _navigationController.hideNavBar.value = false;
-                                pushNewScreen(context,screen: GroupParticipantScreen(fromChat: (channel.extraData['isConv'] != null && channel.extraData['isConv'] == false))).then((value) => _navigationController.hideNavBar.value = true).then((value) => _navigationController.hideNavBar.value = true);
+                                if(channel.extraData['isConv'] !=null && !(channel.extraData['isConv'] as bool)){
+                                  pushNewScreen(context, screen: const SettingsGroupScreen());
+                                } else {
+
+                                }
+                                //_chatController.channel.value = channel;
+                                //_navigationController.hideNavBar.value = false;
+                                //pushNewScreen(context,screen: GroupParticipantScreen(fromChat: (channel.extraData['isConv'] != null && channel.extraData['isConv'] == false))).then((value) => _navigationController.hideNavBar.value = true).then((value) => _navigationController.hideNavBar.value = true);
                               }
                             },
                             child: Padding(
@@ -311,12 +318,14 @@ class StreamChannelHeader extends StatelessWidget
                                             .first
                                             .user!
                                             .extraData["userDTO"]));
-                                _navigationController.hideNavBar.value = false;
-                                pushNewScreen(context,screen: const ProfileElseScreen(fromConversation: true)).then((value) => _navigationController.hideNavBar.value = true);
+                                pushNewScreen(context,screen: const SettingsProfileElseScreen(fromConversation: true, fromProfile: false));
                               } else if(channel.isGroup){
-                                _navigationController.hideNavBar.value = false;
                                 _chatController.channel.value = channel;
-                                pushNewScreen(context,screen: GroupParticipantScreen(fromChat: (channel.extraData['isConv'] != null && channel.extraData['isConv'] == false))).then((value) => _navigationController.hideNavBar.value = true);
+                                if(channel.extraData['isConv'] !=null && !(channel.extraData['isConv'] as bool)){
+                                  pushNewScreen(context, screen: const SettingsGroupScreen());
+                                } else {
+
+                                }
                               }
                             },
                             child: Padding(
@@ -450,9 +459,9 @@ class StreamChannelHeader extends StatelessWidget
                             Share.share("Join the group on SIRKL ${uri.toString()}");
                           },
                           child: Container(
-                            width: 25,
-                            height: 25,
-                            color: Colors.redAccent,
+                            width: 0,
+                            height: 0,
+                            color: Colors.transparent,
                             //dialogMenu = channel.memberCount == 2 ? dialogPopMenuConv(context, channel) : channel.extraData["isConv"] == false ? dialogPopMenuPrivateGroup(context, channel) : channel.extraData["owner"] == null ? dialogPopMenuGroup(context, channel) : dialogPopMenuGroupWithOwner(context, channel);
                           ),
                         )
@@ -580,363 +589,5 @@ class StreamChannelHeader extends StatelessWidget
       ))
       ..show();
   }
-
-  YYDialog dialogPopMenuConv(BuildContext context, Channel channel) {
-    commonController.userClicked.value = userFromJson(
-        json.encode(channel.state?.members
-            .where((element) =>
-        element.userId != StreamChat
-            .of(context)
-            .currentUser!
-            .id)
-            .first
-            .user!
-            .extraData["userDTO"]));
-    return YYDialog().build(context)
-      ..width = 180
-      ..borderRadius = 10.0
-      ..gravity = Gravity.rightTop
-      ..barrierColor =
-      MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor =
-      MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white.withOpacity(0.95)
-      ..margin = const EdgeInsets.only(top: 90, right: 20)
-      ..widget(InkWell(
-        onTap: () async {
-          dialogMenu.dismiss();
-          if (_commonController.userClickedFollowStatus.value) {
-            if (await _commonController
-                .removeUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)) {
-              utils.showToast(
-                  context,
-                  con.userRemovedofSirklRes.trParams({
-                    "user": _commonController.userClicked.value!.userName.isNullOrBlank!?
-                    _commonController.userClicked.value!.wallet! : _commonController.userClicked.value!.userName!
-                  }));
-            }
-          } else {
-            if (await _commonController
-                .addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)) {
-              utils.showToast(
-                  context,
-                  con.userAddedToSirklRes.trParams({
-                    "user": _commonController.userClicked.value!.userName.isNullOrBlank! ?
-                    _commonController.userClicked.value!.wallet! : _commonController.userClicked.value!.userName!
-                  }));
-            }
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                _commonController.userClickedFollowStatus.value
-                    ? con.removeOfMySirklRes.tr
-                    : con.addToMySirklRes.tr,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) :const Color(0xff00CB7D),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () {
-          _chatController.isEditingProfile.value = true;
-          dialogMenu.dismiss();
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "• Add a nickname",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () {
-          _navigationController.hideNavBar.value = false;
-          pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: true));
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                con.profileMenuTabRes.tr,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () {
-          dialogMenu.dismiss();
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                con.reportRes.tr,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () async {
-          dialogMenu.dismiss();
-          showDialog(context: context,
-              barrierDismissible: true,
-              builder: (_) => CupertinoAlertDialog(
-                title: Text("Delete Conversation", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
-                content: Text("Are you sure? This action is irreversible", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
-                actions: [
-                  CupertinoDialogAction(child: Text("No", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){
-                    Get.back();},),
-                  CupertinoDialogAction(child: Text("Yes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
-                    onPressed: () async {
-                      if(!channel.id!.startsWith("!members")) await _chatController.deleteInbox(channel.id!);
-                      await channel.delete();
-                      Get.back();
-                      Navigator.pop(context);
-                    },)
-                ],
-              )
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "• Delete the chat",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..show();
-  }
-
-  YYDialog dialogPopMenuPrivateGroup(BuildContext context, Channel channel) {
-    commonController.userClicked.value = userFromJson(
-        json.encode(channel.state?.members
-            .where((element) =>
-        element.userId != StreamChat
-            .of(context)
-            .currentUser!
-            .id)
-            .first
-            .user!
-            .extraData["userDTO"]));
-    return YYDialog().build(context)
-      ..width = 180
-      ..borderRadius = 10.0
-      ..gravity = Gravity.rightTop
-      ..barrierColor =
-      MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.black.withOpacity(0.05)
-      ..backgroundColor =
-      MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E3244).withOpacity(0.95) : Colors.white.withOpacity(0.95)
-      ..margin = const EdgeInsets.only(top: 90, right: 20)
-      ..widget(InkWell(
-        onTap: () async {
-          dialogMenu.dismiss();
-          showDialog(context: context,
-              barrierDismissible: true,
-              builder: (_) =>
-                  CupertinoAlertDialog(
-                    title: Text("Quit Group", style: TextStyle(fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: "Gilroy",
-                        color: MediaQuery
-                            .of(context)
-                            .platformBrightness == Brightness.dark ? Colors
-                            .white : Colors.black),),
-                    content: Text("Are you sure?",
-                        style: TextStyle(fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: "Gilroy",
-                            color: MediaQuery
-                                .of(context)
-                                .platformBrightness == Brightness.dark
-                                ? Colors.white.withOpacity(0.5)
-                                : Colors.black.withOpacity(0.5))),
-                    actions: [
-                      CupertinoDialogAction(child: Text("No",
-                          style: TextStyle(fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: "Gilroy",
-                              color: MediaQuery
-                                  .of(context)
-                                  .platformBrightness == Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black)), onPressed: () {
-                        Get.back();
-                      },),
-                      CupertinoDialogAction(child: Text("Yes",
-                          style: TextStyle(fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: "Gilroy",
-                              color: MediaQuery
-                                  .of(context)
-                                  .platformBrightness == Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black)),
-                        onPressed: () async {
-                          await channel.removeMembers([_homeController.id.value]);
-                          Navigator.pop(context);
-                        },)
-                    ],
-                  )
-          );
-
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text("• Quit the group",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xff9BA0A5) : const Color(0xFF828282) ,
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () {
-          dialogMenu.dismiss();
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                con.reportRes.tr,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () async {
-          if(channel.createdBy?.id == _homeController.id.value) {
-            dialogMenu.dismiss();
-            showDialog(context: context,
-                barrierDismissible: true,
-                builder: (_) =>
-                    CupertinoAlertDialog(
-                      title: Text("Delete Group", style: TextStyle(fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: "Gilroy",
-                          color: MediaQuery
-                              .of(context)
-                              .platformBrightness == Brightness.dark ? Colors
-                              .white : Colors.black),),
-                      content: Text("Are you sure? This action is irreversible",
-                          style: TextStyle(fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: "Gilroy",
-                              color: MediaQuery
-                                  .of(context)
-                                  .platformBrightness == Brightness.dark
-                                  ? Colors.white.withOpacity(0.5)
-                                  : Colors.black.withOpacity(0.5))),
-                      actions: [
-                        CupertinoDialogAction(child: Text("No",
-                            style: TextStyle(fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: "Gilroy",
-                                color: MediaQuery
-                                    .of(context)
-                                    .platformBrightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black)), onPressed: () {
-                          Get.back();
-                        },),
-                        CupertinoDialogAction(child: Text("Yes",
-                            style: TextStyle(fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: "Gilroy",
-                                color: MediaQuery
-                                    .of(context)
-                                    .platformBrightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black)),
-                          onPressed: () async {
-                            if (!channel.id!.startsWith(
-                                "!members")) {
-                              await _chatController.deleteInbox(
-                                channel.id!);
-                            }
-                            await channel.delete();
-                            Get.back();
-                            Navigator.pop(context);
-                          },)
-                      ],
-                    )
-            );
-          } else {
-            utils.showToast(context, "Only the creator of the group can delete it");
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "• Delete the group",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..show();
-  }
-
 
 }

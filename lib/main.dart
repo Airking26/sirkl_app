@@ -139,84 +139,68 @@ class _MyHomePageState extends State<MyHomePage>{
 
   initFirebase() async {
     await LocalNotificationInitialize().initialize(flutterLocalNotificationsPlugin);
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      if(message.data["type"] == "0" || message.data["type"] == "1"){
-        LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-      } else if(message.data['type'] == "2"){
-        await FlutterCallkitIncoming.endAllCalls();
-        await _callController.leaveChannel();
-      } else if(message.data['type'] == "3"){
-        await FlutterCallkitIncoming.endAllCalls();
-        LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-      } else if(message.data['type'] == "4"){
-        LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"],  flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-        await _homeController.registerNotification(NotificationRegisterDto(message: message.data["body"]));
-      } else if(message.data['type'] == 5 || message.data['type'] == 6){
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+        if (_homeController.notificationActive.value) {
+          if (message.data["type"] == "0" || message.data["type"] == "1") {
+            LocalNotificationInitialize.showBigTextNotification(
+                title: message.data["title"],
+                body: message.data["body"],
+                flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+          } else if (message.data['type'] == "2") {
+            await FlutterCallkitIncoming.endAllCalls();
+            await _callController.leaveChannel();
+          } else if (message.data['type'] == "3") {
+            await FlutterCallkitIncoming.endAllCalls();
+            LocalNotificationInitialize.showBigTextNotification(
+                title: message.data["title"],
+                body: message.data["body"],
+                flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+          } else if (message.data['type'] == "4") {
+            LocalNotificationInitialize.showBigTextNotification(
+                title: message.data["title"],
+                body: message.data["body"],
+                flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+            await _homeController.registerNotification(
+                NotificationRegisterDto(message: message.data["body"]));
+          } else if (message.data['type'] == 5 || message.data['type'] == 6) {
 
-      }
-      else if(message.data['type'] == "message.new" && message.data['channel_id'] != _chatController.channel.value?.id){
-        final client = StreamChat.of(context).client;
-        final response = await client.getMessage(message.data['id']);
-        final respChannel = await client.queryChannel("try", channelId: (message.data["cid"] as String).replaceFirst('try:', ''));
-        if(respChannel.members!.length > 2) {
-          LocalNotificationInitialize.showBigTextNotification(
-              title: respChannel.channel!.name,
-              body: "${response.message.user?.name} : ${response.message.text!}",
-              flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-        } else {
-          LocalNotificationInitialize.showBigTextNotification(
-              title: "New message from ${response.message.user?.name}",
-              body: response.message.text!,
-              flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+          }
+          else if (message.data['type'] == "message.new" &&
+              message.data['channel_id'] != _chatController.channel.value?.id) {
+            final client = StreamChat
+                .of(context)
+                .client;
+            final response = await client.getMessage(message.data['id']);
+            final respChannel = await client.queryChannel("try",
+                channelId: (message.data["cid"] as String).replaceFirst(
+                    'try:', ''));
+            if (respChannel.members!.length > 2) {
+              LocalNotificationInitialize.showBigTextNotification(
+                  title: respChannel.channel!.name,
+                  body: "${response.message.user?.name} : ${response.message
+                      .text!}",
+                  flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+            } else {
+              LocalNotificationInitialize.showBigTextNotification(
+                  title: "New message from ${response.message.user?.name}",
+                  body: response.message.text!,
+                  flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+            }
+          }
+          else {
+            showCallNotification(message.data);
+          }
         }
-      }
-      else {
-        showCallNotification(message.data);
-      }
-    });
-    FirebaseMessaging.onMessageOpenedApp.listen((event) async{
-      debugPrint("OnMessageOpenedApp");
-      if(event.data["cid"] != null) {
-        final response = await StreamChat
-            .of(context)
-            .client
-            .queryChannel("try",
-            channelId: (event.data["cid"] as String).replaceFirst('try:', ''));
-        if (response.members!.length > 2) {
-          _navigationController.hideNavBar.value = true;
-          // ignore: use_build_context_synchronously
-          pushNewScreen(context, screen: DetailedChatScreen(create: false,
-              channelId: (event.data["cid"] as String).replaceFirst(
-                  'try:', ''))).then((value) => _navigationController.hideNavBar.value = false);
-        } else {
-          final user = response.members!.where((element) =>
-          element.user!.id != event.data["receiver_id"]).toList()[0];
-          await _commonController.getUserById(user.user!.id);
-          _navigationController.hideNavBar.value = true;
-          // ignore: use_build_context_synchronously
-          pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
-        }
-      }
-    });
-    FirebaseMessaging.instance.getInitialMessage().then((event) async{
-      debugPrint("OnDebugSirkl : Initial Message");
-      if(event != null) {
-        debugPrint("Event not null");
-        if (event.data['cid'] != null) {
-          debugPrint("OnDebugSirkl : CID not null");
-          final client = StreamChatClient("mhgk84t9jfnt");
-          final box = GetStorage();
-          var refreshToken = box.read(con.REFRESH_TOKEN);
-          var requestToken = await HomeService().refreshToken(refreshToken);
-          var refreshTokenDTO = refreshTokenDtoFromJson(
-              json.encode(requestToken.body));
-          var accessToken = refreshTokenDTO.accessToken!;
-          var request = await ProfileService().retrieveTokenStreamChat(
-              accessToken);
-          var id = userFromJson(box.read(con.USER)).id;
-          await client.connectUser(
-              User(id: id!,), request.body!, connectWebSocket: false);
-          final response = await client.queryChannel("try",
+      });
+
+
+      FirebaseMessaging.onMessageOpenedApp.listen((event) async {
+        debugPrint("OnMessageOpenedApp");
+        if (event.data["cid"] != null) {
+          final response = await StreamChat
+              .of(context)
+              .client
+              .queryChannel("try",
               channelId: (event.data["cid"] as String).replaceFirst(
                   'try:', ''));
           if (response.members!.length > 2) {
@@ -224,23 +208,66 @@ class _MyHomePageState extends State<MyHomePage>{
             // ignore: use_build_context_synchronously
             pushNewScreen(context, screen: DetailedChatScreen(create: false,
                 channelId: (event.data["cid"] as String).replaceFirst(
-                    'try:', ''))).then((value) => _navigationController.hideNavBar.value = false);
+                    'try:', ''))).then((value) =>
+            _navigationController.hideNavBar.value = false);
           } else {
             final user = response.members!.where((element) =>
             element.user!.id != event.data["receiver_id"]).toList()[0];
             await _commonController.getUserById(user.user!.id);
             _navigationController.hideNavBar.value = true;
             // ignore: use_build_context_synchronously
-            pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
+            pushNewScreen(
+                context, screen: const DetailedChatScreen(create: true)).then((
+                value) => _navigationController.hideNavBar.value = false);
           }
         }
-      }
-      else {
-        debugPrint("OnDebugSirkl : Event is null");
-      }
-
-    });
-    _callController.listenCall();
+      });
+      FirebaseMessaging.instance.getInitialMessage().then((event) async {
+        debugPrint("OnDebugSirkl : Initial Message");
+        if (event != null) {
+          debugPrint("Event not null");
+          if (event.data['cid'] != null) {
+            debugPrint("OnDebugSirkl : CID not null");
+            final client = StreamChatClient("mhgk84t9jfnt");
+            final box = GetStorage();
+            var refreshToken = box.read(con.REFRESH_TOKEN);
+            var requestToken = await HomeService().refreshToken(refreshToken);
+            var refreshTokenDTO = refreshTokenDtoFromJson(
+                json.encode(requestToken.body));
+            var accessToken = refreshTokenDTO.accessToken!;
+            var request = await ProfileService().retrieveTokenStreamChat(
+                accessToken);
+            var id = userFromJson(box.read(con.USER)).id;
+            await client.connectUser(
+                User(id: id!,), request.body!, connectWebSocket: false);
+            final response = await client.queryChannel("try",
+                channelId: (event.data["cid"] as String).replaceFirst(
+                    'try:', ''));
+            if (response.members!.length > 2) {
+              _navigationController.hideNavBar.value = true;
+              // ignore: use_build_context_synchronously
+              pushNewScreen(context, screen: DetailedChatScreen(create: false,
+                  channelId: (event.data["cid"] as String).replaceFirst(
+                      'try:', ''))).then((value) =>
+              _navigationController.hideNavBar.value = false);
+            } else {
+              final user = response.members!.where((element) =>
+              element.user!.id != event.data["receiver_id"]).toList()[0];
+              await _commonController.getUserById(user.user!.id);
+              _navigationController.hideNavBar.value = true;
+              // ignore: use_build_context_synchronously
+              pushNewScreen(
+                  context, screen: const DetailedChatScreen(create: true))
+                  .then((value) =>
+              _navigationController.hideNavBar.value = false);
+            }
+          }
+        }
+        else {
+          debugPrint("OnDebugSirkl : Event is null");
+        }
+      });
+      _callController.listenCall();
   }
 
   @override
@@ -253,28 +280,37 @@ class _MyHomePageState extends State<MyHomePage>{
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  await GetStorage().initStorage;
+  var notificationActive = GetStorage().read(con.NOTIFICATION_ACTIVE) ?? true;
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   await LocalNotificationInitialize().initialize(flutterLocalNotificationsPlugin);
-  if(message.data["type"] == "0" || message.data["type"] == "1"){
-    LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-  } else if(message.data['type'] == "2"){
-    await FlutterCallkitIncoming.endAllCalls();
-  } else if(message.data['type'] == "3"){
-    LocalNotificationInitialize.showBigTextNotification(title: message.data["title"], body: message.data["body"], flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-  } else if(message.data['type'] == "4"){
-    try {
-      await GetStorage().initStorage;
-      var notificationSaved = GetStorage().read(con.notificationSaved) ?? [];
-      (notificationSaved as List<dynamic>).add(message.data["body"]);
-      await GetStorage().write(con.notificationSaved, notificationSaved);
-    } on Error {
-      var t = '';
-    }
-  } else if(message.data['type'] == 5 || message.data['type'] == 6){
+  if(notificationActive) {
+    if (message.data["type"] == "0" || message.data["type"] == "1") {
+      LocalNotificationInitialize.showBigTextNotification(
+          title: message.data["title"],
+          body: message.data["body"],
+          flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+    } else if (message.data['type'] == "2") {
+      await FlutterCallkitIncoming.endAllCalls();
+    } else if (message.data['type'] == "3") {
+      LocalNotificationInitialize.showBigTextNotification(
+          title: message.data["title"],
+          body: message.data["body"],
+          flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+    } else if (message.data['type'] == "4") {
+      try {
+        var notificationSaved = GetStorage().read(con.notificationSaved) ?? [];
+        (notificationSaved as List<dynamic>).add(message.data["body"]);
+        await GetStorage().write(con.notificationSaved, notificationSaved);
+      } on Error {
+        var t = '';
+      }
+    } else if (message.data['type'] == 5 || message.data['type'] == 6) {
 
-  } else if(message.data["uuid"] != null) {
-    showCallNotification(message.data);
+    } else if (message.data["uuid"] != null) {
+      showCallNotification(message.data);
     }
+  }
 }
 
 Future<void> showCallNotification(Map<String, dynamic> data) async {

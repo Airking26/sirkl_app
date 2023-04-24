@@ -148,7 +148,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                     "assets/images/add_user.png",
                     width: 20, height: 20,
                     color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                  )) : Container(),
+                  )) : IconButton(onPressed: (){}, icon :Icon(Icons.add, color: Colors.transparent, size: 24,)),
             ],
           ),
         ),

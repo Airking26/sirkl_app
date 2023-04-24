@@ -50,7 +50,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                 child:
                 ClipOval(child: SizedBox.fromSize(size: const Size.fromRadius(30),
                   child: GestureDetector(onTap: () async {
-                    await _profileController.getImage(false);
+                    await _profileController.getImageForGroup();
                   },
                       child:
                       Obx(() => CachedNetworkImage(imageUrl: _profileController.urlPictureGroup.value, color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
@@ -70,6 +70,8 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                 },
                 style: const TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.w500),
                 cursorColor: const Color(0xff00CB7D),
+                maxLines: 1,
+                maxLength: 10,
                 decoration: const InputDecoration(hintText: "Name of the group", hintStyle: TextStyle(fontFamily: "Gilroy"),
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: Color(0xff00CB7D)),
@@ -84,7 +86,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
         const SizedBox(height: 24,),
         Container(
           padding: const EdgeInsets.symmetric(vertical: 24),
-          color: Colors.white,
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF113751) : Colors.white,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
@@ -99,7 +101,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                    const Text("Group type", style: TextStyle(color: Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),),
+                      Text("Group type", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),),
                     Text(_chatController.groupType.value == 0 ? "Public" : "Private", style: const TextStyle(color: Colors.grey, fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16),)
                   ],),
                 ),
@@ -120,7 +122,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                         ),),
                       InkWell(onTap: (){
                         _chatController.groupType.value = 0;
-                      },child: const Text("Public", style: TextStyle(color: Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),))
+                      },child: Text("Public", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),))
                   ],),
                 ),
                 _chatController.groupTypeCollapsed.value ? const SizedBox(width : 0, height: 0) : Transform.translate(
@@ -139,7 +141,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                         ),),
                       InkWell(onTap: (){
                         _chatController.groupType.value = 1;
-                      }, child: const Text("Private", style: TextStyle(color: Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),))
+                      }, child: Text("Private", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),))
                   ],),
                 ),
               ],
@@ -148,13 +150,13 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
         ),
         _chatController.groupTypeCollapsed.value ? const SizedBox(width : 0, height: 0) : Padding(
           padding: EdgeInsets.only(bottom: 16.0, left: _chatController.groupType.value == 0  ? 0 : 24, right: 24, top: 8),
-          child: Text(_chatController.groupType.value == 0  ? "This group is open to everyone interested in joining!" : "Users can request to join your groups, but access will only be granted upon approval from an admin.", textAlign: TextAlign.start, style: TextStyle(fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark
-              ? Colors.white : Colors.grey, fontWeight: FontWeight.w500, fontSize: 13),),
+          child: Text(_chatController.groupType.value == 0  ? "This group is open to everyone interested in joining!" : "Users can request to join your groups, but access will only be granted upon approval from an admin.", textAlign: TextAlign.start, style: TextStyle(fontFamily: "Gilroy", color:
+               Colors.grey, fontWeight: FontWeight.w500, fontSize: 13),),
         ),
         SizedBox(height: _chatController.groupVisibilityCollapsed.value || _chatController.groupTypeCollapsed.value ? 8 : 24,),
         Container(
           padding: const EdgeInsets.symmetric(vertical: 24),
-          color: Colors.white,
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF113751) : Colors.white,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
@@ -168,7 +170,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Visible", style: TextStyle(color: Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),),
+                      Text("Visible", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),),
                       Text(_chatController.groupVisibility.value == 0 ? "Yes" : "No", style: const TextStyle(color: Colors.grey, fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16),)
                     ],),
                 ),
@@ -189,7 +191,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                         ),),
                       InkWell(onTap : (){
                         _chatController.groupVisibility.value = 0;
-                      },child: const Text("Yes", style: TextStyle(color: Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),))
+                      },child: Text("Yes", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),))
                     ],),
                 ),
                 _chatController.groupVisibilityCollapsed.value ? const SizedBox(width: 0, height: 0,) : Transform.translate(
@@ -209,7 +211,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                       InkWell(onTap: (){
                         _chatController.groupVisibility.value = 1;
                       },
-                          child: const Text("No", style: TextStyle(color: Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),))
+                          child: Text("No", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),))
                     ],),
                 ),
               ],
@@ -249,7 +251,11 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton(onPressed: () { Navigator.pop(context); }, child: const Text("Cancel", style: TextStyle(color: Colors.grey, fontFamily: "Gilroy"),),),
+              TextButton(onPressed: () {
+                _profileController.urlPictureGroup.value = "";
+                _chatController.groupTextController.value.text = "";
+                Navigator.pop(context);
+                }, child: const Text("Cancel", style: TextStyle(color: Colors.grey, fontFamily: "Gilroy"),),),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Text(

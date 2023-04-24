@@ -9,11 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_badged/flutter_badge.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -29,6 +25,7 @@ import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/my_story_viewer_screen.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
+import 'package:sirkl/profile/ui/settings_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
 import '../../home/ui/pdf_screen.dart';
@@ -44,10 +41,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late final GalleryController controller;
   final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
-  final _commonController = Get.put(CommonController());
+  final _navigationController = Get.put(NavigationController());
+
   final PagingController<int, NftDto> pagingController =
       PagingController(firstPageKey: 0);
-  final _navigationController = Get.put(NavigationController());
   YYDialog dialogMenu = YYDialog();
   static var pageKey = 0;
   Utils utils = Utils();
@@ -65,10 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _homeController.userMe.value.description == ""
             ? ""
             : _homeController.userMe.value.description!;
-    _profileController.urlPicture.value =
-        _homeController.userMe.value.picture == null
-            ? ""
-            : _homeController.userMe.value.picture!;
+    _profileController.urlPicture.value = _homeController.userMe.value.picture == null ? "" : _homeController.userMe.value.picture!;
     super.initState();
   }
 
@@ -141,64 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                _profileController.isLoadingPicture.value
-                                    ? Container(
-                                        padding: const EdgeInsets.all(8),
-                                        width: 48,
-                                        height: 48,
-                                        child: const CircularProgressIndicator(
-                                          color: Color(0xFF00CB7D),
-                                        ))
-                                    : _profileController.isEditingProfile.value
-                                        ? InkWell(
-                                            onTap: () {
-                                              _profileController.updateMe(
-                                                  UpdateMeDto(
-                                                      userName: _profileController
-                                                              .usernameTextEditingController
-                                                              .value
-                                                              .text
-                                                              .isEmpty
-                                                          ? "${_homeController
-                                                              .userMe
-                                                              .value
-                                                              .wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
-                                                          : _profileController
-                                                              .usernameTextEditingController
-                                                              .value
-                                                              .text,
-                                                      description: _profileController
-                                                              .descriptionTextEditingController
-                                                              .value
-                                                              .text
-                                                              .isEmpty
-                                                          ? ""
-                                                          : _profileController
-                                                              .descriptionTextEditingController
-                                                              .value
-                                                              .text,
-                                                      picture:
-                                                          _profileController
-                                                              .urlPicture
-                                                              .value),
-                                                  StreamChat.of(context)
-                                                      .client);
-                                            },
-                                            child: const Padding(
-                                              padding: EdgeInsets.only(
-                                                  top: 16.0, left: 16),
-                                              child: Text("DONE",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      fontFamily: 'Gilroy',
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color:
-                                                          Color(0xFF00CB7D))),
-                                            ),
-                                          )
-                                        : IconButton(
+                                IconButton(
                                             onPressed: () {
                                               pushNewScreen(context,
                                                       screen:
@@ -235,34 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             )),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 12.0),
-                                  child: _profileController
-                                          .isEditingProfile.value
-                                      ? SizedBox(
-                                          width: 200,
-                                          child: TextField(
-                                            //autofocus: true,
-                                            maxLines: 1,
-                                            controller: _profileController
-                                                .usernameTextEditingController
-                                                .value,
-                                            maxLength: 10,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontFamily: "Gilroy",
-                                                fontWeight: FontWeight.w600,
-                                                color: MediaQuery.of(context)
-                                                            .platformBrightness ==
-                                                        Brightness.dark
-                                                    ? Colors.white
-                                                    : Colors.black),
-                                            decoration: const InputDecoration(
-                                                border: InputBorder.none,
-                                                isCollapsed: true,
-                                                hintText: ""),
-                                          ),
-                                        )
-                                      : Text(
+                                  child: Text(
                                           _homeController.userMe.value.userName!
                                                       .isEmpty ||
                                                   _homeController.userMe.value
@@ -286,13 +196,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 IconButton(
                                     onPressed: () async {
-                                      dialogMenu = dialogPopMenu(context);
+                                      _navigationController.hideNavBar.value = true;
+                                      pushNewScreen(context, screen: const SettingScreen()).then((value) => _navigationController.hideNavBar.value = false);
                                     },
-                                    icon:  Icon(Icons.settings_rounded, size: 30, color: MediaQuery.of(context)
-                                        .platformBrightness ==
-                                        Brightness.dark
-                                        ? Colors.white
-                                        : Colors.black)),
+                                    icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
                               ],
                             ),
                           ),
@@ -317,10 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   size: const Size.fromRadius(70),
                                   child: GestureDetector(
                                       onTap: () async {
-                                        if (_profileController
-                                            .isEditingProfile.value) {
-                                          await _profileController.getImage(true);
-                                        } else if(_profileController.myStories.value != null && _profileController.myStories.value!.isNotEmpty){
+                                        if(_profileController.myStories.value != null && _profileController.myStories.value!.isNotEmpty){
                                           _navigationController.hideNavBar.value = true;
                                           pushNewScreen(context, screen: const MyStoryViewerScreen()).then((value) {
                                                 if(value == null){
@@ -331,7 +235,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               });
                                         }
                                       },
-                                      child: _profileController.urlPicture.value.isEmpty
+                                      child: _homeController.userMe.value.picture.isNullOrBlank!
                                           ? TinyAvatar(
                                               baseString: _homeController
                                                   .userMe.value.wallet!,
@@ -340,14 +244,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               colourScheme: TinyAvatarColourScheme
                                                   .seascape)
                                           : CachedNetworkImage(
-                                              imageUrl: _profileController
-                                                  .urlPicture.value,
-                                              color: Colors.white.withOpacity(
-                                                  _profileController
-                                                          .isEditingProfile
-                                                          .value
-                                                      ? 0.2
-                                                      : 0.0),
+                                              imageUrl: _homeController.userMe.value.picture!,
+                                              color: Colors.white.withOpacity(0.0),
                                               fit: BoxFit.cover,
                                               colorBlendMode:
                                                   BlendMode.difference,
@@ -360,9 +258,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             )),
                       ),
-                      _profileController.isEditingProfile.value
-                          ? Container()
-                          : Positioned(
+                      Positioned(
                               top: Platform.isAndroid ? 210 : 190,
                               right: MediaQuery.of(context).size.width / 3.25,
                               child: DeferPointer(
@@ -578,230 +474,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             )));
   }
 
-  YYDialog dialogPopMenu(BuildContext context) {
-    return YYDialog().build(context)
-      ..width = 175
-      ..borderRadius = 10.0
-      ..gravity = Gravity.rightTop
-      ..barrierColor =
-          MediaQuery.of(context).platformBrightness == Brightness.dark
-              ? Colors.transparent
-              : Colors.black.withOpacity(0.05)
-      ..backgroundColor =
-          MediaQuery.of(context).platformBrightness == Brightness.dark
-              ? const Color(0xFF1E3244).withOpacity(0.95)
-              : Colors.white.withOpacity(0.95)
-      ..margin = const EdgeInsets.only(top: 90, right: 20)
-      ..widget(InkWell(
-        onTap: () {
-          _profileController.isEditingProfile.value = true;
-          dialogMenu.dismiss();
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                con.editProfileRes.tr,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness ==
-                            Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () async{
-          dialogMenu.dismiss();
-          _navigationController.hideNavBar.value = true;
-          await _commonController.getUserById("63f78a6188f7d4001f68699a");
-          pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                con.contactUsRes.tr,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness ==
-                            Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () async{
-          dialogMenu.dismiss();
-          var uri = await _profileController.createDynamicLink("/profileShared?id=${_homeController.id.value}");
-          Share.share("Check out my profile on SIRKL ${uri.toString()}");
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "• Share profile",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness ==
-                        Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () async {
-          dialogMenu.dismiss();
-          await GetStorage().erase();
-          await StreamChat.of(context).client.disconnectUser();
-          _homeController.accessToken.value = "";
-          _navigationController.controller.value.jumpToTab(0);
-          _navigationController.hideNavBar.value = true;
-          await _profileController.deleteUser(_homeController.id.value);
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                con.logoutRes.tr,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness ==
-                            Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () async {
-          dialogMenu.dismiss();
-          showDialog(
-              context: context,
-              barrierDismissible: true,
-              builder: (_) => CupertinoAlertDialog(
-                    title: Text(
-                      "Delete Account",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: "Gilroy",
-                          color: MediaQuery.of(context).platformBrightness ==
-                                  Brightness.dark
-                              ? Colors.white
-                              : Colors.black),
-                    ),
-                    content: Text("Are you sure? You will lost all your data.",
-                        style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: "Gilroy",
-                            color: MediaQuery.of(context).platformBrightness ==
-                                    Brightness.dark
-                                ? Colors.white.withOpacity(0.5)
-                                : Colors.black.withOpacity(0.5))),
-                    actions: [
-                      CupertinoDialogAction(
-                        child: Text("No",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: "Gilroy",
-                                color:
-                                    MediaQuery.of(context).platformBrightness ==
-                                            Brightness.dark
-                                        ? Colors.white
-                                        : Colors.black)),
-                        onPressed: () {
-                          Get.back();
-                        },
-                      ),
-                      CupertinoDialogAction(
-                        child: Text("Yes",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: "Gilroy",
-                                color:
-                                    MediaQuery.of(context).platformBrightness ==
-                                            Brightness.dark
-                                        ? Colors.white
-                                        : Colors.black)),
-                        onPressed: () async {
-                          await StreamChat.of(context).client.disconnectUser();
-                          await _profileController
-                              .deleteUser(_homeController.id.value);
-                          await GetStorage().erase();
-                          _homeController.accessToken.value = "";
-                          _navigationController.controller.value.jumpToTab(0);
-                          Get.back();
-                        },
-                      )
-                    ],
-                  ));
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 8.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "• Delete account",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness ==
-                            Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..divider(color: const Color(0xFF828282), padding: 20.0)
-      ..widget(InkWell(
-        onTap: () {
-          dialogMenu.dismiss();
-          pushNewScreen(context,
-              screen: const PDFScreen(isTermsAndConditions: 2));
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 10.0, 16.0),
-          child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                con.legalRes.tr,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness ==
-                            Brightness.dark
-                        ? const Color(0xff9BA0A5)
-                        : const Color(0xFF828282),
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600),
-              )),
-        ),
-      ))
-      ..show();
-  }
 
   @override
   void dispose() {

@@ -270,6 +270,8 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
     _chatController.chipsList.clear();
     FocusManager.instance.primaryFocus?.unfocus();
     _chatController.messageSending.value = false;
+    _profileController.urlPictureGroup.value = "";
+    _chatController.groupTextController.value.text = "";
     Navigator.pop(context);
     Navigator.pop(context);
     Navigator.pop(context);

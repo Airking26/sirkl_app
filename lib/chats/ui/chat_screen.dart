@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:sirkl/chats/ui/settings_group_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/new_message_screen.dart';
@@ -156,9 +157,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel) async{
                   _chatController.channel.value = channel;
                   _navigationController.hideNavBar.value = true;
-                  if(channel.extraData["isConv"] != null && channel.extraData["isConv"] == false && channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == false){
-                    await channel.addMembers([ _homeController.id.value ]);
-                    pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {_navigationController.hideNavBar.value = false;});
+                  if(channel.extraData["isConv"] != null && channel.extraData["isConv"] == false && channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == false && (channel.membership!.channelRole != 'channel_member' && channel.membership!.channelRole != 'channel_moderator')){
+                    //await channel.addMembers([ _homeController.id.value ]);
+                    _navigationController.hideNavBar.value = true;
+                    pushNewScreen(context, screen: const SettingsGroupScreen()).then((value) => _navigationController.hideNavBar.value = false);
                   } else if(channel.extraData["isConv"] != null && channel.extraData["isConv"] == false && channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == true){
                     //await channel.a
                   } else {

@@ -66,12 +66,13 @@ class HomeController extends GetxController{
   var loadingStories = true.obs;
   var pageKey = 0.obs;
   var nicknames = {}.obs;
-  var notificationsSaved = [].obs;
+  var userBlocked = [].obs;
   var iHaveNft = false.obs;
   var heHasNft = false.obs;
   var isInFav = <String>[].obs;
   var isFavNftSelected = false.obs;
   var qrActive = false.obs;
+  var notificationActive = true.obs;
 
   final connector = WalletConnect(
     bridge: 'https://bridge.walletconnect.org',
@@ -89,6 +90,7 @@ class HomeController extends GetxController{
     var accessTok = box.read(con.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
     var checkBoxRead = box.read(con.contractAddresses);
+    notificationActive.value = box.read(con.NOTIFICATION_ACTIVE) ?? true;
     if(checkBoxRead != null) {
       contractAddresses.value = box.read(con.contractAddresses).cast<String>() ?? [];
     } else {
@@ -97,6 +99,12 @@ class HomeController extends GetxController{
     var user = box.read(con.USER);
     userMe.value = user != null ? userFromJson(box.read(con.USER) ?? "") : UserDTO();
     id.value = user != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
+    userBlocked.value = box.read(con.USER_BLOCKED) ?? [];
+  }
+
+  switchActiveNotification(bool active) async{
+    await box.write(con.NOTIFICATION_ACTIVE, active);
+    notificationActive.value = active;
   }
 
   connectWallet(BuildContext context) async {
