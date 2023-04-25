@@ -141,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage>{
     await LocalNotificationInitialize().initialize(flutterLocalNotificationsPlugin);
       FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
         if (_homeController.notificationActive.value) {
-          if (message.data["type"] == "0" || message.data["type"] == "1") {
+          if (message.data["type"] == "0" || message.data["type"] == "1" || message.data['type'] == "5" || message.data['type'] == "6" || message.data['type'] == "7") {
             LocalNotificationInitialize.showBigTextNotification(
                 title: message.data["title"],
                 body: message.data["body"],
@@ -162,8 +162,6 @@ class _MyHomePageState extends State<MyHomePage>{
                 flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
             await _homeController.registerNotification(
                 NotificationRegisterDto(message: message.data["body"]));
-          } else if (message.data['type'] == 5 || message.data['type'] == 6) {
-
           }
           else if (message.data['type'] == "message.new" &&
               message.data['channel_id'] != _chatController.channel.value?.id) {
@@ -285,7 +283,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   await LocalNotificationInitialize().initialize(flutterLocalNotificationsPlugin);
   if(notificationActive) {
-    if (message.data["type"] == "0" || message.data["type"] == "1") {
+    if (message.data["type"] == "0" || message.data["type"] == "1" || message.data["type"] == "5" || message.data["type"] == "6" || message.data["type"] == "7") {
       LocalNotificationInitialize.showBigTextNotification(
           title: message.data["title"],
           body: message.data["body"],
@@ -305,8 +303,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       } on Error {
         var t = '';
       }
-    } else if (message.data['type'] == 5 || message.data['type'] == 6) {
-
     } else if (message.data["uuid"] != null) {
       showCallNotification(message.data);
     }

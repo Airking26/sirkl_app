@@ -46,47 +46,34 @@ class _SettingScreenState extends State<SettingScreen> {
           children: [
             buildAppbar(context),
           const SizedBox(height: 24,),
-            GestureDetector(
-                onTap: () async {
-                  if (_profileController
-                      .isEditingProfile.value) {
-                    await _profileController.getImageForProfile();
-                  }
-                },
-                child:
-                Align(
-                  alignment: Alignment.center,
-                  child: ClipOval(
-                    child: SizedBox.fromSize(
-                        size: const Size.fromRadius(70),
-                        child: _profileController.urlPicture.value.isEmpty
-                          ? TinyAvatar(
-                          baseString: _homeController
-                              .userMe.value.wallet!,
-                          dimension: 140,
-                          circular: true,
-                          colourScheme: TinyAvatarColourScheme
-                              .seascape)
-                          : CachedNetworkImage(
-                          imageUrl: _profileController
-                              .urlPicture.value,
-                          color: Colors.white.withOpacity(
-                              _profileController
-                                  .isEditingProfile
-                                  .value
-                                  ? 0.2
-                                  : 0.0),
-                          fit: BoxFit.cover,
-                          colorBlendMode:
-                          BlendMode.difference,
-                          placeholder: (context, url) =>
-                          const Center(
-                              child: CircularProgressIndicator(
-                                  color: Color(0xff00CB7D))),
-                          errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))),
-                    ),
+            Align(
+              alignment: Alignment.center,
+              child: ClipOval(
+                child: SizedBox.fromSize(
+                    size: const Size.fromRadius(70),
+                    child: _profileController.urlPicture.value.isEmpty
+                      ? TinyAvatar(
+                      baseString: _homeController
+                          .userMe.value.wallet!,
+                      dimension: 140,
+                      circular: true,
+                      colourScheme: TinyAvatarColourScheme
+                          .seascape)
+                      : CachedNetworkImage(
+                      imageUrl: _profileController
+                          .urlPicture.value,
+                      color: Colors.white.withOpacity(
+                           0.0),
+                      fit: BoxFit.cover,
+                      colorBlendMode:
+                      BlendMode.difference,
+                      placeholder: (context, url) =>
+                      const Center(
+                          child: CircularProgressIndicator(
+                              color: Color(0xff00CB7D))),
+                      errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))),
                 ),
-                ),
+            ),
             const SizedBox(height: 24,),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -94,6 +81,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 InkWell(
                   onTap: (){
                     _profileController.isEditingProfile.value = true;
+                    Navigator.pop(context);
                   },
                   child: Material(
                     borderRadius: BorderRadius.circular(10),
@@ -155,12 +143,12 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                   Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? Colors.white : Colors.black,),
-                  const Padding(
+                  /*const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
                     child: Text("Blocked users", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
                   ),
                   Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                      ? Colors.white : Colors.black,),
+                      ? Colors.white : Colors.black,),*/
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Row(
@@ -260,34 +248,7 @@ class _SettingScreenState extends State<SettingScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
-                child: _profileController
-                    .isEditingProfile.value
-                    ? SizedBox(
-                  width: 200,
-                  child: TextField(
-                    //autofocus: true,
-                    maxLines: 1,
-                    controller: _profileController
-                        .usernameTextEditingController
-                        .value,
-                    maxLength: 10,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontFamily: "Gilroy",
-                        fontWeight: FontWeight.w600,
-                        color: MediaQuery.of(context)
-                            .platformBrightness ==
-                            Brightness.dark
-                            ? Colors.white
-                            : Colors.black),
-                    decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        isCollapsed: true,
-                        hintText: ""),
-                  ),
-                )
-                    : Text(
+                child: Text(
                   _homeController.userMe.value.userName!
                       .isEmpty ||
                       _homeController.userMe.value
@@ -309,63 +270,6 @@ class _SettingScreenState extends State<SettingScreen> {
                           : Colors.black),
                 ),
               ),
-              _profileController.isLoadingPicture.value
-                  ? Container(
-                  padding: const EdgeInsets.all(8),
-                  width: 48,
-                  height: 48,
-                  child: const CircularProgressIndicator(
-                    color: Color(0xFF00CB7D),
-                  )) :
-              _profileController.isEditingProfile.value
-                  ? InkWell(
-                onTap: () {
-                  _profileController.updateMe(
-                      UpdateMeDto(
-                          userName: _profileController
-                              .usernameTextEditingController
-                              .value
-                              .text
-                              .isEmpty
-                              ? "${_homeController
-                              .userMe
-                              .value
-                              .wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
-                              : _profileController
-                              .usernameTextEditingController
-                              .value
-                              .text,
-                          description: _profileController
-                              .descriptionTextEditingController
-                              .value
-                              .text
-                              .isEmpty
-                              ? ""
-                              : _profileController
-                              .descriptionTextEditingController
-                              .value
-                              .text,
-                          picture:
-                          _profileController
-                              .urlPicture
-                              .value),
-                      StreamChat.of(context)
-                          .client);
-                },
-                child: const Padding(
-                  padding: EdgeInsets.only(
-                      top: 16.0, left: 16),
-                  child: Text("DONE",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontFamily: 'Gilroy',
-                          fontSize: 16,
-                          fontWeight:
-                          FontWeight.w700,
-                          color:
-                          Color(0xFF00CB7D))),
-                ),
-              ) :
               IconButton(
                   onPressed: () async {
                     dialogMenu = dialogPopMenu(context);

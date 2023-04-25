@@ -318,7 +318,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                       child: Text("Report", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
                     ),
                   ),
-                  Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                  /*Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? Colors.white : Colors.black,),
                   InkWell(
                     onTap: () async {
@@ -327,7 +327,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text("Block user", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
                     ),
-                  ),
+                  ),*/
                   const SizedBox(height: 24,),
                 ],
               ),

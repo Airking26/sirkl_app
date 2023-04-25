@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 /// A widget that displays a channel preview.
@@ -168,6 +169,7 @@ class StreamChannelListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final channelState = channel.state!;
     final currentUser = channel.client.state.currentUser!;
+    final _homeController = Get.put(HomeController());
 
     final channelPreviewTheme = StreamChannelPreviewTheme.of(context);
 
@@ -219,7 +221,7 @@ class StreamChannelListTile extends StatelessWidget {
                 onPressed: onDeletePressed,
                 backgroundColor: Colors.white,
                 foregroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
-                icon: Icons.delete_rounded,
+                icon: (channel.membership != null && channel.membership != null && channel.membership!.channelRole == "channel_moderator" || channel.createdBy?.id == _homeController.id.value) || channel.extraData['isConv'] == true ? Icons.delete_rounded : Icons.remove_circle_rounded,
               )] : [SlidableAction(
                 spacing: 0,
                 padding: EdgeInsets.zero,

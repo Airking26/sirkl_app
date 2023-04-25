@@ -40,7 +40,7 @@ class ChatsController extends GetxController{
   Rx<Channel?> channel = (null as Channel?).obs;
   Rx<Channel?> nestedChannel = (null as Channel?).obs;
 
-  Future<String?> createInbox(InboxCreationDto inboxCreationDto) async{
+  Future<String> createInbox(InboxCreationDto inboxCreationDto) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var req = await _chatService.createInbox(accessToken, inboxCreationDtoToJson(inboxCreationDto));
@@ -51,7 +51,7 @@ class ChatsController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       req = await _chatService.createInbox(accessToken, inboxCreationDtoToJson(inboxCreationDto));
     }
-    return req.body;
+    return req.body!;
   }
 
 

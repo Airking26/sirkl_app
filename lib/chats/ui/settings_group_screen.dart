@@ -93,7 +93,6 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                 _chatController.isEditingGroup.value = true;
               } else{
                 await _chatController.channel.value!.addMembers([_homeController.id.value]);
-                await _homeController.retrieveTokenStreamChat(StreamChat.of(context).client, null);
                 Navigator.pop(context);
                 _navigationController.hideNavBar.value = true;
                 pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: _chatController.channel.value!.id,)).then((value) => _navigationController.hideNavBar.value = true);
@@ -416,7 +415,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                         hintText: _chatController.channel.value!.extraData['nameOfGroup'] as String),
                   ),
                 ) : Text(
-                _chatController.channel.value!.extraData['nameOfGroup'] as String,
+                  (_chatController.channel.value!.extraData['nameOfGroup'] as String),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 20,

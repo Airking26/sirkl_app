@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/chats/ui/settings_group_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
@@ -130,7 +131,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             controller: tabController,
             children: [
               Obx(() =>StreamChannelListView(
-                channelSlidableEnabled: true,
+                channelSlidableEnabled: !_chatController.searchIsActive.value ,
                 channelConv : true,
                 channelFriends: true,
                 channelFav: false,
@@ -138,15 +139,21 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   showDialog(context: context,
                       barrierDismissible: true,
                       builder: (_) => CupertinoAlertDialog(
-                        title: Text("Delete Conversation", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                        title: Text((channel.membership != null && channel.membership!.channelRole == "channel_moderator" || channel.createdBy?.id == _homeController.id.value) || channel.extraData['isConv'] == true ? "Delete" : "Leave", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
                         content: Text("Are you sure? This action is irreversible", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                         actions: [
                           CupertinoDialogAction(child: Text("No", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){ Get.back();},),
                           CupertinoDialogAction(child: Text("Yes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
                             onPressed: () async {
+                            if((channel.membership != null && channel.membership!.channelRole == "channel_moderator" || channel.createdBy?.id == _homeController.id.value) || channel.extraData['isConv'] == true){
                               await channel.delete();
                               _commonController.refreshInboxes.value = true;
                               Get.back();
+                            } else {
+                             await channel.removeMembers([_homeController.id.value]);
+                             _commonController.refreshInboxes.value = true;
+                             Get.back();
+                            }
                             },)
                         ],
                       ));
@@ -157,11 +164,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel) async{
                   _chatController.channel.value = channel;
                   _navigationController.hideNavBar.value = true;
-                  var k = channel.membership;
                   if(channel.extraData["isConv"] != null && channel.extraData["isConv"] == false && channel.membership == null){
                     _navigationController.hideNavBar.value = true;
                     pushNewScreen(context, screen: const SettingsGroupScreen()).then((value) {
-                      streamChannelListControllerFriends?.doInitialLoad();
+                      streamChannelListControllerFriends?.refresh();
                         _navigationController.hideNavBar.value = false;
                     });
                   } else {
@@ -171,12 +177,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ),
               ),
               Obx(() =>StreamChannelListView(
-                channelSlidableEnabled: true,
+                channelSlidableEnabled: !_chatController.searchIsActive.value ,
                 onChannelDeletePressed: (context, channel) async {
                   showDialog(context: context,
                       barrierDismissible: true,
                       builder: (_) => CupertinoAlertDialog(
-                        title: Text("Delete Conversation", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                        title: Text("Delete", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
                         content: Text("Are you sure? This action is irreversible", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                         actions: [
                           CupertinoDialogAction(child: Text("No", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){ Get.back();},),

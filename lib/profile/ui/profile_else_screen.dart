@@ -101,6 +101,31 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          InkWell(
+                            onTap: (){Navigator.pop(context);},
+                            child: SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: ImageIcon(const AssetImage(
+                                "assets/images/arrow_left.png",
+                              ),color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: (){
+                              pushNewScreen(context, screen: const SettingsProfileElseScreen(fromConversation: false, fromProfile: true));
+                            },
+                            child: SizedBox(
+                              height: 75,
+                              width: 200,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 12.0),
+                                child: Text(_homeController.nicknames[_commonController.userClicked.value!.wallet!] != null ?
+                                _homeController.nicknames[_commonController.userClicked.value!.wallet!] + (_commonController.userClicked.value!.userName!.isEmpty ? "" : " (${_commonController.userClicked.value!.userName!})") : (_commonController.userClicked.value!.userName!.isEmpty ? "${_commonController.userClicked.value!.wallet!.substring(0, 6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}" : _commonController.userClicked.value!.userName!), textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                              ),
+                            ),
+                          ),
                           IconButton(onPressed: () async{
                             if(!_commonController.userClickedFollowStatus.value) {
                               if( await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)){
@@ -111,17 +136,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                               _navigationController.hideNavBar.value = true;
                               pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true, fromProfile: true,)).then((value) => _navigationController.hideNavBar.value = true);
                             }
-                            }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :const Color(0xff00CB7D), height: 28, width: 28,)),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12.0),
-                            child: Text(_homeController.nicknames[_commonController.userClicked.value!.wallet!] != null ?
-                                _homeController.nicknames[_commonController.userClicked.value!.wallet!] + (_commonController.userClicked.value!.userName!.isEmpty ? "" : " (${_commonController.userClicked.value!.userName!})") : (_commonController.userClicked.value!.userName!.isEmpty ? "${_commonController.userClicked.value!.wallet!.substring(0, 6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}" : _commonController.userClicked.value!.userName!), textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
-                          ),
-                          IconButton(onPressed: (){
-                            _navigationController.hideNavBar.value = true;
-                            pushNewScreen(context, screen: const SettingsProfileElseScreen(fromConversation: false, fromProfile: true,)).then((value) => _navigationController.hideNavBar.value = widget.fromNested);
-                            //dialogMenu = dialogPopMenu(context);
-                            }, icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
+                          }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :const Color(0xff00CB7D), height: 28, width: 28,)),
                         ],),
                     ),
                   ),

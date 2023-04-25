@@ -172,7 +172,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             )),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 12.0),
-                                  child: Text(
+                                  child:  _profileController
+                                      .isEditingProfile.value
+                                      ? SizedBox(
+                                    width: 200,
+                                    child: TextField(
+                                      //autofocus: true,
+                                      maxLines: 1,
+                                      controller: _profileController
+                                          .usernameTextEditingController
+                                          .value,
+                                      maxLength: 10,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontFamily: "Gilroy",
+                                          fontWeight: FontWeight.w600,
+                                          color: MediaQuery.of(context)
+                                              .platformBrightness ==
+                                              Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black),
+                                      decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          isCollapsed: true,
+                                          hintText: ""),
+                                    ),
+                                  )
+                                      : Text(
                                           _homeController.userMe.value.userName!
                                                       .isEmpty ||
                                                   _homeController.userMe.value
@@ -194,7 +221,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   : Colors.black),
                                         ),
                                 ),
-                                IconButton(
+                                _profileController.isLoadingPicture.value
+                                    ? Container(
+                                    padding: const EdgeInsets.all(8),
+                                    width: 48,
+                                    height: 48,
+                                    child: const CircularProgressIndicator(
+                                      color: Color(0xFF00CB7D),
+                                    )) :
+                                _profileController.isEditingProfile.value
+                                    ? InkWell(
+                                  onTap: () {
+                                    _profileController.updateMe(
+                                        UpdateMeDto(
+                                            userName: _profileController
+                                                .usernameTextEditingController
+                                                .value
+                                                .text
+                                                .isEmpty
+                                                ? "${_homeController
+                                                .userMe
+                                                .value
+                                                .wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
+                                                : _profileController
+                                                .usernameTextEditingController
+                                                .value
+                                                .text,
+                                            description: _profileController
+                                                .descriptionTextEditingController
+                                                .value
+                                                .text
+                                                .isEmpty
+                                                ? ""
+                                                : _profileController
+                                                .descriptionTextEditingController
+                                                .value
+                                                .text,
+                                            picture:
+                                            _profileController
+                                                .urlPicture
+                                                .value),
+                                        StreamChat.of(context)
+                                            .client);
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 16.0, left: 16),
+                                    child: Text("DONE",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontFamily: 'Gilroy',
+                                            fontSize: 16,
+                                            fontWeight:
+                                            FontWeight.w700,
+                                            color:
+                                            Color(0xFF00CB7D))),
+                                  ),
+                                ) :IconButton(
                                     onPressed: () async {
                                       _navigationController.hideNavBar.value = true;
                                       pushNewScreen(context, screen: const SettingScreen()).then((value) => _navigationController.hideNavBar.value = false);
@@ -224,7 +307,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   size: const Size.fromRadius(70),
                                   child: GestureDetector(
                                       onTap: () async {
-                                        if(_profileController.myStories.value != null && _profileController.myStories.value!.isNotEmpty){
+                                        if(_profileController.isEditingProfile.value){
+                                          await _profileController.getImageForProfile();
+                                        }
+                                        else if(_profileController.myStories.value != null && _profileController.myStories.value!.isNotEmpty){
                                           _navigationController.hideNavBar.value = true;
                                           pushNewScreen(context, screen: const MyStoryViewerScreen()).then((value) {
                                                 if(value == null){
@@ -245,7 +331,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   .seascape)
                                           : CachedNetworkImage(
                                               imageUrl: _homeController.userMe.value.picture!,
-                                              color: Colors.white.withOpacity(0.0),
+                                              color: Colors.white.withOpacity(_profileController
+                                                  .isEditingProfile
+                                                  .value
+                                                  ? 0.2
+                                                  : 0.0),
                                               fit: BoxFit.cover,
                                               colorBlendMode:
                                                   BlendMode.difference,

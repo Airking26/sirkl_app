@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/chats/ui/chat_screen.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
@@ -255,7 +256,7 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
     var members = _chatController.chipsList.map((element) => element.id!)
         .toList();
     members.add(_homeController.id.value);
-    final idChannelCreated = await _chatController.createInbox(
+    var idChannelCreated = await _chatController.createInbox(
         InboxCreationDto(
             isConv: false,
             createdBy: _homeController.id.value,
@@ -272,12 +273,12 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
     _chatController.messageSending.value = false;
     _profileController.urlPictureGroup.value = "";
     _chatController.groupTextController.value.text = "";
-    Navigator.pop(context);
-    Navigator.pop(context);
-    Navigator.pop(context);
-    _navigationController.hideNavBar.value = true;
     _chatController.fromGroupCreation.value = true;
-    pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: idChannelCreated,)).then((value) => _navigationController.hideNavBar.value = false);
+    Navigator.popUntil(context, (route) => route.isFirst);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: idChannelCreated,)).then((value) => _navigationController.hideNavBar.value = false);
+    });
+//    pushNewScreen(context, screen: const ChatScreen());
   }
 
   Container buildAppBar() {

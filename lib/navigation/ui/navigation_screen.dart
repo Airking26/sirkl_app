@@ -105,7 +105,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
           items: _navBarsItems(),
           confineInSafeArea: true,
           handleAndroidBackButtonPress: true,
-
           decoration: NavBarDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,

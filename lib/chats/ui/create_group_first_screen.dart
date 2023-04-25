@@ -274,7 +274,8 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                   _utils.showToast(context, "Please, enter a name for you group.");
                 } else {
                   _navigationController.hideNavBar.value = true;
-                  pushNewScreen(context, screen: const CreateGroupSecondScreen()).then((value) => _navigationController.hideNavBar.value = true);
+                  pushNewScreen(context, screen: const CreateGroupSecondScreen()).then((value) {
+                    _navigationController.hideNavBar.value = true;});
                 }
               }, child: Text("Create", style: TextStyle(color: _chatController.groupNameIsEmpty.value ? Colors.grey : Color(0xff00CB7D), fontFamily: "Gilroy", fontWeight: FontWeight.w600,),),),
             ],

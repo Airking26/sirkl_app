@@ -95,7 +95,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                       children: [
                         ListTile(leading: IconButton(icon : Icon(Icons.groups, size: 28, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,), onPressed: (){}, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),tileColor: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF113751) : Colors.white, title: Text("New group", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),), contentPadding: const EdgeInsets.symmetric(horizontal: 16,),onTap: (){
                           _navigationController.hideNavBar.value = true;
-                          pushNewScreen(context, screen: const CreateGroupFirstScreen()).then((value) => _navigationController.hideNavBar.value = true);
+                          pushNewScreen(context, screen: const CreateGroupFirstScreen()).then((value) {
+                            _navigationController.hideNavBar.value = true;});
                           _chatController.sendingMessageMode.value = 1;
                           _chatController.chipsList.clear();
                         }),
