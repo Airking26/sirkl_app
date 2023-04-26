@@ -221,7 +221,7 @@ class StreamChannelListTile extends StatelessWidget {
                 onPressed: onDeletePressed,
                 backgroundColor: Colors.white,
                 foregroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
-                icon: (channel.membership != null && channel.membership != null && channel.membership!.channelRole == "channel_moderator" || channel.createdBy?.id == _homeController.id.value) || channel.extraData['isConv'] == true ? Icons.delete_rounded : Icons.remove_circle_rounded,
+                icon: (channel.membership != null && channel.membership != null && channel.membership!.channelRole == "channel_moderator" || channel.createdBy?.id == _homeController.id.value) || channel.extraData['isConv'] == true ? Icons.delete_rounded : Icons.close_rounded,
               )] : [SlidableAction(
                 spacing: 0,
                 padding: EdgeInsets.zero,

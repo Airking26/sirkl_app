@@ -98,7 +98,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
           (_chatController.channel.value!.membership != null && _chatController.channel.value!.membership!.channelRole == "channel_member" && _chatController.channel.value?.createdBy?.id != _homeController.id.value) ?
           const SizedBox() : InkWell(
             onTap: () async {
-              if(_chatController.channel.value!.membership != null && _chatController.channel.value!.membership!.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value){
+              if(_chatController.channel.value!.membership != null && _chatController.channel.value!.membership!.channelRole == "channel_moderator" || (_chatController.channel.value?.createdBy?.id == _homeController.id.value && _chatController.channel.value!.membership?.channelRole == "channel_member")){
                 _chatController.isEditingGroup.value = true;
               } else {
                 if (_chatController.channel.value!

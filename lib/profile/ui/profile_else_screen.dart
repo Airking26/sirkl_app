@@ -134,7 +134,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                             } else {
                               widget.fromConversation ? Navigator.of(context).pop():
                               _navigationController.hideNavBar.value = true;
-                              pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true, fromProfile: true,)).then((value) => _navigationController.hideNavBar.value = true);
+                              pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true, fromProfile: true,)).then((value) => _navigationController.hideNavBar.value = !widget.fromNested);
                             }
                           }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :const Color(0xff00CB7D), height: 28, width: 28,)),
                         ],),

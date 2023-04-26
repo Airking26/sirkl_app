@@ -88,11 +88,9 @@ class _MyHomePageState extends State<MyHomePage>{
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
-  FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
   @override
   void initState() {
-    initDynamicLinks();
     _homeController.putFCMToken(context, widget.client, true);
     initFirebase();
     _callController.setupVoiceSDKEngine(context);
@@ -100,32 +98,6 @@ class _MyHomePageState extends State<MyHomePage>{
     super.initState();
   }
 
-  Future<void> initDynamicLinks() async {
-    dynamicLinks.onLink.listen((event) async{
-      final Uri uri = event.link;
-      final queryParams = uri.queryParameters;
-      if(queryParams.isNotEmpty){
-        var path = event.link.path;
-        var id = queryParams["id"];
-        if(path == "/profileShared") {
-          await _commonController.getUserById(id!);
-          pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
-        } else if(path == "/joinGroup"){
-          var stream = widget.client.queryChannels();
-          var channels = await stream.first;
-          var channel = channels.first;
-          _chatController.channel.value = channel;
-          if(channel.membership == null && channel.extraData["isConv"] != null && channel.extraData["isConv"] == false){
-            pushNewScreen(context, screen: const SettingsGroupScreen());
-          } else {
-            pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage()));
-          }
-        }
-      }
-    }).onError((error){
-      print(error);
-    });
-  }
 
   getCurrentCall() async {
     var calls = await FlutterCallkitIncoming.activeCalls();
@@ -197,7 +169,6 @@ class _MyHomePageState extends State<MyHomePage>{
         }
       });
 
-
       FirebaseMessaging.onMessageOpenedApp.listen((event) async {
         debugPrint("OnMessageOpenedApp");
         if (event.data["cid"] != null) {
@@ -226,6 +197,7 @@ class _MyHomePageState extends State<MyHomePage>{
           }
         }
       });
+
       FirebaseMessaging.instance.getInitialMessage().then((event) async {
         debugPrint("OnDebugSirkl : Initial Message");
         if (event != null) {
@@ -271,6 +243,65 @@ class _MyHomePageState extends State<MyHomePage>{
           debugPrint("OnDebugSirkl : Event is null");
         }
       });
+
+    FirebaseDynamicLinks.instance.onLink.listen((event) async{
+      final Uri uri = event.link;
+      final queryParams = uri.queryParameters;
+      if(queryParams.isNotEmpty){
+        var path = event.link.path;
+        var id = queryParams["id"];
+        if(path == "/profileShared") {
+          await _commonController.getUserById(id!);
+          pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
+        } else if(path == "/joinGroup"){
+            var stream = widget.client.queryChannels(filter: Filter.equal("id", id!));
+            var channels = await stream.first;
+            var channel = channels.first;
+            _chatController.channel.value = channel;
+            if(channel.membership == null && channel.extraData["isConv"] != null && channel.extraData["isConv"] == false){
+              pushNewScreen(context, screen: const SettingsGroupScreen());
+            } else {
+              pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage()));
+            }
+        }
+      }
+    }).onError((error){
+    });
+
+    FirebaseDynamicLinks.instance.getInitialLink().then((event) async {
+      if(event != null) {
+        final Uri uri = event.link;
+        final queryParams = uri.queryParameters;
+        if (queryParams.isNotEmpty) {
+          var path = event.link.path;
+          var id = queryParams["id"];
+          if (path == "/profileShared") {
+            await _commonController.getUserById(id!);
+            pushNewScreen(context,
+                screen: const ProfileElseScreen(fromConversation: false));
+          } else if (path == "/joinGroup") {
+            _homeController.retrieveAccessToken();
+            try {
+              await _homeController.retrieveTokenStreamChat(widget.client, null);}
+            catch (e) {
+              var stream = widget.client.queryChannels(
+                  filter: Filter.equal("id", id!));
+              var channels = await stream.first;
+              var channel = channels.first;
+              _chatController.channel.value = channel;
+              if (channel.membership == null &&
+                  channel.extraData["isConv"] != null &&
+                  channel.extraData["isConv"] == false) {
+                pushNewScreen(context, screen: const SettingsGroupScreen());
+              } else {
+                pushNewScreen(context, screen: StreamChannel(
+                    channel: channel, child: const ChannelPage()));
+              }
+            }
+          }
+        }
+      }
+    });
       _callController.listenCall();
   }
 

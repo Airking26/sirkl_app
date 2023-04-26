@@ -452,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _commonController.userClicked.value =
                     _commonController.users[index];
                 pushNewScreen(context,
-                    screen: const ProfileElseScreen(fromConversation: false));
+                    screen: const ProfileElseScreen(fromConversation: false, fromNested: true,));
               },
               child: _commonController.users[index].picture == null
                   ? SizedBox(
@@ -536,7 +536,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _commonController.users[index];
                   pushNewScreen(context,
                           screen:
-                              const ProfileElseScreen(fromConversation: false))
+                              const ProfileElseScreen(fromConversation: false, fromNested: true,))
                       .then((value) => _commonController.users.refresh());
                 },
                 child: Transform.translate(
@@ -563,7 +563,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           _commonController.users[index];
                       pushNewScreen(context,
                               screen: const ProfileElseScreen(
-                                  fromConversation: false))
+                                  fromConversation: false, fromNested: true,))
                           .then((value) => _commonController.users.refresh());
                     },
                     child: Transform.translate(

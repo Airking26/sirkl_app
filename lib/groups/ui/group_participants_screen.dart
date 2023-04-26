@@ -77,7 +77,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                 },
                 controller: _memberListController, onMemberTap: (member){
                 _commonController.userClicked.value = userFromJson(json.encode(member.user?.extraData['userDTO']));
-                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false, fromNested: true,));
+                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false,));
               },),
             ),
           ),
