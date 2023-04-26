@@ -49,11 +49,34 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       client: StreamChat.of(context).client,
       filter:
       _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ?
-      Filter.and([
-        Filter.autoComplete('nameOfGroup', _chatController.query.value),
-        Filter.equal('isConv', false),
-        Filter.equal('isGroupVisible', true)
-      ])
+          searchFriends ?
+              Filter.or([
+                Filter.and([
+                  Filter.in_("members", [_homeController.id.value]),
+                  Filter.autoComplete('member.user.name', _chatController.query.value),
+                  Filter.exists("${_homeController.id.value}_follow_channel"),
+                  Filter.equal("${_homeController.id.value}_follow_channel", true),
+                  Filter.equal('isConv', true),
+                ]),
+                Filter.and([
+                  Filter.autoComplete('nameOfGroup', _chatController.query.value),
+                  Filter.equal('isConv', false),
+                  Filter.equal('isGroupVisible', true)
+                ])
+              ])
+       :
+          Filter.and([
+            Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
+            Filter.equal('isConv', true),
+            Filter.or([
+              Filter.equal("created_by_id", _homeController.id.value),
+              Filter.in_("members", [_homeController.id.value]),
+            ]),
+            Filter.or([
+              Filter.notExists("${_homeController.id.value}_follow_channel"),
+              Filter.equal("${_homeController.id.value}_follow_channel", false)
+            ])
+          ])
         :
           Filter.and([
             if(searchFriends)
@@ -324,7 +347,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         Padding(
                           padding: const EdgeInsets.only(top: 12.0),
                           child: Obx(() =>Text(
-                            _chatController.searchIsActive.value ? _chatController.index.value == 0 ? "Friends" : "Others" :
+                            _chatController.searchIsActive.value ? _chatController.index.value == 0 ? "Inbox" : "Others" :
                             con.chatsTabRes.tr,
                             style: TextStyle(
                                 color: MediaQuery.of(context).platformBrightness == Brightness.dark

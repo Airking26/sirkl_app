@@ -69,7 +69,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
           child: ClipOval(
             child: SizedBox.fromSize(
               size: const Size.fromRadius(70),
-              child: _chatController.channel.value!.extraData["picOfGroup"] == null && (!_chatController.isEditingGroup.value && !_profileController.urlPictureGroup.isNullOrBlank!)
+              child: _chatController.channel.value!.extraData["picOfGroup"] == null || (!_chatController.isEditingGroup.value && !_profileController.urlPictureGroup.isNullOrBlank!)
                   ? TinyAvatar(
                   baseString: _chatController.channel.value!.extraData['nameOfGroup'] as String,
                   dimension: 140,

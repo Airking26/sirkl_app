@@ -3,13 +3,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 class RequestWaitingForApprovalScreen extends StatefulWidget {
@@ -24,6 +22,7 @@ class _RequestWaitingForApprovalScreenState extends State<RequestWaitingForAppro
   final _homeController = Get.put(HomeController());
   final _chatController = Get.put(ChatsController());
   final utils = Utils();
+
 
   @override
   Widget build(BuildContext context) {

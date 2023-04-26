@@ -17,6 +17,8 @@ import 'package:sirkl/home/ui/pdf_screen.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/profile/ui/my_communities_screen.dart';
+import 'package:sirkl/profile/ui/my_group_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -131,15 +133,25 @@ class _SettingScreenState extends State<SettingScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text("My groups", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
+                  InkWell(
+                    onTap: (){
+                      pushNewScreen(context, screen: const MyGroupScreen());
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text("My groups", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
+                    ),
                   ),
                   Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? Colors.white : Colors.black,),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text("My Communities", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
+                  InkWell(
+                    onTap: (){
+                      pushNewScreen(context, screen: const MyCommunityScreen());
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text("My Communities", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
+                    ),
                   ),
                   Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? Colors.white : Colors.black,),
