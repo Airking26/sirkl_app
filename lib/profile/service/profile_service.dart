@@ -14,4 +14,5 @@ class ProfileService extends GetConnect{
   Future<Response<Map<String, dynamic>>> deleteUser(String accessToken, String id) => delete("${con.URL_SERVER}user/$id", headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<List<dynamic>>> retrieveMyStories(String accessToken) => get("${con.URL_SERVER}story/mine", headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<List<dynamic>>> retrieveReadersForAStory(String accessToken, String id) => get("${con.URL_SERVER}story/readers/$id", headers: {'Authorization':'Bearer $accessToken'});
+  Future<Response<Map<String, dynamic>>> deleteNotification(String accessToken, String id) => delete("${con.URL_SERVER}notification/$id", headers: {'Authorization':'Bearer $accessToken'});
 }

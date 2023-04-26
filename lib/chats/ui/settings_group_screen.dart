@@ -10,6 +10,7 @@ import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -18,6 +19,8 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
+
+import 'requests_waiting_for_approval_screen.dart';
 
 
 class SettingsGroupScreen extends StatefulWidget {
@@ -37,6 +40,12 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
   final _navigationController = Get.put(NavigationController());
   final _nameGroupController = TextEditingController();
   final utils = Utils();
+
+  @override
+  void initState() {
+    _chatController.retrieveRequestsWaiting(_chatController.channel.value!.id!);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,11 +100,28 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
             onTap: () async {
               if(_chatController.channel.value!.membership != null && _chatController.channel.value!.membership!.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value){
                 _chatController.isEditingGroup.value = true;
-              } else{
-                await _chatController.channel.value!.addMembers([_homeController.id.value]);
-                Navigator.pop(context);
-                _navigationController.hideNavBar.value = true;
-                pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: _chatController.channel.value!.id,)).then((value) => _navigationController.hideNavBar.value = true);
+              } else {
+                if (_chatController.channel.value!
+                    .extraData["isGroupPrivate"] as bool) {
+                 if(await _chatController.requestToJoinGroup(RequestToJoinDto(
+                      receiver: _chatController.channel.value!.createdBy?.id,
+                      requester: _homeController.id.value, channelId: _chatController.channel.value!.id,
+                  channelName: _chatController.channel.value!.extraData["nameOfGroup"] as String))) {
+                   utils.showToast(context, "Your request has been sent, you will be notify if it is accepted");
+                 } else {
+                   utils.showToast(context, "Request already sent");
+                 }
+                } else {
+                  await _chatController.channel.value!.addMembers(
+                      [_homeController.id.value]);
+                  Navigator.pop(context);
+                  _chatController.fromGroupJoin.value = true;
+                  pushNewScreen(context, screen: DetailedChatScreen(
+                    create: false,
+                    channelId: _chatController.channel.value!.id,)).then((
+                      value) =>
+                  _navigationController.hideNavBar.value = false);
+                }
               }
             },
             child: Material(
@@ -110,7 +136,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                   children: [
                     Icon( _chatController.channel.value!.membership != null && (_chatController.channel.value!.membership!.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value) ? Icons.mode_edit_rounded : Icons.add_rounded, color : MediaQuery.of(context).platformBrightness == Brightness.dark ?  Colors.white : Colors.black),
                     const SizedBox(height: 4),
-                    Text(_chatController.channel.value!.membership != null && (_chatController.channel.value!.membership!.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value)? "Edit" : "Join", style: TextStyle(fontFamily: "Gilroy"),)
+                    Text(_chatController.channel.value!.membership != null && (_chatController.channel.value!.membership!.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value)? "Edit" : "Join", style: const TextStyle(fontFamily: "Gilroy"),)
                   ],),
               ),
             ),
@@ -118,7 +144,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
           SizedBox(width:  (_chatController.channel.value!.membership != null && _chatController.channel.value!.membership!.channelRole == "channel_member" && _chatController.channel.value?.createdBy?.id != _homeController.id.value) ? 0 : 16,),
           InkWell(
             onTap: () async {
-              var uri = await _profileController.createDynamicLink("/joinGroup?id=${_commonController.userClicked.value!.id!}");
+              var uri = await _profileController.createDynamicLink("/joinGroup?id=${_chatController.channel.value!.id!}");
               Share.share("Join this group ${uri.toString()}");
             },
             child: Material(
@@ -156,9 +182,21 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text("Participants (${_chatController.channel.value!.memberCount!})", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
+                child: Text("Participants (${_chatController.channel.value!.memberCount!})", style: const TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
               ),
             ),
+            _chatController.channel.value!.membership != null && _chatController.requestsWaiting.isNotEmpty && ((_chatController.channel.value!.membership!.channelRole == "channel_member" && _chatController.channel.value?.createdBy?.id == _homeController.id.value) ||  _chatController.channel.value!.membership!.channelRole == "channel_moderator")?
+            Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                ? Colors.white : Colors.black,) : const SizedBox(),
+            _chatController.channel.value!.membership != null && _chatController.requestsWaiting.isNotEmpty && ((_chatController.channel.value!.membership!.channelRole == "channel_member" && _chatController.channel.value?.createdBy?.id == _homeController.id.value) ||  _chatController.channel.value!.membership!.channelRole == "channel_moderator")? InkWell(
+              onTap: () async {
+                pushNewScreen(context, screen: const RequestWaitingForApprovalScreen());
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text("Waiting for approval (${_chatController.requestsWaiting.length})", style: const TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
+              ),
+            ) : const SizedBox(),
             Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                 ? Colors.white : Colors.black,),
             Padding(
@@ -415,7 +453,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                         hintText: _chatController.channel.value!.extraData['nameOfGroup'] as String),
                   ),
                 ) : Text(
-                  (_chatController.channel.value!.extraData['nameOfGroup'] as String),
+                  formatName(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 20,
@@ -464,6 +502,20 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
         ),
       ),
     );
+  }
+
+  String formatName(){
+    if(_chatController.channel.value!.extraData["isGroupPrivate"] as bool){
+      return "${_chatController.channel.value!.extraData['nameOfGroup'] as String} (Private)";
+    } else {
+      return (_chatController.channel.value!.extraData['nameOfGroup'] as String);
+    }
+  }
+
+  @override
+  void dispose() {
+    _chatController.requestsWaiting.clear();
+    super.dispose();
   }
 
 }

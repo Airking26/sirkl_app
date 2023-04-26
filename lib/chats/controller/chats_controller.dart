@@ -6,6 +6,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/chats/service/chats_service.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
+import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/service/home_service.dart';
@@ -19,6 +20,7 @@ class ChatsController extends GetxController{
   var searchIsActive = false.obs;
   var chipsList = <UserDTO>[].obs;
   var chipsListAddUsers = <UserDTO>[].obs;
+  var requestsWaiting = <UserDTO>[].obs;
   var query = "".obs;
   final _chatService = ChatsService();
   final _homeService = HomeService();
@@ -36,6 +38,7 @@ class ChatsController extends GetxController{
   var groupNameIsEmpty = true.obs;
   var groupTextController = TextEditingController().obs;
   var fromGroupCreation = false.obs;
+  var fromGroupJoin = false.obs;
   var isEditingGroup = false.obs;
   Rx<Channel?> channel = (null as Channel?).obs;
   Rx<Channel?> nestedChannel = (null as Channel?).obs;
@@ -146,5 +149,66 @@ class ChatsController extends GetxController{
     }
   }
 
+  Future<bool> requestToJoinGroup(RequestToJoinDto requestToJoinDTO) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _chatService.requestToJoinGroup(accessToken, requestToJoinDtoToJson(requestToJoinDTO));
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _chatService.requestToJoinGroup(accessToken, requestToJoinDtoToJson(requestToJoinDTO));
+      if(request.isOk) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if(request.isOk) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> acceptDeclineRequest(RequestToJoinDto requestToJoinDto) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _chatService.acceptDeclineRequest(accessToken, requestToJoinDtoToJson(requestToJoinDto));
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _chatService.acceptDeclineRequest(accessToken, requestToJoinDtoToJson(requestToJoinDto));
+      if(request.isOk) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if(request.isOk) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  retrieveRequestsWaiting(String channelId) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _chatService.getRequestsWaiting(accessToken, channelId);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _chatService.getRequestsWaiting(accessToken, channelId);
+      if(request.isOk) {
+        requestsWaiting.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
+      }
+    } else if(request.isOk) {
+      requestsWaiting.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
+    }
+  }
 
 }

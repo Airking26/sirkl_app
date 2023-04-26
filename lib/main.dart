@@ -23,6 +23,7 @@ import 'package:sirkl/common/language.dart';
 import 'package:sirkl/common/local_notification_initialize.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
@@ -30,6 +31,7 @@ import 'package:sirkl/home/utils/analyticService.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'chats/ui/settings_group_screen.dart';
 import 'navigation/ui/navigation_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
@@ -88,6 +90,16 @@ class _MyHomePageState extends State<MyHomePage>{
 
   FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
+  @override
+  void initState() {
+    initDynamicLinks();
+    _homeController.putFCMToken(context, widget.client, true);
+    initFirebase();
+    _callController.setupVoiceSDKEngine(context);
+    getCurrentCall();
+    super.initState();
+  }
+
   Future<void> initDynamicLinks() async {
     dynamicLinks.onLink.listen((event) async{
       final Uri uri = event.link;
@@ -102,23 +114,17 @@ class _MyHomePageState extends State<MyHomePage>{
           var stream = widget.client.queryChannels();
           var channels = await stream.first;
           var channel = channels.first;
-          await channel.addMembers([_homeController.id.value]);
-          pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: id));
+          _chatController.channel.value = channel;
+          if(channel.membership == null && channel.extraData["isConv"] != null && channel.extraData["isConv"] == false){
+            pushNewScreen(context, screen: const SettingsGroupScreen());
+          } else {
+            pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage()));
+          }
         }
       }
     }).onError((error){
       print(error);
     });
-  }
-
-  @override
-  void initState() {
-    initDynamicLinks();
-    _homeController.putFCMToken(context, widget.client, true);
-    initFirebase();
-    _callController.setupVoiceSDKEngine(context);
-    getCurrentCall();
-    super.initState();
   }
 
   getCurrentCall() async {

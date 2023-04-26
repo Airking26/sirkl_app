@@ -288,4 +288,18 @@ class ProfileController extends GetxController{
     return shortLink.shortUrl;
   }
 
+  deleteNotification(String id) async{
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _profileService.deleteNotification(accessToken, id);
+    if(request.statusCode == 401) {
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _profileService.deleteNotification(accessToken, id);
+    }
+  }
+
 }

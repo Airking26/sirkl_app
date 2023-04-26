@@ -78,7 +78,7 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
             children: [
               InkWell(
                 onTap: () async {
-                  var uri = await _profileController.createDynamicLink("/joinGroup?id=${_commonController.userClicked.value!.id!}");
+                  var uri = await _profileController.createDynamicLink("/joinGroup?id=${_chatController.channel.value!.id!}");
                   Share.share("Join this group ${uri.toString()}");
                 },
                 child: Material(

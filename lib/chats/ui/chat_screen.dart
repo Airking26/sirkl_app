@@ -164,14 +164,17 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 controller: _chatController.searchIsActive.value && _chatController.query.value.isNotEmpty ? buildStreamChannelListController(true) : streamChannelListControllerFriends!, onChannelTap: (channel) async{
                   _chatController.channel.value = channel;
                   _navigationController.hideNavBar.value = true;
-                  if(channel.extraData["isConv"] != null && channel.extraData["isConv"] == false && channel.membership == null){
+                  if(channel.membership == null && channel.extraData["isConv"] != null && channel.extraData["isConv"] == false){
                     _navigationController.hideNavBar.value = true;
                     pushNewScreen(context, screen: const SettingsGroupScreen()).then((value) {
                       streamChannelListControllerFriends?.refresh();
-                        _navigationController.hideNavBar.value = false;
+                      _navigationController.hideNavBar.value = _chatController.fromGroupJoin.value;
+                      _chatController.fromGroupJoin.value = false;
                     });
                   } else {
-                    pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {_navigationController.hideNavBar.value = false;});
+                    pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value) {
+                      _navigationController.hideNavBar.value = false;
+                    });
                   }
                 },
               ),

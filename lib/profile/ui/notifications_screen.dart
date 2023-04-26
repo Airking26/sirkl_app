@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/controller/common_controller.dart';
@@ -27,6 +29,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
+  final _chatController = Get.put(ChatsController());
   final _commonController = Get.put(CommonController());
   final PagingController<int, NotificationDto> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
@@ -127,6 +130,22 @@ class _NotificationScreenState extends State<NotificationScreen> {
             await _commonController.getUserById(item.idData);
             pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
           },
+          trailing: item.type == 7 ? Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+            IconButton(onPressed: () async {
+              if(await _chatController.acceptDeclineRequest(RequestToJoinDto(receiver: _homeController.id.value, requester: item.requester, channelName: item.channelName, channelId: item.channelId, accept: true))) {
+                await _profileController.deleteNotification(item.id);
+                pagingController.refresh();
+              }
+            }, icon: const Icon(Icons.add, color: Color(0xff00CB7D),)),
+            IconButton(onPressed: () async {
+              if(await _chatController.acceptDeclineRequest(RequestToJoinDto(receiver: _homeController.id.value, requester: item.requester, channelName: item.channelName, channelId: item.channelId, accept: false))) {
+                await _profileController.deleteNotification(item.id);
+                pagingController.refresh();
+              }
+            }, icon: const Icon(Icons.close_rounded, color: Colors.grey,))
+          ],) : const SizedBox(),
           leading:
               item.type != 0 && item.type != 1 && item.type != 5 && item.type != 6 && item.type != 7?
                   Container(
