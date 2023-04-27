@@ -122,7 +122,7 @@ class CommonController extends GetxController{
       } else {
         gettingStoryAndContacts.value = false;
       }
-    } on CastError{
+    } on Error{
         var requestToken = await _homeService.refreshToken(refreshToken!);
         var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
         accessToken = refreshTokenDto.accessToken!;
@@ -138,7 +138,7 @@ class CommonController extends GetxController{
           else {
             gettingStoryAndContacts.value = false;
           }
-        } on CastError{
+        } on Error{
           gettingStoryAndContacts.value = false;
         }
     }

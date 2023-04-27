@@ -190,7 +190,7 @@ class ProfileController extends GetxController{
     Response<List<dynamic>> request;
     try{
       request = await _profileService.retrieveNotifications(accessToken, id, offset.toString());
-    } on CastError{
+    } on Error{
       var requestToken = await _homeService.refreshToken(refreshToken);
       var refreshTokenDTO = refreshTokenDtoFromJson(
           json.encode(requestToken.body));

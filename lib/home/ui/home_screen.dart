@@ -14,6 +14,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/chats/ui/add_contact_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
@@ -144,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 18.0),
+                padding: const EdgeInsets.only(top: 16.0),
                 child: Image.asset(
                   MediaQuery.of(context).platformBrightness == Brightness.dark ? "assets/images/logo_dark_theme.png" : "assets/images/logo_light_theme.png",
                   height: 25,
@@ -152,21 +153,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                   onPressed: () {
-                    /*_navigationController.hideNavBar.value = true;
-                    pushNewScreen(context, screen: const NewMessageScreen()).then((value) {
-                      _navigationController.hideNavBar.value = false;
-                      if(_chatController.messageHasBeenSent.value) {
-                        _chatController.messageHasBeenSent.value = false;
-                      }
-                    });*/
+                    pushNewScreen(context, screen: const AddContactScreen()).then((value) => _commonController.users.refresh());
                   },
                   icon: Image.asset(
-                    "assets/images/edit.png",
+                    "assets/images/add_user.png",
+                    width: 24,
+                    height: 24,
                     color: _homeController.accessToken.value.isEmpty
                         ? Colors.transparent
-                        : MediaQuery.of(context).platformBrightness == Brightness.dark
-                            ? Colors.transparent
-                            : Colors.transparent,
+                        : const Color(0xFF00CB7D),
                   )),
             ],
           ),

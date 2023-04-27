@@ -193,7 +193,7 @@ class CallsController extends GetxController{
     var request;
     try{
       request = await _callService.retrieveCalls(accessToken, offset);
-    } on CastError{
+    } on Error{
       var requestToken = await _homeService.refreshToken(refreshToken!);
       var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
@@ -206,13 +206,13 @@ class CallsController extends GetxController{
     }
   }
 
-  retrieveUsers(String substring, int offset) async{
+  Future<List<UserDTO>> retrieveUsers(String substring, int offset) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request;
     try{
       request = await _callService.searchUser(accessToken, substring, offset.toString());
-    } on CastError{
+    } on Error{
       var requestToken = await _homeService.refreshToken(refreshToken!);
       var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
@@ -221,6 +221,8 @@ class CallsController extends GetxController{
     }
     if(request.isOk) {
       return request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
+    } else {
+      return [];
     }
   }
 

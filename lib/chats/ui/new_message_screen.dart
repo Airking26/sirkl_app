@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:sirkl/chats/ui/add_contact_screen.dart';
 import 'package:sirkl/chats/ui/create_group_first_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
@@ -45,7 +46,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   final utils = Utils();
   final StreamMessageInputController _messageInputController = StreamMessageInputController();
   final _searchController = FloatingSearchBarController();
-  final _groupNameController = TextEditingController();
 
   @override
   void initState() {
@@ -107,11 +107,12 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                         },),
                         const SizedBox(height: 4,),
                         ListTile(leading: IconButton(icon : Image.asset("assets/images/add_user.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, width: 22, height: 22,), onPressed: (){}, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),tileColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white, title: Text("Add a user to my SIRKL", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),), contentPadding: const EdgeInsets.symmetric(horizontal: 16), onTap: (){
-                          _searchController.open();
-                          _chatController.searchIsActive.value = true;
-                          pagingController.itemList = [];
                           _chatController.sendingMessageMode.value = 3;
                           _chatController.chipsList.clear();
+                          pushNewScreen(context, screen: const AddContactScreen()).then((value) {
+                          pagingController.refresh();
+                              _commonController.users.refresh();
+                          });
                         },),
                         const SizedBox(height: 16,),
                       ],

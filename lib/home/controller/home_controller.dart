@@ -58,6 +58,8 @@ class HomeController extends GetxController{
   var isConfiguring = false.obs;
   var accessToken = "".obs;
   var userMe = UserDTO().obs;
+  var userAdded = UserDTO().obs;
+  var nicknameUser = "".obs;
   var isLoadingNfts = true.obs;
   var address = "".obs;
   var indexStory = 0.obs;
@@ -294,7 +296,7 @@ class HomeController extends GetxController{
     Response<List<dynamic>> request;
     try{
       request = await _homeService.retrieveNFTs(accessToken, id, isFav, offset.toString());
-    } on CastError {
+    } on Error {
       var requestToken = await _homeService.refreshToken(refreshToken);
       var refreshTokenDTO = refreshTokenDtoFromJson(
           json.encode(requestToken.body));
@@ -462,7 +464,7 @@ class HomeController extends GetxController{
     Response<List> request;
     try{
       request = await _homeService.retrieveStories(accessToken, offset.toString());
-    } on CastError{
+    } on Error{
       var requestToken = await _homeService.refreshToken(refreshToken);
       var refreshTokenDTO = refreshTokenDtoFromJson(
           json.encode(requestToken.body));

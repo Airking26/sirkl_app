@@ -36,6 +36,7 @@ class ChatsController extends GetxController{
   var groupTypeCollapsed = true.obs;
   var groupVisibilityCollapsed = true.obs;
   var groupNameIsEmpty = true.obs;
+  var contactAddIsEmpty = true.obs;
   var groupTextController = TextEditingController().obs;
   var fromGroupCreation = false.obs;
   var fromGroupJoin = false.obs;

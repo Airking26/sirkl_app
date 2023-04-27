@@ -114,7 +114,8 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                           ),
                           InkWell(
                             onTap: (){
-                              pushNewScreen(context, screen: const SettingsProfileElseScreen(fromConversation: false, fromProfile: true));
+                              _navigationController.hideNavBar.value = true;
+                              pushNewScreen(context, screen: const SettingsProfileElseScreen(fromConversation: false, fromProfile: true)).then((value) => _navigationController.hideNavBar.value = !widget.fromNested);
                             },
                             child: SizedBox(
                               height: 75,
