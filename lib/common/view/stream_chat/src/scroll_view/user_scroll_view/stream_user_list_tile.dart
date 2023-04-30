@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -108,6 +109,7 @@ class StreamUserListTile extends StatelessWidget {
   final EdgeInsetsGeometry contentPadding;
 
   final _homeController = Get.put(HomeController());
+  final _chatController = Get.put(ChatsController());
 
   /// Creates a copy of this tile but with the given fields replaced with
   /// the new values.
@@ -163,8 +165,8 @@ class StreamUserListTile extends StatelessWidget {
                   : (userFromJson(json.encode(user.extraData["userDTO"])).userName.isNullOrBlank! ? "${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(0,10)}...${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(user.extraData["userDTO"])).wallet!.length - 4)}": userFromJson(json.encode(user.extraData["userDTO"])).userName!)),
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, fontFamily: "Gilroy",color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
             ),
-        SizedBox(width: channelRole == "channel_moderator" ? 4 : 0,),
-        channelRole == "channel_moderator" ? const Icon(Icons.diamond_outlined, color: Color(0xFF00CB7D), size: 16,) : const SizedBox(height: 0, width: 0,)
+        SizedBox(width: channelRole == "channel_moderator" || _chatController.channel.value!.createdBy!.id == user.id  ? 4 : 0,),
+        channelRole == "channel_moderator" || _chatController.channel.value!.createdBy!.id == user.id  ? const Icon(Icons.diamond_outlined, color: Color(0xFF00CB7D), size: 16,) : const SizedBox(height: 0, width: 0,)
       ],
     );
 
@@ -179,7 +181,7 @@ class StreamUserListTile extends StatelessWidget {
         );
 
     return Slidable(
-      enabled: slidableEnabled ?? false,
+      enabled: _chatController.channel.value!.createdBy!.id != user.id ? slidableEnabled ?? false : false,
       endActionPane: ActionPane(
         extentRatio: 0.33,
         motion: const ScrollMotion(), children: [

@@ -63,10 +63,17 @@ class _MyCommunityScreenState extends State<MyCommunityScreen> {
                     channelConv : false,
                     channelFriends: false,
                     channelFav: false,
+                    emptyBuilder: (context){
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 48.0, vertical: 16),
+                        child: Text("Claim the ownership of your communities and it will appear here..", style: TextStyle(fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w600), textAlign: TextAlign.center,),
+                      );
+                    },
                     controller: streamChannelListControllerCommunities!,
                     onChannelTap: (channel){
                       _chatController.channel.value = channel;
-                      pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage()));
+                      pushNewScreen(context, screen: StreamChannel(channel: channel,
+                          child: const ChannelPage()));
                       },),
                 ),
               ))
@@ -118,7 +125,7 @@ class _MyCommunityScreenState extends State<MyCommunityScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Text(
-                  "My Groups",
+                  "My Communities",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 20,

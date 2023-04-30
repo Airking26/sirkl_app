@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
+import 'package:dart_vlc/channel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -289,7 +290,6 @@ class StreamMemberListView extends StatelessWidget {
   /// Defaults to [Clip.hardEdge].
   final Clip clipBehavior;
 
-  final _chatController = Get.put(ChatsController());
 
   @override
   Widget build(BuildContext context) => PagedValueListView<int, Member>(

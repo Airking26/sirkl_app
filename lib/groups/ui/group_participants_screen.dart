@@ -37,7 +37,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
     limit: 25,
     filter: Filter.and(
       [
-        Filter.notIn("id", [StreamChat.of(context).currentUser!.id, 'bot_one', 'bot_two', 'bot_three']),
+        Filter.notIn("id", ['bot_one', 'bot_two', 'bot_three']),
       ],
     ),
     sort: [
@@ -76,8 +76,13 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                   if(!isAdmin) await _commonController.notifyUserAsAdmin(NotificationAddedAdminDto(idUser: memberId, idChannel: _chatController.channel.value!.id!, channelName: _chatController.channel.value!.extraData["nameOfGroup"] as String));
                 },
                 controller: _memberListController, onMemberTap: (member){
-                _commonController.userClicked.value = userFromJson(json.encode(member.user?.extraData['userDTO']));
-                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false,));
+                  if(_homeController.id.value != member.user!.id) {
+                    _commonController.userClicked.value =
+                        userFromJson(json.encode(member.user
+                            ?.extraData['userDTO']));
+                    pushNewScreen(context, screen: const ProfileElseScreen(
+                      fromConversation: false,));
+                  }
               },),
             ),
           ),

@@ -418,7 +418,7 @@ class _ChannelLastMessageTextState extends State<ChannelLastMessageText> {
           //if (_lastMessage == null) return const Offstage();
 
           return StreamMessagePreviewText(
-            message: _lastMessage ?? Message(text: "No Message Yet"),
+            message: widget.channel.extraData["isConv"] == null ? _lastMessage ?? Message(text: "Only for holders") : _lastMessage  ?? Message(text: "No Message Yet"),
             textStyle: widget.textStyle,
             language: widget.channel.client.state.currentUser?.language,
           );
