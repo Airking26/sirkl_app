@@ -141,7 +141,7 @@ class _CallsScreenState extends State<CallsScreen> {
                       ),
                     ),
                     IconButton(
-                        onPressed: () {
+                        onPressed: () async {
                           pushNewScreen(context, screen: const NewCallScreen());
                         },
                         icon: Image.asset(

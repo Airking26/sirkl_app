@@ -21,6 +21,7 @@ import 'package:sirkl/common/model/notification_register_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
+import 'package:sirkl/common/model/token_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -31,6 +32,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/model/contract_address_dto.dart' as cad;
 import 'package:web3dart/crypto.dart';
 
 import '../../common/model/refresh_token_dto.dart';
@@ -229,7 +231,7 @@ class HomeController extends GetxController{
             var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
             await _homeService.uploadAPNToken(accessToken, token);
           }
-          await getNFTsContractAddresses(client, userMe.value.wallet!);
+          await getTokenContractAddress(client, userMe.value.wallet!);
         }
       } else if(request.isOk){
         userMe.value = userFromJson(json.encode(request.body));
@@ -243,11 +245,26 @@ class HomeController extends GetxController{
           var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
           await _homeService.uploadAPNToken(accessToken, token);
         }
-        await getNFTsContractAddresses(client, userMe.value.wallet!);
+        await getTokenContractAddress(client, userMe.value.wallet!);
       } else {
         debugPrint(request.statusText);
         debugPrint(request.bodyString);
       }
+    }
+  }
+
+  getTokenContractAddress(StreamChatClient? client, String wallet) async {
+    var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
+    if(request.isOk){
+      var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
+      tokenContractAddress.result?.tokenBalances?.forEach((element) {
+        if(element.tokenBalance != "0"){
+          contractAddresses.add(element.contractAddress!);
+        } else {
+          contractAddresses.remove(element.contractAddress!);
+        }
+      });
+      await getTokenContractAddress(client, wallet);
     }
   }
 
@@ -281,6 +298,7 @@ class HomeController extends GetxController{
       box.write(con.contractAddresses, contractAddresses);
     }
   }
+
 
   getAllNftConfig() async{
     await _homeService.getAllNFTConfig(accessToken.value);

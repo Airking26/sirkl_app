@@ -16,6 +16,7 @@ import 'package:sirkl/common/model/group_creation_dto.dart';
 import 'package:sirkl/common/model/group_dto.dart';
 import 'package:sirkl/common/model/nft_alchemy_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
+import 'package:sirkl/common/model/token_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/service/group_service.dart';
 import 'package:sirkl/common/constants.dart' as con;
