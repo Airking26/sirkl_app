@@ -53,6 +53,8 @@ class CallsController extends GetxController{
     await agoraEngine.value?.enableAudio();
     await agoraEngine.value?.leaveChannel();
 
+
+
     agoraEngine.value?.setEventHandler(
       RtcEngineEventHandler(
         joinChannelSuccess: (String x, int y, int elapsed) {

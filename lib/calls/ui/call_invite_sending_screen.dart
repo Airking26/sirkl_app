@@ -35,7 +35,6 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
   @override
   void dispose() {
     timer.cancel();
-    //_callController.timer.value.dispose();
     super.dispose();
   }
 
@@ -62,8 +61,8 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                   const VerticalSpacing(of: 24),
                   Text(
                     _callController.userCalled.value.nickname.isNullOrBlank!
-                        ? (_callController.userCalled.value.userName.isNullOrBlank! ? "${_callController.userCalled.value.wallet!.substring(0, 6)}...${_callController.userCalled.value.wallet!.substring(_callController.userCalled.value.wallet!.length - 4)}" : _callController.userCalled.value.userName!.length > 10 ? "${_callController.userCalled.value.userName!.substring(0,10)}..." : _callController.userCalled.value.userName!) :
-                    "${_callController.userCalled.value.nickname!} (${_callController.userCalled.value.userName.isNullOrBlank! ? "${_callController.userCalled.value.wallet!.substring(0, 5)}..." : _callController.userCalled.value.userName!.length > 5 ? "${_callController.userCalled.value.userName!.substring(0,5)}..." : _callController.userCalled.value.userName!})",
+                        ? (_callController.userCalled.value.userName.isNullOrBlank! ? "${_callController.userCalled.value.wallet!.substring(0, 6)}...${_callController.userCalled.value.wallet!.substring(_callController.userCalled.value.wallet!.length - 4)}" : _callController.userCalled.value.userName!) :
+                    "${_callController.userCalled.value.nickname!} (${_callController.userCalled.value.userName.isNullOrBlank! ? "${_callController.userCalled.value.wallet!.substring(0, 6)}...${_callController.userCalled.value.wallet!.substring(_callController.userCalled.value.wallet!.length - 4)}" :  _callController.userCalled.value.userName!})",
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme

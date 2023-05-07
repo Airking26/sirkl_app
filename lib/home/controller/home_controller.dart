@@ -274,7 +274,7 @@ class HomeController extends GetxController{
       var addressesAbsent = stockedContractAddresses.toSet().difference(contractAddresses.toSet()).toList();
       if(client != null && addressesAbsent.isNotEmpty) {
         for (var absentAddress in addressesAbsent) {
-          //await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
+          await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
         }
       }
 

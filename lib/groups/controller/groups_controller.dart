@@ -107,10 +107,10 @@ class GroupsController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       req = await _groupService.retrieveGroups(accessToken);
       if(req.isOk){
-        var groups = groupDtoFromJson(json.encode(req.body)).sublist(1460);
+        var groups = groupDtoFromJson(json.encode(req.body)).sublist(2172);
         for (var element in groups) {
           if(!element.image.contains("token-image-placeholder.svg") && !element.image.contains("data:image")) {
-            await Future.delayed(Duration(seconds: 1));
+            await Future.delayed(const Duration(seconds: 1));
             var resp = await Dio().get(element.image,
                 options: Options(responseType: ResponseType.bytes));
             final result = await ImageGallerySaver.saveImage(
@@ -125,10 +125,10 @@ class GroupsController extends GetxController{
         }
       }
     } else if(req.isOk){
-      var groups = groupDtoFromJson(json.encode(req.body)).sublist(1460);
+      var groups = groupDtoFromJson(json.encode(req.body)).sublist(2172);
       for (var element in groups) {
         if(!element.image.contains("token-image-placeholder.svg") && !element.image.contains("data:image")) {
-          await Future.delayed(Duration(seconds: 1));
+          await Future.delayed(const Duration(seconds: 1));
           var resp = await Dio().get(element.image,
               options: Options(responseType: ResponseType.bytes));
           final result = await ImageGallerySaver.saveImage(

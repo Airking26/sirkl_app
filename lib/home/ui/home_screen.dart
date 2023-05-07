@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -13,7 +12,6 @@ import 'package:highlight_text/highlight_text.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:nice_buttons/nice_buttons.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/add_contact_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -51,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final utils = Utils();
   final storyController = StoryController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  var result;
   QRViewController? controller;
 
   @override
@@ -1049,54 +1046,4 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
-  final TextEditingController _textFieldController = TextEditingController();
-  _displayDialog(BuildContext context) async {
-    return showDialog(
-      barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.white.withOpacity(0.85),
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0))),
-            title: const Text('Beta Version Access Code', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: "Gilroy"),),
-            content: TextField(
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontFamily: "Gilroy"),
-              cursorColor: const Color(0xFF00CB7D),
-              controller: _textFieldController,
-              decoration: const InputDecoration(hintText: "Enter Code", hintStyle: TextStyle(fontWeight: FontWeight.w500, fontFamily: "Gilroy"), focusColor: Color(0xFF00CB7D), hoverColor: Color(0xFF00CB7D), fillColor: Color(0xFF00CB7D),enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFF00CB7D)),
-              ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF00CB7D)),
-                ),),
-            ),
-            actions: [
-              TextButton(
-                child: const Text('SUBMIT', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: Color(0xFF00CB7D)),),
-                onPressed: () {
-                  if(_textFieldController.text == "BETAKING2023") {
-                    Navigator.of(context).pop();
-                  } else {
-                    Fluttertoast.showToast(
-                      msg: "Wrong Access Code",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
-                      textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
-                      fontSize: 16.0
-                  );
-                  }
-                },
-              )
-            ],
-          );
-        }
-    );
-  }
 }

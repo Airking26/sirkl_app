@@ -1,5 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
-
+import 'dart:developer';
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -118,6 +118,7 @@ class _MyHomePageState extends State<MyHomePage>{
   initFirebase() async {
     await LocalNotificationInitialize().initialize(flutterLocalNotificationsPlugin);
       FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+        debugPrint("onMessage: $message");
         if (_homeController.notificationActive.value) {
           if (message.data["type"] == "0" || message.data["type"] == "1" || message.data['type'] == "5" || message.data['type'] == "6" || message.data['type'] == "7") {
             LocalNotificationInitialize.showBigTextNotification(
@@ -314,6 +315,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  debugPrint("OnDebugSirkl : Background Handler");
   await Firebase.initializeApp();
   await GetStorage().initStorage;
   var notificationActive = GetStorage().read(con.NOTIFICATION_ACTIVE) ?? true;

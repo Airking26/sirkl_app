@@ -248,32 +248,6 @@ class _NewCallScreenState extends State<NewCallScreen> {
           pagingController.refresh();
           pagingController.appendLastPage(_commonController.users);
         }
-        /*if(query.isNotEmpty && query.contains('.eth')){
-          String? ethFromEns = await _chatController.getEthFromEns(query);
-          if(_profileController.isUserExists.value == null && ethFromEns != "" && ethFromEns != "0") {
-            pagingController.itemList = [UserDTO(id: '', userName: query, picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: ethFromEns, following: 0, isInFollowing: false)];
-          } else if(_profileController.isUserExists.value != null){
-            pagingController.itemList = [_profileController.isUserExists.value!];
-          }
-          else {
-            pagingController.itemList = [];
-          }
-        }
-        else if(query.isNotEmpty && isValidEthereumAddress(query.toLowerCase())){
-          _profileController.isUserExists.value = await _profileController.getUserByWallet(query.toLowerCase());
-          if(_profileController.isUserExists.value == null) {
-            pagingController.itemList = [UserDTO(id: '', userName: "", picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: query.toLowerCase(), following: 0, isInFollowing: false)];
-          } else {
-            pagingController.itemList = [_profileController.isUserExists.value!];
-          }
-        }
-        else {
-          if(query.isNotEmpty) {
-            pagingController.itemList = [];
-          } else {
-            pagingController.refresh();
-          }
-        }*/
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
