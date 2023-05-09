@@ -127,15 +127,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: (){
                   if(_homeController.qrActive.value) {
                     _homeController.qrActive.value = false;
-                    _navigationController.hideNavBar.value = false;
+                    _navigationController.hideNavBar.value = true;
                   }
                 },
                 child: SizedBox(
                   width: 50,
                   height: 50,
-                  child: ImageIcon(const AssetImage(
-                    "assets/images/arrow_left.png",
-                  ),color: _homeController.qrActive.value ? MediaQuery.of(context).platformBrightness == Brightness.dark
+                  child: Icon(Icons.keyboard_arrow_left_rounded,
+                  size: 42,
+                  color: _homeController.qrActive.value ? MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? Colors.white
                       : Colors.black : Colors.transparent,
                   ),
@@ -150,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                   onPressed: () {
-                    pushNewScreen(context, screen: const AddContactScreen()).then((value) => _commonController.users.refresh());
+                    if(_homeController.accessToken.value.isNotEmpty) pushNewScreen(context, screen: const AddContactScreen()).then((value) => _commonController.users.refresh());
                   },
                   icon: Image.asset(
                     "assets/images/add_user.png",
@@ -660,7 +660,7 @@ class _HomeScreenState extends State<HomeScreen> {
             await _homeController.signMessageWithMetamask(context);
           },
           label: const Text(
-            "Slide to sign",
+            "Slide to sign in",
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -756,7 +756,6 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: (finish) async {
               _navigationController.hideNavBar.value = true;
               _homeController.qrActive.value = true;
-              //pushNewScreen(context, screen: const QRCodeScreen()).then((value) => _navigationController.hideNavBar.value = false);
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

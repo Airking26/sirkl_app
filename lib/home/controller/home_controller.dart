@@ -264,7 +264,7 @@ class HomeController extends GetxController{
           contractAddresses.remove(element.contractAddress!);
         }
       });
-      await getTokenContractAddress(client, wallet);
+      await getNFTsContractAddresses(client, wallet);
     }
   }
 

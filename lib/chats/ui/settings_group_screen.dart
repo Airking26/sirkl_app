@@ -10,6 +10,7 @@ import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
@@ -248,6 +249,39 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                 ? Colors.white : Colors.black,) : const SizedBox(),
             InkWell(
               onTap: () async {
+                showDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (_) => CupertinoAlertDialog(
+                      title: Text("Report", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                      actions: [
+                        CupertinoDialogAction(child:Text("Harassment or bullying", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+                          onPressed: () async {
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Harassment or bullying", type: 1), utils);
+                            Get.back();
+                          },),
+                        CupertinoDialogAction(child:Text("Hate speech or discrimination", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+                          onPressed: () async {
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Hate speech or discrimination", type: 1), utils);
+                            Get.back();
+                          },),
+                        CupertinoDialogAction(child:Text("Explicit or inappropriate content", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+                          onPressed: () async {
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Explicit or inappropriate content", type: 1), utils);
+                            Get.back();
+                          },),
+                        CupertinoDialogAction(child:Text("Spam or scams", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+                          onPressed: () async {
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Spam or scams", type: 1), utils);
+                            Get.back();
+                          },),
+                        CupertinoDialogAction(child:Text("Privacy violations", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+                          onPressed: () async {
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Privacy violations", type: 1), utils);
+                            Get.back();
+                          },),
+                      ],
+                    ));
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -419,13 +453,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
             children: [
               InkWell(
                 onTap: (){Navigator.pop(context);},
-                child: SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: ImageIcon(const AssetImage(
-                    "assets/images/arrow_left.png",
-                  ),color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                  ),
+                child: Icon(Icons.keyboard_arrow_left_rounded,size: 42,color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                 ),
               ),
               Padding(

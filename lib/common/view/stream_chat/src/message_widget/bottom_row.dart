@@ -141,8 +141,8 @@ class BottomRow extends StatelessWidget {
       if (showTimeStamp)
         WidgetSpan(
           child: Text(
-            Jiffy(message.createdAt.toLocal()).jm,
-            style: TextStyle(color: Color(0xFF828282), fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 10),
+            Jiffy(message.createdAt.toLocal()).Hm,
+            style: const TextStyle(color: Color(0xFF828282), fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 10),
           ),
         ),
       if (showSendingIndicator)

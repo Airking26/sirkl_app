@@ -84,9 +84,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                 fontFamily: "Gilroy"),
                             decoration: InputDecoration(
                                 hintText:
-                                    _chatController.contactAddIsEmpty.value
-                                        ? "Paste a wallet, an ENS or a username"
-                                        : "Limanina (0xfdezz...ee3r)",
+                                "Paste a wallet, an ENS or a username",
                                 hintStyle:
                                     const TextStyle(fontFamily: "Gilroy"),
                                 border: const OutlineInputBorder(),
@@ -331,7 +329,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
               TextButton(
                 onPressed: () async {
                   if (_chatController.contactAddIsEmpty.value) {
-                    _utils.showToast(context, "Select a user.");
+                    _utils.showToast(context, "Please enter a valid user");
                   } else {
                     if(nicknameController.text.isNotEmpty){
                       await _profileController.updateMe(UpdateMeDto(nicknames: {_homeController.userAdded.value.wallet! : nicknameController.text}), StreamChat.of(context).client);

@@ -210,7 +210,7 @@ class _MessageActionsModalState extends State<MessageActionsModal> {
                             message: widget.message,
                             channel: channel,
                           ),
-                        if (widget.showEditMessage)
+                        if (widget.showEditMessage && !widget.message.attachments.map((e) => e.type).contains('voicenote'))
                           EditMessageButton(
                             onTap: () {
                               Navigator.of(context).pop();

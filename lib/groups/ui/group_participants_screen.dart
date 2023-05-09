@@ -122,13 +122,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
             children: [
               InkWell(
                 onTap: (){Navigator.pop(context);},
-                child: SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: ImageIcon(const AssetImage(
-                    "assets/images/arrow_left.png",
-                  ),color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                  ),
+                child: Icon(Icons.keyboard_arrow_left_rounded,size: 42,color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                 ),
               ),
               Padding(

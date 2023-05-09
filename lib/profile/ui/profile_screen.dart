@@ -441,7 +441,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 48.0),
                   child: _profileController.isEditingProfile.value
                       ? TextField(
-                          maxLines: null,
+                          maxLines: 2,
                           controller: _profileController
                               .descriptionTextEditingController.value,
                           maxLength: 120,

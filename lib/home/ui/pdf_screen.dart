@@ -60,18 +60,8 @@ class _PDFScreenState extends State<PDFScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                onTap: (){
-                  Navigator.pop(context);
-                },
-                child: SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: ImageIcon(const AssetImage(
-                    "assets/images/arrow_left.png",
-                  ),color:  MediaQuery.of(context).platformBrightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
-                  ),
+                onTap: (){Navigator.pop(context);},
+                child: Icon(Icons.keyboard_arrow_left_rounded,size: 42,color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                 ),
               ),
               Padding(

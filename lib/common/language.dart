@@ -14,7 +14,7 @@ class Language extends Translations{
       c.connectYourWalletRes: "Connect Your Wallet",
       c.walletConnectedRes: "Wallet Connected",
       c.talkWithRes: "Talk with other wallets and your NFT groups",
-      c.bySigningRes: "For your security, you know have to sign a message through your wallet, by signing you agree to terms and conditions and privacy policy.",
+      c.bySigningRes: "For your security, you now have to sign a message through your wallet, by signing you agree to terms and conditions and privacy policy.",
       c.getStartedRes: "Get Started",
       c.myNFTCollectionRes: "My NFT Collection",
       c.nFTCollectionRes: "NFT Collection",

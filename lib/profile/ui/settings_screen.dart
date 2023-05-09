@@ -197,12 +197,25 @@ class _SettingScreenState extends State<SettingScreen> {
                       ? Colors.white : Colors.black,),
                   InkWell(
                     onTap: () async {
-                      await GetStorage().erase();
-                      await StreamChat.of(context).client.disconnectUser();
-                      _homeController.accessToken.value = "";
-                      _navigationController.controller.value.jumpToTab(0);
-                      _navigationController.hideNavBar.value = true;
-                      await _profileController.deleteUser(_homeController.id.value);
+
+                      showDialog(context: context,
+                          barrierDismissible: true,
+                          builder: (_) => CupertinoAlertDialog(
+                            title: Text("Logout", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                            content: Text("Are you sure? This action is irreversible", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+                            actions: [
+                              CupertinoDialogAction(child: Text("No", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){ Get.back();},),
+                              CupertinoDialogAction(child: Text("Yes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
+                                onPressed: () async {
+                                  await GetStorage().erase();
+                                  await StreamChat.of(context).client.disconnectUser();
+                                  _homeController.accessToken.value = "";
+                                  _navigationController.controller.value.jumpToTab(0);
+                                  _navigationController.hideNavBar.value = true;
+                                  await _profileController.deleteUser(_homeController.id.value);
+                                },)
+                            ],
+                          ));
                     },
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -249,13 +262,7 @@ class _SettingScreenState extends State<SettingScreen> {
             children: [
               InkWell(
                 onTap: (){Navigator.pop(context);},
-                child: SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: ImageIcon(const AssetImage(
-                    "assets/images/arrow_left.png",
-                  ),color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                  ),
+                child: Icon(Icons.keyboard_arrow_left_rounded,size: 42,color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                 ),
               ),
               Padding(
