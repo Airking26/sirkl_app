@@ -39,8 +39,8 @@ class AttachmentButton extends StatelessWidget {
       ),
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints.tightFor(
-        height: 24,
-        width: 24,
+        height: 20,
+        width: 20,
       ),
       splashRadius: 24,
       onPressed: onPressed,

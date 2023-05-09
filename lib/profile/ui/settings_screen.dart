@@ -185,8 +185,13 @@ class _SettingScreenState extends State<SettingScreen> {
                       ? Colors.white : Colors.black,),
                   InkWell(
                     onTap: () async {
-                      await _commonController.getUserById("63f78a6188f7d4001f68699a");
-                      pushNewScreen(context, screen: const DetailedChatScreen(create: true));
+                      if(!_profileController.contactUsClicked.value) {
+                        _profileController.contactUsClicked.value = true;
+                        await _commonController.getUserById(
+                            "63f78a6188f7d4001f68699a");
+                        await pushNewScreen(context,
+                            screen: const DetailedChatScreen(create: true)).then((value) => _profileController.contactUsClicked.value = false);
+                      }
                     },
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0),

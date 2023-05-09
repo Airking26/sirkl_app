@@ -49,6 +49,7 @@ class ProfileController extends GetxController{
   var hasUnreadNotif = false.obs;
   var isStoryPosting = false.obs;
   var simpleS3 = SimpleS3().obs;
+  var contactUsClicked = false.obs;
 
   updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
     isLoadingPicture.value = true;

@@ -35,8 +35,10 @@ class CommonController extends GetxController{
   var queryHasChanged = false.obs;
   var inboxClicked = InboxDto().obs;
   var refreshInboxes = false.obs;
+  var contactAddLoading = false.obs;
 
   Future<bool> addUserToSirkl(String id, StreamChatClient streamChatClient, String myId) async{
+    contactAddLoading.value = true;
     var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, myId], "isConv": true});
     var meFollow = channel.channel?.extraData["${myId}_follow_channel"] as dynamic;
     if(meFollow == null || (meFollow != null && meFollow == false)) {
@@ -53,6 +55,7 @@ class CommonController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _commonService.addUserToSirkl(accessToken, id);
       if(request.isOk) {
+        contactAddLoading.value = false;
         refreshInboxes.value = true;
         if(!users.map((element) => element.id).contains(userFromJson(json.encode(request.body)).id)) {
           users.add(userFromJson(json.encode(request.body)));
@@ -60,9 +63,11 @@ class CommonController extends GetxController{
         userClickedFollowStatus.value = true;
         return true;
       } else {
+        contactAddLoading.value = false;
         return false;
       }
     } else if(request.isOk) {
+      contactAddLoading.value = false;
       refreshInboxes.value = true;
       if(!users.map((element) => element.id).contains(userFromJson(json.encode(request.body)).id)) {
         users.add(userFromJson(json.encode(request.body)));
@@ -70,6 +75,7 @@ class CommonController extends GetxController{
       userClickedFollowStatus.value = true;
       return true;
     } else {
+      contactAddLoading.value = false;
       return false;
     }
   }

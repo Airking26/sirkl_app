@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:record/record.dart';
+import 'package:sirkl/common/view/stream_chat/src/misc/stream_svg_icon.dart';
 import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
 
 typedef RecordCallback = void Function(String);
@@ -47,9 +48,24 @@ class _RecordButtonState extends State<RecordButton> {
   Widget build(BuildContext context) {
     late final IconData icon;
     late final Color? color;
+
+    return IconButton(
+      icon: Icon( _isRecording ? Icons.stop : Icons.mic),
+      color: _isRecording ? const Color(0xff00CB7D) : StreamChatTheme.of(context).primaryIconTheme.color,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints.tightFor(
+        height: 24,
+        width: 24,
+      ),
+      splashRadius: 24,
+      onPressed: (){
+        _isRecording ? _stop() : _start();
+      },
+    );
+
     if (_isRecording) {
       icon = Icons.stop;
-      color = Color(0xff00CB7D);
+      color = const Color(0xff00CB7D);
     } else {
       color = StreamChatTheme.of(context).primaryIconTheme.color;
       icon = Icons.mic;
@@ -61,6 +77,7 @@ class _RecordButtonState extends State<RecordButton> {
       child: Icon(
         icon,
         color: color,
+        size: 24,
       ),
     );
   }

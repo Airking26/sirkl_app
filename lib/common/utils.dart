@@ -34,6 +34,7 @@ class Utils{
 
   void showToast(BuildContext context, String message) {
     final scaffold = ScaffoldMessenger.of(context);
+    scaffold.removeCurrentSnackBar();
     scaffold.showSnackBar(
       SnackBar(
         backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437),

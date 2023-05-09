@@ -32,7 +32,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
   final _callController = Get.put(CallsController());
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
   final nicknameController = TextEditingController();
   final userController = TextEditingController();
   final _utils = Utils();
@@ -335,7 +334,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       await _profileController.updateMe(UpdateMeDto(nicknames: {_homeController.userAdded.value.wallet! : nicknameController.text}), StreamChat.of(context).client);
                       _homeController.updateNickname(_homeController.userAdded.value.wallet!, nicknameController.text);
                     }
-                    if( await _commonController.addUserToSirkl(_homeController.userAdded.value.id!, StreamChat.of(context).client, _homeController.id.value)){
+                    if(await _commonController.addUserToSirkl(_homeController.userAdded.value.id!, StreamChat.of(context).client, _homeController.id.value)){
                         _utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _homeController.userAdded.value.userName ?? _homeController.userAdded.value.wallet!}));
                         nicknameController.clear();
                         userController.clear();
@@ -347,7 +346,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                     }
                   }
                 },
-                child: Text(
+                child: _commonController.contactAddLoading.value ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Color(0xff00CB7D),)) : Text(
                   "Add",
                   style: TextStyle(
                     color: _chatController.contactAddIsEmpty.value
@@ -367,6 +366,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
   @override
   void dispose() {
+    _homeController.userAdded.value = UserDTO();
+    _chatController.contactAddIsEmpty.value = true;
     nicknameController.clear();
     nicknameController.dispose();
     super.dispose();

@@ -16,7 +16,7 @@ class _PDFScreenState extends State<PDFScreen> {
     if(widget.isTermsAndConditions == 0) {
       toRead = "assets/pdf/tc.pdf";
     } else if(widget.isTermsAndConditions == 1) {
-      toRead = "assets/pdf/tc.pdf";
+      toRead = "assets/pdf/pp.pdf";
     } else {
       toRead = "assets/pdf/all.pdf";
     }
@@ -42,7 +42,7 @@ class _PDFScreenState extends State<PDFScreen> {
             blurRadius: 0.01,
           ),
         ],
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(35)),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(0)),
         gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,

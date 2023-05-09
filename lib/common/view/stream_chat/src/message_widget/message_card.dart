@@ -264,36 +264,39 @@ class _MessageCardState extends State<MessageCard> {
                     alignment: Alignment.bottomRight,
                     child: SizedBox(
                       child: Padding(
-                        padding: const EdgeInsets.only(
+                        padding: EdgeInsets.only(
                             left: 12,
                             right: 12,
-                            bottom: 12.0,
-                            top: 12
+                            bottom: widget.message.attachments.map((e) => e.type).contains("voicenote") ? 0 : 12,
+                            top: widget.message.attachments.map((e) => e.type).contains("voicenote") ? 0 : 12
                         ),
-                        child: widget.bottomRowBuilder?.call(
-                          context,
-                          widget.message,
-                        ) ??
-                            BottomRow(
-                              message: widget.message,
-                              reverse: widget.reverse,
-                              messageTheme: widget.messageTheme,
-                              hasUrlAttachments: widget.hasUrlAttachments,
-                              isOnlyEmoji: widget.isOnlyEmoji,
-                              isDeleted: widget.message.isDeleted,
-                              isGiphy: widget.isGiphy,
-                              showInChannel: widget.showInChannel,
-                              showSendingIndicator: widget.showSendingIndicator,
-                              showThreadReplyIndicator: widget.showThreadReplyIndicator,
-                              showTimeStamp: widget.showTimeStamp,
-                              showUsername: false,
-                              streamChatTheme: StreamChatThemeData(colorTheme: StreamColorTheme.dark(appBg: Colors.red)),
-                              onThreadTap: widget.onThreadTap,
-                              deletedBottomRowBuilder: widget.deletedBottomRowBuilder,
-                              streamChat: widget.streamChat,
-                              hasNonUrlAttachments: widget.hasNonUrlAttachments,
-                              usernameBuilder: widget.usernameBuilder,
-                            ),
+                        child: Transform.translate(
+                          offset: Offset(0, widget.message.attachments.map((e) => e.type).contains("voicenote") ? -12 : 0),
+                          child: widget.bottomRowBuilder?.call(
+                            context,
+                            widget.message,
+                          ) ??
+                              BottomRow(
+                                message: widget.message,
+                                reverse: widget.reverse,
+                                messageTheme: widget.messageTheme,
+                                hasUrlAttachments: widget.hasUrlAttachments,
+                                isOnlyEmoji: widget.isOnlyEmoji,
+                                isDeleted: widget.message.isDeleted,
+                                isGiphy: widget.isGiphy,
+                                showInChannel: widget.showInChannel,
+                                showSendingIndicator: widget.showSendingIndicator,
+                                showThreadReplyIndicator: widget.showThreadReplyIndicator,
+                                showTimeStamp: widget.showTimeStamp,
+                                showUsername: false,
+                                streamChatTheme: StreamChatThemeData(colorTheme: StreamColorTheme.dark(appBg: Colors.red)),
+                                onThreadTap: widget.onThreadTap,
+                                deletedBottomRowBuilder: widget.deletedBottomRowBuilder,
+                                streamChat: widget.streamChat,
+                                hasNonUrlAttachments: widget.hasNonUrlAttachments,
+                                usernameBuilder: widget.usernameBuilder,
+                              ),
+                        ),
                       ),
                     ),
                   ) : const SizedBox(height: 12,)
