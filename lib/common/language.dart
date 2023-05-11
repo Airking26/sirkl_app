@@ -25,7 +25,7 @@ class Language extends Translations{
       c.privacyPolicyRes: "• Privacy Policy",
       c.logoutRes: "• Logout",
       c.noGroupYetRes: "No Groups Yet",
-      c.errorFindingCollection: "You don't find your collection here and you own the NFT",
+      c.errorFindingCollection: "You don't find your collection here and you own the NFT : ",
       c.errorGroupCollection: "You don't have NFT related group",
       c.addGroupRes: "+ Add a group chat to the list",
       c.newMessageRes: "Compose",

@@ -119,11 +119,11 @@ class _RequestWaitingForApprovalScreenState extends State<RequestWaitingForAppro
             ]),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 44.0),
+        padding: const EdgeInsets.only(top: 12.0),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
@@ -132,7 +132,7 @@ class _RequestWaitingForApprovalScreenState extends State<RequestWaitingForAppro
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 12.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 child: Text(
                   "Waiting for approval",
                   textAlign: TextAlign.center,

@@ -266,7 +266,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
-            con.noChatsRes.tr,
+            _chatController.searchIsActive.value ? "No Chat Found" : con.noChatsRes.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
@@ -278,7 +278,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         const SizedBox(
           height: 15,
         ),
-        Padding(
+        _chatController.searchIsActive.value ? const SizedBox() : Padding(
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
             con.noFriendsSentenceRes.tr,

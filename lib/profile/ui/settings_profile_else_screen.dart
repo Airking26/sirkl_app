@@ -217,6 +217,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                   InkWell(
                     onTap: (){
                       _profileController.isEditingProfileElse.value = true;
+                      _profileController.usernameElseTextEditingController.value.text = _homeController.nicknames[_commonController.userClicked.value!.wallet!] ?? "";
                     },
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -396,11 +397,11 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
             ]),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 44.0),
+        padding: const EdgeInsets.only(top: 12.0),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
@@ -409,7 +410,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 12.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 child:
                 _profileController.isEditingProfileElse.value ?
                 SizedBox(
@@ -445,9 +446,12 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
               ),
               _profileController.isEditingProfileElse.value ? InkWell(
                 onTap: () async {
+
                   await _profileController.updateMe(UpdateMeDto(nicknames: {_commonController.userClicked.value!.wallet! : _profileController.usernameElseTextEditingController.value.text}), StreamChat.of(context).client);
                   _homeController.updateNickname(_commonController.userClicked.value!.wallet!, _profileController.usernameElseTextEditingController.value.text);
                   _profileController.isEditingProfileElse.value = false;
+                  _profileController.usernameElseTextEditingController.value.clear();
+                  _commonController.showSirklUsers(_homeController.id.value);
                 },
                 child: const Padding(
                   padding: EdgeInsets.only(top: 16.0, left: 16),
@@ -467,5 +471,12 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _profileController.isEditingProfileElse.value = false;
+    _profileController.usernameElseTextEditingController.value.clear();
+    super.dispose();
   }
 }

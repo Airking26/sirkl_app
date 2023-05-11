@@ -113,11 +113,11 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
             ]),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 44.0),
+        padding: const EdgeInsets.only(top: 12.0),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
@@ -126,7 +126,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 12.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 child: Text(
                    "Members" ,
                   style: TextStyle(

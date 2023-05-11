@@ -158,11 +158,11 @@ class _NewCallScreenState extends State<NewCallScreen> {
             ]),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 44.0),
+        padding: const EdgeInsets.only(top: 0.0),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
@@ -171,7 +171,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 12.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 child: Text(
                   con.newCallRes.tr,
                   style: TextStyle(
@@ -272,7 +272,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
         leading: InkWell(
             onTap: (){
                 _commonController.userClicked.value = item;
-                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
+                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false, fromNested: true,));
             },
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(90.0), child:

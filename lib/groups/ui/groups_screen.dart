@@ -329,7 +329,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 54.0),
               child: Text(
-                con.noGroupYetRes.tr,
+                "No Group Found",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,

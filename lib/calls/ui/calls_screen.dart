@@ -275,13 +275,13 @@ class _CallsScreenState extends State<CallsScreen> {
         InkWell(
           onTap: (){
             _commonController.userClicked.value = callDto.called;
-            pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
+            pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false, fromNested: true,));
           },
             child: SizedBox(height: 50, width: 50, child: TinyAvatar(baseString: callDto.called.wallet!, dimension: 50, circular: true, colourScheme:TinyAvatarColourScheme.seascape))) :
         InkWell(
           onTap: (){
             _commonController.userClicked.value = callDto.called;
-            pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false)).then((value) => _callController.pagingController.value.notifyListeners());
+            pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false, fromNested: true,)).then((value) => _callController.pagingController.value.notifyListeners());
           },
           child: ClipRRect(
             borderRadius: BorderRadius.circular(90),
@@ -358,7 +358,7 @@ class _CallsScreenState extends State<CallsScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
-            con.noCallsRes.tr,
+            _callController.isSearchIsActive.value ? "No Results Found" : con.noCallsRes.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
@@ -370,7 +370,7 @@ class _CallsScreenState extends State<CallsScreen> {
         const SizedBox(
           height: 15,
         ),
-        Padding(
+        _callController.isSearchIsActive.value ? const SizedBox() : Padding(
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
             con.noCallsSentenceRes.tr,
@@ -381,7 +381,7 @@ class _CallsScreenState extends State<CallsScreen> {
                 fontFamily: "Gilroy",
                 fontWeight: FontWeight.w500),
           ),
-        ),
+        ) ,
       ],
     );
   }

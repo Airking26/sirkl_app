@@ -175,11 +175,11 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
             ]),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 44.0),
+        padding: const EdgeInsets.only(top: 0.0),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
@@ -188,7 +188,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 12.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 child: Text(
                   "Add User",
                   style: TextStyle(

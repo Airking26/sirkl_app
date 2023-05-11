@@ -85,11 +85,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.only(top: 44.0),
+                padding: const EdgeInsets.only(top: 12.0),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       InkWell(
@@ -98,7 +98,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
+                        padding: const EdgeInsets.only(top: 0.0),
                         child: Text(con.notificationsRes.tr, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
                       ),
                       IconButton(onPressed: (){}, icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.transparent,)),

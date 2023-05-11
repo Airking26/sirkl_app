@@ -5,6 +5,7 @@ import 'package:sirkl/common/constants.dart' as con;
 
 class HomeService extends GetConnect{
 
+  
   Future<Response<Map<String, dynamic>>> verifySignature(String walletConnectDTO) => post('${con.URL_SERVER}auth/verifySignature', walletConnectDTO);
   Future<Response<Map<String, dynamic>>> refreshToken(String refreshToken) => get('${con.URL_SERVER}auth/refresh', headers: {'Refresh': refreshToken});
   Future<Response<Map<String, dynamic>>> uploadFCMToken(String accessToken, String updateFcmdto) => put('${con.URL_SERVER}user/me/fcm', updateFcmdto, headers: {'Authorization':'Bearer $accessToken'});

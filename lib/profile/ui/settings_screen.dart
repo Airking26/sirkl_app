@@ -258,11 +258,11 @@ class _SettingScreenState extends State<SettingScreen> {
             ]),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 44.0),
+        padding: const EdgeInsets.only(top: 24.0),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
@@ -270,29 +270,26 @@ class _SettingScreenState extends State<SettingScreen> {
                 child: Icon(Icons.keyboard_arrow_left_rounded,size: 42,color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 12.0),
-                child: Text(
-                  _homeController.userMe.value.userName!
-                      .isEmpty ||
-                      _homeController.userMe.value
-                          .userName ==
-                          _homeController
-                              .userMe.value.wallet
-                      ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
-                      : _homeController
-                      .userMe.value.userName!,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: "Gilroy",
-                      fontWeight: FontWeight.w600,
-                      color: MediaQuery.of(context)
-                          .platformBrightness ==
-                          Brightness.dark
-                          ? Colors.white
-                          : Colors.black),
-                ),
+              Text(
+                _homeController.userMe.value.userName!
+                    .isEmpty ||
+                    _homeController.userMe.value
+                        .userName ==
+                        _homeController
+                            .userMe.value.wallet
+                    ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
+                    : _homeController
+                    .userMe.value.userName!,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 20,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600,
+                    color: MediaQuery.of(context)
+                        .platformBrightness ==
+                        Brightness.dark
+                        ? Colors.white
+                        : Colors.black),
               ),
               IconButton(
                   onPressed: () async {
