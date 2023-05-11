@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:defer_pointer/defer_pointer.dart';
@@ -110,7 +112,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                             itemCount: _chatController.chipsListAddUsers.length,
                             itemBuilder: buildToSendChip),
                             ),
-                        SizedBox(height: 24,)
+                        const SizedBox(height: 24,)
                       ],
                     ),
                     Padding(
@@ -203,9 +205,10 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                     for (var element in _chatController.chipsListAddUsers) {
                       await _chatController.channel.value?.addMembers([element.id!]);
                       await _commonController.notifyAddedInGroup(NotificationAddedAdminDto(idUser: element.id!, idChannel: _chatController.channel.value!.id!, channelName: _chatController.channel.value!.extraData["nameOfGroup"] as String));
+                      _chatController.channel.refresh();
                     }
                     Navigator.pop(context);
-                  }, child: Text("DONE", style: TextStyle(fontWeight: FontWeight.w700, fontFamily: "Gilroy", color: Color(0xFF00CB7D)),),
+                  }, child: const Text("DONE", style: TextStyle(fontWeight: FontWeight.w700, fontFamily: "Gilroy", color: Color(0xFF00CB7D)),),
                   ),
             ],
           ),
@@ -321,7 +324,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                 borderRadius: BorderRadius.circular(90.0), child:
             item.picture == null ?
             SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
-            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         trailing: InkWell(
           onTap: () async {

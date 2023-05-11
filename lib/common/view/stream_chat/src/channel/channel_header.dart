@@ -390,7 +390,7 @@ class StreamChannelHeader extends StatelessWidget
                                             : Colors.black),
                                   ),
                                   channel.memberCount != null && channel.memberCount! > 2 ? Text(
-                                    "${channel.memberCount!} participants",
+                                    "${_chatController.channel.value?.memberCount!} participants",
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(

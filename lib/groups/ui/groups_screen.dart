@@ -44,35 +44,151 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
   late StreamChatClient client;
 
   StreamChannelListController buildStreamChannelListController(bool isFav){
-    return StreamChannelListController(
-      client: client,
-      filter:
-      _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ?
-      Filter.and([
-        Filter.autoComplete('name', _groupController.query.value),
-        Filter.greater("member_count", 2),
-        Filter.notExists("isConv"),
-      ]) :
+    try {
+      return StreamChannelListController(
+        client: client,
+        filter:
+        _groupController.searchIsActive.value &&
+            _groupController.query.value.isNotEmpty ?
+        Filter.and([
+          Filter.autoComplete('name', _groupController.query.value),
+          Filter.greater("member_count", 2),
+          Filter.notExists("isConv"),
+        ]) :
+        isFav ?
+        Filter.and([
+          if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
+              "contractAddress", _homeController.contractAddresses)
+          else
+            Filter.equal("contractAddress", ""),
+          Filter.exists("${_homeController.id.value}_favorite"),
+          Filter.equal("${_homeController.id.value}_favorite", true),
+          Filter.greater("member_count", 2)
+        ]) :
+        Filter.and([
+          if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
+              "contractAddress", _homeController.contractAddresses)
+          else
+            Filter.equal("contractAddress", ""),
+          Filter.greater("member_count", 2),
+          Filter.or([
+            Filter.notExists("${_homeController.id.value}_favorite"),
+            Filter.equal("${_homeController.id.value}_favorite", false)
+          ])
+        ]),
+        channelStateSort: const [SortOption('last_message_at')],
+        limit: 10,
+      );
+    } on StreamChatNetworkError catch (e){
+      if(e.statusCode == 1000){
+        _homeController.putFCMToken(context, StreamChat.of(context).client, false);
+        return StreamChannelListController(
+          client: client,
+          filter:
+          _groupController.searchIsActive.value &&
+              _groupController.query.value.isNotEmpty ?
+          Filter.and([
+            Filter.autoComplete('name', _groupController.query.value),
+            Filter.greater("member_count", 2),
+            Filter.notExists("isConv"),
+          ]) :
           isFav ?
-                  Filter.and([
-                    if(_homeController.contractAddresses.isNotEmpty) Filter.in_("contractAddress", _homeController.contractAddresses)
-                    else Filter.equal("contractAddress", ""),
-                    Filter.exists("${_homeController.id.value}_favorite"),
-                    Filter.equal("${_homeController.id.value}_favorite", true),
-                    Filter.greater("member_count", 2)
-                  ]) :
-                      Filter.and([
-                        if(_homeController.contractAddresses.isNotEmpty) Filter.in_("contractAddress", _homeController.contractAddresses)
-                        else Filter.equal("contractAddress", ""),
-                        Filter.greater("member_count", 2),
-                        Filter.or([
-                          Filter.notExists("${_homeController.id.value}_favorite"),
-                          Filter.equal("${_homeController.id.value}_favorite", false)
-                        ])
-                      ]),
-      channelStateSort: const [SortOption('last_message_at')],
-      limit: 10,
-    );
+          Filter.and([
+            if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
+                "contractAddress", _homeController.contractAddresses)
+            else
+              Filter.equal("contractAddress", ""),
+            Filter.exists("${_homeController.id.value}_favorite"),
+            Filter.equal("${_homeController.id.value}_favorite", true),
+            Filter.greater("member_count", 2)
+          ]) :
+          Filter.and([
+            if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
+                "contractAddress", _homeController.contractAddresses)
+            else
+              Filter.equal("contractAddress", ""),
+            Filter.greater("member_count", 2),
+            Filter.or([
+              Filter.notExists("${_homeController.id.value}_favorite"),
+              Filter.equal("${_homeController.id.value}_favorite", false)
+            ])
+          ]),
+          channelStateSort: const [SortOption('last_message_at')],
+          limit: 10,
+        );
+      } else if(e.statusCode == 400){
+        StreamChat.of(context).client.openConnection(includeUserDetailsInConnectCall: true);
+        return StreamChannelListController(
+          client: client,
+          filter:
+          _groupController.searchIsActive.value &&
+              _groupController.query.value.isNotEmpty ?
+          Filter.and([
+            Filter.autoComplete('name', _groupController.query.value),
+            Filter.greater("member_count", 2),
+            Filter.notExists("isConv"),
+          ]) :
+          isFav ?
+          Filter.and([
+            if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
+                "contractAddress", _homeController.contractAddresses)
+            else
+              Filter.equal("contractAddress", ""),
+            Filter.exists("${_homeController.id.value}_favorite"),
+            Filter.equal("${_homeController.id.value}_favorite", true),
+            Filter.greater("member_count", 2)
+          ]) :
+          Filter.and([
+            if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
+                "contractAddress", _homeController.contractAddresses)
+            else
+              Filter.equal("contractAddress", ""),
+            Filter.greater("member_count", 2),
+            Filter.or([
+              Filter.notExists("${_homeController.id.value}_favorite"),
+              Filter.equal("${_homeController.id.value}_favorite", false)
+            ])
+          ]),
+          channelStateSort: const [SortOption('last_message_at')],
+          limit: 10,
+        );
+      } else {
+        return StreamChannelListController(
+          client: client,
+          filter:
+          _groupController.searchIsActive.value &&
+              _groupController.query.value.isNotEmpty ?
+          Filter.and([
+            Filter.autoComplete('name', _groupController.query.value),
+            Filter.greater("member_count", 2),
+            Filter.notExists("isConv"),
+          ]) :
+          isFav ?
+          Filter.and([
+            if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
+                "contractAddress", _homeController.contractAddresses)
+            else
+              Filter.equal("contractAddress", ""),
+            Filter.exists("${_homeController.id.value}_favorite"),
+            Filter.equal("${_homeController.id.value}_favorite", true),
+            Filter.greater("member_count", 2)
+          ]) :
+          Filter.and([
+            if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
+                "contractAddress", _homeController.contractAddresses)
+            else
+              Filter.equal("contractAddress", ""),
+            Filter.greater("member_count", 2),
+            Filter.or([
+              Filter.notExists("${_homeController.id.value}_favorite"),
+              Filter.equal("${_homeController.id.value}_favorite", false)
+            ])
+          ]),
+          channelStateSort: const [SortOption('last_message_at')],
+          limit: 10,
+        );
+      }
+    }
   }
 
   @override
@@ -524,12 +640,12 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             ),
           ),
           Obx(()=>Positioned(
-              top: _groupController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
+              top: 110,
               child: _groupController.searchIsActive.value ? DeferPointer(
                 child: SizedBox(
                     height: 110,
                     width: MediaQuery.of(context).size.width,
-                    child:buildFloatingSearchBar()),
+                    child:Transform.translate(offset: Offset(0, -30), child: buildFloatingSearchBar())),
               ):
               _groupController.addAGroup.value ? Container() : Container(
                   height: 50,

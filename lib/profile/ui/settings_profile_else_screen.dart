@@ -419,7 +419,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                     autofocus: true,
                     maxLines: 1,
                     controller: _profileController.usernameElseTextEditingController.value,
-                    maxLength: 10,
+                    maxLength: 13,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
                     decoration: const InputDecoration(

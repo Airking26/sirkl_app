@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/size_config.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class CallInviteSendingScreen extends StatefulWidget {
@@ -20,6 +19,7 @@ class CallInviteSendingScreen extends StatefulWidget {
 class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
 
   final _callController = Get.put(CallsController());
+  final _homeController = Get.put(HomeController());
   late Timer timer ;
 
   @override
@@ -35,6 +35,8 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
   @override
   void dispose() {
     timer.cancel();
+    _callController.isCallOnSpeaker.value = false;
+    _callController.isCallMuted.value = false;
     super.dispose();
   }
 
@@ -131,14 +133,14 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: _callController.isCallMuted.value ? Colors.black : Colors.white),
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color:  Colors.white),
                           child: IconButton(
-                              icon: SvgPicture.asset("assets/images/micro.svg", color: _callController.isCallMuted.value ? Colors.white : Colors.black),
+                              icon: Icon(_callController.isCallMuted.value ? Icons.mic_off_rounded: Icons.mic),
                               onPressed: () async {
                                 _callController.isCallMuted.value = !_callController.isCallMuted.value;
-                                _callController.agoraEngine.value?.muteAllRemoteAudioStreams(_callController.isCallMuted.value);
+                                _callController.isCallMuted.value ? _callController.agoraEngine.value?.disableAudio() : _callController.agoraEngine.value?.enableAudio();
                               }),
                         ),
                         InkWell(
@@ -163,11 +165,11 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                           ),
                         ),
                         Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: _callController.isCallOnSpeaker.value ? Colors.black : Colors.white),
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: Colors.white),
                           child: IconButton(
-                              icon: SvgPicture.asset("assets/images/volume.svg", color: _callController.isCallOnSpeaker.value ? Colors.white : Colors.black),
+                              icon: Icon(_callController.isCallOnSpeaker.value ? Icons.volume_up_rounded : Icons.phone_enabled_rounded),
                               onPressed: () async {
                                 _callController.isCallOnSpeaker.value = !_callController.isCallOnSpeaker.value;
                                 _callController.agoraEngine.value?.setEnableSpeakerphone(_callController.isCallOnSpeaker.value);
@@ -184,5 +186,6 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
       ),
     ));
   }
+
 }
 

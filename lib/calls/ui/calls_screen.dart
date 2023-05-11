@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
@@ -157,12 +156,14 @@ class _CallsScreenState extends State<CallsScreen> {
             ),
           ),
           _callController.callList.value == null || _callController.callList.value!.isEmpty ? Container() : Positioned(
-              top: Platform.isAndroid? 80 : 60,
+              top:  110,
               child: DeferPointer(
                 child: SizedBox(
                     height: 110,
                     width: MediaQuery.of(context).size.width,
-                    child: buildFloatingSearchBar()),
+                    child: Transform.translate(
+                      offset: const Offset(0, -30),
+                        child: buildFloatingSearchBar())),
               ))
         ],
       ),

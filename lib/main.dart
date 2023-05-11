@@ -1,8 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
-import 'dart:developer';
 import 'dart:async';
 import 'dart:convert';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -12,7 +10,6 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:sirkl/common/model/notification_dto.dart';
 import 'package:sirkl/common/model/notification_register_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
@@ -36,7 +33,7 @@ import 'navigation/ui/navigation_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
 void main() async{
-  final client = StreamChatClient("mhgk84t9jfnt");
+  final client = StreamChatClient("mhgk84t9jfnt", logLevel: Level.INFO);
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -165,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage>{
             }
           }
           else {
-            showCallNotification(message.data);
+            if(message.data['type']!= "message.new" ) showCallNotification(message.data);
           }
         }
       });
@@ -181,7 +178,6 @@ class _MyHomePageState extends State<MyHomePage>{
                   'try:', ''));
           if (response.members!.length > 2) {
             _navigationController.hideNavBar.value = true;
-            // ignore: use_build_context_synchronously
             pushNewScreen(context, screen: DetailedChatScreen(create: false,
                 channelId: (event.data["cid"] as String).replaceFirst(
                     'try:', ''))).then((value) =>
@@ -191,7 +187,6 @@ class _MyHomePageState extends State<MyHomePage>{
             element.user!.id != event.data["receiver_id"]).toList()[0];
             await _commonController.getUserById(user.user!.id);
             _navigationController.hideNavBar.value = true;
-            // ignore: use_build_context_synchronously
             pushNewScreen(
                 context, screen: const DetailedChatScreen(create: true)).then((
                 value) => _navigationController.hideNavBar.value = false);
@@ -222,7 +217,6 @@ class _MyHomePageState extends State<MyHomePage>{
                     'try:', ''));
             if (response.members!.length > 2) {
               _navigationController.hideNavBar.value = true;
-              // ignore: use_build_context_synchronously
               pushNewScreen(context, screen: DetailedChatScreen(create: false,
                   channelId: (event.data["cid"] as String).replaceFirst(
                       'try:', ''))).then((value) =>
@@ -232,7 +226,6 @@ class _MyHomePageState extends State<MyHomePage>{
               element.user!.id != event.data["receiver_id"]).toList()[0];
               await _commonController.getUserById(user.user!.id);
               _navigationController.hideNavBar.value = true;
-              // ignore: use_build_context_synchronously
               pushNewScreen(
                   context, screen: const DetailedChatScreen(create: true))
                   .then((value) =>

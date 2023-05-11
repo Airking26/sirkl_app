@@ -182,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       controller: _profileController
                                           .usernameTextEditingController
                                           .value,
-                                      maxLength: 10,
+                                      maxLength: 13,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           fontSize: 20,

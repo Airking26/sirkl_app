@@ -259,7 +259,7 @@ class HomeController extends GetxController{
       var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
       tokenContractAddress.result?.tokenBalances?.forEach((element) {
         if(element.tokenBalance != "0"){
-          contractAddresses.add(element.contractAddress!);
+          if(!contractAddresses.contains(element.contractAddress)) contractAddresses.add(element.contractAddress!);
         } else {
           contractAddresses.remove(element.contractAddress!);
         }
