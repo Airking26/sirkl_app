@@ -113,7 +113,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
             ]),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 12.0),
+        padding: const EdgeInsets.only(top: 24.0),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(

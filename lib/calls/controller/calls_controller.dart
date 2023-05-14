@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
@@ -54,11 +56,11 @@ class CallsController extends GetxController{
     await agoraEngine.value?.leaveChannel();
 
 
-
     agoraEngine.value?.setEventHandler(
       RtcEngineEventHandler(
         joinChannelSuccess: (String x, int y, int elapsed) {
           _navigationController.hideNavBar.value = true;
+          playRingback(37);
           pushNewScreen(context, screen: const CallInviteSendingScreen()).then((value) {
             pageKey.value = 0;
             pagingController.value.refresh();
@@ -67,6 +69,7 @@ class CallsController extends GetxController{
           });
         },
         userJoined: (int remoteUid, int elapsed) {
+          playRingback(50);
           timer.value = StopWatchTimer();
           timer.value.onStartTimer();
           userJoinedCall.value = true;
@@ -76,6 +79,22 @@ class CallsController extends GetxController{
         },
       ),
     );
+  }
+
+  void playRingback(int soundToPlay) {
+       if(Platform.isAndroid) {
+      FlutterBeep.playSysSound(soundToPlay == 50 ? 50 : 35);
+    } else {
+      FlutterBeep.playSysSound(soundToPlay == 50 ? 50 : 37).then((value) {
+          if(soundToPlay != 50) {
+            Timer.periodic(const Duration(seconds: 4), (timer) {
+              FlutterBeep.playSysSound(soundToPlay == 50 ? 50 : 37);
+              soundToPlay == 50 ? timer.cancel() : null ;
+            });
+          }
+      });
+
+    }
   }
 
   leaveChannel() async{
@@ -125,17 +144,21 @@ class CallsController extends GetxController{
           print('Device Token FCM: $event');
           break;
         case Event.ACTION_CALL_ACCEPT:
+          playRingback(50);
           await join(event.body['extra']["channel"] ?? event.body['id'], event.body['extra']['userCalled'], event.body['extra']['userCalling']);
           break;
         case Event.ACTION_CALL_DECLINE:
+          playRingback(50);
           //await FlutterCallkitIncoming.endAllCalls();
           //await endCall(event.body["extra"]["userCalling"], event.body["id"]);
           break;
         case Event.ACTION_CALL_ENDED:
+          playRingback(50);
           await FlutterCallkitIncoming.endAllCalls();
           print('Device Token FCM: $event');
           break;
         case Event.ACTION_CALL_TIMEOUT:
+          playRingback(50);
           await updateCall(CallModificationDto(id: event.body["extra"]["callId"], status: 2, updatedAt: DateTime.now()));
           break;
         case Event.ACTION_CALL_CALLBACK:
@@ -266,7 +289,9 @@ class CallsController extends GetxController{
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _profileService.getUserByID(accessToken, id);
       if(request.isOk) userCalled.value = userFromJson(json.encode(request.body));
-    } else if(request.isOk) userCalled.value = userFromJson(json.encode(request.body));
+    } else if(request.isOk) {
+      userCalled.value = userFromJson(json.encode(request.body));
+    }
   }
 
   Future<List<CallDto>> searchInCalls(String search) async{

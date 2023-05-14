@@ -55,7 +55,8 @@ class MyApp extends StatelessWidget {
       translations: Language(),
       locale: const Locale('en'),
       builder: (context, child){
-        return StreamChat(client: client, child: child,);
+        return StreamChat(client: client, child: MediaQuery(data: MediaQuery.of(context).copyWith(
+            textScaleFactor: 1.0), child: child!),);
       },
       darkTheme: ThemeData(brightness: Brightness.dark, dividerColor: Colors.transparent),
       themeMode: ThemeMode.system,

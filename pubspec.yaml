@@ -84,6 +84,7 @@ dependencies:
   just_audio: ^0.9.31
   firebase_dynamic_links: ^5.1.1
   flutter_typeahead: ^4.3.7
+  flutter_beep: ^1.0.0
 
 dev_dependencies:
   flutter_test:

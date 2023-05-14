@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/common/size_config.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class CallInviteSendingScreen extends StatefulWidget {
@@ -19,13 +19,13 @@ class CallInviteSendingScreen extends StatefulWidget {
 class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
 
   final _callController = Get.put(CallsController());
-  final _homeController = Get.put(HomeController());
   late Timer timer ;
 
   @override
   void initState() {
     timer = Timer(const Duration(seconds: 30), () async {
       if(!_callController.userJoinedCall.value){
+        _callController.playRingback(50);
         await _callController.missedCallNotification(_callController.userCalled.value.id!);
         await _callController.leaveChannel();}}
     );
@@ -145,6 +145,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                         ),
                         InkWell(
                           onTap: () async{
+                            FlutterBeep.playSysSound(50);
                             if(_callController.userJoinedCall.value) {
                               await _callController.endCall(_callController.userCalled.value.id!, _callController.currentCallId.value);
                               await FlutterCallkitIncoming.endAllCalls();

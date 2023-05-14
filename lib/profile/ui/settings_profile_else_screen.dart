@@ -397,7 +397,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
             ]),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 12.0),
+        padding: const EdgeInsets.only(top: 24.0),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(

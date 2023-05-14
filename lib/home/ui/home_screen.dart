@@ -1,11 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_beep/flutter_beep.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:highlight_text/highlight_text.dart';
@@ -142,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 16.0),
+                padding: const EdgeInsets.only(top: 12.0),
                 child: Image.asset(
                   MediaQuery.of(context).platformBrightness == Brightness.dark ? "assets/images/logo_dark_theme.png" : "assets/images/logo_light_theme.png",
                   height: 25,
@@ -754,8 +756,9 @@ class _HomeScreenState extends State<HomeScreen> {
             endColor: const Color(0xff0063FB).withOpacity(0.5),
             gradientOrientation: GradientOrientation.Horizontal,
             onTap: (finish) async {
-              _navigationController.hideNavBar.value = true;
-              _homeController.qrActive.value = true;
+             _callController.playRingback(1);
+              //_navigationController.hideNavBar.value = true;
+              //_homeController.qrActive.value = true;
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
