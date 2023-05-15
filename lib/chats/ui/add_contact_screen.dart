@@ -73,6 +73,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                     Brightness.dark
                                 ? const Color(0xFF2D465E)
                                 : Colors.white),
+                        noItemsFoundBuilder: (context){
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
+                            child: Text("No user found for this search..", style: DefaultTextStyle.of(context).style.copyWith(
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Gilroy", fontSize: 16)),
+                          );
+                        },
                         textFieldConfiguration: TextFieldConfiguration(
                             controller: userController,
                             //enabled: _chatController.contactAddIsEmpty.value,
