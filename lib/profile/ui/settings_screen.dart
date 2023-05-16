@@ -215,9 +215,11 @@ class _SettingScreenState extends State<SettingScreen> {
                                   await GetStorage().erase();
                                   await StreamChat.of(context).client.disconnectUser();
                                   _homeController.accessToken.value = "";
+                                  _homeController.address.value = "";
                                   _navigationController.controller.value.jumpToTab(0);
                                   _navigationController.hideNavBar.value = true;
                                   await _profileController.deleteUser(_homeController.id.value);
+                                  Get.back();
                                 },)
                             ],
                           ));
@@ -405,6 +407,7 @@ class _SettingScreenState extends State<SettingScreen> {
                           .deleteUser(_homeController.id.value);
                       await GetStorage().erase();
                       _homeController.accessToken.value = "";
+                      _homeController.address.value = "";
                       _navigationController.controller.value.jumpToTab(0);
                       Get.back();
                     },

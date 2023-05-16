@@ -542,6 +542,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
 
   @override
   void dispose() {
+    _chatController.isEditingGroup.value = false;
     _chatController.requestsWaiting.clear();
     super.dispose();
   }

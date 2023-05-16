@@ -299,7 +299,7 @@ class _MessageCardState extends State<MessageCard> {
                         ),
                       ),
                     ),
-                  ) : const SizedBox(height: 12,)
+                  ) : SizedBox(height: widget.message.attachments.map((e) => e.type).contains('voicenote') ? 0 : 12,)
 
                 ],
               ),

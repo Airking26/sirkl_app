@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -124,7 +126,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                           IconButton(onPressed: () async{
                             if(!_commonController.userClickedFollowStatus.value) {
                               if( await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)){
-                                utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
+                                utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName.isNullOrBlank! ? "${_commonController.userClicked.value!.wallet!.substring(0, 6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}" : _commonController.userClicked.value!.userName!}));
                               }
                             } else {
                               widget.fromConversation ? Navigator.of(context).pop():

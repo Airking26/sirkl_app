@@ -37,7 +37,7 @@ class AttachmentButton extends StatelessWidget {
       icon: StreamSvgIcon.attach(
         color: color,
       ),
-      padding: EdgeInsets.zero,
+      padding: EdgeInsets.only(top: 2),
       constraints: const BoxConstraints.tightFor(
         height: 20,
         width: 20,

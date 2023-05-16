@@ -47,6 +47,7 @@ class CallsController extends GetxController{
   Rx<PagingController<int, CallDto>> pagingController = PagingController<int, CallDto>(firstPageKey: 0).obs;
   var pageKey = 0.obs;
   var isFromConv = false.obs;
+  late Timer timerRing;
 
   Future<void> setupVoiceSDKEngine(BuildContext context) async {
     await [Permission.microphone].request();
@@ -60,7 +61,7 @@ class CallsController extends GetxController{
       RtcEngineEventHandler(
         joinChannelSuccess: (String x, int y, int elapsed) {
           _navigationController.hideNavBar.value = true;
-          playRingback(37);
+          playRingback(1);
           pushNewScreen(context, screen: const CallInviteSendingScreen()).then((value) {
             pageKey.value = 0;
             pagingController.value.refresh();
@@ -87,10 +88,11 @@ class CallsController extends GetxController{
     } else {
       FlutterBeep.playSysSound(soundToPlay == 50 ? 50 : 37).then((value) {
           if(soundToPlay != 50) {
-            Timer.periodic(const Duration(seconds: 4), (timer) {
-              FlutterBeep.playSysSound(soundToPlay == 50 ? 50 : 37);
-              soundToPlay == 50 ? timer.cancel() : null ;
+            timerRing = Timer.periodic(const Duration(seconds: 4), (timer) {
+              FlutterBeep.playSysSound(37);
             });
+          } else {
+            timerRing.cancel();
           }
       });
 

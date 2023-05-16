@@ -321,16 +321,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               });
                                         }
                                       },
-                                      child: _homeController.userMe.value.picture.isNullOrBlank!
+                                      child: _profileController.urlPicture.value.isEmpty
                                           ? TinyAvatar(
-                                              baseString: _homeController
-                                                  .userMe.value.wallet!,
+                                              baseString: _profileController.urlPicture.value,
                                               dimension: 140,
                                               circular: true,
                                               colourScheme: TinyAvatarColourScheme
                                                   .seascape)
                                           : CachedNetworkImage(
-                                              imageUrl: _homeController.userMe.value.picture!,
+                                              imageUrl: _profileController.urlPicture.value,
                                               color: Colors.white.withOpacity(_profileController
                                                   .isEditingProfile
                                                   .value

@@ -96,7 +96,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                 _commonController.userClickedFollowStatus.value ? const SizedBox() : InkWell(
                   onTap: () async {
                     if( await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)){
-                    utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
+                      utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName.isNullOrBlank! ? "${_commonController.userClicked.value!.wallet!.substring(0, 6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}" : _commonController.userClicked.value!.userName!}));
                     }
                   },
                   child: Material(

@@ -437,9 +437,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                                       : Colors.black)),
                                           onPressed: () async {
                                             if (!channel.id!
-                                                .startsWith("!members"))
+                                                .startsWith("!members")) {
                                               await _chatController
                                                   .deleteInbox(channel.id!);
+                                            }
                                             await channel.delete();
                                             _commonController
                                                 .refreshInboxes.value = true;

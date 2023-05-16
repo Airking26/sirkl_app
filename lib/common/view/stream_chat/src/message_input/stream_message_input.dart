@@ -676,7 +676,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
                       channel.config?.commands.isNotEmpty == true)
                     _buildCommandButton(context),
                   ...widget.actions,
-                ].insertBetween(const SizedBox(width: 4)),
+                ].insertBetween(const SizedBox(width: 0)),
               ),
         duration: const Duration(milliseconds: 300),
         alignment: Alignment.center,

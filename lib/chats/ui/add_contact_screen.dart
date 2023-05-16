@@ -336,14 +336,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
               TextButton(
                 onPressed: () async {
                   if (_chatController.contactAddIsEmpty.value) {
-                    _utils.showToast(context, "Please enter a valid user");
+                    _utils.showToast(context, "Please enter a user");
                   } else {
                     if(nicknameController.text.isNotEmpty){
                       await _profileController.updateMe(UpdateMeDto(nicknames: {_homeController.userAdded.value.wallet! : nicknameController.text}), StreamChat.of(context).client);
                       _homeController.updateNickname(_homeController.userAdded.value.wallet!, nicknameController.text);
                     }
                     if(await _commonController.addUserToSirkl(_homeController.userAdded.value.id!, StreamChat.of(context).client, _homeController.id.value)){
-                        _utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _homeController.userAdded.value.userName ?? _homeController.userAdded.value.wallet!}));
+                        _utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _homeController.userAdded.value.userName.isNullOrBlank! ? "${_homeController.userAdded.value.wallet!.substring(0, 6)}...${_homeController.userAdded.value.wallet!.substring(_homeController.userAdded.value.wallet!.length - 4)}" : _homeController.userAdded.value.userName!}));
                         nicknameController.clear();
                         userController.clear();
                         _chatController.contactAddIsEmpty.value = true;

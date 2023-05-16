@@ -50,6 +50,7 @@ class _ChannelPageState extends State<ChannelPage> {
           Expanded(
             child: StreamMessageListView(
               onMessageSwiped: _reply,
+
               messageBuilder: (context, details, messages, defaultMessageWidget) {
                 return defaultMessageWidget.copyWith(
                   onReplyTap: _reply,
@@ -80,8 +81,8 @@ class _ChannelPageState extends State<ChannelPage> {
             ),
           ),
           const StreamTypingIndicator(),
-          StreamMessageInput(messageInputController: _messageInputController, focusNode: _focusNode, actions: [
-            RecordButton(recordingFinishedCallback: _recordingFinishedCallback,)
+          StreamMessageInput(messageInputController: _messageInputController, showCommandsButton : false, focusNode: _focusNode, actions: [
+            RecordButton(recordingFinishedCallback: _recordingFinishedCallback)
           ],),
         ],
       ),

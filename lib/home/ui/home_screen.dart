@@ -756,9 +756,8 @@ class _HomeScreenState extends State<HomeScreen> {
             endColor: const Color(0xff0063FB).withOpacity(0.5),
             gradientOrientation: GradientOrientation.Horizontal,
             onTap: (finish) async {
-             _callController.playRingback(1);
-              //_navigationController.hideNavBar.value = true;
-              //_homeController.qrActive.value = true;
+              _navigationController.hideNavBar.value = true;
+              _homeController.qrActive.value = true;
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -997,7 +996,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Padding(
                 padding: EdgeInsets.all(24.0),
                 child: Text("Generate your QR code from the website 'app.sirkl.io' either from the login page or the header once you are logged in.",
-                  textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, fontFamily: "Gilroy"),),
+                  textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14, fontFamily: "Gilroy"),),
               ),
             ),
           )
