@@ -369,8 +369,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                       screen: StreamChannel(
                                           channel: channel,
                                           child: const ChannelPage()))
-                                  .then((value) {
+                                  .then((value) async{
                                 _navigationController.hideNavBar.value = false;
+                                if(_chatController.needToRefresh.value) await streamChannelListControllerFriends?.refresh();
+                                _chatController.needToRefresh.value = false;
                               });
                             }
                           },

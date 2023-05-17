@@ -330,7 +330,9 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
           onTap: () async {
             var isPresent = await _chatController.channel.value?.queryMembers(filter: Filter.equal("id", item.id!));
             if(isPresent!.members.isEmpty) {
-              _chatController.chipsListAddUsers.add(item);
+              if(!_chatController.chipsListAddUsers.map((element) => element.id).contains(item.id)) {
+                _chatController.chipsListAddUsers.add(item);
+              }
             } else {
               utils.showToast(context, "This user is already present in this group");
             }

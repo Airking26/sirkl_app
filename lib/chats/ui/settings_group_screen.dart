@@ -70,7 +70,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
           child: ClipOval(
             child: SizedBox.fromSize(
               size: const Size.fromRadius(70),
-              child: _chatController.channel.value!.extraData["picOfGroup"] == null || (!_chatController.isEditingGroup.value && !_profileController.urlPictureGroup.isNullOrBlank!)
+              child: _chatController.channel.value!.extraData["picOfGroup"] == null
                   ? TinyAvatar(
                   baseString: _chatController.channel.value!.extraData['nameOfGroup'] as String,
                   dimension: 140,
@@ -498,8 +498,11 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                   if(_nameGroupController.text.isNotEmpty || !_profileController.urlPictureGroup.value.isNullOrBlank!){
                     if(_profileController.urlPictureGroup.value.isNullOrBlank!){
                       await _chatController.channel.value!.updatePartial(set: {"nameOfGroup": _nameGroupController.text});
+                      _chatController.channel.refresh();
                     } else {
                       await _chatController.channel.value!.updatePartial(set: {"nameOfGroup": _nameGroupController.text.isEmpty ? _chatController.channel.value!.extraData['nameOfGroup'] as String : _nameGroupController.text, "picOfGroup": _profileController.urlPictureGroup.value});
+                      _chatController.needToRefresh.value = true;
+                      _chatController.channel.refresh();
                     }
                   }
                   _chatController.isEditingGroup.value = false;

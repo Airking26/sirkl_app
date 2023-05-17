@@ -212,6 +212,7 @@ class _SettingScreenState extends State<SettingScreen> {
                               CupertinoDialogAction(child: Text("No", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){ Get.back();},),
                               CupertinoDialogAction(child: Text("Yes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
                                 onPressed: () async {
+                                  Get.back();
                                   await GetStorage().erase();
                                   await StreamChat.of(context).client.disconnectUser();
                                   _homeController.accessToken.value = "";
@@ -219,7 +220,6 @@ class _SettingScreenState extends State<SettingScreen> {
                                   _navigationController.controller.value.jumpToTab(0);
                                   _navigationController.hideNavBar.value = true;
                                   await _profileController.deleteUser(_homeController.id.value);
-                                  Get.back();
                                 },)
                             ],
                           ));

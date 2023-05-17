@@ -294,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontSize: 18)),
                   );
                 },
-                indexBarItemHeight: MediaQuery.of(context).size.height / 50,
+                indexBarItemHeight: MediaQuery.of(context).size.height / (_homeController.stories.value!.isEmpty ? 40 : 50),
                 indexBarOptions: IndexBarOptions(
                     textStyle: const TextStyle(
                         color: Colors.white,

@@ -270,11 +270,11 @@ class StreamChannelHeader extends StatelessWidget
                                   (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ?
                                       Image.asset("assets/images/app_icon_rounded.png") :
                                   channel.extraData['isConv'] !=null && !(channel.extraData['isConv'] as bool) ?
-                                      channel.extraData["picOfGroup"] == null ?
+                                      _chatController.channel.value!.extraData["picOfGroup"] == null ?
                                   TinyAvatar(baseString: userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!, dimension: 40, circular: true,
                                       colourScheme: TinyAvatarColourScheme.seascape) :
                                   CachedNetworkImage(
-                                      imageUrl: channel.extraData["picOfGroup"] as String,
+                                      imageUrl: _chatController.channel.value!.extraData["picOfGroup"] as String,
                                       width: 40,
                                       height: 40,
                                       fit: BoxFit.cover,

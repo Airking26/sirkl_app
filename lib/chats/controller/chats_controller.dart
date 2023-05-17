@@ -41,6 +41,7 @@ class ChatsController extends GetxController{
   var fromGroupCreation = false.obs;
   var fromGroupJoin = false.obs;
   var isEditingGroup = false.obs;
+  var needToRefresh = false.obs;
   Rx<Channel?> channel = (null as Channel?).obs;
   Rx<Channel?> nestedChannel = (null as Channel?).obs;
 
