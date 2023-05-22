@@ -96,7 +96,7 @@ class _PlaygroundOverlay extends StatelessWidget {
             children: [
               // Close button
               Positioned(
-                left: 16,
+                left: 24,
                 top: _top,
                 child: EditorCloseButton(
                   controller: deController,

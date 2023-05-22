@@ -137,7 +137,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                           height: 52,
                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color:  Colors.white),
                           child: IconButton(
-                              icon: Icon(_callController.isCallMuted.value ? Icons.mic_off_rounded: Icons.mic),
+                              icon: Icon(_callController.isCallMuted.value ? Icons.mic_off_rounded: Icons.mic, color: Colors.black87),
                               onPressed: () async {
                                 _callController.isCallMuted.value = !_callController.isCallMuted.value;
                                 _callController.isCallMuted.value ? _callController.agoraEngine.value?.disableAudio() : _callController.agoraEngine.value?.enableAudio();
@@ -145,7 +145,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                         ),
                         InkWell(
                           onTap: () async{
-                            FlutterBeep.playSysSound(50);
+                            _callController.playRingback(50);
                             if(_callController.userJoinedCall.value) {
                               await _callController.endCall(_callController.userCalled.value.id!, _callController.currentCallId.value);
                               await FlutterCallkitIncoming.endAllCalls();
@@ -170,7 +170,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                           height: 52,
                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(90), color: Colors.white),
                           child: IconButton(
-                              icon: Icon(_callController.isCallOnSpeaker.value ? Icons.volume_up_rounded : Icons.volume_down_rounded),
+                              icon: Icon(_callController.isCallOnSpeaker.value ? Icons.volume_up_rounded : Icons.volume_down_rounded, color: Colors.black87,),
                               onPressed: () async {
                                 _callController.isCallOnSpeaker.value = !_callController.isCallOnSpeaker.value;
                                 _callController.agoraEngine.value?.setEnableSpeakerphone(_callController.isCallOnSpeaker.value);

@@ -67,7 +67,7 @@ class ProfileController extends GetxController{
         box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
         if(!updateMeDto.userName.isNullOrBlank! || !updateMeDto.picture.isNullOrBlank!) {
           await streamChatClient.disconnectUser();
-          await _homeController.retrieveTokenStreamChat(streamChatClient, null);
+          await _homeController.connectUser(streamChatClient);
         }
         isEditingProfile.value = false;
         isLoadingPicture.value = false;
@@ -79,7 +79,7 @@ class ProfileController extends GetxController{
       box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
       if(!updateMeDto.userName.isNullOrBlank! || !updateMeDto.picture.isNullOrBlank!) {
         await streamChatClient.disconnectUser();
-        await _homeController.retrieveTokenStreamChat(streamChatClient, null);
+        await _homeController.connectUser(streamChatClient);
       }
       isEditingProfile.value = false;
       isLoadingPicture.value = false;
@@ -146,14 +146,14 @@ class ProfileController extends GetxController{
   }
 
   getImageForProfile() async{
-    List<Media>? res = await ImagesPicker.pick(count: 1, pickType: PickType.all, language: Language.English, cropOpt: CropOption(aspectRatio: CropAspectRatio.custom, cropType: CropType.circle,), maxSize: 500, quality: 0.8);
+    List<Media>? res = await ImagesPicker.pick(count: 1, pickType: PickType.image, language: Language.English, cropOpt: CropOption(aspectRatio: CropAspectRatio.custom, cropType: CropType.circle,), maxSize: 500, quality: 0.8);
     if(res != null) isLoadingPicture.value = true;
     urlPicture.value = await SimpleS3().uploadFile(File(res!.first.path), "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
     isLoadingPicture.value = false;
   }
 
   getImageForGroup() async{
-    List<Media>? res = await ImagesPicker.pick(count: 1, pickType: PickType.all, language: Language.English, cropOpt: CropOption(aspectRatio: CropAspectRatio.custom, cropType: CropType.circle,), maxSize: 500, quality: 0.8);
+    List<Media>? res = await ImagesPicker.pick(count: 1, pickType: PickType.image, language: Language.English, cropOpt: CropOption(aspectRatio: CropAspectRatio.custom, cropType: CropType.circle,), maxSize: 500, quality: 0.8);
     if(res != null) isLoadingPicture.value = true;
     urlPictureGroup.value = await SimpleS3().uploadFile(File(res!.first.path), "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
     isLoadingPicture.value = false;
@@ -214,19 +214,7 @@ class ProfileController extends GetxController{
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _homeService.updateNFTStatus(accessToken, nftModificationDtoToJson(nftModificationDto));
-      if(request.isOk){
-        if(nftModificationDto.isFav) {
-          await client.updateChannelPartial(nftModificationDto.contractAddress, 'try', set: {"${_homeController.id.value}_favorite" : true});
-        } else {
-          await client.updateChannelPartial(nftModificationDto.contractAddress, 'try', unset: ["${_homeController.id.value}_favorite"]);
-        }
-      }
-    } else if(request.isOk){
-      if(nftModificationDto.isFav) {
-        await client.updateChannelPartial(nftModificationDto.contractAddress, 'try', set: {"${_homeController.id.value}_favorite" : true});
-      } else {
-        await client.updateChannelPartial(nftModificationDto.contractAddress, 'try', unset: ["${_homeController.id.value}_favorite"]);
-      }
+
     }
   }
 

@@ -59,17 +59,12 @@ class EditorCloseButton extends StatelessWidget {
           onTap: () {
             _onPressed(context);
           },
-          child: Container(
-            height: 36,
-            width: 36,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.black26,
-            ),
-            child: const Icon(
+          child: const Padding(
+            padding: EdgeInsets.only(top: 16.0),
+            child: Icon(
               Icons.close_rounded,
               color: Colors.white,
-              size: 16,
+              size: 36,
             ),
           ),
         ),
@@ -88,7 +83,7 @@ class _AppDialog extends StatelessWidget {
       child: Text(
         'NO',
         style: Theme.of(context).textTheme.button!.copyWith(
-              color: Color(0xFF00CB7D),
+              color: const Color(0xFF00CB7D),
             ),
       ),
     );
@@ -99,7 +94,7 @@ class _AppDialog extends StatelessWidget {
       child: Text(
         'DISCARD',
         style: Theme.of(context).textTheme.button!.copyWith(
-              color: Color(0xFF00CB7D),
+              color: const Color(0xFF00CB7D),
             ),
       ),
     );

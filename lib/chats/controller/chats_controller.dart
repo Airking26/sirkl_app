@@ -44,6 +44,7 @@ class ChatsController extends GetxController{
   var needToRefresh = false.obs;
   Rx<Channel?> channel = (null as Channel?).obs;
   Rx<Channel?> nestedChannel = (null as Channel?).obs;
+  var retryProgress = false.obs;
 
   Future<String> createInbox(InboxCreationDto inboxCreationDto) async{
     var accessToken = box.read(con.ACCESS_TOKEN);

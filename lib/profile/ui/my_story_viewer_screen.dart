@@ -1,5 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
@@ -38,10 +42,10 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
       storyItems = _profileController.myStories.value!.map((e) => e.type == 0 ?
       StoryItem.pageImage(url: e.url,
           controller: controller,
-          imageFit: BoxFit.cover,
+          imageFit: BoxFit.fitWidth,
           duration: const Duration(seconds: 5)) :
       StoryItem.pageVideo(
-          e.url, controller: controller, imageFit: BoxFit.cover)).toList();
+          e.url, controller: controller, imageFit: BoxFit.fitWidth)).toList();
     super.initState();
   }
 
@@ -80,33 +84,129 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 24.0),
-            child: Align(alignment: Alignment.bottomCenter, child: MaterialButton(
-              padding: const EdgeInsets.all(15),
-              elevation: 0,
-              color: Colors.white24,
-              highlightElevation: 0,
-              minWidth: double.minPositive,
-              height: double.minPositive,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(100),
-              ),
-              onPressed: () async{
-                controller.pause();
-                await _profileController.retrieveUsersForAStory(_profileController.myStories.value![currentIndex].id);
-                showModalBottomSheet(context: context, builder: (context){
-                  return _profileController.readers.value == null || _profileController.readers.value?.length == 0 ? const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 48),
-                    child: Text("No one has seen your story yet", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, fontFamily: 'Gilroy', color: Colors.black),),
-                  ) : buildListViewReaders();
-                }).then((value) {
-                  _profileController.readers.value = [];
-                  controller.play();});
-              },
-              child: const Icon(
-                Icons.remove_red_eye_outlined,
-                color: Colors.white ,
-                size: 25,
-              ),
+            child: Align(alignment: Alignment.bottomCenter, child:
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                MaterialButton(
+                  padding: const EdgeInsets.all(15),
+                  elevation: 0,
+                  color: Colors.white24,
+                  highlightElevation: 0,
+                  minWidth: double.minPositive,
+                  height: double.minPositive,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  onPressed: () async{
+                    controller.pause();
+                    await _profileController.retrieveUsersForAStory(_profileController.myStories.value![currentIndex].id);
+                    showModalBottomSheet(context: context, builder: (context){
+                      return _profileController.readers.value == null || _profileController.readers.value?.length == 0 ? const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 48),
+                        child: Text("No one has seen your story yet", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, fontFamily: 'Gilroy', color: Colors.black),),
+                      ) : buildListViewReaders();
+                    }).then((value) {
+                      _profileController.readers.value = [];
+                      controller.play();});
+                  },
+                  child: const Icon(
+                    Icons.remove_red_eye_outlined,
+                    color: Colors.white ,
+                    size: 25,
+                  ),
+                ),
+                const SizedBox(width: 24,),
+                MaterialButton(
+                  padding: const EdgeInsets.all(15),
+                  elevation: 0,
+                  color: Colors.white24,
+                  highlightElevation: 0,
+                  minWidth: double.minPositive,
+                  height: double.minPositive,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  onPressed: () async{
+                    controller.pause();
+
+                    showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (_) => CupertinoAlertDialog(
+                          title: Text(
+                            "Delete Story",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: "Gilroy",
+                                color: MediaQuery.of(context).platformBrightness ==
+                                    Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black),
+                          ),
+                          content: Text("Are you sure?",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: "Gilroy",
+                                  color: MediaQuery.of(context).platformBrightness ==
+                                      Brightness.dark
+                                      ? Colors.white.withOpacity(0.5)
+                                      : Colors.black.withOpacity(0.5))),
+                          actions: [
+                            CupertinoDialogAction(
+                              child: Text("No",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: "Gilroy",
+                                      color:
+                                      MediaQuery.of(context).platformBrightness ==
+                                          Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black)),
+                              onPressed: () {
+                                Get.back();
+                              },
+                            ),
+                            CupertinoDialogAction(
+                              child: Text("Yes",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: "Gilroy",
+                                      color:
+                                      MediaQuery.of(context).platformBrightness ==
+                                          Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black)),
+                              onPressed: () async {
+                                await _homeController.deleteStory(_profileController.myStories.value![currentIndex].createdBy.id!, _profileController.myStories.value![currentIndex].id);
+                                _profileController.myStories.value?.removeWhere((element) => element.id == _profileController.myStories.value![currentIndex].id);
+                                _profileController.myStories.refresh();
+                                Fluttertoast.showToast(
+                                    msg: "The story has been deleted",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0
+                                );
+                                controller.play();
+                                Get.back();
+                              },
+                            )
+                          ],
+                        ));
+                  },
+                  child: const Icon(
+                    Icons.delete_rounded,
+                    color: Colors.white ,
+                    size: 25,
+                  ),
+                ),
+              ],
             ),
             ),
           )

@@ -53,16 +53,19 @@ class ColorPicker extends StatelessWidget {
                     final colors = controller.setting.colors
                         .skip(index * colorCount)
                         .take(colorCount);
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: colors
-                          .map(
-                            (color) => _ColorCircle(
-                              color: color,
-                              controller: controller,
-                            ),
-                          )
-                          .toList(),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: colors
+                            .map(
+                              (color) => _ColorCircle(
+                                color: color,
+                                controller: controller,
+                              ),
+                            )
+                            .toList(),
+                      ),
                     );
                   },
                 ),

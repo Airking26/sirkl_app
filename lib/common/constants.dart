@@ -1,6 +1,7 @@
 /// Common ///
 const String URL_SERVER = "http://sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com/";
 const String ACCESS_TOKEN = "access_token";
+const String STREAM_CHAT_TOKEN = "stream_chat_token";
 const String REFRESH_TOKEN = "refresh_token";
 const String USER = "user";
 const String NOTIFICATION_ACTIVE = "notification_active";

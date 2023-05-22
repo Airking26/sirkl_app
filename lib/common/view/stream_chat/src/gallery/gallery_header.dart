@@ -101,9 +101,9 @@ class StreamGalleryHeader extends StatelessWidget
         if (!message.isEphemeral)
           IconButton(
             icon: StreamSvgIcon.iconMenuPoint(
-              color: galleryHeaderThemeData.iconMenuPointColor,
+              color: Colors.transparent,
             ),
-            onPressed: () => _showMessageActionModalBottomSheet(context),
+            onPressed: () {},
           ),
       ],
       centerTitle: true,

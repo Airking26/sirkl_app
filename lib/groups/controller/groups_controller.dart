@@ -35,6 +35,7 @@ class GroupsController extends GetxController{
   final _chatController = Get.put(ChatsController());
   var isLoadingAvailableNFT = true.obs;
   var refreshGroups = false.obs;
+  var retryProgress = false.obs;
 
   createChannel(StreamChatClient streamChatClient, GroupDto groupDto, String pic) async{
     _chatController.channel.value = streamChatClient.channel("try",

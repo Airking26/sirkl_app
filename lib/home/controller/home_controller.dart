@@ -77,6 +77,7 @@ class HomeController extends GetxController{
   var isFavNftSelected = false.obs;
   var qrActive = false.obs;
   var notificationActive = true.obs;
+  var streamChatToken = "".obs;
 
   final connector = WalletConnect(
     bridge: 'https://bridge.walletconnect.org',
@@ -93,6 +94,7 @@ class HomeController extends GetxController{
   retrieveAccessToken(){
     var accessTok = box.read(con.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
+    streamChatToken.value = box.read(con.STREAM_CHAT_TOKEN) ?? "";
     var checkBoxRead = box.read(con.contractAddresses);
     notificationActive.value = box.read(con.NOTIFICATION_ACTIVE) ?? true;
     if(checkBoxRead != null) {
@@ -201,7 +203,6 @@ class HomeController extends GetxController{
   }
 
   putFCMToken(BuildContext context, StreamChatClient client,bool isLogged) async {
-    retrieveAccessToken();
     if(accessToken.value.isNotEmpty) {
       final firebaseMessaging = await FirebaseMessaging.instance.getToken();
       var accessToken = box.read(con.ACCESS_TOKEN);
@@ -223,10 +224,10 @@ class HomeController extends GetxController{
           userMe.value = userFromJson(json.encode(request.body));
           box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
           retrieveAccessToken();
-          if(isLogged) updateAllNftConfig();
-          await retrieveTokenStreamChat(client, firebaseMessaging!);
           await retrieveNicknames();
           await _commonController.showSirklUsers(id.value);
+          await client.addDevice(firebaseMessaging!, PushProvider.firebase, pushProviderName: "Firebase_Config");
+          if(isLogged) updateAllNftConfig();
           if(Platform.isIOS) {
             var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
             await _homeService.uploadAPNToken(accessToken, token);
@@ -237,10 +238,10 @@ class HomeController extends GetxController{
         userMe.value = userFromJson(json.encode(request.body));
         box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
         retrieveAccessToken();
-        if(isLogged) updateAllNftConfig();
-        await retrieveTokenStreamChat(client, firebaseMessaging!);
         await retrieveNicknames();
         await _commonController.showSirklUsers(id.value);
+        await client.addDevice(firebaseMessaging!, PushProvider.firebase, pushProviderName: "Firebase_Config");
+        if(isLogged) updateAllNftConfig();
         if(Platform.isIOS) {
           var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
           await _homeService.uploadAPNToken(accessToken, token);
@@ -377,6 +378,21 @@ class HomeController extends GetxController{
       stories.refresh();
     }
   }
+
+  deleteStory(String createdBy, String id) async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _homeService.deleteStory(accessToken, createdBy, id);
+    if(request.statusCode == 401){
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _homeService.deleteStory(accessToken, createdBy, id);
+    }
+  }
+
   updateNickname(String wallet, String nickname) async {
     if(nicknames[wallet] != nickname) {
       nicknames[wallet] = nickname;
@@ -411,52 +427,64 @@ class HomeController extends GetxController{
     }
   }
 
-  Future<void> retrieveTokenStreamChat(StreamChatClient client, String? firebaseMessaging) async{
+  Future<void> connectUser(StreamChatClient client) async{
+    retrieveAccessToken();
     if(client.wsConnectionStatus != ConnectionStatus.connected) {
       var accessToken = box.read(con.ACCESS_TOKEN);
       var refreshToken = box.read(con.REFRESH_TOKEN);
-      var request = await _profileService.retrieveTokenStreamChat(accessToken);
-      var userToPass = UserDTO(id: userMe.value.id, userName: userMe.value.userName, picture: userMe.value.picture, isAdmin: userMe.value.isAdmin, createdAt: userMe.value.createdAt, description: userMe.value.description, fcmToken: userMe.value.fcmToken, wallet: userMe.value.wallet, following: userMe.value.following, isInFollowing: userMe.value.isInFollowing);
-      if (request.statusCode == 401) {
-        var requestToken = await _homeService.refreshToken(refreshToken);
-        var refreshTokenDTO = refreshTokenDtoFromJson(
-            json.encode(requestToken.body));
-        accessToken = refreshTokenDTO.accessToken!;
-        box.write(con.ACCESS_TOKEN, accessToken);
-        request = await _profileService.retrieveTokenStreamChat(accessToken);
-        if (request.isOk) {
+      if (streamChatToken.value.isNullOrBlank!) {
+        var request = await _profileService.retrieveTokenStreamChat(
+            accessToken);
+        streamChatToken.value = request.body!;
+        await box.write(con.STREAM_CHAT_TOKEN, request.body);
+        var userToPass = UserDTO(id: userMe.value.id,
+            userName: userMe.value.userName,
+            picture: userMe.value.picture,
+            isAdmin: userMe.value.isAdmin,
+            createdAt: userMe.value.createdAt,
+            description: userMe.value.description,
+            fcmToken: userMe.value.fcmToken,
+            wallet: userMe.value.wallet,
+            following: userMe.value.following,
+            isInFollowing: userMe.value.isInFollowing);
+        if (request.statusCode == 401) {
+          var requestToken = await _homeService.refreshToken(refreshToken);
+          var refreshTokenDTO = refreshTokenDtoFromJson(
+              json.encode(requestToken.body));
+          accessToken = refreshTokenDTO.accessToken!;
+          box.write(con.ACCESS_TOKEN, accessToken);
+          request = await _profileService.retrieveTokenStreamChat(accessToken);
+          if (request.isOk) {
+            await client.connectUser(User(id: id.value,
+                name: userMe.value.userName.isNullOrBlank!
+                    ? userMe.value.wallet
+                    : userMe.value.userName!,
+                extraData: {"userDTO": userToPass}), request.body!);
+            controllerConnected.value = true;
+            if (DateTime.now().difference(userMe.value.createdAt!) <
+                const Duration(minutes: 1)) {
+              await _commonController.addUserToSirkl(
+                  "63f78a6188f7d4001f68699a", client, id.value);
+              await getWelcomeMessage();
+            }
+          }
+        } else if (request.isOk) {
           await client.connectUser(User(id: id.value,
               name: userMe.value.userName.isNullOrBlank!
                   ? userMe.value.wallet
                   : userMe.value.userName!,
-              extraData: {"userDTO": userToPass}), request.body! );
+              extraData: {"userDTO": userToPass}), request.body!);
           controllerConnected.value = true;
-          if (firebaseMessaging != null) {
-            await client.addDevice(
-                firebaseMessaging, PushProvider.firebase,
-                pushProviderName: "Firebase_Config");
-          }
-          if(DateTime.now().difference(userMe.value.createdAt!) < const Duration(minutes: 1)){
-            await _commonController.addUserToSirkl("63f78a6188f7d4001f68699a", client, id.value);
+          if (DateTime.now().difference(userMe.value.createdAt!) <
+              const Duration(minutes: 1)) {
+            await _commonController.addUserToSirkl(
+                "63f78a6188f7d4001f68699a", client, id.value);
             await getWelcomeMessage();
           }
         }
-      } else if (request.isOk) {
-        await client.connectUser(User(id: id.value,
-            name: userMe.value.userName.isNullOrBlank!
-                ? userMe.value.wallet
-                : userMe.value.userName!,
-            extraData: {"userDTO": userToPass}), request.body!);
+      } else {
+        await client.connectUser(User(id: id.value), streamChatToken.value);
         controllerConnected.value = true;
-        if (firebaseMessaging != null) {
-          await client.addDevice(
-              firebaseMessaging, PushProvider.firebase,
-              pushProviderName: "Firebase_Config");
-        }
-        if(DateTime.now().difference(userMe.value.createdAt!) < const Duration(minutes: 1)){
-          await _commonController.addUserToSirkl("63f78a6188f7d4001f68699a", client, id.value);
-          await getWelcomeMessage();
-        }
       }
     }
   }

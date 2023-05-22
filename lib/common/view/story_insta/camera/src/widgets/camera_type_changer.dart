@@ -158,7 +158,7 @@ class _CameraType extends StatelessWidget {
           type.value.toUpperCase(),
           style: TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: (14.0 * activePercent).clamp(12.0, 14.0),
+            fontSize: 12,
             color: Colors.white
                 .withAlpha((0xFF * activePercent.clamp(0.5, 1.0)).round()),
           ),

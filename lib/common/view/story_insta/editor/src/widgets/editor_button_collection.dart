@@ -132,12 +132,6 @@ class _EditorButtonCollectionState extends State<EditorButtonCollection> {
           ),
         ],
       ),
-      _EditingOption(
-        id: 'sticker-picker',
-        icon: Icons.emoji_emotions,
-        onPressed: _onStickerIconPressed,
-        disableOnpressed: true,
-      ),
     ];
   }
 
@@ -170,9 +164,8 @@ class _EditorButtonCollectionState extends State<EditorButtonCollection> {
                   _currentOption == null || _currentOption?.id == option.id;
 
               return Padding(
-                padding: index != 0
-                    ? const EdgeInsets.only(top: 8)
-                    : EdgeInsets.zero,
+                padding:
+                    const EdgeInsets.only(top: 16),
                 child: _OptionView(
                   option: option,
                   isSelected: isSelected,
@@ -262,7 +255,7 @@ class _OptionViewState extends State<_OptionView> {
             children: List.generate(option.items.length, (index) {
               final subOption = option.items[index];
               return Padding(
-                padding: const EdgeInsets.only(top: 8, right: 8),
+                padding: const EdgeInsets.only(top: 8, right: 0),
                 child: _OptionView(
                   option: subOption,
                   isSelected: _currentOption?.id == subOption.id,

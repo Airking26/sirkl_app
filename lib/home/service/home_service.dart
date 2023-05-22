@@ -21,6 +21,7 @@ class HomeService extends GetConnect{
     ],
   }), headers: {"accept": 'application/json'});
   Future<Response<Map<String, dynamic>>> updateStory(String accessToken, String storyModificationDTO) => patch('${con.URL_SERVER}story/modify', storyModificationDTO, headers: {'Authorization':'Bearer $accessToken'});
+  Future<Response<Map<String, dynamic>>> deleteStory(String accessToken, String createdBy, String id) => delete('${con.URL_SERVER}story/mine/$createdBy/$id', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> updateNicknames(String accessToken, String wallet, String nicknameCreationDTO) => put('${con.URL_SERVER}nicknames/$wallet', nicknameCreationDTO, headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> retrieveNicknames(String accessToken) => get('${con.URL_SERVER}nicknames/retrieve', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<List<dynamic>>> retrieveStories(String accessToken, String offset) => get('${con.URL_SERVER}story/others/$offset', headers: {'Authorization':'Bearer $accessToken'});

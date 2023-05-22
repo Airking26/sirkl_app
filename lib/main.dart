@@ -28,13 +28,19 @@ import 'package:sirkl/home/utils/analyticService.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:stream_chat_persistence/stream_chat_persistence.dart';
 import 'chats/ui/settings_group_screen.dart';
 import 'navigation/ui/navigation_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
 void main() async{
-  final client = StreamChatClient("mhgk84t9jfnt", logLevel: Level.INFO);
   WidgetsFlutterBinding.ensureInitialized();
+  final chatPersistentClient = StreamChatPersistenceClient(
+    logLevel: Level.WARNING,
+    connectionMode: ConnectionMode.background,
+  );
+  final client = StreamChatClient("mhgk84t9jfnt", logLevel: Level.WARNING)
+    ..chatPersistenceClient = chatPersistentClient;
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.instance.subscribeToTopic("all");
@@ -89,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
   @override
   void initState() {
+    _homeController.connectUser(widget.client);
     _homeController.putFCMToken(context, widget.client, true);
     initFirebase();
     _callController.setupVoiceSDKEngine(context);
@@ -277,7 +284,7 @@ class _MyHomePageState extends State<MyHomePage>{
           } else if (path == "/joinGroup") {
             _homeController.retrieveAccessToken();
             try {
-              await _homeController.retrieveTokenStreamChat(widget.client, null);}
+              await _homeController.connectUser(widget.client);}
             catch (e) {
               var stream = widget.client.queryChannels(
                   filter: Filter.equal("id", id!));
@@ -302,7 +309,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
   @override
   Widget build(BuildContext context) {
-    return const NavigationScreen();
+    return NavigationScreen(client: widget.client);
   }
 
 }

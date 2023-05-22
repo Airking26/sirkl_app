@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/chats/ui/settings_group_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
@@ -16,8 +17,9 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  const ChatScreen({Key? key, required this.client}) : super(key: key);
 
+  final StreamChatClient client;
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
@@ -27,171 +29,59 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final _homeController = Get.put(HomeController());
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
-  StreamChannelListController? streamChannelListControllerFriends;
-  StreamChannelListController? streamChannelListControllerOthers;
   final _floatingSearchBarController = FloatingSearchBarController();
   late TabController tabController;
 
-  @override
-  void initState() {
-    streamChannelListControllerFriends = buildStreamChannelListController(true);
-    streamChannelListControllerOthers = buildStreamChannelListController(false);
-    super.initState();
-  }
-
-  StreamChannelListController buildStreamChannelListController(bool searchFriends) {
-    try {
-      return StreamChannelListController(
-        client: StreamChat
-            .of(context)
-            .client,
-        filter: _chatController.searchIsActive.value &&
-            _chatController.query.value.isNotEmpty
-            ? searchFriends
-            ? Filter.or([
-          Filter.and([
-            Filter.in_("members", [_homeController.id.value]),
-            Filter.autoComplete(
-                'member.user.name', _chatController.query.value),
-            Filter.exists("${_homeController.id.value}_follow_channel"),
-            Filter.equal(
-                "${_homeController.id.value}_follow_channel", true),
-            Filter.equal('isConv', true),
-          ]),
-          Filter.and([
-            Filter.autoComplete(
-                'nameOfGroup', _chatController.query.value),
-            Filter.equal('isConv', false),
-            Filter.equal('isGroupVisible', true)
-          ])
-        ])
-            : Filter.and([
+  late final _controllerFriend = StreamChannelListController(
+    client: widget.client,
+    filter: Filter.and([
+      Filter.equal("type", "try"),
+      Filter.in_("members", [_homeController.id.value]),
+      Filter.or([
+        Filter.and([
           Filter.greater(
               "last_message_at", "2020-11-23T12:00:18.54912Z"),
+          Filter.exists(
+              "${_homeController.id.value}_follow_channel"),
+          Filter.equal(
+              "${_homeController.id.value}_follow_channel", true),
           Filter.equal('isConv', true),
-          Filter.or([
-            Filter.equal("created_by_id", _homeController.id.value),
-            Filter.in_("members", [_homeController.id.value]),
-          ]),
-          Filter.or([
-            Filter.notExists(
-                "${_homeController.id.value}_follow_channel"),
-            Filter.equal(
-                "${_homeController.id.value}_follow_channel", false)
-          ])
-        ])
-            : Filter.and([
-          if (searchFriends)
-            Filter.and([
-              Filter.in_("members", [_homeController.id.value]),
-              Filter.or([
-                Filter.and([
-                  Filter.greater(
-                      "last_message_at", "2020-11-23T12:00:18.54912Z"),
-                  Filter.exists(
-                      "${_homeController.id.value}_follow_channel"),
-                  Filter.equal(
-                      "${_homeController.id.value}_follow_channel", true),
-                  Filter.equal('isConv', true),
-                ]),
-                Filter.equal('isConv', false),
-              ]),
-            ])
-          else
-            Filter.and([
-              Filter.greater(
-                  "last_message_at", "2020-11-23T12:00:18.54912Z"),
-              Filter.equal('isConv', true),
-              Filter.or([
-                Filter.equal("created_by_id", _homeController.id.value),
-                Filter.in_("members", [_homeController.id.value]),
-              ]),
-              Filter.or([
-                Filter.notExists(
-                    "${_homeController.id.value}_follow_channel"),
-                Filter.equal(
-                    "${_homeController.id.value}_follow_channel", false)
-              ])
-            ])
         ]),
-        channelStateSort: const [SortOption('last_message_at')],
-        limit: 10,
-      );
-    } on StreamChatNetworkError catch (e) {
-      if (e.statusCode == 1000) {
-        debugPrint("StreamChatNetworkError");
-         _homeController.putFCMToken(context, StreamChat.of(context).client, false);
-        return StreamChannelListController(
-          client: StreamChat
-              .of(context)
-              .client,
-          filter: Filter.and([
-            Filter.greater(
-                "last_message_at", "2020-11-23T12:00:18.54912Z"),
-            Filter.equal('isConv', true),
-            Filter.or([
-              Filter.equal("created_by_id", _homeController.id.value),
-              Filter.in_("members", [_homeController.id.value]),
-            ]),
-            Filter.or([
-              Filter.notExists(
-                  "${_homeController.id.value}_follow_channel"),
-              Filter.equal(
-                  "${_homeController.id.value}_follow_channel", false)
-            ])
-          ]),
-          channelStateSort: const [SortOption('last_message_at')],
-          limit: 10,
-        );
-      } else if(e.statusCode == 400){
-        StreamChat.of(context).client.openConnection(includeUserDetailsInConnectCall: true);
-        return StreamChannelListController(
-          client: StreamChat
-              .of(context)
-              .client,
-          filter: Filter.and([
-            Filter.greater(
-                "last_message_at", "2020-11-23T12:00:18.54912Z"),
-            Filter.equal('isConv', true),
-            Filter.or([
-              Filter.equal("created_by_id", _homeController.id.value),
-              Filter.in_("members", [_homeController.id.value]),
-            ]),
-            Filter.or([
-              Filter.notExists(
-                  "${_homeController.id.value}_follow_channel"),
-              Filter.equal(
-                  "${_homeController.id.value}_follow_channel", false)
-            ])
-          ]),
-          channelStateSort: const [SortOption('last_message_at')],
-          limit: 10,
-        );
-      } else {
-        return StreamChannelListController(
-          client: StreamChat
-              .of(context)
-              .client,
-          filter: Filter.and([
-            Filter.greater(
-                "last_message_at", "2020-11-23T12:00:18.54912Z"),
-            Filter.equal('isConv', true),
-            Filter.or([
-              Filter.equal("created_by_id", _homeController.id.value),
-              Filter.in_("members", [_homeController.id.value]),
-            ]),
-            Filter.or([
-              Filter.notExists(
-                  "${_homeController.id.value}_follow_channel"),
-              Filter.equal(
-                  "${_homeController.id.value}_follow_channel", false)
-            ])
-          ]),
-          channelStateSort: const [SortOption('last_message_at')],
-          limit: 10,
-        );
-      }
-    }
+        Filter.equal('isConv', false),
+      ]),
+    ]),
+    channelStateSort: const [SortOption('last_message_at')],
+    limit: 10,
+  );
+  late final _controllerOther = StreamChannelListController(
+    client: widget.client,
+    filter:
+    Filter.and([
+      Filter.equal("type", "try"),
+      Filter.greater(
+          "last_message_at", "2020-11-23T12:00:18.54912Z"),
+      Filter.equal('isConv', true),
+      Filter.or([
+        Filter.equal("created_by_id", _homeController.id.value),
+        Filter.in_("members", [_homeController.id.value]),
+      ]),
+      Filter.or([
+        Filter.notExists(
+            "${_homeController.id.value}_follow_channel"),
+        Filter.equal(
+            "${_homeController.id.value}_follow_channel", false)
+      ])
+    ])
+    ,
+    channelStateSort: const [SortOption('last_message_at')],
+    limit: 10,
+  );
+
+  @override
+  void initState() {
+    _controllerFriend.doInitialLoad();
+    _controllerOther.doInitialLoad();
+    super.initState();
   }
 
   @override
@@ -206,8 +96,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
     return Obx(() {
       if (_commonController.refreshInboxes.value) {
-        streamChannelListControllerFriends?.refresh();
-        streamChannelListControllerOthers?.refresh();
+        _controllerFriend.refresh();
+        _controllerOther.refresh();
         _commonController.refreshInboxes.value = false;
       }
       return Scaffold(
@@ -229,18 +119,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       child: Expanded(
         child: SafeArea(
           minimum: const EdgeInsets.only(top: 28),
-          child: !_homeController.controllerConnected.value
-              ? const Center(
-                  child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child:
-                          CircularProgressIndicator(color: Color(0xff00CB7D))))
-              : TabBarView(
+          child: TabBarView(
                   physics: const NeverScrollableScrollPhysics(),
                   controller: tabController,
                   children: [
                     Obx(() => StreamChannelListView(
+                      errorBuilder: (context, error){
+                        return noGroupRetry(true);
+                      },
                           channelSlidableEnabled:
                               !_chatController.searchIsActive.value,
                           channelConv: true,
@@ -343,9 +229,31 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             return noGroupUI();
                           },
                           controller: _chatController.searchIsActive.value &&
-                                  _chatController.query.value.isNotEmpty
-                              ? buildStreamChannelListController(true)
-                              : streamChannelListControllerFriends!,
+                              _chatController.query.value.isNotEmpty
+                              ? StreamChannelListController(
+                            client: widget.client,
+                            filter: Filter.or([
+                              Filter.and([
+                                Filter.equal("type", "try"),
+                                Filter.in_("members", [_homeController.id.value]),
+                                Filter.autoComplete(
+                                    'member.user.name', _chatController.query.value),
+                                Filter.exists("${_homeController.id.value}_follow_channel"),
+                                Filter.equal(
+                                    "${_homeController.id.value}_follow_channel", true),
+                                Filter.equal('isConv', true),
+                              ]),
+                              Filter.and([
+                                Filter.equal("type", "try"),
+                                Filter.autoComplete(
+                                    'nameOfGroup', _chatController.query.value),
+                                Filter.equal('isConv', false),
+                                Filter.equal('isGroupVisible', true)
+                              ])
+                            ]),
+                            channelStateSort: const [SortOption('last_message_at')],
+                            limit: 10,
+                          ) : _controllerFriend,
                           onChannelTap: (channel) async {
                             _chatController.channel.value = channel;
                             _navigationController.hideNavBar.value = true;
@@ -359,7 +267,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               pushNewScreen(context,
                                       screen: const SettingsGroupScreen())
                                   .then((value) {
-                                streamChannelListControllerFriends?.refresh();
+                                _controllerFriend.refresh();
                                 _navigationController.hideNavBar.value =
                                     _chatController.fromGroupJoin.value;
                                 _chatController.fromGroupJoin.value = false;
@@ -371,13 +279,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                           child: const ChannelPage()))
                                   .then((value) async{
                                 _navigationController.hideNavBar.value = false;
-                                if(_chatController.needToRefresh.value) await streamChannelListControllerFriends?.refresh();
+                                if(_chatController.needToRefresh.value) await _controllerFriend.refresh();
                                 _chatController.needToRefresh.value = false;
                               });
                             }
                           },
                         )),
                     Obx(() => StreamChannelListView(
+                      errorBuilder: (context, error){
+                        return noGroupRetry(false);
+                      },
                           channelSlidableEnabled:
                               !_chatController.searchIsActive.value,
                           onChannelDeletePressed: (context, channel) async {
@@ -464,9 +375,27 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             return noGroupUI();
                           },
                           controller: _chatController.searchIsActive.value &&
-                                  _chatController.query.value.isNotEmpty
-                              ? buildStreamChannelListController(false)
-                              : streamChannelListControllerOthers!,
+                              _chatController.query.value.isNotEmpty ? StreamChannelListController(
+                            client: widget.client, filter: Filter.and([
+                            Filter.equal("type", "try"),
+                            Filter.autoComplete(
+                                'member.user.name', _chatController.query.value),
+                            Filter.greater(
+                                "last_message_at", "2020-11-23T12:00:18.54912Z"),
+                            Filter.equal('isConv', true),
+                            Filter.or([
+                              Filter.equal("created_by_id", _homeController.id.value),
+                              Filter.in_("members", [_homeController.id.value]),
+                            ]),
+                            Filter.or([
+                              Filter.notExists(
+                                  "${_homeController.id.value}_follow_channel"),
+                              Filter.equal(
+                                  "${_homeController.id.value}_follow_channel", false)
+                            ]),
+                          ]),
+                          channelStateSort: const [SortOption('last_message_at')],
+                            limit: 10,): _controllerOther,
                           onChannelTap: (channel) {
                             _chatController.channel.value = channel;
                             _navigationController.hideNavBar.value = true;
@@ -534,6 +463,64 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       fontWeight: FontWeight.w500),
                 ),
               ),
+      ],
+    );
+  }
+
+  Column noGroupRetry(bool isMySirkl) {
+    return Column(
+      children: [
+        const SizedBox(
+          height: 100,
+        ),
+        Image.asset(
+          "assets/images/people.png",
+          width: 150,
+          height: 150,
+        ),
+        const SizedBox(
+          height: 30,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 54.0),
+          child: Text(
+                 "No Chat Found",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color:
+                    MediaQuery.of(context).platformBrightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                fontSize: 25,
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w700),
+          ),
+        ),
+        const SizedBox(
+          height: 12,
+        ),
+        Obx(()=>NiceButtons(
+            stretch: false,
+            borderThickness: 5,
+            width: 150,
+            height: 45,
+            progress: false,
+            borderColor: const Color(0xff0063FB).withOpacity(0.5),
+            startColor: const Color(0xff1DE99B),
+            endColor: const Color(0xff0063FB),
+            gradientOrientation: GradientOrientation.Horizontal,
+            onTap: (finish) async {
+              _chatController.retryProgress.value = true;
+              isMySirkl ? await _controllerFriend.doInitialLoad() : await _controllerOther.doInitialLoad();
+              _chatController.retryProgress.value = false;
+            },
+            child:
+            _chatController.retryProgress.value ? const Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white)),) : const Text("RETRY", style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w700),)
+        )),
       ],
     );
   }
@@ -823,7 +810,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           : Colors.white,
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async {
-        if (query.isNotEmpty) _chatController.query.value = query;
+        if (query.isNotEmpty){
+          _chatController.query.value = query;
+        }
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
@@ -849,6 +838,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _controllerOther.dispose();
+    _controllerFriend.dispose();
     _chatController.index.value = 0;
     super.dispose();
   }

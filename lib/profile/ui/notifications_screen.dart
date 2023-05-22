@@ -132,7 +132,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         child: ListTile(
           onTap: () async{
             await _commonController.getUserById(item.idData);
-            pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
+            pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false, fromNested: true,));
           },
           trailing: item.type == 7 ? Row(
             mainAxisSize: MainAxisSize.min,

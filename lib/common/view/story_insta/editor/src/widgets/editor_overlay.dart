@@ -31,7 +31,7 @@ class EditorOverlay extends StatelessWidget {
 
             // Close button
             Positioned(
-              left: 8,
+              left: 16,
               top: _top,
               child: EditorCloseButton(controller: controller),
             ),

@@ -85,6 +85,7 @@ dependencies:
   firebase_dynamic_links: ^5.1.1
   flutter_typeahead: ^4.3.7
   flutter_beep: ^1.0.0
+  stream_chat_persistence: ^6.1.0
 
 dev_dependencies:
   flutter_test:

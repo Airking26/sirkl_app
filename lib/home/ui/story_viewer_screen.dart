@@ -36,10 +36,10 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
           e!.type == 0 ?
           StoryItem.pageImage(url: e.url,
               controller: controller,
-              imageFit: BoxFit.cover,
+              imageFit: BoxFit.fitWidth,
               duration: const Duration(seconds: 5)) :
           StoryItem.pageVideo(
-              e.url, controller: controller, imageFit: BoxFit.cover)
+              e.url, controller: controller, imageFit: BoxFit.fitWidth)
           ).toList();
     super.initState();
   }

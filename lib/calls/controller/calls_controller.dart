@@ -151,8 +151,8 @@ class CallsController extends GetxController{
           break;
         case Event.ACTION_CALL_DECLINE:
           playRingback(50);
-          //await FlutterCallkitIncoming.endAllCalls();
-          //await endCall(event.body["extra"]["userCalling"], event.body["id"]);
+          await FlutterCallkitIncoming.endAllCalls();
+          await endCall(event.body["extra"]["userCalling"], event.body["id"]);
           break;
         case Event.ACTION_CALL_ENDED:
           playRingback(50);

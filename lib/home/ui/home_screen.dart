@@ -274,90 +274,88 @@ class _HomeScreenState extends State<HomeScreen> {
           fit: FlexFit.loose,
           child: Padding(
             padding: const EdgeInsets.only(top: 0),
-            child: SafeArea(
-              child: AzListView(
-                indexBarWidth: _commonController.users.length > 20 ? 30 : 0,
-                indexBarMargin:
-                    const EdgeInsets.only(right: 8, top: 12, bottom: 12),
-                indexHintBuilder: (context, hint) {
-                  return Container(
-                    width: 60,
-                    height: 60,
-                    decoration: const BoxDecoration(
-                        shape: BoxShape.circle, color: Color(0xff00CB7D)),
-                    alignment: Alignment.center,
-                    child: Text(hint,
-                        style: const TextStyle(
-                            fontFamily: "Gilroy",
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            fontSize: 18)),
-                  );
-                },
-                indexBarItemHeight: MediaQuery.of(context).size.height / (_homeController.stories.value!.isEmpty ? 40 : 50),
-                indexBarOptions: IndexBarOptions(
-                    textStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: "Gilroy"),
-                    decoration: BoxDecoration(
-                      color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                          ? const Color(0xff9BA0A5).withOpacity(0.8)
-                          : const Color(0xFF828282).withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    downDecoration: BoxDecoration(
-                      color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                          ? const Color(0xff9BA0A5).withOpacity(0.8)
-                          : const Color(0xFF828282).withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    selectTextStyle: const TextStyle(
-                        color: Color(0xff00CB7D),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: "Gilroy"),
-                    selectItemDecoration: const BoxDecoration(),
-                    needRebuild: true,
-                    indexHintAlignment: Alignment.centerRight,
-                    indexHintOffset: const Offset(0, 0)),
-                padding: const EdgeInsets.only(top: 16),
-                indexBarData: _commonController.users.length > 20
-                    ? [
-                        "0",
-                        'A',
-                        'B',
-                        'C',
-                        'D',
-                        'E',
-                        'F',
-                        'G',
-                        'H',
-                        'I',
-                        'J',
-                        'K',
-                        'L',
-                        'M',
-                        'N',
-                        'O',
-                        'P',
-                        'Q',
-                        'R',
-                        'S',
-                        'T',
-                        'U',
-                        'V',
-                        'W',
-                        'X',
-                        'Y',
-                        'Z',
-                      ]
-                    : [],
-                data: _commonController.users,
-                itemCount: _commonController.users.length,
-                itemBuilder: buildSirklRepertoire,
-              ),
+            child: AzListView(
+              indexBarWidth: _commonController.users.length > 20 ? 30 : 0,
+              indexBarMargin:
+                  const EdgeInsets.only(right: 8, top: 12, bottom: 12),
+              indexHintBuilder: (context, hint) {
+                return Container(
+                  width: 60,
+                  height: 60,
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: Color(0xff00CB7D)),
+                  alignment: Alignment.center,
+                  child: Text(hint,
+                      style: const TextStyle(
+                          fontFamily: "Gilroy",
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontSize: 18)),
+                );
+              },
+              indexBarItemHeight: MediaQuery.of(context).size.height / (_homeController.stories.value == null || _homeController.stories.value!.isEmpty ? 40 : 50),
+              indexBarOptions: IndexBarOptions(
+                  textStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: "Gilroy"),
+                  decoration: BoxDecoration(
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                        ? const Color(0xff9BA0A5).withOpacity(0.8)
+                        : const Color(0xFF828282).withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  downDecoration: BoxDecoration(
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                        ? const Color(0xff9BA0A5).withOpacity(0.8)
+                        : const Color(0xFF828282).withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  selectTextStyle: const TextStyle(
+                      color: Color(0xff00CB7D),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: "Gilroy"),
+                  selectItemDecoration: const BoxDecoration(),
+                  needRebuild: true,
+                  indexHintAlignment: Alignment.centerRight,
+                  indexHintOffset: const Offset(0, 0)),
+              padding: const EdgeInsets.only(top: 16),
+              indexBarData: _commonController.users.length > 20
+                  ? [
+                      "0",
+                      'A',
+                      'B',
+                      'C',
+                      'D',
+                      'E',
+                      'F',
+                      'G',
+                      'H',
+                      'I',
+                      'J',
+                      'K',
+                      'L',
+                      'M',
+                      'N',
+                      'O',
+                      'P',
+                      'Q',
+                      'R',
+                      'S',
+                      'T',
+                      'U',
+                      'V',
+                      'W',
+                      'X',
+                      'Y',
+                      'Z',
+                    ]
+                  : [],
+              data: _commonController.users,
+              itemCount: _commonController.users.length,
+              itemBuilder: buildSirklRepertoire,
             ),
           )),
     );
