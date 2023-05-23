@@ -52,7 +52,6 @@ void main() async{
 class MyApp extends StatelessWidget {
 
   const MyApp({Key? key, required this.client}) : super(key: key);
-
   final StreamChatClient client;
 
   @override
@@ -68,15 +67,14 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: ThemeData(brightness: Brightness.light, dividerColor: Colors.transparent),
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(client: client),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.client}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
 
-  final StreamChatClient client;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -95,8 +93,8 @@ class _MyHomePageState extends State<MyHomePage>{
 
   @override
   void initState() {
-    _homeController.connectUser(widget.client);
-    _homeController.putFCMToken(context, widget.client, true);
+    _homeController.connectUser(StreamChat.of(context).client);
+    _homeController.putFCMToken(context, StreamChat.of(context).client, true);
     initFirebase();
     _callController.setupVoiceSDKEngine(context);
     getCurrentCall();
@@ -256,7 +254,7 @@ class _MyHomePageState extends State<MyHomePage>{
           await _commonController.getUserById(id!);
           pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
         } else if(path == "/joinGroup"){
-            var stream = widget.client.queryChannels(filter: Filter.equal("id", id!));
+            var stream = StreamChat.of(context).client.queryChannels(filter: Filter.equal("id", id!));
             var channels = await stream.first;
             var channel = channels.first;
             _chatController.channel.value = channel;
@@ -284,9 +282,9 @@ class _MyHomePageState extends State<MyHomePage>{
           } else if (path == "/joinGroup") {
             _homeController.retrieveAccessToken();
             try {
-              await _homeController.connectUser(widget.client);}
+              await _homeController.connectUser(StreamChat.of(context).client);}
             catch (e) {
-              var stream = widget.client.queryChannels(
+              var stream = StreamChat.of(context).client.queryChannels(
                   filter: Filter.equal("id", id!));
               var channels = await stream.first;
               var channel = channels.first;
@@ -309,7 +307,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
   @override
   Widget build(BuildContext context) {
-    return NavigationScreen(client: widget.client);
+    return const NavigationScreen();
   }
 
 }

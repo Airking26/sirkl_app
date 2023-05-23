@@ -17,9 +17,8 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key, required this.client}) : super(key: key);
+  const ChatScreen({Key? key}) : super(key: key);
 
-  final StreamChatClient client;
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
@@ -33,7 +32,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   late TabController tabController;
 
   late final _controllerFriend = StreamChannelListController(
-    client: widget.client,
+    client: StreamChat.of(context).client,
     filter: Filter.and([
       Filter.equal("type", "try"),
       Filter.in_("members", [_homeController.id.value]),
@@ -54,7 +53,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     limit: 10,
   );
   late final _controllerOther = StreamChannelListController(
-    client: widget.client,
+    client: StreamChat.of(context).client,
     filter:
     Filter.and([
       Filter.equal("type", "try"),
@@ -231,7 +230,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           controller: _chatController.searchIsActive.value &&
                               _chatController.query.value.isNotEmpty
                               ? StreamChannelListController(
-                            client: widget.client,
+                            client: StreamChat.of(context).client,
                             filter: Filter.or([
                               Filter.and([
                                 Filter.equal("type", "try"),
@@ -376,7 +375,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           },
                           controller: _chatController.searchIsActive.value &&
                               _chatController.query.value.isNotEmpty ? StreamChannelListController(
-                            client: widget.client, filter: Filter.and([
+                            client: StreamChat.of(context).client, filter: Filter.and([
                             Filter.equal("type", "try"),
                             Filter.autoComplete(
                                 'member.user.name', _chatController.query.value),

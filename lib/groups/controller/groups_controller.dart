@@ -31,7 +31,7 @@ class GroupsController extends GetxController{
   final _groupService = GroupService();
   final _homeService = HomeService();
   final box = GetStorage();
-  var nftsAvailable = <CollectionDbDto>[].obs;
+  var nftAvailable = <CollectionDbDto>[].obs;
   final _chatController = Get.put(ChatsController());
   var isLoadingAvailableNFT = true.obs;
   var refreshGroups = false.obs;
@@ -81,12 +81,12 @@ class GroupsController extends GetxController{
       req = await _groupService.retrieveGroups(accessToken);
       if(req.isOk){
         var groups = groupDtoFromJson(json.encode(req.body));
-        nftsAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress.toLowerCase()).contains(element.contractAddress.toLowerCase())).toList().cast<CollectionDbDto>();
+        nftAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress.toLowerCase()).contains(element.contractAddress.toLowerCase())).toList().cast<CollectionDbDto>();
         isLoadingAvailableNFT.value = false;
       }
     } else if(req.isOk){
       var groups = groupDtoFromJson(json.encode(req.body));
-      nftsAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress.toLowerCase()).contains(element.contractAddress.toLowerCase())).toList().cast<CollectionDbDto>() ;
+      nftAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress.toLowerCase()).contains(element.contractAddress.toLowerCase())).toList().cast<CollectionDbDto>() ;
       isLoadingAvailableNFT.value = false;
     }
   }
@@ -96,6 +96,7 @@ class GroupsController extends GetxController{
     if(request.isOk) {
       return contractCreatorDtoFromJson(json.encode(request.body))?.result?.first?.contractCreator;
     }
+    return "";
   }
 
   retrieveGroupsToCreate(StreamChatClient streamChatClient) async{

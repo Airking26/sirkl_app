@@ -18,8 +18,7 @@ import 'package:sirkl/common/constants.dart' as con;
 
 class NavigationScreen extends StatefulWidget {
 
-  const NavigationScreen({Key? key, required this.client}) : super(key: key);
-  final StreamChatClient client;
+  const NavigationScreen({Key? key}) : super(key: key);
 
   @override
   State<NavigationScreen> createState() => _NavigationScreenState();
@@ -37,8 +36,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
   late final List<Widget> _pages = [
     const HomeScreen(),
     const CallsScreen(),
-    GroupsScreen(client: widget.client),
-    ChatScreen(client: widget.client),
+    const GroupsScreen(),
+    const ChatScreen(),
     const ProfileScreen()
   ];
 
