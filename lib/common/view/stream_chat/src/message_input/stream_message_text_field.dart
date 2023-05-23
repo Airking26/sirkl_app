@@ -74,6 +74,7 @@ class StreamMessageTextField extends StatefulWidget {
     this.decoration = const InputDecoration(),
     TextInputType? keyboardType,
     this.textInputAction,
+    this.hasAttachment = false,
     this.textCapitalization = TextCapitalization.none,
     this.style,
     this.strutStyle,
@@ -552,6 +553,8 @@ class StreamMessageTextField extends StatefulWidget {
   ///    Flutter.
   /// {@endtemplate}
   final String? restorationId;
+
+  final bool hasAttachment;
 
   /// {@macro flutter.widgets.editableText.scribbleEnabled}
   final bool scribbleEnabled;

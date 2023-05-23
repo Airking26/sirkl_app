@@ -675,7 +675,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
                       channel.state != null &&
                       channel.config?.commands.isNotEmpty == true)
                     _buildCommandButton(context),
-                  ...widget.actions,
+                  ..._effectiveController.attachments.isEmpty ? widget.actions : [],
                 ].insertBetween(const SizedBox(width: 0)),
               ),
         duration: const Duration(milliseconds: 300),
@@ -785,6 +785,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
                       ),
                       mobile: (context, child) => child,
                       child: StreamMessageTextField(
+                        hasAttachment: _effectiveController.attachments.isEmpty,
                         key: const Key('messageInputText'),
                         maxLines: widget.maxLines,
                         minLines: widget.minLines,
@@ -884,7 +885,9 @@ class StreamMessageInputState extends State<StreamMessageInput>
               : null),
       suffixIconConstraints: const BoxConstraints.tightFor(height: 40),
       prefixIconConstraints: const BoxConstraints.tightFor(height: 40),
-      suffixIcon: Row(
+      suffixIcon:
+      //_effectiveController.attachments.isEmpty ?
+      Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (_commandEnabled)

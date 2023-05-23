@@ -83,11 +83,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         : buildSignWalletUI(),
                 _homeController.accessToken.value.isNotEmpty
                     ? _commonController.gettingStoryAndContacts.value &&
-                            _homeController.loadingStories.value
+                            _homeController.loadingStories.value && !_homeController.isFirstConnexion.value
                         ? Container(
                             margin: const EdgeInsets.only(top: 150),
                             child: const CircularProgressIndicator(
-                                color: Color(0xff00CB7D)))
+                                color: Color(0xFF00CB7D)))
                         : _commonController.users.isNotEmpty
                             ? buildRepertoireList(context)
                             : buildEmptyFriends()

@@ -5,19 +5,12 @@ import 'package:flutter_portal/flutter_portal.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/conditional_parent_builder/conditional_parent_builder.dart';
 import 'package:sirkl/common/view/stream_chat/platform_widget_builder/src/platform_widget_builder.dart';
-import 'package:sirkl/common/view/stream_chat/src/attachment/file_attachment.dart';
-import 'package:sirkl/common/view/stream_chat/src/attachment/giphy_attachment.dart';
-import 'package:sirkl/common/view/stream_chat/src/attachment/image_attachment.dart';
-import 'package:sirkl/common/view/stream_chat/src/attachment/image_group.dart';
-import 'package:sirkl/common/view/stream_chat/src/attachment/video_attachment.dart';
 import 'package:sirkl/common/view/stream_chat/src/context_menu_items/context_menu_reaction_picker.dart';
 import 'package:sirkl/common/view/stream_chat/src/context_menu_items/stream_chat_context_menu_item.dart';
 import 'package:sirkl/common/view/stream_chat/src/dialogs/delete_message_dialog.dart';
 import 'package:sirkl/common/view/stream_chat/src/dialogs/message_dialog.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_actions_modal/message_actions_modal.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/message_widget_content.dart';
-import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
-import 'package:sirkl/common/view/stream_chat/src/utils/helpers.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import '../../../../../home/controller/home_controller.dart';
@@ -168,7 +161,7 @@ class StreamMessageWidget extends StatefulWidget {
             );
           },
           'video': (context, message, attachments) {
-            final border = RoundedRectangleBorder(
+            const border = RoundedRectangleBorder(
               side: BorderSide.none,
               borderRadius:  BorderRadius.only(topRight: Radius.circular(10), topLeft: Radius.circular(10)),
             );
@@ -200,7 +193,7 @@ class StreamMessageWidget extends StatefulWidget {
             );
           },
           'giphy': (context, message, attachments) {
-            final border = RoundedRectangleBorder(
+            const border = RoundedRectangleBorder(
               side: BorderSide.none,
               borderRadius:  BorderRadius.only(topRight: Radius.circular(10), topLeft: Radius.circular(10)),
             );
@@ -231,7 +224,7 @@ class StreamMessageWidget extends StatefulWidget {
             );
           },
           'file': (context, message, attachments) {
-            final border = RoundedRectangleBorder(
+            const border = RoundedRectangleBorder(
               side: BorderSide.none,
               borderRadius:  BorderRadius.only(topRight: Radius.circular(10), topLeft: Radius.circular(10)),
             );
@@ -798,8 +791,7 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
         widget.showUserAvatar != DisplayWidget.gone ? avatarWidth + 8.5 : 0.5;
 
     final showReactions = shouldShowReactions;
-    var k = (widget.message.text.isNullOrBlank! || widget.message.attachments.isNotEmpty || widget.message.text!.length > 20) ?  widget.widthFactor : 0.5 ;
-    var t = widget.message.text;
+
 
     return ConditionalParentBuilder(
       builder: (context, child) {
@@ -839,7 +831,7 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
                   alignment: widget.reverse
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
-                  widthFactor: 0.90
+                  widthFactor: widget.message.attachments.map((e) => e.type).contains('voicenote') ? 1.03 : widget.widthFactor
                   //(widget.message.text.isNullOrBlank! || widget.message.attachments.isNotEmpty || widget.message.text!.length > 20) ?  widget.widthFactor : widget.message.text!.length < 5 ? 0.35 : 0.5
                 ,
                   child: MessageWidgetContent(

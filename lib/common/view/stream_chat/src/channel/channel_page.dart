@@ -24,7 +24,6 @@ class _ChannelPageState extends State<ChannelPage> {
   FocusNode? _focusNode;
   final StreamMessageInputController _messageInputController = StreamMessageInputController();
   final _commonController = Get.put(CommonController());
-  final _chatController = Get.put(ChatsController());
 
   @override
   void initState() {

@@ -46,8 +46,6 @@ class _RecordButtonState extends State<RecordButton> {
 
   @override
   Widget build(BuildContext context) {
-    late final IconData icon;
-    late final Color? color;
 
     return IconButton(
       icon: Icon( _isRecording ? Icons.stop : Icons.mic),
@@ -61,24 +59,6 @@ class _RecordButtonState extends State<RecordButton> {
       onPressed: (){
         _isRecording ? _stop() : _start();
       },
-    );
-
-    if (_isRecording) {
-      icon = Icons.stop;
-      color = const Color(0xff00CB7D);
-    } else {
-      color = StreamChatTheme.of(context).primaryIconTheme.color;
-      icon = Icons.mic;
-    }
-    return GestureDetector(
-      onTap: () {
-        _isRecording ? _stop() : _start();
-      },
-      child: Icon(
-        icon,
-        color: color,
-        size: 24,
-      ),
     );
   }
 }

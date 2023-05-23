@@ -293,41 +293,33 @@ class _FullScreenMediaState extends State<StreamFullScreenMedia> {
                           ? StreamChannelHeaderTheme.of(context).color
                           : Colors.black,
                       duration: kThemeAnimationDuration,
-                      child: ContextMenuArea(
-                        verticalPadding: 0,
-                        builder: (_) => [
-                          DownloadMenuItem(
-                            attachment: attachment,
-                          ),
-                        ],
-                        child: PhotoView(
-                          imageProvider: (imageUrl == null &&
-                                  attachment.localUri != null &&
-                                  attachment.file?.bytes != null)
-                              ? Image.memory(attachment.file!.bytes!).image
-                              : CachedNetworkImageProvider(imageUrl!),
-                          errorBuilder: (_, __, ___) => const AttachmentError(),
-                          loadingBuilder: (context, _) {
-                            final image = Image.asset(
-                              'assets/images/placeholder.png',
-                              fit: BoxFit.cover,
-                            );
-                            final colorTheme =
-                                StreamChatTheme.of(context).colorTheme;
-                            return Shimmer.fromColors(
-                              baseColor: colorTheme.disabled,
-                              highlightColor: colorTheme.inputBg,
-                              child: image,
-                            );
-                          },
-                          maxScale: PhotoViewComputedScale.covered,
-                          minScale: PhotoViewComputedScale.contained,
-                          heroAttributes: PhotoViewHeroAttributes(
-                            tag: widget.mediaAttachmentPackages,
-                          ),
-                          backgroundDecoration: const BoxDecoration(
-                            color: Colors.transparent,
-                          ),
+                      child: PhotoView(
+                        imageProvider: (imageUrl == null &&
+                                attachment.localUri != null &&
+                                attachment.file?.bytes != null)
+                            ? Image.memory(attachment.file!.bytes!).image
+                            : CachedNetworkImageProvider(imageUrl!),
+                        errorBuilder: (_, __, ___) => const AttachmentError(),
+                        loadingBuilder: (context, _) {
+                          final image = Image.asset(
+                            'assets/images/placeholder.png',
+                            fit: BoxFit.cover,
+                          );
+                          final colorTheme =
+                              StreamChatTheme.of(context).colorTheme;
+                          return Shimmer.fromColors(
+                            baseColor: colorTheme.disabled,
+                            highlightColor: colorTheme.inputBg,
+                            child: image,
+                          );
+                        },
+                        maxScale: PhotoViewComputedScale.covered,
+                        minScale: PhotoViewComputedScale.contained,
+                        heroAttributes: PhotoViewHeroAttributes(
+                          tag: widget.mediaAttachmentPackages,
+                        ),
+                        backgroundDecoration: const BoxDecoration(
+                          color: Colors.transparent,
                         ),
                       ),
                     ),
