@@ -156,13 +156,13 @@ class _CallsScreenState extends State<CallsScreen> {
             ),
           ),
           _callController.callList.value == null || _callController.callList.value!.isEmpty ? Container() : Positioned(
-              top:  110,
+              top:  MediaQuery.of(context).size.width / 3.5,
               child: DeferPointer(
                 child: SizedBox(
-                    height: 110,
+                    height: MediaQuery.of(context).size.width / 3.5,
                     width: MediaQuery.of(context).size.width,
                     child: Transform.translate(
-                      offset: const Offset(0, -30),
+                      offset: Offset(0, -(MediaQuery.of(context).size.width / 12)),
                         child: buildFloatingSearchBar())),
               ))
         ],
@@ -244,7 +244,7 @@ class _CallsScreenState extends State<CallsScreen> {
           removeTop: true,
           child: Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(top: 24),
+              padding: EdgeInsets.only(top: MediaQuery.of(context).size.width / 15),
               child: SafeArea(
                 child: PagedListView.separated(
                   pagingController: _callController.isSearchIsActive.value ? pagingSearchController :  _callController.pagingController.value,

@@ -37,6 +37,10 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
     timer.cancel();
     _callController.isCallOnSpeaker.value = false;
     _callController.isCallMuted.value = false;
+    if(!_callController.userJoinedCall.value){
+      _callController.playRingback(50);
+      _callController.missedCallNotification(_callController.userCalled.value.id!);
+      _callController.leaveChannel();}
     super.dispose();
   }
 

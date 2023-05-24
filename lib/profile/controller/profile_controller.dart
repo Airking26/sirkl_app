@@ -66,8 +66,17 @@ class ProfileController extends GetxController{
         _homeController.userMe.value = userFromJson(json.encode(request.body));
         box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
         if(!updateMeDto.userName.isNullOrBlank! || !updateMeDto.picture.isNullOrBlank!) {
-          await streamChatClient.disconnectUser();
-          await _homeController.connectUser(streamChatClient);
+          var userToPass = UserDTO(id: _homeController.userMe.value.id,
+              userName: _homeController.userMe.value.userName,
+              picture: _homeController.userMe.value.picture,
+              isAdmin: _homeController.userMe.value.isAdmin,
+              createdAt: _homeController.userMe.value.createdAt,
+              description: _homeController.userMe.value.description,
+              fcmToken: _homeController.userMe.value.fcmToken,
+              wallet: _homeController.userMe.value.wallet,
+              following: _homeController.userMe.value.following,
+              isInFollowing: _homeController.userMe.value.isInFollowing);
+          await streamChatClient.updateUser(User(id: _homeController.id.value, name: _homeController.userMe.value.userName!, extraData: {"userDTO": userToPass}));
         }
         isEditingProfile.value = false;
         isLoadingPicture.value = false;
@@ -78,8 +87,17 @@ class ProfileController extends GetxController{
       _homeController.userMe.value = userFromJson(json.encode(request.body));
       box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
       if(!updateMeDto.userName.isNullOrBlank! || !updateMeDto.picture.isNullOrBlank!) {
-        await streamChatClient.disconnectUser();
-        await _homeController.connectUser(streamChatClient);
+        var userToPass = UserDTO(id: _homeController.userMe.value.id,
+            userName: _homeController.userMe.value.userName,
+            picture: _homeController.userMe.value.picture,
+            isAdmin: _homeController.userMe.value.isAdmin,
+            createdAt: _homeController.userMe.value.createdAt,
+            description: _homeController.userMe.value.description,
+            fcmToken: _homeController.userMe.value.fcmToken,
+            wallet: _homeController.userMe.value.wallet,
+            following: _homeController.userMe.value.following,
+            isInFollowing: _homeController.userMe.value.isInFollowing);
+        await streamChatClient.updateUser(User(id: _homeController.id.value, name: _homeController.userMe.value.userName!, extraData: {"userDTO": userToPass}));
       }
       isEditingProfile.value = false;
       isLoadingPicture.value = false;

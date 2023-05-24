@@ -228,7 +228,7 @@ class CallsController extends GetxController{
       request = await _callService.retrieveCalls(accessToken, offset);
     }
     if(request.isOk) {
-      callList.value = callDtoFromJson(json.encode(request.body));
+      callList.value == null ? callList.value = callDtoFromJson(json.encode(request.body)) : callList.value?.addAll(callDtoFromJson(json.encode(request.body)));
       return callDtoFromJson(json.encode(request.body));
     }
   }

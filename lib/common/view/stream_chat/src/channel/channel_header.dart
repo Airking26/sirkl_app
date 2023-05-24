@@ -363,31 +363,33 @@ class StreamChannelHeader extends StatelessWidget
                                           hintText: ""
                                       ),
                                     ),
-                                  ):
-                                  Text(
-                                  (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ?
-                                      (channel.extraData['ens'] == null || channel.extraData['ens'] == "0") ?
-                                  "${(channel.extraData["wallet"] as String).substring(0, 6)}...${(channel.extraData["wallet"] as String).substring((channel.extraData["wallet"] as String).length - 4)}":
-                                      channel.extraData['ens']:
-                                    channel.memberCount != null && channel.memberCount! > 2 ?
-                                        channel.extraData['nameOfGroup'] == null ?
-                                        channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
-                                        channel.extraData["nameOfGroup"]
-                                            :
-                                    _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] != null ?
-                                    _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] + " (" + (!userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
-                                          userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName! : "${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(0,6)}...${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.length - 4)}") + ")"
-                                            : (!userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
-                                        userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName! : "${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(0,6)}...${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.length - 4)}"),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: "Gilroy",
-                                        color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                                            ? Colors.white
-                                            : Colors.black),
+                                  ):SizedBox(
+                                    width: MediaQuery.of(context).size.width / 2.5,
+                                    child: Text(
+                                    (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ?
+                                        (channel.extraData['ens'] == null || channel.extraData['ens'] == "0") ?
+                                    "${(channel.extraData["wallet"] as String).substring(0, 6)}...${(channel.extraData["wallet"] as String).substring((channel.extraData["wallet"] as String).length - 4)}":
+                                        channel.extraData['ens']:
+                                      channel.memberCount != null && channel.memberCount! > 2 ?
+                                          channel.extraData['nameOfGroup'] == null ?
+                                          channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
+                                          channel.extraData["nameOfGroup"]
+                                              :
+                                      _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] != null ?
+                                      _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] + " (" + (!userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
+                                            userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName! : "${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(0,6)}...${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.length - 4)}") + ")"
+                                              : (!userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
+                                          userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName! : "${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(0,6)}...${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.length - 4)}"),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          fontFamily: "Gilroy",
+                                          color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black),
+                                    ),
                                   ),
                                   channel.memberCount != null && channel.memberCount! > 2 ? Text(
                                     "${_chatController.channel.value?.memberCount!} participants",
@@ -422,6 +424,7 @@ class StreamChannelHeader extends StatelessWidget
                                 .user!
                                 .extraData["userDTO"]));
                         _callController.isFromConv.value = true;
+                        //var t = await StreamChat.of(context).client.createCall(callId: DateTime.now().toString(), callType: 'video', channelType: channel.type, channelId: channel.id!, );
                         await _callController.inviteCall(_callController.userCalled.value, DateTime.now().toString(), _homeController.id.value);
                       }, icon: Image.asset(
                         "assets/images/call_tab.png",

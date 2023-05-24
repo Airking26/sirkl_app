@@ -80,7 +80,7 @@ class HomeController extends GetxController{
   var notificationActive = true.obs;
   var streamChatToken = "".obs;
 
-  final connector = WalletConnect(
+  var connector = WalletConnect(
     bridge: 'https://bridge.walletconnect.org',
     clientMeta: const PeerMeta(
       name: 'SIRKL',
@@ -121,9 +121,21 @@ class HomeController extends GetxController{
     });
 
     connector.on('session_request', (payload) {
+      var k = payload;
     });
 
     connector.on('disconnect', (session) {
+      connector = WalletConnect(
+        bridge: 'https://bridge.walletconnect.org',
+        clientMeta: const PeerMeta(
+          name: 'SIRKL',
+          description: 'SIRKL Login',
+          url: 'https://walletconnect.org',
+          icons: [
+            'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png'
+          ],
+        ),
+      );
     });
 
     if (!connector.connected) {

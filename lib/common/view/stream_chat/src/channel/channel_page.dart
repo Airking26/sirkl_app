@@ -49,7 +49,6 @@ class _ChannelPageState extends State<ChannelPage> {
           Expanded(
             child: StreamMessageListView(
               onMessageSwiped: _reply,
-
               messageBuilder: (context, details, messages, defaultMessageWidget) {
                 return defaultMessageWidget.copyWith(
                   onReplyTap: _reply,
