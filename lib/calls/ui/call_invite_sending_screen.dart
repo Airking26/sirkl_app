@@ -23,6 +23,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
 
   @override
   void initState() {
+    FocusManager.instance.primaryFocus?.unfocus();
     timer = Timer(const Duration(seconds: 30), () async {
       if(!_callController.userJoinedCall.value){
         _callController.playRingback(50);
@@ -37,10 +38,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
     timer.cancel();
     _callController.isCallOnSpeaker.value = false;
     _callController.isCallMuted.value = false;
-    if(!_callController.userJoinedCall.value){
-      _callController.playRingback(50);
-      _callController.missedCallNotification(_callController.userCalled.value.id!);
-      _callController.leaveChannel();}
+    _callController.playRingback(50);
     super.dispose();
   }
 
@@ -151,7 +149,6 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                           onTap: () async{
                             _callController.playRingback(50);
                             if(_callController.userJoinedCall.value) {
-                              await _callController.endCall(_callController.userCalled.value.id!, _callController.currentCallId.value);
                               await FlutterCallkitIncoming.endAllCalls();
                               await _callController.leaveChannel();
                             } else {

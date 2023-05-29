@@ -40,7 +40,7 @@ class StreamMessageText extends StatelessWidget {
             .translate(language)
             .replaceMentions()
             .text
-            ?.replaceAll('\n', '\n\n');
+            ?.replaceAll('\n', '\n\n').trimLeft();
         final themeData = Theme.of(context);
         return MarkdownBody(
           data: messageText ?? '',

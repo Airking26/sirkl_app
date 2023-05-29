@@ -31,10 +31,10 @@ class _OffsetAnimationState extends State<OffsetAnimation>
     _hideNavigationBar = widget.hideNavigationBar;
 
     _navBarHideAnimationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
+        AnimationController(vsync: this, duration: Duration.zero);
     _navBarOffsetAnimation = Tween<Offset>(
+            // ignore: prefer_const_constructors
             begin: Offset(0, 0), end: Offset(0, widget.navBarHeight! + 22.0))
-        .chain(CurveTween(curve: Curves.ease))
         .animate(_navBarHideAnimationController);
 
     _hideAnimation();

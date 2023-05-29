@@ -18,6 +18,7 @@ class ChatsController extends GetxController{
   final box = GetStorage();
   var index = 0.obs;
   var searchIsActive = false.obs;
+  var searchIsActiveInCompose = false.obs;
   var chipsList = <UserDTO>[].obs;
   var chipsListAddUsers = <UserDTO>[].obs;
   var requestsWaiting = <UserDTO>[].obs;

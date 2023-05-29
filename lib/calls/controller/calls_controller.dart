@@ -138,50 +138,50 @@ class CallsController extends GetxController{
   listenCall() {
     FlutterCallkitIncoming.onEvent.listen((event) async{
       switch (event!.event) {
-        case Event.ACTION_CALL_INCOMING:
+        case Event.actionCallIncoming:
           currentCallId.value = event.body['id'];
-          print('Device Token FCM: $event');
           break;
-        case Event.ACTION_CALL_START:
-          print('Device Token FCM: $event');
+        case Event.actionCallStart:
           break;
-        case Event.ACTION_CALL_ACCEPT:
+        case Event.actionCallAccept:
           playRingback(50);
           await join(event.body['extra']["channel"] ?? event.body['id'], event.body['extra']['userCalled'], event.body['extra']['userCalling']);
           break;
-        case Event.ACTION_CALL_DECLINE:
+        case Event.actionCallDecline:
           playRingback(50);
           await FlutterCallkitIncoming.endAllCalls();
           await endCall(event.body["extra"]["userCalling"], event.body["id"]);
           break;
-        case Event.ACTION_CALL_ENDED:
+        case Event.actionCallEnded:
           playRingback(50);
           await FlutterCallkitIncoming.endAllCalls();
-          print('Device Token FCM: $event');
           break;
-        case Event.ACTION_CALL_TIMEOUT:
+        case Event.actionCallTimeout:
           playRingback(50);
           await updateCall(CallModificationDto(id: event.body["extra"]["callId"], status: 2, updatedAt: DateTime.now()));
           break;
-        case Event.ACTION_CALL_CALLBACK:
+        case Event.actionCallCallback:
           print('Device Token FCM: $event');
           break;
-        case Event.ACTION_CALL_TOGGLE_HOLD:
+        case Event.actionCallToggleHold:
           print('Device Token FCM: $event');
           break;
-        case Event.ACTION_CALL_TOGGLE_MUTE:
+        case Event.actionCallToggleMute:
           print('Device Token FCM: $event');
           break;
-        case Event.ACTION_CALL_TOGGLE_DMTF:
+        case Event.actionCallToggleDmtf:
           print('Device Token FCM: $event');
           break;
-        case Event.ACTION_CALL_TOGGLE_GROUP:
+        case Event.actionCallToggleGroup:
           print('Device Token FCM: $event');
           break;
-        case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+        case Event.actionCallToggleAudioSession:
           print('Device Token FCM: $event');
           break;
-        case Event.ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+        case Event.actionDidUpdateDevicePushTokenVoip:
+          print('Device Token FCM: $event');
+          break;
+        case Event.actionCallCustom:
           print('Device Token FCM: $event');
           break;
       }

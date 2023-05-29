@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +19,6 @@ import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:tiny_avatar/tiny_avatar.dart';
-import 'dart:io';
-
-import '../../common/utils.dart';
 
 class CallsScreen extends StatefulWidget {
   const CallsScreen({Key? key}) : super(key: key);
@@ -156,14 +155,12 @@ class _CallsScreenState extends State<CallsScreen> {
             ),
           ),
           _callController.callList.value == null || _callController.callList.value!.isEmpty ? Container() : Positioned(
-              top:  MediaQuery.of(context).size.width / 3.5,
+              top: Platform.isAndroid ? 80 : 60,
               child: DeferPointer(
                 child: SizedBox(
-                    height: MediaQuery.of(context).size.width / 3.5,
+                    height: 110,
                     width: MediaQuery.of(context).size.width,
-                    child: Transform.translate(
-                      offset: Offset(0, -(MediaQuery.of(context).size.width / 12)),
-                        child: buildFloatingSearchBar())),
+                    child: buildFloatingSearchBar()),
               ))
         ],
       ),
@@ -243,18 +240,16 @@ class _CallsScreenState extends State<CallsScreen> {
           context: context,
           removeTop: true,
           child: Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).size.width / 15),
-              child: SafeArea(
-                child: PagedListView.separated(
-                  pagingController: _callController.isSearchIsActive.value ? pagingSearchController :  _callController.pagingController.value,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  builderDelegate: PagedChildBuilderDelegate<CallDto>(
-                    noItemsFoundIndicatorBuilder: (context) => noCallUI(),
-                      itemBuilder: (context, item, index) => callTile(item, index)),
-                  separatorBuilder: (context, index){
-                    return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
-                ),
+            child: SafeArea(
+              minimum: const EdgeInsets.only(top: 28),
+              child: PagedListView.separated(
+                pagingController: _callController.isSearchIsActive.value ? pagingSearchController :  _callController.pagingController.value,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                builderDelegate: PagedChildBuilderDelegate<CallDto>(
+                  noItemsFoundIndicatorBuilder: (context) => noCallUI(),
+                    itemBuilder: (context, item, index) => callTile(item, index)),
+                separatorBuilder: (context, index){
+                  return const Divider(color: Color(0xFF828282), thickness: 0.2, endIndent: 20, indent: 86,);},
               ),
             ),
           ),

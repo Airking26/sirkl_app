@@ -91,7 +91,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _chatController.searchIsActive.value ?const SizedBox(height: 0, width: 0,) :  Column(
+                    _chatController.searchIsActiveInCompose.value ?const SizedBox(height: 0, width: 0,) :  Column(
                       children: [
                         ListTile(leading: IconButton(icon : Icon(Icons.groups, size: 28, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,), onPressed: (){}, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,),tileColor: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF113751) : Colors.white, title: Text("New group", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 16, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),), contentPadding: const EdgeInsets.symmetric(horizontal: 16,),onTap: (){
                           _navigationController.hideNavBar.value = true;
@@ -151,7 +151,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                         ),
                       ],
                     ) : Container(),
-                    _chatController.searchIsActive.value ? const SizedBox(height: 0, width: 0,) : Padding(
+                    _chatController.searchIsActiveInCompose.value ? const SizedBox(height: 0, width: 0,) : Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
                         con.contactsRes.tr,
@@ -313,10 +313,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         }
         else {
           if(query.isNotEmpty) {
-            _chatController.searchIsActive.value = true;
+            _chatController.searchIsActiveInCompose.value = true;
             pagingController.itemList = [];
           } else {
-            _chatController.searchIsActive.value = false;
+            _chatController.searchIsActiveInCompose.value = false;
             pagingController.refresh();
           }
         }
@@ -333,13 +333,13 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           showIfClosed: true,
           showIfOpened: true,
           onTap: () {
-            if(_chatController.searchIsActive.value) {
-              _chatController.searchIsActive.value = false;
+            if(_chatController.searchIsActiveInCompose.value) {
+              _chatController.searchIsActiveInCompose.value = false;
               _searchController.close();
               _chatController.sendingMessageMode.value = 0;
               pagingController.refresh();
             } else {
-              _chatController.searchIsActive.value = true;
+              _chatController.searchIsActiveInCompose.value = true;
               _searchController.open();
             }
           },
@@ -635,7 +635,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
 
   @override
   void dispose() {
-    _chatController.searchIsActive.value = false;
+    _chatController.searchIsActiveInCompose.value = false;
     _chatController.sendingMessageMode.value = 0;
     _chatController.chipsList.clear();
     pagingController.dispose();

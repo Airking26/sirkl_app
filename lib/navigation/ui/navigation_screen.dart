@@ -100,6 +100,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   Widget build(BuildContext context) {
     return Obx(() =>Scaffold(
         body: PersistentTabView(
+
           context,
           screens: _pages,
           hideNavigationBar: _navigationController.hideNavBar.value,

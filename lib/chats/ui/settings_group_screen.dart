@@ -96,10 +96,13 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          (_chatController.channel.value!.membership != null && _chatController.channel.value!.membership!.channelRole == "channel_member" && _chatController.channel.value?.createdBy?.id != _homeController.id.value) ?
+          ((_chatController.channel.value!.membership != null && _chatController.channel.value!.membership?.channelRole == "channel_member")
+              || (_chatController.channel.value!.state!.members
+              .map((e) => e.userId!)
+              .contains(_homeController.id.value)) && _chatController.channel.value?.createdBy?.id != _homeController.id.value) ?
           const SizedBox() : InkWell(
             onTap: () async {
-              if(_chatController.channel.value!.membership != null && _chatController.channel.value!.membership!.channelRole == "channel_moderator" || (_chatController.channel.value?.createdBy?.id == _homeController.id.value && _chatController.channel.value!.membership?.channelRole == "channel_member")){
+              if((_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || (_chatController.channel.value?.createdBy?.id == _homeController.id.value))){
                 _chatController.isEditingGroup.value = true;
               } else {
                 if (_chatController.channel.value!
@@ -135,14 +138,14 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon( _chatController.channel.value!.membership != null && (_chatController.channel.value!.membership!.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value) ? Icons.mode_edit_rounded : Icons.add_rounded, color : MediaQuery.of(context).platformBrightness == Brightness.dark ?  Colors.white : Colors.black),
+                    Icon( (_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value) ? Icons.mode_edit_rounded : Icons.add_rounded, color : MediaQuery.of(context).platformBrightness == Brightness.dark ?  Colors.white : Colors.black),
                     const SizedBox(height: 4),
-                    Text(_chatController.channel.value!.membership != null && (_chatController.channel.value!.membership!.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value)? "Edit" : "Join", style: const TextStyle(fontFamily: "Gilroy"),)
+                    Text((_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value)? "Edit" : "Join", style: const TextStyle(fontFamily: "Gilroy"),)
                   ],),
               ),
             ),
           ),
-          SizedBox(width:  (_chatController.channel.value!.membership != null && _chatController.channel.value!.membership!.channelRole == "channel_member" && _chatController.channel.value?.createdBy?.id != _homeController.id.value) ? 0 : 16,),
+          SizedBox(width:  ((_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && _chatController.channel.value?.createdBy?.id != _homeController.id.value) ? 0 : 16,),
           InkWell(
             onTap: () async {
               var uri = await _profileController.createDynamicLink("/joinGroup?id=${_chatController.channel.value!.id!}");
@@ -175,7 +178,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
           children: [
             InkWell(
               onTap: (){
-                if(_chatController.channel.value!.membership != null) {
+                if(_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) {
                   pushNewScreen(context, screen: GroupParticipantScreen(fromChat: true));
                 } else {
                   utils.showToast(context, "You have to be a member to access this data");
@@ -186,10 +189,10 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                 child: Text("Participants (${_chatController.channel.value!.memberCount!})", style: const TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
               ),
             ),
-            _chatController.channel.value!.membership != null && _chatController.requestsWaiting.isNotEmpty && ((_chatController.channel.value!.membership!.channelRole == "channel_member" && _chatController.channel.value?.createdBy?.id == _homeController.id.value) ||  _chatController.channel.value!.membership!.channelRole == "channel_moderator")?
+            (_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && _chatController.requestsWaiting.isNotEmpty && ((_chatController.channel.value?.createdBy?.id == _homeController.id.value) ||  _chatController.channel.value!.membership?.channelRole == "channel_moderator")?
             Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                 ? Colors.white : Colors.black,) : const SizedBox(),
-            _chatController.channel.value!.membership != null && _chatController.requestsWaiting.isNotEmpty && ((_chatController.channel.value!.membership!.channelRole == "channel_member" && _chatController.channel.value?.createdBy?.id == _homeController.id.value) ||  _chatController.channel.value!.membership!.channelRole == "channel_moderator")? InkWell(
+            (_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && _chatController.requestsWaiting.isNotEmpty && ((_chatController.channel.value?.createdBy?.id == _homeController.id.value) ||  _chatController.channel.value!.membership?.channelRole == "channel_moderator")? InkWell(
               onTap: () async {
                 pushNewScreen(context, screen: const RequestWaitingForApprovalScreen());
               },
@@ -209,9 +212,9 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                   SizedBox(
                     height: 20,
                     child: Switch(
-                      value: _chatController.channel.value!.membership != null && (_chatController.channel.value!.membership!.channelRole == "channel_member" ||  _chatController.channel.value!.membership!.channelRole == "channel_moderator") &&
+                      value: (_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) &&
                           !_chatController.channel.value!.isMuted ,
-                      onChanged: _chatController.channel.value!.membership != null  && (_chatController.channel.value!.membership!.channelRole == "channel_member" ||  _chatController.channel.value!.membership!.channelRole == "channel_moderator") ? (active) async {
+                      onChanged: (_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) ? (active) async {
                         if(!active) {
                           await StreamChat
                               .of(context)
@@ -288,9 +291,10 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                 child: Text("Report", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
               ),
             ),
-            _chatController.channel.value!.membership == null ? const SizedBox() :Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                ? Colors.white : Colors.black,),
-            _chatController.channel.value!.membership == null ? const SizedBox() : InkWell(
+            (_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) ? Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                ? Colors.white : Colors.black,) :  const SizedBox(),
+            (_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) ?
+            InkWell(
               onTap: () async {
                 showDialog(context: context,
                     barrierDismissible: true,
@@ -347,7 +351,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                 padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: Text("Leave the group", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
               ),
-            ),
+            ) : const SizedBox(),
             _chatController.channel.value?.createdBy?.id == _homeController.id.value ||
                 _chatController.channel.value?.membership?.channelRole == "channel_moderator" ? Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                 ? Colors.white : Colors.black,) : const SizedBox(),

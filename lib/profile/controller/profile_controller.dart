@@ -77,6 +77,7 @@ class ProfileController extends GetxController{
               following: _homeController.userMe.value.following,
               isInFollowing: _homeController.userMe.value.isInFollowing);
           await streamChatClient.updateUser(User(id: _homeController.id.value, name: _homeController.userMe.value.userName!, extraData: {"userDTO": userToPass}));
+          descriptionTextEditingController.value.clear();
         }
         isEditingProfile.value = false;
         isLoadingPicture.value = false;
@@ -98,6 +99,7 @@ class ProfileController extends GetxController{
             following: _homeController.userMe.value.following,
             isInFollowing: _homeController.userMe.value.isInFollowing);
         await streamChatClient.updateUser(User(id: _homeController.id.value, name: _homeController.userMe.value.userName!, extraData: {"userDTO": userToPass}));
+        descriptionTextEditingController.value.clear();
       }
       isEditingProfile.value = false;
       isLoadingPicture.value = false;
@@ -232,7 +234,6 @@ class ProfileController extends GetxController{
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _homeService.updateNFTStatus(accessToken, nftModificationDtoToJson(nftModificationDto));
-
     }
   }
 

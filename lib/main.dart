@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 import 'dart:async';
 import 'dart:convert';
+import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -33,10 +34,36 @@ import 'chats/ui/settings_group_screen.dart';
 import 'navigation/ui/navigation_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  debugPrint("OnDebugSirkl : Background Handler");
+  await Firebase.initializeApp();
+  await GetStorage().initStorage;
+  var notificationActive = GetStorage().read(con.NOTIFICATION_ACTIVE) ?? true;
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  await LocalNotificationInitialize().initialize(flutterLocalNotificationsPlugin);
+  if(notificationActive) {
+    if (message.data['type'] == "2") {
+      await FlutterCallkitIncoming.endAllCalls();
+    }  else if (message.data['type'] == "4") {
+      try {
+        var notificationSaved = GetStorage().read(con.notificationSaved) ?? [];
+        (notificationSaved as List<dynamic>).add(message.data["body"]);
+        await GetStorage().write(con.notificationSaved, notificationSaved);
+      } on Error {
+        var t = '';
+      }
+    } else if (message.data['type'] == "8") {
+      showCallNotification(message.data);
+    }
+  }
+}
+
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   final chatPersistentClient = StreamChatPersistenceClient(
-    logLevel: Level.WARNING,
+    logLevel: Level.INFO,
     connectionMode: ConnectionMode.background,
   );
   final client = StreamChatClient("mhgk84t9jfnt", logLevel: Level.WARNING)
@@ -46,7 +73,12 @@ void main() async{
   FirebaseMessaging.instance.subscribeToTopic("all");
   await GetStorage.init();
   AnalyticService().getAnalyticObserver();
-  runApp(MyApp(client: client));
+  runApp(DevicePreview(
+      enabled: true,
+      tools: const [
+        ...DevicePreview.defaultTools,
+      ],
+      builder: (context) => MyApp(client: client)));
 }
 
 class MyApp extends StatelessWidget {
@@ -67,7 +99,7 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: ThemeData(brightness: Brightness.light, dividerColor: Colors.transparent),
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
@@ -168,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage>{
             }
           }
           else {
-            if(message.data['type']!= "message.new" ) showCallNotification(message.data);
+            if(message.data['type'] == "8" ) showCallNotification(message.data);
           }
         }
       });
@@ -312,41 +344,6 @@ class _MyHomePageState extends State<MyHomePage>{
 
 }
 
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  debugPrint("OnDebugSirkl : Background Handler");
-  await Firebase.initializeApp();
-  await GetStorage().initStorage;
-  var notificationActive = GetStorage().read(con.NOTIFICATION_ACTIVE) ?? true;
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  await LocalNotificationInitialize().initialize(flutterLocalNotificationsPlugin);
-  if(notificationActive) {
-    if (message.data["type"] == "0" || message.data["type"] == "1" || message.data["type"] == "5" || message.data["type"] == "6" || message.data["type"] == "7") {
-      LocalNotificationInitialize.showBigTextNotification(
-          title: message.data["title"],
-          body: message.data["body"],
-          flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-    } else if (message.data['type'] == "2") {
-      await FlutterCallkitIncoming.endAllCalls();
-    } else if (message.data['type'] == "3") {
-      LocalNotificationInitialize.showBigTextNotification(
-          title: message.data["title"],
-          body: message.data["body"],
-          flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-    } else if (message.data['type'] == "4") {
-      try {
-        var notificationSaved = GetStorage().read(con.notificationSaved) ?? [];
-        (notificationSaved as List<dynamic>).add(message.data["body"]);
-        await GetStorage().write(con.notificationSaved, notificationSaved);
-      } on Error {
-        var t = '';
-      }
-    } else if (message.data["uuid"] != null) {
-      showCallNotification(message.data);
-    }
-  }
-}
-
 Future<void> showCallNotification(Map<String, dynamic> data) async {
   var params = entities.CallKitParams(
       id: data['uuid'],
@@ -358,20 +355,16 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
     duration: 30000,
     textAccept: 'Accept',
     textDecline: 'Decline',
-    textMissedCall: 'Missed call',
-    textCallback: 'Call back',
     extra: <String, dynamic>{'userCalling': data["caller_id"], "userCalled": data['called_id'], "callId": data["call_id"], "channel": data["channel"]},
     android: const entities.AndroidParams(
-      isCustomNotification: false,
+      isCustomNotification: true,
       isCustomSmallExNotification: true,
       isShowLogo: false,
-      isShowCallback: false,
-      isShowMissedCallNotification: false,
       ringtonePath: 'system_ringtone_default',
       backgroundColor: '#102437',
       actionColor: '#4CAF50'
     ),
-    ios: entities.IOSParams(
+    ios: const entities.IOSParams(
       iconName: 'CallKitLogo',
       handleType: '',
       supportsVideo: true,

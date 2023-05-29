@@ -135,7 +135,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                IconButton(
+                                _profileController
+                                    .isEditingProfile.value
+                                    ? const SizedBox(width: 42, height: 24,) : IconButton(
                                             onPressed: () {
                                               pushNewScreen(context,
                                                       screen:
@@ -210,7 +212,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               : _homeController
                                                   .userMe.value.userName!,
                                           textAlign: TextAlign.center,
+                                          maxLines: 1,
                                           style: TextStyle(
+                                              overflow: TextOverflow.ellipsis,
                                               fontSize: 20,
                                               fontFamily: "Gilroy",
                                               fontWeight: FontWeight.w600,

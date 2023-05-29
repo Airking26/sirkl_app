@@ -138,6 +138,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         channelSlidableEnabled: true,
                         onChannelFavPressed: (context, channel) async{
                           _homeController.isInFav.remove(channel.id);
+                          _homeController.isInFav.refresh();
                           await _profileController.updateNft(NftModificationDto(contractAddress: channel.id!, id: _homeController.id.value, isFav: false), StreamChat.of(context).client);
                           await StreamChat.of(context).client.updateChannelPartial(channel.id!, 'try', unset: ["${_homeController.id.value}_favorite"]);
                           _groupController.refreshGroups.value = true;
@@ -199,6 +200,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         channelFav: false,
                         onChannelFavPressed: (context, channel) async {
                           _homeController.isInFav.add(channel.id!);
+                          _homeController.isInFav.refresh();
                           await _profileController.updateNft(NftModificationDto(contractAddress: channel.id!, id: _homeController.id.value, isFav: true), StreamChat.of(context).client);
                           await StreamChat.of(context).client.updateChannelPartial(channel.id!, 'try', set: {"${_homeController.id.value}_favorite" : true});
                           _groupController.refreshGroups.value = true;
@@ -545,12 +547,12 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             ),
           ),
           Obx(()=>Positioned(
-              top: 110,
+              top: _groupController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
               child: _groupController.searchIsActive.value ? DeferPointer(
                 child: SizedBox(
                     height: 110,
                     width: MediaQuery.of(context).size.width,
-                    child:Transform.translate(offset: Offset(0, -30), child: buildFloatingSearchBar())),
+                    child:buildFloatingSearchBar()),
               ):
               _groupController.addAGroup.value ? Container() : Container(
                   height: 50,

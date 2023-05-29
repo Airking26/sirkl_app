@@ -59,7 +59,7 @@ dependencies:
   slider_button: ^2.0.0
   agora_rtc_engine: ^5.3.1
   permission_handler: ^9.2.0
-  flutter_callkit_incoming: ^1.0.3+3
+  flutter_callkit_incoming: ^2.0.0
   ethereum_addresses: ^1.0.2
   widget_circular_animator: ^1.0.0
   flutter_badged: ^2.0.3
@@ -86,6 +86,7 @@ dependencies:
   flutter_typeahead: ^4.3.7
   flutter_beep: ^1.0.0
   stream_chat_persistence: ^6.1.0
+  device_preview: ^1.1.0
 
 dev_dependencies:
   flutter_test:
