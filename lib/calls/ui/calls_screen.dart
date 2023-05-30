@@ -70,6 +70,8 @@ class _CallsScreenState extends State<CallsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
     return Obx(()=>Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
@@ -238,7 +240,7 @@ class _CallsScreenState extends State<CallsScreen> {
   MediaQuery buildListCall(BuildContext context) {
     return MediaQuery.removePadding(
           context: context,
-          removeTop: true,
+          removeTop: false,
           child: Expanded(
             child: SafeArea(
               minimum: const EdgeInsets.only(top: 28),

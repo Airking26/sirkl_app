@@ -80,8 +80,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   void dispose() {
-    _controllerCommunitiesOther.dispose();
-    _controllerCommunitiesFav.dispose();
+    //_controllerCommunitiesOther.dispose();
+    //_controllerCommunitiesFav.dispose();
     _groupController.index.value = 0;
     super.dispose();
   }
@@ -137,11 +137,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         },
                         channelSlidableEnabled: true,
                         onChannelFavPressed: (context, channel) async{
+                          await StreamChat.of(context).client.updateChannelPartial(channel.id!, 'try', unset: ["${_homeController.id.value}_favorite"]);
+                          _groupController.refreshGroups.value = true;
                           _homeController.isInFav.remove(channel.id);
                           _homeController.isInFav.refresh();
                           await _profileController.updateNft(NftModificationDto(contractAddress: channel.id!, id: _homeController.id.value, isFav: false), StreamChat.of(context).client);
-                          await StreamChat.of(context).client.updateChannelPartial(channel.id!, 'try', unset: ["${_homeController.id.value}_favorite"]);
-                          _groupController.refreshGroups.value = true;
                         },
                         channelConv: false,
                         channelFriends: false,
@@ -199,11 +199,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         channelSlidableEnabled: true,
                         channelFav: false,
                         onChannelFavPressed: (context, channel) async {
+                          await StreamChat.of(context).client.updateChannelPartial(channel.id!, 'try', set: {"${_homeController.id.value}_favorite" : true});
+                          _groupController.refreshGroups.value = true;
                           _homeController.isInFav.add(channel.id!);
                           _homeController.isInFav.refresh();
                           await _profileController.updateNft(NftModificationDto(contractAddress: channel.id!, id: _homeController.id.value, isFav: true), StreamChat.of(context).client);
-                          await StreamChat.of(context).client.updateChannelPartial(channel.id!, 'try', set: {"${_homeController.id.value}_favorite" : true});
-                          _groupController.refreshGroups.value = true;
                         },
                         emptyBuilder: (context){
                           return _groupController.searchIsActive.value && _groupController.query.value.isNotEmpty ? SingleChildScrollView(child: noGroupFoundUI()) : noGroupUI();

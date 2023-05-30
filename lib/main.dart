@@ -1,4 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
@@ -344,7 +343,7 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
       appName: 'Sirkl',
     avatar: data["pic"] ?? 'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png',
     handle: data["body"],
-    type: 0,
+    type: 1,
     duration: 30000,
     textAccept: 'Accept',
     textDecline: 'Decline',
@@ -352,7 +351,7 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
     extra: <String, dynamic>{'userCalling': data["caller_id"], "userCalled": data['called_id'], "callId": data["call_id"], "channel": data["channel"]},
     android: const entities.AndroidParams(
       isCustomNotification: true,
-      isCustomSmallExNotification: false,
+      isCustomSmallExNotification: true,
       isShowLogo: false,
       ringtonePath: 'system_ringtone_default',
       backgroundColor: '#102437',
