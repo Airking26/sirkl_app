@@ -254,11 +254,13 @@ class _AddContactScreenState extends State<AddContactScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextField(
+                  maxLength: 13,
                   controller: nicknameController,
                   style: DefaultTextStyle.of(context).style.copyWith(
                       fontStyle: FontStyle.normal, fontFamily: "Gilroy"),
                   decoration: InputDecoration(
                       hintText: 'Only you will see it',
+
                       hintStyle: const TextStyle(fontFamily: "Gilroy"),
                       border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(

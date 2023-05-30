@@ -351,7 +351,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             )),
                       ),
-                      Positioned(
+                      _profileController.isEditingProfile.value ? const SizedBox() : Positioned(
                               top: Platform.isAndroid ? 210 : 190,
                               right: MediaQuery.of(context).size.width / 3.25,
                               child: DeferPointer(

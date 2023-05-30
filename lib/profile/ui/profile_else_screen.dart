@@ -177,8 +177,8 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                 ),
               ),
             ),
-            _commonController.userClicked.value!.description ==  "" ? const SizedBox(height: 0,) : const SizedBox(height: 10,),
-            _commonController.userClicked.value!.description ==  "" ? Container() : Padding(
+            _commonController.userClicked.value!.description.isNullOrBlank! ? const SizedBox(height: 0,) : const SizedBox(height: 10,),
+            _commonController.userClicked.value!.description.isNullOrBlank! ? Container() : Padding(
               padding: const EdgeInsets.symmetric(horizontal: 48.0),
               child: Text(_commonController.userClicked.value!.description!,  textAlign: TextAlign.center, style: const TextStyle(height: 1.5, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282), fontSize: 15),),
             ),

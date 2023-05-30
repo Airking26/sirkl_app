@@ -46,7 +46,7 @@ typedef StreamChannelListViewIndexedWidgetBuilder
 /// See also:
 /// * [StreamChannelListTile]
 /// * [StreamChannelListController]
-class StreamChannelListView extends StatelessWidget {
+class StreamChannelListView extends StatefulWidget {
   /// Creates a new instance of [StreamChannelListView].
   const StreamChannelListView({
     super.key,
@@ -299,37 +299,43 @@ class StreamChannelListView extends StatelessWidget {
   final Clip clipBehavior;
 
   @override
+  State<StreamChannelListView> createState() => _StreamChannelListViewState();
+}
+
+class _StreamChannelListViewState extends State<StreamChannelListView> with AutomaticKeepAliveClientMixin {
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return PagedValueListView<int, Channel>(
-      scrollDirection: scrollDirection,
-      padding: padding,
-      physics: physics,
-      reverse: reverse,
-      controller: controller,
-      scrollController: scrollController,
-      primary: primary,
-      shrinkWrap: shrinkWrap,
-      addAutomaticKeepAlives: addAutomaticKeepAlives,
-      addRepaintBoundaries: addRepaintBoundaries,
-      addSemanticIndexes: addSemanticIndexes,
-      keyboardDismissBehavior: keyboardDismissBehavior,
-      restorationId: restorationId,
-      dragStartBehavior: dragStartBehavior,
-      cacheExtent: cacheExtent,
-      clipBehavior: clipBehavior,
-      loadMoreTriggerIndex: loadMoreTriggerIndex,
-      separatorBuilder: separatorBuilder,
+      scrollDirection: widget.scrollDirection,
+      padding: widget.padding,
+      physics: widget.physics,
+      reverse: widget.reverse,
+      controller: widget.controller,
+      scrollController: widget.scrollController,
+      primary: widget.primary,
+      shrinkWrap: widget.shrinkWrap,
+      addAutomaticKeepAlives: widget.addAutomaticKeepAlives,
+      addRepaintBoundaries: widget.addRepaintBoundaries,
+      addSemanticIndexes: widget.addSemanticIndexes,
+      keyboardDismissBehavior: widget.keyboardDismissBehavior,
+      restorationId: widget.restorationId,
+      dragStartBehavior: widget.dragStartBehavior,
+      cacheExtent: widget.cacheExtent,
+      clipBehavior: widget.clipBehavior,
+      loadMoreTriggerIndex: widget.loadMoreTriggerIndex,
+      separatorBuilder: widget.separatorBuilder,
       itemBuilder: (context, channels, index) {
         final channel = channels[index];
-        final onTap = onChannelTap;
-        final onLongPress = onChannelLongPress;
-        final onFavPressed = onChannelFavPressed;
-        final onDeletePressed = onChannelDeletePressed;
-        final onAddPressed = onChannelAddPressed;
-        final slidableEnabled = channelSlidableEnabled;
-        final isFav = channelFav;
-        final isConv = channelConv;
-        final isFriends = channelFriends;
+        final onTap = widget.onChannelTap;
+        final onLongPress = widget.onChannelLongPress;
+        final onFavPressed = widget.onChannelFavPressed;
+        final onDeletePressed = widget.onChannelDeletePressed;
+        final onAddPressed = widget.onChannelAddPressed;
+        final slidableEnabled = widget.channelSlidableEnabled;
+        final isFav = widget.channelFav;
+        final isConv = widget.channelConv;
+        final isFriends = widget.channelFriends;
         final streamChannelListTile = StreamChannelListTile(
           isConv: isConv,
           isFriends: !isFriends! ? channel.id!.startsWith("!members") ? false : true : true,
@@ -351,7 +357,7 @@ class StreamChannelListView extends StatelessWidget {
           onLongPress: onLongPress == null ? null : () => onLongPress(channel),
         );
 
-        return itemBuilder?.call(
+        return widget.itemBuilder?.call(
               context,
               channels,
               index,
@@ -361,7 +367,7 @@ class StreamChannelListView extends StatelessWidget {
       },
       emptyBuilder: (context) {
         final chatThemeData = StreamChatTheme.of(context);
-        return emptyBuilder?.call(context) ??
+        return widget.emptyBuilder?.call(context) ??
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(8),
@@ -380,7 +386,7 @@ class StreamChannelListView extends StatelessWidget {
       },
       loadMoreErrorBuilder: (context, error) =>
           StreamScrollViewLoadMoreError.list(
-        onTap: controller.retry,
+        onTap: widget.controller.retry,
         error: Text(context.translations.loadingChannelsError),
       ),
       loadMoreIndicatorBuilder: (context) => const Center(
@@ -390,20 +396,23 @@ class StreamChannelListView extends StatelessWidget {
         ),
       ),
       loadingBuilder: (context) =>
-          loadingBuilder?.call(context) ??
+          widget.loadingBuilder?.call(context) ??
           const Center(
             child: StreamScrollViewLoadingWidget(),
           ),
       errorBuilder: (context, error) =>
-          errorBuilder?.call(context, error) ??
+          widget.errorBuilder?.call(context, error) ??
           Center(
             child: StreamScrollViewErrorWidget(
               errorTitle: Text(context.translations.loadingChannelsError),
-              onRetryPressed: controller.refresh,
+              onRetryPressed: widget.controller.refresh,
             ),
           ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 /// A widget that is used to display a separator between

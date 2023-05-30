@@ -122,7 +122,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   physics: const NeverScrollableScrollPhysics(),
                   controller: tabController,
                   children: [
-                    Obx(() => StreamChannelListView(
+                    StreamChannelListView(
                       errorBuilder: (context, error){
                         return noGroupRetry(true);
                       },
@@ -283,8 +283,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               });
                             }
                           },
-                        )),
-                    Obx(() => StreamChannelListView(
+                        ),
+                    StreamChannelListView(
                       errorBuilder: (context, error){
                         return noGroupRetry(false);
                       },
@@ -406,7 +406,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               _navigationController.hideNavBar.value = false;
                             });
                           },
-                        ))
+                        )
                   ],
                 ),
         ),

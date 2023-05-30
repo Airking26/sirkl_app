@@ -416,7 +416,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))),
         trailing: _chatController.sendingMessageMode.value == 2 ? Checkbox(
           onChanged: (selected) {
-            if (_chatController.chipsList.value.length == 3 && _chatController.sendingMessageMode.value == 2) {
+            if (_chatController.chipsList.value.length == 3 && _chatController.sendingMessageMode.value == 2 && selected!) {
               utils.showToast(context, con.maxUserSelectedRes.tr);
             }
             else if (selected!) {

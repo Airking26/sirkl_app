@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 import 'dart:async';
 import 'dart:convert';
-import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -37,12 +36,10 @@ import 'package:sirkl/common/constants.dart' as con;
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   debugPrint("OnDebugSirkl : Background Handler");
-  await Firebase.initializeApp();
   await GetStorage().initStorage;
   var notificationActive = GetStorage().read(con.NOTIFICATION_ACTIVE) ?? true;
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  await LocalNotificationInitialize().initialize(flutterLocalNotificationsPlugin);
   if(notificationActive) {
+    debugPrint("ENTERING NOTIFICATION ACTIVE");
     if (message.data['type'] == "2") {
       await FlutterCallkitIncoming.endAllCalls();
     }  else if (message.data['type'] == "4") {
@@ -54,6 +51,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         var t = '';
       }
     } else if (message.data['type'] == "8") {
+      debugPrint("ENTERING 8 MODE");
       showCallNotification(message.data);
     }
   }
@@ -73,12 +71,7 @@ void main() async{
   FirebaseMessaging.instance.subscribeToTopic("all");
   await GetStorage.init();
   AnalyticService().getAnalyticObserver();
-  runApp(DevicePreview(
-      enabled: true,
-      tools: const [
-        ...DevicePreview.defaultTools,
-      ],
-      builder: (context) => MyApp(client: client)));
+  runApp(MyApp(client: client));
 }
 
 class MyApp extends StatelessWidget {
@@ -355,10 +348,11 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
     duration: 30000,
     textAccept: 'Accept',
     textDecline: 'Decline',
+    missedCallNotification: const entities.NotificationParams(showNotification: false),
     extra: <String, dynamic>{'userCalling': data["caller_id"], "userCalled": data['called_id'], "callId": data["call_id"], "channel": data["channel"]},
     android: const entities.AndroidParams(
       isCustomNotification: true,
-      isCustomSmallExNotification: true,
+      isCustomSmallExNotification: false,
       isShowLogo: false,
       ringtonePath: 'system_ringtone_default',
       backgroundColor: '#102437',

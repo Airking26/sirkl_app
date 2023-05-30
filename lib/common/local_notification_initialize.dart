@@ -12,13 +12,8 @@ class LocalNotificationInitialize{
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  void onDidReceiveLocalNotification(NotificationResponse notificationResponse) async {
-    var k = notificationResponse;
-    //Get.to(() => const DetailedChatScreen(create: true,));
-  }
-
   static Future showBigTextNotification({required String title, required String body, var payload, required FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin}) async {
-    AndroidNotificationDetails androidNotificationDetails =  const AndroidNotificationDetails("sirkl_notifications_id", "sirkl_notifications_channel", playSound: true, importance: Importance.high, priority: Priority.high, color: Colors.white);
+    AndroidNotificationDetails androidNotificationDetails = const AndroidNotificationDetails("sirkl_notifications_id", "sirkl_notifications_channel", playSound: true, importance: Importance.high, priority: Priority.high, color: Colors.white);
     var notificationDetails = NotificationDetails(android: androidNotificationDetails, iOS: const DarwinNotificationDetails());
     await flutterLocalNotificationsPlugin.show(0, title, body, notificationDetails);
   }

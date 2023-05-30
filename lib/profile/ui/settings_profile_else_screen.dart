@@ -282,7 +282,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                   ) : const SizedBox(),
                   Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? Colors.white : Colors.black,),
-                  widget.fromConversation ? InkWell(
+                  /*widget.fromConversation ? InkWell(
                     onTap: () async {
                       showDialog(
                           context: context,
@@ -312,7 +312,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                     ),
                   ) : const SizedBox(),
                   widget.fromConversation ? Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                      ? Colors.white : Colors.black,) : const SizedBox(),
+                      ? Colors.white : Colors.black,) : const SizedBox(),*/
                   InkWell(
                     onTap: () async {
                       showDialog(

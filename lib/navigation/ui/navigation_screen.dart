@@ -7,7 +7,6 @@ import 'package:sirkl/calls/controller/calls_controller.dart';
 import 'package:sirkl/calls/ui/calls_screen.dart';
 import 'package:sirkl/chats/ui/chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import '../../groups/ui/groups_screen.dart';
@@ -100,7 +99,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
   Widget build(BuildContext context) {
     return Obx(() =>Scaffold(
         body: PersistentTabView(
-
           context,
           screens: _pages,
           hideNavigationBar: _navigationController.hideNavBar.value,
