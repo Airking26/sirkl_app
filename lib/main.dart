@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
@@ -47,7 +49,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         (notificationSaved as List<dynamic>).add(message.data["body"]);
         await GetStorage().write(con.notificationSaved, notificationSaved);
       } on Error {
-        var t = '';
+        throw Error();
       }
     } else if (message.data['type'] == "8") {
       debugPrint("ENTERING 8 MODE");
@@ -343,7 +345,7 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
       appName: 'Sirkl',
     avatar: data["pic"] ?? 'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png',
     handle: data["body"],
-    type: 1,
+    type: 0,
     duration: 30000,
     textAccept: 'Accept',
     textDecline: 'Decline',

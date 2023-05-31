@@ -482,10 +482,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () async {
                           _callController.userCalled.value =
                               _commonController.users[index];
-                          await _callController.inviteCall(
-                              _commonController.users[index],
-                              DateTime.now().toString(),
-                              _homeController.id.value);
+                          await _callController.inviteCall(_commonController.users[index], DateTime.now().toString(), _homeController.id.value);
                         },
                         child: Image.asset(
                           "assets/images/call_tab.png",
