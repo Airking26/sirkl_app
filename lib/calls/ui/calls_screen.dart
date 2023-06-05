@@ -70,8 +70,6 @@ class _CallsScreenState extends State<CallsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).unfocus();
-
     return Obx(()=>Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark

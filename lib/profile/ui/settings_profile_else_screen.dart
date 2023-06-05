@@ -446,7 +446,6 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
               ),
               _profileController.isEditingProfileElse.value ? InkWell(
                 onTap: () async {
-
                   await _profileController.updateMe(UpdateMeDto(nicknames: {_commonController.userClicked.value!.wallet! : _profileController.usernameElseTextEditingController.value.text}), StreamChat.of(context).client);
                   _homeController.updateNickname(_commonController.userClicked.value!.wallet!, _profileController.usernameElseTextEditingController.value.text);
                   _profileController.isEditingProfileElse.value = false;

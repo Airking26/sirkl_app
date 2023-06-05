@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget buildListOfStories() {
     return Container(
-      padding: const EdgeInsets.only(right: 8, left: 8, top: 24),
+      padding: const EdgeInsets.only(right: 8, left: 8, top: 12),
       height: (_homeController.stories.value == null ||
                   _homeController.stories.value!.isEmpty) &&
               !_homeController.loadingStories.value
@@ -242,23 +242,28 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(
           height: 4,
         ),
-        Text(
-          _homeController.stories.value![index]!.first!.createdBy.nickname.isNullOrBlank! ?
-              (_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
-                  ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 5)}..."
-                  : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 6
-                      ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 7)}..."
-                      : _homeController.stories.value![index]!.first!.createdBy.userName!) :
-          "${_homeController.stories.value![index]!.first!.createdBy.nickname!} (${_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
-              ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 3)}..."
-              : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 3
-              ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 4)}..."
-              : _homeController.stories.value![index]!.first!.createdBy.userName!})",
-          style: TextStyle(
-              fontFamily: "Gilroy",
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-              color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black),
+        SizedBox(
+          width: 60,
+          child: Text(
+            _homeController.stories.value![index]!.first!.createdBy.nickname.isNullOrBlank! ?
+                (_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
+                    ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 5)}..."
+                    : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 6
+                        ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 7)}..."
+                        : _homeController.stories.value![index]!.first!.createdBy.userName!) :
+            "${_homeController.stories.value![index]!.first!.createdBy.nickname!.length > 5 ? "${_homeController.stories.value![index]!.first!.createdBy.nickname!.substring(0,5)}..." : _homeController.stories.value![index]!.first!.createdBy.nickname!} (${_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
+                ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 3)}..."
+                : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 3
+                ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 4)}..."
+                : _homeController.stories.value![index]!.first!.createdBy.userName!})",
+            maxLines: 2,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black),
+          ),
         )
       ],
     );

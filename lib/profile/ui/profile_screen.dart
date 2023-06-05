@@ -59,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
             : _homeController.userMe.value.userName!;
     _profileController.descriptionTextEditingController.value.text =
-        _homeController.userMe.value.description == ""
+        _homeController.userMe.value.description.isNullOrBlank!
             ? ""
             : _homeController.userMe.value.description!;
     _profileController.urlPicture.value = _homeController.userMe.value.picture == null ? "" : _homeController.userMe.value.picture!;
@@ -463,7 +463,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               isCollapsed: true,
                               hintText: con.noDescYetRes.tr),
                         )
-                      : _homeController.userMe.value.description == "" ? Container(): Text(
+                      : _homeController.userMe.value.description.isNullOrBlank! ? Container(): Text(
                                _homeController.userMe.value.description!,
                           textAlign: TextAlign.center,
                           style: const TextStyle(

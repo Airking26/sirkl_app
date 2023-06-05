@@ -1,14 +1,17 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'
     hide GetStringUtils;
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/bottom_row.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/message_widget.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/parse_attachments.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/quoted_message.dart';
 import 'package:sirkl/common/view/stream_chat/src/theme/message_theme.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 
 /// {@template messageCard}
 /// The widget containing a quoted message.
@@ -166,6 +169,8 @@ class _MessageCardState extends State<MessageCard> {
   final GlobalKey linksKey = GlobalKey();
   double? widthLimit;
 
+  final _homeController = Get.put(HomeController());
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -192,6 +197,7 @@ class _MessageCardState extends State<MessageCard> {
 
   @override
   Widget build(BuildContext context) {
+    final userDTO = userFromJson(json.encode(widget.message.user?.extraData["userDTO"]));
     return Material(
       elevation: 1,
       shadowColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent: Colors.transparent,
@@ -232,18 +238,27 @@ class _MessageCardState extends State<MessageCard> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  !widget.showTimeStamp || widget.showUserAvatar == DisplayWidget.gone  ? const SizedBox() :  Padding(
+                    padding: const EdgeInsets.only(left: 15.0, right: 12, top: 12),
+                    child: Text(_homeController.nicknames[userDTO.wallet] != null ?
+                    _homeController.nicknames[userDTO.wallet] + (userDTO.userName!.isEmpty ? "" : " (${userDTO.userName!})") : (userDTO.userName!.isEmpty ? "${userDTO.wallet!.substring(0, 6)}...${userDTO.wallet!.substring(userDTO.wallet!.length - 4)}" : userDTO.userName!), maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Color(0xFF00CB7D): Colors.blueGrey),),
+                  ),
                   if (widget.hasQuotedMessage) QuotedMessage(
                       reverse: widget.reverse,
                       message: widget.message,
                       hasNonUrlAttachments: widget.hasNonUrlAttachments,
                       onQuotedMessageTap: widget.onQuotedMessageTap,
                     ),
-                  if (widget.hasNonUrlAttachments) ParseAttachments(
-                      key: attachmentsKey,
-                      message: widget.message,
-                      attachmentBuilders: widget.attachmentBuilders,
-                      attachmentPadding: widget.attachmentPadding,
-                    ),
+                  if (widget.hasNonUrlAttachments) Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: ParseAttachments(
+                        key: attachmentsKey,
+                        message: widget.message,
+                        attachmentBuilders: widget.attachmentBuilders,
+                        attachmentPadding: widget.attachmentPadding,
+                      ),
+                  ),
                   if (!widget.isGiphy) ConstrainedBox(
                       constraints: BoxConstraints.loose(const Size.fromWidth(500)),
                       child: TextBubble(
@@ -268,7 +283,7 @@ class _MessageCardState extends State<MessageCard> {
                             left: 12,
                             right: 12,
                             bottom: widget.message.attachments.map((e) => e.type).contains("voicenote") ? 0 : 12,
-                            top: widget.message.attachments.map((e) => e.type).contains("voicenote") ? 0 : 12
+                            top: 0
                         ),
                         child: Transform.translate(
                           offset: Offset(0, widget.message.attachments.map((e) => e.type).contains("voicenote") ? -12 : 0),
@@ -299,8 +314,7 @@ class _MessageCardState extends State<MessageCard> {
                         ),
                       ),
                     ),
-                  ) : SizedBox(height: widget.message.attachments.map((e) => e.type).contains('voicenote') ? 0 : 12,)
-
+                  ) : SizedBox(height: widget.message.attachments.map((e) => e.type).contains('voicenote') && !widget.showTimeStamp ? 12 : 12,)
                 ],
               ),
             ),

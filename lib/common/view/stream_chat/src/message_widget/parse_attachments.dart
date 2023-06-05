@@ -55,7 +55,7 @@ class ParseAttachments extends StatelessWidget {
     });
 
     return Padding(
-      padding: attachmentPadding,
+      padding: EdgeInsets.zero,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: attachmentList.insertBetween(

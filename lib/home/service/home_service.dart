@@ -20,6 +20,14 @@ class HomeService extends GetConnect{
       "erc20",
     ],
   }), headers: {"accept": 'application/json'});
+  Future<Response<Map<String, dynamic>>>  getTokenMetadataWithAlchemy(String contractAddress) => post("https://eth-mainnet.g.alchemy.com/v2/${con.alchemyApiKey}", jsonEncode({
+    'jsonrpc': '2.0',
+    'id': 1,
+    'method': 'alchemy_getTokenMetadata',
+    'params': [
+      contractAddress,
+    ],
+  }), headers: {"accept": 'application/json'});
   Future<Response<Map<String, dynamic>>> updateStory(String accessToken, String storyModificationDTO) => patch('${con.URL_SERVER}story/modify', storyModificationDTO, headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> deleteStory(String accessToken, String createdBy, String id) => delete('${con.URL_SERVER}story/mine/$createdBy/$id', headers: {'Authorization':'Bearer $accessToken'});
   Future<Response<Map<String, dynamic>>> updateNicknames(String accessToken, String wallet, String nicknameCreationDTO) => put('${con.URL_SERVER}nicknames/$wallet', nicknameCreationDTO, headers: {'Authorization':'Bearer $accessToken'});

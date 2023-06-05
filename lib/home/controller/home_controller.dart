@@ -22,6 +22,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
 import 'package:sirkl/common/model/token_dto.dart';
+import 'package:sirkl/common/model/token_metadata.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -54,7 +55,9 @@ class HomeController extends GetxController{
 
   Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
   RxList<String> contractAddresses = <String>[].obs;
+  RxList<DropdownMenuItem> dropDownMenuItems = <DropdownMenuItem>[].obs;
   Rx<PagingController<int, List<StoryDto?>?>> pagingController = PagingController<int, List<StoryDto?>?>(firstPageKey: 0).obs;
+
 
   var id = "".obs;
   var isConfiguring = false.obs;
@@ -90,7 +93,7 @@ class HomeController extends GetxController{
         'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png'
       ],
     ),
-  );
+  ).obs;
 
   retrieveAccessToken(){
     var accessTok = box.read(con.ACCESS_TOKEN);
@@ -116,16 +119,16 @@ class HomeController extends GetxController{
 
   connectWallet(BuildContext context) async {
 
-    connector.on('connect', (session) async{
+    connector.value.on('connect', (session) async{
       address.value = sessionStatus?.accounts[0];
     });
 
-    connector.on('session_request', (payload) {
+    connector.value.on('session_request', (payload) {
       var k = payload;
     });
 
-    connector.on('disconnect', (session) {
-      connector = WalletConnect(
+    connector.value.on('disconnect', (session) {
+      connector.value = WalletConnect(
         bridge: 'https://bridge.walletconnect.org',
         clientMeta: const PeerMeta(
           name: 'SIRKL',
@@ -138,8 +141,8 @@ class HomeController extends GetxController{
       );
     });
 
-    if (!connector.connected) {
-      sessionStatus = await connector.createSession(
+    if (!connector.value.connected) {
+      sessionStatus = await connector.value.createSession(
         chainId: 4160,
         onDisplayUri: (uri) async {
           _uri = uri;
@@ -182,11 +185,11 @@ class HomeController extends GetxController{
   }
 
   signMessageWithMetamask(BuildContext context) async {
-    if (connector.connected) {
+    if (connector.value.connected) {
       try {
         var message = generateSessionMessage(address.value);
         EthereumWalletConnectProvider provider =
-        EthereumWalletConnectProvider(connector);
+        EthereumWalletConnectProvider(connector.value);
         launchUrlString(_uri, mode: LaunchMode.externalApplication);
         var signature = await provider.personalSign(message: message, address: address.value, password: "");
         await loginWithWallet(context, address.value, message, signature);
@@ -280,6 +283,47 @@ class HomeController extends GetxController{
       });
       await getNFTsContractAddresses(client, wallet);
     }
+  }
+
+  getDropDownList(String wallet) async {
+    var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
+    if(request.isOk){
+      var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
+      tokenContractAddress.result?.tokenBalances?.forEach((element) async {
+        if(element.tokenBalance != "0"){
+          var tokenMetadata = await getTokenMetadata(element.contractAddress!);
+          dropDownMenuItems.add(DropdownMenuItem(
+              child:
+          Row(
+            children: [
+              tokenMetadata != null && tokenMetadata.result != null && tokenMetadata.result?.logo != null ? Image.network(tokenMetadata.result!.logo!, width: 22, height: 22,) : const SizedBox(),
+              const SizedBox(width: 4,),
+              tokenMetadata != null && tokenMetadata.result != null && tokenMetadata.result?.symbol != null ? Text(tokenMetadata.result!.symbol!, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),) : const SizedBox()
+            ],
+          )));
+        }
+      });
+    }
+  }
+
+  Future<TokenMetadataDTO?> getTokenMetadata(String contractAddress) async {
+    var accessToken = box.read(con.ACCESS_TOKEN);
+    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var request = await _homeService.getTokenMetadataWithAlchemy(contractAddress);
+    if (request.statusCode == 401) {
+      var requestToken = await _homeService.refreshToken(refreshToken);
+      var refreshTokenDTO = refreshTokenDtoFromJson(
+          json.encode(requestToken.body));
+      accessToken = refreshTokenDTO.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      request = await _homeService.getTokenMetadataWithAlchemy(contractAddress);
+      if(request.isOk){
+        return tokenMetadataFromJson(json.encode(request.body));
+      }
+    } else if(request.isOk){
+      return tokenMetadataFromJson(json.encode(request.body));
+    }
+    return null;
   }
 
   getNFTsContractAddresses(StreamChatClient? client, String wallet) async{
