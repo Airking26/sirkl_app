@@ -51,6 +51,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     ]),
     channelStateSort: const [SortOption('last_message_at')],
     limit: 10,
+    presence: true,
   );
   late final _controllerOther = StreamChannelListController(
     client: StreamChat.of(context).client,
@@ -70,9 +71,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         Filter.equal(
             "${_homeController.id.value}_follow_channel", false)
       ])
-    ])
-    ,
+    ]),
     channelStateSort: const [SortOption('last_message_at')],
+    presence: true,
     limit: 10,
   );
 
@@ -208,7 +209,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                                             .id.value) ||
                                                 channel.extraData['isConv'] ==
                                                     true) {
-                                              await channel.delete();
+                                              channel.extraData['isConv'] == true ? await channel.truncate(skipPush: false) : await channel.delete();
                                               _commonController
                                                   .refreshInboxes.value = true;
                                               Get.back();
@@ -348,12 +349,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                                       ? Colors.white
                                                       : Colors.black)),
                                           onPressed: () async {
+                                            await channel.truncate(skipPush: false);
                                             if (!channel.id!
                                                 .startsWith("!members")) {
                                               await _chatController
                                                   .deleteInbox(channel.id!);
                                             }
-                                            await channel.delete();
                                             _commonController
                                                 .refreshInboxes.value = true;
                                             Get.back();

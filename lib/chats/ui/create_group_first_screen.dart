@@ -9,8 +9,6 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:web3dart/web3dart.dart';
 
 
@@ -377,10 +375,6 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                 ),
               ),
               TextButton(onPressed: () async {
-                //_homeController.connectWallet(context);
-                //EthereumWalletConnectProvider provider =
-                //EthereumWalletConnectProvider(_homeController.connector.value);
-                //provider.signTransaction(from: "0x47dA6eA33A1C2E3782a0498b94703fDC81a237A3", to: "0x47dA6eA33A1C2E3782a0498b94703fDC81a237A3", gasPrice: BigInt.from(2000000000000000000), value: BigInt.from(2000000000000000000), nonce: 1, gas: 1);
                 if(_chatController.groupTextController.value.text.isEmpty) {
                   _utils.showToast(context, "Please, enter a name for you group.");
                 } else {

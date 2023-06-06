@@ -17,7 +17,6 @@ class HomeService extends GetConnect{
     'method': 'alchemy_getTokenBalances',
     'params': [
       wallet,
-      "erc20",
     ],
   }), headers: {"accept": 'application/json'});
   Future<Response<Map<String, dynamic>>>  getTokenMetadataWithAlchemy(String contractAddress) => post("https://eth-mainnet.g.alchemy.com/v2/${con.alchemyApiKey}", jsonEncode({

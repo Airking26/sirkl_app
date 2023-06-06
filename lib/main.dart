@@ -58,27 +58,58 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+final chatPersistentClient = StreamChatPersistenceClient(
+  logLevel: Level.INFO,
+  connectionMode: ConnectionMode.background,
+);
+
+StreamChatClient buildStreamChatClient(
+    String apiKey, {
+      Level logLevel = Level.INFO,
+    }) {
+  return StreamChatClient(
+    apiKey,
+    logLevel: logLevel,
+  )..chatPersistenceClient = chatPersistentClient;
+}
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  final chatPersistentClient = StreamChatPersistenceClient(
-    logLevel: Level.INFO,
-    connectionMode: ConnectionMode.background,
-  );
-  final client = StreamChatClient("mhgk84t9jfnt", logLevel: Level.WARNING)
-    ..chatPersistenceClient = chatPersistentClient;
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.instance.subscribeToTopic("all");
   await GetStorage.init();
   AnalyticService().getAnalyticObserver();
-  runApp(MyApp(client: client));
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
 
-  const MyApp({Key? key, required this.client}) : super(key: key);
-  final StreamChatClient client;
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  final _homeController = Get.put(HomeController());
+  late final StreamChatClient client;
+
+  Future<void> _initConnection() async {
+    _homeController.retrieveAccessToken();
+    client = buildStreamChatClient('mhgk84t9jfnt');
+    await client.connectUser(
+        User(id: _homeController.id.value),
+        _homeController.streamChatToken.value,
+      );
+  }
+
+  @override
+  void initState() {
+    _initConnection();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

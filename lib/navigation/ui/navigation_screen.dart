@@ -97,7 +97,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() =>Scaffold(
+    return Obx(() => Scaffold(
         body: PersistentTabView(
           context,
           screens: _pages,

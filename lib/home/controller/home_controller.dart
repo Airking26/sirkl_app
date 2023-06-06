@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as htp;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,7 @@ import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/contract_address_dto.dart' as cad;
 import 'package:web3dart/crypto.dart';
+import 'package:web3dart/web3dart.dart';
 
 import '../../common/model/refresh_token_dto.dart';
 import '../../common/model/update_fcm_dto.dart';
@@ -272,10 +274,13 @@ class HomeController extends GetxController{
 
   getTokenContractAddress(StreamChatClient? client, String wallet) async {
     var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
+    var ethClient = Web3Client('https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2', htp.Client());
+    var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet));
+    if(balance.getInWei > BigInt.zero && !contractAddresses.contains("0x0000000000000000000000000000000000000000")) contractAddresses.add("0x0000000000000000000000000000000000000000");
     if(request.isOk){
       var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
       tokenContractAddress.result?.tokenBalances?.forEach((element) {
-        if(element.tokenBalance != "0"){
+        if(element.tokenBalance != "0x0000000000000000000000000000000000000000000000000000000000000000"){
           if(!contractAddresses.contains(element.contractAddress)) contractAddresses.add(element.contractAddress!);
         } else {
           contractAddresses.remove(element.contractAddress!);
@@ -287,10 +292,22 @@ class HomeController extends GetxController{
 
   getDropDownList(String wallet) async {
     var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
+    var ethClient = Web3Client('https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2', htp.Client());
+    var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet));
+    if(balance.getInWei > BigInt.zero) {
+      dropDownMenuItems.add(DropdownMenuItem(child: Row(
+        children: [
+          Image.network("https://raw.githubusercontent.com/dappradar/tokens/main/ethereum/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee/logo.png", width: 22, height: 22,),
+          const SizedBox(width: 4,),
+          const Text("ETH", style: TextStyle(
+              fontFamily: "Gilroy", fontWeight: FontWeight.w500),)
+        ],
+      )));
+    }
     if(request.isOk){
       var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
       tokenContractAddress.result?.tokenBalances?.forEach((element) async {
-        if(element.tokenBalance != "0"){
+        if(element.tokenBalance != "0x0000000000000000000000000000000000000000000000000000000000000000"){
           var tokenMetadata = await getTokenMetadata(element.contractAddress!);
           dropDownMenuItems.add(DropdownMenuItem(
               child:

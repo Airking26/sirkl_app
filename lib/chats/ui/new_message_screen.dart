@@ -18,6 +18,7 @@ import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
@@ -40,6 +41,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   final _homeController = Get.put(HomeController());
   final _profileController = Get.put(ProfileController());
   final _commonController = Get.put(CommonController());
+  final _groupController = Get.put(GroupsController());
   final _navigationController = Get.put(NavigationController());
   YYDialog dialogMenu = YYDialog();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
