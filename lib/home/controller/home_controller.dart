@@ -541,8 +541,6 @@ class HomeController extends GetxController{
                   const Duration(minutes: 1)) {
                 await _commonController.addUserToSirkl(
                     "63f78a6188f7d4001f68699a", client, id.value);
-                final firebaseMessaging = await FirebaseMessaging.instance.getToken();
-                await client.addDevice(firebaseMessaging!, PushProvider.firebase, pushProviderName: "Firebase_Config");
                 await getWelcomeMessage();
               }
             }
@@ -557,8 +555,6 @@ class HomeController extends GetxController{
                 const Duration(minutes: 1)) {
               await _commonController.addUserToSirkl(
                   "63f78a6188f7d4001f68699a", client, id.value);
-              final firebaseMessaging = await FirebaseMessaging.instance.getToken();
-              await client.addDevice(firebaseMessaging!, PushProvider.firebase, pushProviderName: "Firebase_Config");
               await getWelcomeMessage();
             }
           }

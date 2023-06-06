@@ -87,6 +87,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   @override
   void initState() {
+    _navigationController.controller.value.index = _homeController.accessToken.value.isNullOrBlank! ? 0 : 3;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _navigationController.controller.value.index = 0;
+    });
     if(_homeController.accessToken.value.isNotEmpty) {
       _navigationController.hideNavBar.value = false;
     } else {
@@ -97,7 +101,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Scaffold(
+    return Obx(() =>Scaffold(
         body: PersistentTabView(
           context,
           screens: _pages,

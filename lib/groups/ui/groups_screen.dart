@@ -74,14 +74,16 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   void initState() {
+    _controllerCommunitiesFav.doInitialLoad();
+    _controllerCommunitiesOther.doInitialLoad();
     _groupController.index.value = _homeController.isInFav.isEmpty ? 1 : 0;
     super.initState();
   }
 
   @override
   void dispose() {
-    //_controllerCommunitiesOther.dispose();
-    //_controllerCommunitiesFav.dispose();
+    _controllerCommunitiesOther.dispose();
+    _controllerCommunitiesFav.dispose();
     _groupController.index.value = 0;
     super.dispose();
   }
@@ -125,6 +127,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             child: Expanded(
               child:
               TabBarView(
+                viewportFraction: 0.99,
                 physics: const NeverScrollableScrollPhysics(),
                 controller: tabController,
                 children: [
