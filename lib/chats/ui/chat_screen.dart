@@ -38,7 +38,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       Filter.in_("members", [_homeController.id.value]),
       Filter.or([
         Filter.and([
-          Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
+          Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
           Filter.exists("${_homeController.id.value}_follow_channel"),
           Filter.equal("${_homeController.id.value}_follow_channel", true),
           Filter.equal('isConv', true),
@@ -55,7 +55,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     filter:
     Filter.and([
       Filter.equal("type", "try"),
-      Filter.greater("last_message_at", "2020-11-23T12:00:18.54912Z"),
+      Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
       Filter.equal('isConv', true),
       Filter.or([
         Filter.equal("created_by_id", _homeController.id.value),

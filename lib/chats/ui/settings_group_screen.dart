@@ -50,6 +50,10 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var k = _chatController.channel.value!.membership != null;
+    var fk = _chatController.channel.value!.membership?.channelRole == "channel_member";
+    var f  = _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value);
+    var kf = _chatController.channel.value?.createdBy?.id != _homeController.id.value;
     return Scaffold(
       backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
           ? const Color(0xFF102437)
@@ -96,10 +100,8 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ((_chatController.channel.value!.membership != null && _chatController.channel.value!.membership?.channelRole == "channel_member")
-              || (_chatController.channel.value!.state!.members
-              .map((e) => e.userId!)
-              .contains(_homeController.id.value)) && _chatController.channel.value?.createdBy?.id != _homeController.id.value) ?
+          (_chatController.channel.value!.membership != null && _chatController.channel.value!.membership?.channelRole == "channel_member") && _chatController.channel.value?.createdBy?.id != _homeController.id.value
+              || (_chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value) && _chatController.channel.value?.createdBy?.id != _homeController.id.value) ?
           const SizedBox() : InkWell(
             onTap: () async {
               if((_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || (_chatController.channel.value?.createdBy?.id == _homeController.id.value))){
@@ -260,27 +262,27 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                       actions: [
                         CupertinoDialogAction(child:Text("Harassment or bullying", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                           onPressed: () async {
-                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Harassment or bullying", type: 1), utils);
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Harassment or bullying", type: 1), utils);
                             Get.back();
                           },),
                         CupertinoDialogAction(child:Text("Hate speech or discrimination", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                           onPressed: () async {
-                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Hate speech or discrimination", type: 1), utils);
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Hate speech or discrimination", type: 1), utils);
                             Get.back();
                           },),
                         CupertinoDialogAction(child:Text("Explicit or inappropriate content", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                           onPressed: () async {
-                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Explicit or inappropriate content", type: 1), utils);
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Explicit or inappropriate content", type: 1), utils);
                             Get.back();
                           },),
                         CupertinoDialogAction(child:Text("Spam or scams", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                           onPressed: () async {
-                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Spam or scams", type: 1), utils);
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Spam or scams", type: 1), utils);
                             Get.back();
                           },),
                         CupertinoDialogAction(child:Text("Privacy violations", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                           onPressed: () async {
-                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Privacy violations", type: 1), utils);
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Privacy violations", type: 1), utils);
                             Get.back();
                           },),
                       ],
