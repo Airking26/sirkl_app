@@ -228,7 +228,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: _chatController.groupVisibilityCollapsed.value || _chatController.groupTypeCollapsed.value ? 8 : 24,),
+              /*SizedBox(height: _chatController.groupVisibilityCollapsed.value || _chatController.groupTypeCollapsed.value ? 8 : 24,),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF113751) : Colors.white,
@@ -276,7 +276,11 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Checkbox(value: _chatController.groupPaying.value == 1, onChanged: (checked){
-                              if(checked!) _chatController.groupPaying.value = 1;
+                              if(checked! && _homeController.dropDownMenuItems.isNotEmpty) {
+                                _chatController.groupPaying.value = 1;
+                              } else {
+                                _utils.showToast(context, "You don't have any token link with this wallet.");
+                              }
                             },
                               checkColor: const Color(0xFF00CB7D),
                               fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
@@ -284,7 +288,12 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                                     (states) => const BorderSide(width: 0.0, color: Colors.transparent),
                               ),),
                             InkWell(onTap: (){
-                              _chatController.groupPaying.value = 1;
+                              if(_homeController.dropDownMenuItems.isNotEmpty) {
+                                _chatController.groupPaying.value = 1;
+                              } else {
+                                _utils.showToast(context, "You don't have any token link with this wallet.");
+                              }
+
                             },
                                 child: Text("Yes", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),))
                           ],),
@@ -317,7 +326,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                     ],
                   ),
                 ),
-              ),
+              ),*/
               const SizedBox(height: 24,),
             ],),
           ),

@@ -86,7 +86,6 @@ dependencies:
   flutter_typeahead: ^4.3.7
   flutter_beep: ^1.0.0
   stream_chat_persistence: ^6.1.0
-  device_preview: ^1.1.0
 
 dev_dependencies:
   flutter_test:
