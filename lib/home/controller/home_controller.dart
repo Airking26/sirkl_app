@@ -34,7 +34,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/model/contract_address_dto.dart' as cad;
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -176,6 +175,7 @@ class HomeController extends GetxController{
         },
       );
     }
+
   }
 
   String generateSessionMessage(String accountAddress) {
@@ -275,7 +275,7 @@ class HomeController extends GetxController{
   getTokenContractAddress(StreamChatClient? client, String wallet) async {
     var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
     var ethClient = Web3Client('https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2', htp.Client());
-    var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet));
+    var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet.toLowerCase()));
     if(balance.getInWei > BigInt.zero && !contractAddresses.contains("0x0000000000000000000000000000000000000000")) contractAddresses.add("0x0000000000000000000000000000000000000000");
     if(request.isOk){
       var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
@@ -363,10 +363,10 @@ class HomeController extends GetxController{
        if(!contractAddresses.contains(element.address?.toLowerCase())) contractAddresses.add(element.address!.toLowerCase());
      }
 
-      var addressesAbsent = stockedContractAddresses.toSet().difference(contractAddresses.toSet()).toList();
+      var addressesAbsent = stockedContractAddresses.toSet().difference(initialArray.toSet()).toList();
       if(client != null && addressesAbsent.isNotEmpty) {
         for (var absentAddress in addressesAbsent) {
-          await client.removeChannelMembers(absentAddress.toLowerCase(), "try", [id.value]);
+            contractAddresses.remove(absentAddress);
         }
       }
 

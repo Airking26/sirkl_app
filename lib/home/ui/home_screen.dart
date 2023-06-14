@@ -201,73 +201,71 @@ class _HomeScreenState extends State<HomeScreen> {
         hasUnread = true;
       }
     }
-    return Expanded(
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () {
-              _navigationController.hideNavBar.value = true;
-              _homeController.indexStory.value = index;
-              pushNewScreen(context, screen: const StoryViewerScreen()).then(
-                  (value) {
-                    if(value == null){
-                      _navigationController.hideNavBar.value = false;
-                    }
-                    // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
-                    _homeController.pagingController.value.notifyListeners();
-                  });
-            },
-            child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: 80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xff00CB7D),
-                    width: hasUnread ? 3.0 : 0.0,
-                  ),
+    return Column(
+      children: [
+        InkWell(
+          onTap: () {
+            _navigationController.hideNavBar.value = true;
+            _homeController.indexStory.value = index;
+            pushNewScreen(context, screen: const StoryViewerScreen()).then(
+                (value) {
+                  if(value == null){
+                    _navigationController.hideNavBar.value = false;
+                  }
+                  // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+                  _homeController.pagingController.value.notifyListeners();
+                });
+          },
+          child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xff00CB7D),
+                  width: hasUnread ? 3.0 : 0.0,
                 ),
-                child: listOfStories.first!.createdBy.picture.isNullOrBlank!
-                    ? TinyAvatar(
-                        baseString: _homeController.userMe.value.wallet!,
-                        dimension: 70,
-                        circular: true,
-                        colourScheme: TinyAvatarColourScheme.seascape)
-                    : CircleAvatar(
-                        backgroundColor: const Color(0xff00CB7D),
-                        radius: 36,
-                        backgroundImage: CachedNetworkImageProvider(
-                            listOfStories.first!.createdBy.picture!),
-                      )),
+              ),
+              child: listOfStories.first!.createdBy.picture.isNullOrBlank!
+                  ? TinyAvatar(
+                      baseString: _homeController.userMe.value.wallet!,
+                      dimension: 70,
+                      circular: true,
+                      colourScheme: TinyAvatarColourScheme.seascape)
+                  : CircleAvatar(
+                      backgroundColor: const Color(0xff00CB7D),
+                      radius: 36,
+                      backgroundImage: CachedNetworkImageProvider(
+                          listOfStories.first!.createdBy.picture!),
+                    )),
+        ),
+        const SizedBox(
+          height: 4,
+        ),
+        SizedBox(
+          width: 70,
+          child: Text(
+            _homeController.stories.value![index]!.first!.createdBy.nickname.isNullOrBlank! ?
+                (_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
+                    ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 5)}..."
+                    : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 6
+                        ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 7)}..."
+                        : _homeController.stories.value![index]!.first!.createdBy.userName!) :
+            "${_homeController.stories.value![index]!.first!.createdBy.nickname!.length > 5 ? "${_homeController.stories.value![index]!.first!.createdBy.nickname!.substring(0,5)}..." : _homeController.stories.value![index]!.first!.createdBy.nickname!} (${_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
+                ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 3)}..."
+                : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 3
+                ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 4)}..."
+                : _homeController.stories.value![index]!.first!.createdBy.userName!})",
+            maxLines: 2,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black),
           ),
-          const SizedBox(
-            height: 4,
-          ),
-          Container(
-            width: 70,
-            child: Text(
-              _homeController.stories.value![index]!.first!.createdBy.nickname.isNullOrBlank! ?
-                  (_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
-                      ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 5)}..."
-                      : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 6
-                          ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 7)}..."
-                          : _homeController.stories.value![index]!.first!.createdBy.userName!) :
-              "${_homeController.stories.value![index]!.first!.createdBy.nickname!.length > 5 ? "${_homeController.stories.value![index]!.first!.createdBy.nickname!.substring(0,5)}..." : _homeController.stories.value![index]!.first!.createdBy.nickname!} (${_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
-                  ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 3)}..."
-                  : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 3
-                  ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 4)}..."
-                  : _homeController.stories.value![index]!.first!.createdBy.userName!})",
-              maxLines: 2,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black),
-            ),
-          )
-        ],
-      ),
+        )
+      ],
     );
   }
 

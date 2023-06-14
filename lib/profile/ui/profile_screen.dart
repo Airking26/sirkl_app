@@ -11,6 +11,7 @@ import 'package:flutter_badged/flutter_badge.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:http/http.dart' as htp;
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/nft_dto.dart';
@@ -19,6 +20,7 @@ import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/groups/controller/groups_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
@@ -27,6 +29,7 @@ import 'package:sirkl/profile/ui/my_story_viewer_screen.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
 import 'package:sirkl/profile/ui/settings_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
+import 'package:web3dart/web3dart.dart';
 import '../../common/view/dialog/custom_dial.dart';
 import '../../home/ui/pdf_screen.dart';
 
@@ -42,6 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _profileController = Get.put(ProfileController());
   final _homeController = Get.put(HomeController());
   final _navigationController = Get.put(NavigationController());
+  final web3Controller = Get.put(Web3Controller());
 
   final PagingController<int, NftDto> pagingController =
       PagingController(firstPageKey: 0);
@@ -138,15 +142,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 _profileController
                                     .isEditingProfile.value
                                     ? const SizedBox(width: 42, height: 24,) : IconButton(
-                                            onPressed: () {
-                                              pushNewScreen(context,
+                                            onPressed: () async {
+                                              await _homeController.connectWallet(context);
+                                              await web3Controller.sendTran(Web3Client("https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client()), "createGroup", ["examples", "descs", BigInt.one, EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")], _homeController.connector.value);
+                                              /*pushNewScreen(context,
                                                       screen:
                                                           const NotificationScreen())
                                                   .then((value) =>
                                                       _profileController
                                                           .checkIfHasUnreadNotif(
                                                               _homeController
-                                                                  .id.value));
+                                                                  .id.value));*/
                                             },
                                             icon: FlutterBadge(
                                               icon: Image.asset(
@@ -439,7 +445,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-                _homeController.userMe.value.description == "" ? const SizedBox(height: 0,) : const SizedBox(height: 0,),
+                _homeController.userMe.value.description.isNullOrBlank! ? const SizedBox(height: 0) : const SizedBox(height: 4,),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 48.0),
                   child: _profileController.isEditingProfile.value
@@ -461,7 +467,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               isCollapsed: true,
-                              hintText: con.noDescYetRes.tr),
+                              hintText: _homeController.userMe.value.description.isNullOrBlank! ? con.noDescYetRes.tr : _homeController.userMe.value.description!),
                         )
                       : _homeController.userMe.value.description.isNullOrBlank! ? Container(): Text(
                                _homeController.userMe.value.description!,
@@ -664,6 +670,11 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                             id: homeController.id.value,
                             isFav: fav),
                         StreamChat.of(context).client);
+                    if(fav) {
+                      await StreamChat.of(context).client.updateChannelPartial(widget.nftDto.contractAddress!, 'try', set: {"${homeController.id.value}_favorite" : true});
+                    } else {
+                      await StreamChat.of(context).client.updateChannelPartial(widget.nftDto.contractAddress!, 'try', unset: ["${homeController.id.value}_favorite"]);
+                    }
                     groupController.refreshGroups.value = true;
                   },
                 )),

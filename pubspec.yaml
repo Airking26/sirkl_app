@@ -173,6 +173,7 @@ flutter:
      - svgs/
      - lib/svgs/
      - assets/ca/
+     - assets/abi.json
 
   fonts:
     - family: Gilroy

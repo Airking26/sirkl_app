@@ -1,13 +1,16 @@
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/web3/wallet_connect_ethereum_credentials.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:web3dart/web3dart.dart';
 
 class Web3Controller extends GetxController{
 
   Future<DeployedContract> getContract() async {
     String abi = await rootBundle.loadString("assets/abi.json");
-    String contractAddress = "my_contract_address";
-    String contractName = "my_contract_name";
+    String contractAddress = "0xfa6CE9128520487A7E3a9a5733b78B3BCBB4AA69";
+    String contractName = "PaidGroups";
 
     DeployedContract contract = DeployedContract(
       ContractAbi.fromJson(abi, contractName),
@@ -25,9 +28,22 @@ class Web3Controller extends GetxController{
     return result;
   }
 
-  Future<void> getBalance(Web3Client ethereumClient) async {
-    List<dynamic> result = await query(ethereumClient, 'balance', []);
+  Future<String> sendTran(Web3Client ethereumClient, String functionName, List<dynamic> args, WalletConnect connector) async {
+    DeployedContract contract = await getContract();
+    ContractFunction function = contract.function(functionName);
+    connector.connect(onDisplayUri: (uri) async {
+       launchUrl(Uri.parse("metamask://wc?uri=$uri"), mode: LaunchMode.externalApplication);
+    });
+    EthereumWalletConnectProvider provider = EthereumWalletConnectProvider(connector);
+    String result = await ethereumClient.sendTransaction(WalletConnectEthereumCredentials(provider: provider),
+        Transaction.callContract(contract: contract, function: function, parameters: args, gasPrice: EtherAmount.inWei(BigInt.one), maxGas: 500000));
+    return result;
+  }
+
+  Future<void> createGroup(Web3Client ethereumClient) async {
+    List<dynamic> result = await query(ethereumClient, 'createGroup', ["examplee", "descz", BigInt.one, EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")]);
     var balance = int.parse(result[0].toString());
   }
+
 
 }

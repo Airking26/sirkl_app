@@ -41,7 +41,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   final _homeController = Get.put(HomeController());
   final _profileController = Get.put(ProfileController());
   final _commonController = Get.put(CommonController());
-  final _groupController = Get.put(GroupsController());
   final _navigationController = Get.put(NavigationController());
   YYDialog dialogMenu = YYDialog();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
@@ -240,10 +239,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                 ),
               ),
               IconButton(
-                  onPressed: () {
-                    _navigationController.hideNavBar.value = true;
-                    pushNewScreen(context, screen: const NewMessageScreen()).then((value) => _navigationController.hideNavBar.value = false);
-                  },
+                  onPressed: () {},
                   icon: Image.asset(
                     "assets/images/plus.png",
                     color: MediaQuery.of(context).platformBrightness == Brightness.dark
