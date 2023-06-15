@@ -663,6 +663,34 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getGroups",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "",
+        "type": "string[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "address[][]",
+        "name": "",
+        "type": "address[][]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",

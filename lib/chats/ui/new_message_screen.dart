@@ -396,17 +396,20 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   item.wallet!
                 ],
                 idChannel: idChannel));
-           _navigationController.hideNavBar.value = true;
-           Navigator.pop(context);
             pushNewScreen(context, screen: DetailedChatScreen(
-                create: false, channelId: idChannelCreated)).then((value) => _navigationController.hideNavBar.value = true);
+                create: false, channelId: idChannelCreated)).then((value) {
+              Navigator.pop(context);
+              _navigationController.hideNavBar.value = false;
+            });
           } else {
-            _navigationController.hideNavBar.value = true;
             _commonController.userClicked.value = item;
-            Navigator.pop(context);
             pushNewScreen(
-                context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = true);
+                context, screen: const DetailedChatScreen(create: true)).then((value) {
+                  Navigator.pop(context);
+              _navigationController.hideNavBar.value = false;
+            });
           }
+
         }
       },
         leading: ClipRRect(
