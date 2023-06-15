@@ -144,7 +144,7 @@ class HomeController extends GetxController{
 
     if (!connector.value.connected) {
       sessionStatus = await connector.value.createSession(
-        chainId: 4160,
+        chainId: 5,
         onDisplayUri: (uri) async {
           _uri = uri;
           try{
@@ -344,7 +344,6 @@ class HomeController extends GetxController{
   }
 
   getNFTsContractAddresses(StreamChatClient? client, String wallet) async{
-    var stockedContractAddresses = box.read(con.contractAddresses) ?? [];
     var req = await _homeService.getContractAddressesWithAlchemy(wallet, "");
     if(req.body != null){
     var initialArray = contractAddressDtoFromJson(json.encode(req.body)).contracts!;
@@ -362,13 +361,6 @@ class HomeController extends GetxController{
      for (var element in initialArray) {
        if(!contractAddresses.contains(element.address?.toLowerCase())) contractAddresses.add(element.address!.toLowerCase());
      }
-
-      var addressesAbsent = stockedContractAddresses.toSet().difference(initialArray.toSet()).toList();
-      if(client != null && addressesAbsent.isNotEmpty) {
-        for (var absentAddress in addressesAbsent) {
-            contractAddresses.remove(absentAddress);
-        }
-      }
 
       box.write(con.contractAddresses, contractAddresses);
     }

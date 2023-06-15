@@ -389,6 +389,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                 .toString();
            var idChannelCreated = await _chatController.createInbox(InboxCreationDto(
                 isConv: true,
+                isGroupPaying: false,
                 createdBy: _homeController.id.value,
                 wallets: [
                   _homeController.userMe.value.wallet!,
@@ -396,11 +397,13 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                 ],
                 idChannel: idChannel));
            _navigationController.hideNavBar.value = true;
+           Navigator.pop(context);
             pushNewScreen(context, screen: DetailedChatScreen(
                 create: false, channelId: idChannelCreated)).then((value) => _navigationController.hideNavBar.value = true);
           } else {
             _navigationController.hideNavBar.value = true;
             _commonController.userClicked.value = item;
+            Navigator.pop(context);
             pushNewScreen(
                 context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = true);
           }
@@ -585,6 +588,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       if (element.id.isNullOrBlank!) {
         idChannelCreated = await _chatController.createInbox(InboxCreationDto(
           isConv: true,
+            isGroupPaying: false,
             createdBy: _homeController.id.value,
             wallets: [
               _homeController.userMe.value.wallet!,

@@ -43,13 +43,13 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
     client: StreamChat.of(context).client,
     filter:
     Filter.and([
+      Filter.notExists('isConv'),
       if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
           "contractAddress", _homeController.contractAddresses)
       else
         Filter.equal("contractAddress", ""),
       Filter.exists("${_homeController.id.value}_favorite"),
       Filter.equal("${_homeController.id.value}_favorite", true),
-      Filter.greater("member_count", 2)
     ]),
     channelStateSort: const [SortOption('last_message_at')],
     limit: 10,
@@ -58,11 +58,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
     client: StreamChat.of(context).client,
     filter:
     Filter.and([
+      Filter.notExists('isConv'),
       if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
           "contractAddress", _homeController.contractAddresses)
       else
         Filter.equal("contractAddress", ""),
-      Filter.greater("member_count", 2),
       Filter.or([
         Filter.notExists("${_homeController.id.value}_favorite"),
         Filter.equal("${_homeController.id.value}_favorite", false)
@@ -156,8 +156,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         StreamChannelListController(client: StreamChat.of(context).client, filter:
                         Filter.and([
                           Filter.autoComplete('name', _groupController.query.value),
-                          Filter.greater("member_count", 2),
-                          Filter.notExists("isConv"),
+                          Filter.notExists('isConv'),
                         ]),
                           channelStateSort: const [SortOption('last_message_at')],
                           limit: 10,
@@ -215,7 +214,6 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         StreamChannelListController(client: StreamChat.of(context).client, filter:
                         Filter.and([
                           Filter.autoComplete('name', _groupController.query.value),
-                          Filter.greater("member_count", 2),
                           Filter.notExists("isConv"),
                         ]),
                           channelStateSort: const [SortOption('last_message_at')],

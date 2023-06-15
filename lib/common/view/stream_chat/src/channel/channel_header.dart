@@ -368,6 +368,8 @@ class StreamChannelHeader extends StatelessWidget
                                     child: Text(
                                     (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ?
                                         (channel.extraData['ens'] == null || channel.extraData['ens'] == "0") ?
+                                        (channel.extraData['isGroupPaying'] != null && channel.extraData["isGroupPaying"] == true) ?
+                                        channel.extraData["nameOfGroup"] :
                                     "${(channel.extraData["wallet"] as String).substring(0, 6)}...${(channel.extraData["wallet"] as String).substring((channel.extraData["wallet"] as String).length - 4)}":
                                         channel.extraData['ens']:
                                       channel.memberCount != null && channel.memberCount! > 2 ?
@@ -375,6 +377,8 @@ class StreamChannelHeader extends StatelessWidget
                                           channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
                                           channel.extraData["nameOfGroup"]
                                               :
+                                      (channel.extraData['isGroupPaying'] != null && channel.extraData["isGroupPaying"] == true) ?
+                                      channel.extraData["nameOfGroup"] :
                                       _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] != null ?
                                       _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] + " (" + (!userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
                                             userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName! : "${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(0,6)}...${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.length - 4)}") + ")"
@@ -391,8 +395,8 @@ class StreamChannelHeader extends StatelessWidget
                                               : Colors.black),
                                     ),
                                   ),
-                                  channel.memberCount != null && channel.memberCount! > 2 ? Text(
-                                    "${_chatController.channel.value?.memberCount!} participants",
+                                  (channel.memberCount != null && channel.memberCount! > 2) || (channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true)  ? Text(
+                                    "${channel.extraData['isConv'] == null ? _chatController.channel.value!.memberCount! - 2 : _chatController.channel.value!.memberCount!} participants",
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(

@@ -9,7 +9,7 @@ class Web3Controller extends GetxController{
 
   Future<DeployedContract> getContract() async {
     String abi = await rootBundle.loadString("assets/abi.json");
-    String contractAddress = "0xfa6CE9128520487A7E3a9a5733b78B3BCBB4AA69";
+    String contractAddress = "0x45dcC4DEC99C37d802Fed2e54fB170E18606A22C";
     String contractName = "PaidGroups";
 
     DeployedContract contract = DeployedContract(
@@ -20,29 +20,22 @@ class Web3Controller extends GetxController{
     return contract;
   }
 
-  Future<List<dynamic>> query(Web3Client ethereumClient, String functionName, List<dynamic> args) async {
+  Future<List<dynamic>> query(Web3Client ethereumClient) async {
     DeployedContract contract = await getContract();
-    ContractFunction function = contract.function(functionName);
+    ContractFunction function = contract.function("getGroupCount");
     List<dynamic> result = await ethereumClient.call(
-        contract: contract, function: function, params: args);
+        contract: contract, function: function, params: []);
     return result;
   }
 
-  Future<String> sendTran(Web3Client ethereumClient, String functionName, List<dynamic> args, WalletConnect connector) async {
+  Future<String> call(Web3Client ethereumClient, String functionName, List<dynamic> args, WalletConnect connector) async {
     DeployedContract contract = await getContract();
     ContractFunction function = contract.function(functionName);
-    connector.connect(onDisplayUri: (uri) async {
-       launchUrl(Uri.parse("metamask://wc?uri=$uri"), mode: LaunchMode.externalApplication);
-    });
+    launchUrl(Uri.parse("metamask://"), mode: LaunchMode.externalApplication);
     EthereumWalletConnectProvider provider = EthereumWalletConnectProvider(connector);
     String result = await ethereumClient.sendTransaction(WalletConnectEthereumCredentials(provider: provider),
         Transaction.callContract(contract: contract, function: function, parameters: args, gasPrice: EtherAmount.inWei(BigInt.one), maxGas: 500000));
     return result;
-  }
-
-  Future<void> createGroup(Web3Client ethereumClient) async {
-    List<dynamic> result = await query(ethereumClient, 'createGroup', ["examplee", "descz", BigInt.one, EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")]);
-    var balance = int.parse(result[0].toString());
   }
 
 

@@ -143,8 +143,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     .isEditingProfile.value
                                     ? const SizedBox(width: 42, height: 24,) : IconButton(
                                             onPressed: () async {
+                                              //await web3Controller.query(Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client()));
                                               await _homeController.connectWallet(context);
-                                              await web3Controller.sendTran(Web3Client("https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client()), "createGroup", ["examples", "descs", BigInt.one, EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")], _homeController.connector.value);
+                                              await web3Controller.call(
+                                                  Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client()),
+                                                  "createGroup",
+                                                  ["exams", "dess", BigInt.zero, EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
+                                                  _homeController.connector.value);
                                               /*pushNewScreen(context,
                                                       screen:
                                                           const NotificationScreen())

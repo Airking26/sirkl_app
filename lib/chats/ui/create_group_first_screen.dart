@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/create_group_second_screen.dart';
+import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
@@ -25,6 +28,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
   final _chatController = Get.put(ChatsController());
   final _homeController = Get.put(HomeController());
   final _navigationController = Get.put(NavigationController());
+  final _commonController = Get.put(CommonController());
   final _utils = Utils();
 
   @override
@@ -226,7 +230,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: _chatController.groupVisibilityCollapsed.value || _chatController.groupTypeCollapsed.value ? 8 : 24,),
+              /*SizedBox(height: _chatController.groupVisibilityCollapsed.value || _chatController.groupTypeCollapsed.value ? 8 : 24,),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF113751) : Colors.white,
@@ -274,11 +278,12 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Checkbox(value: _chatController.groupPaying.value == 1, onChanged: (checked){
-                              if(checked! && _homeController.dropDownMenuItems.isNotEmpty) {
+                              _chatController.groupPaying.value = 1;
+                              /*if(checked! && _homeController.dropDownMenuItems.isNotEmpty) {
                                 _chatController.groupPaying.value = 1;
-                              } else {
+                              } else
                                 _utils.showToast(context, "You don't have any token link with this wallet.");
-                              }
+                                */
                             },
                               checkColor: const Color(0xFF00CB7D),
                               fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
@@ -286,11 +291,12 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                                     (states) => const BorderSide(width: 0.0, color: Colors.transparent),
                               ),),
                             InkWell(onTap: (){
-                              if(_homeController.dropDownMenuItems.isNotEmpty) {
+                              _chatController.groupPaying.value = 1;
+                              /*if(_homeController.dropDownMenuItems.isNotEmpty) {
                                 _chatController.groupPaying.value = 1;
                               } else {
                                 _utils.showToast(context, "You don't have any token link with this wallet.");
-                              }
+                              }*/
 
                             },
                                 child: Text("Yes", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),))
@@ -324,7 +330,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                     ],
                   ),
                 ),
-              ),
+              ),*/
               const SizedBox(height: 24,),
             ],),
           ),
@@ -384,9 +390,16 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                 if(_chatController.groupTextController.value.text.isEmpty) {
                   _utils.showToast(context, "Please, enter a name for you group.");
                 } else {
-                  _navigationController.hideNavBar.value = true;
-                  pushNewScreen(context, screen: const CreateGroupSecondScreen()).then((value) {
-                    _navigationController.hideNavBar.value = true;});
+                  if(_chatController.groupPaying.value == 1){
+                    await sendMessageAsGroup();
+                  } else {
+                    _navigationController.hideNavBar.value = true;
+                    pushNewScreen(
+                        context, screen: const CreateGroupSecondScreen()).then((
+                        value) {
+                      _navigationController.hideNavBar.value = true;
+                    });
+                  }
                 }
               }, child: Text("Create", style: TextStyle(color: _chatController.groupNameIsEmpty.value ? Colors.grey : const Color(0xff00CB7D), fontFamily: "Gilroy", fontWeight: FontWeight.w600,),),),
             ],
@@ -394,6 +407,36 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> sendMessageAsGroup() async{
+    _chatController.messageSending.value = true;
+    var idChannel = DateTime
+        .now()
+        .millisecondsSinceEpoch
+        .toString();
+    var idChannelCreated = await _chatController.createInbox(
+        InboxCreationDto(
+            isConv: false,
+            createdBy: _homeController.id.value,
+            isGroupPrivate: _chatController.groupType.value == 0 ? false : true,
+            isGroupVisible: _chatController.groupVisibility.value == 0 ? true : false,
+            isGroupPaying: true,
+            wallets: [_homeController.userMe.value.wallet!],
+            nameOfGroup: _chatController.groupTextController.value.text,
+            picOfGroup: _profileController.urlPictureGroup.value,
+            idChannel: idChannel));
+    FocusManager.instance.primaryFocus?.unfocus();
+    _chatController.messageSending.value = false;
+    _profileController.urlPictureGroup.value = "";
+    _chatController.groupTextController.value.text = "";
+    _chatController.fromGroupCreation.value = true;
+    _commonController.refreshInboxes.value = true;
+    Navigator.popUntil(context, (route) => route.isFirst);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: idChannelCreated,)).then((value) => _navigationController.hideNavBar.value = false);
+    });
+//    pushNewScreen(context, screen: const ChatScreen());
   }
 
   @override

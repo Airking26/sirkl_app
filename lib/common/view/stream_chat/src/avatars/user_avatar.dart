@@ -101,9 +101,11 @@ class StreamUserAvatar extends StatelessWidget {
       fit: BoxFit.cover,
       child: Container(
         constraints: const BoxConstraints(minWidth: 56, maxHeight: 56, maxWidth: 56, minHeight: 56),
-        child: notYetUser ?
+        child: notYetUser && isGroup != null && isGroup as bool ?
         Image.asset("assets/images/app_icon_rounded.png", width: 56, height: 56, fit: BoxFit.cover,) :
-        (!haveNotPicture && isGroup != null && (isGroup as bool)) || (isGroup != null && picOfGroup != null && !(isGroup as bool)) || (!haveNotPicture && memberPage)
+        (!haveNotPicture && isGroup != null && (isGroup as bool))
+            || (isGroup != null && picOfGroup != null && !(isGroup as bool))
+            || (!haveNotPicture && memberPage)
             ? CachedNetworkImage(
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.high,

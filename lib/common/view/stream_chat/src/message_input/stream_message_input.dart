@@ -22,6 +22,7 @@ import 'package:sirkl/common/view/stream_chat/src/message_input/simple_safe_area
 import 'package:sirkl/common/view/stream_chat/src/message_input/tld.dart';
 import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/home/controller/home_controller.dart';
 
 
 const _kCommandTrigger = '/';
@@ -285,6 +286,8 @@ class StreamMessageInputState extends State<StreamMessageInput>
       widget.messageInputController ?? _controller!.value;
   StreamRestorableMessageInputController? _controller;
 
+  final _homeController = Get.put(HomeController());
+
   void _createLocalController([Message? message]) {
     assert(_controller == null, '');
     _controller = StreamRestorableMessageInputController(message: message);
@@ -477,6 +480,29 @@ class StreamMessageInputState extends State<StreamMessageInput>
                         _effectiveFocusNode.unfocus();
                       },
                     ),
+                  ((channel.membership == null &&
+                      !channel.state!.members
+                          .map((e) => e.userId!)
+                          .contains(_homeController.id.value)) &&
+                      channel.extraData["isConv"] != null &&
+                      channel.extraData["isConv"] == false &&
+                      channel.extraData["isGroupPaying"] != null &&
+                      channel.extraData["isGroupPaying"] == true) ?
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    decoration:  BoxDecoration(
+                      border: const Border(top: BorderSide(color: Colors.grey, width: 0.01)),
+                      gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF111D28) : Colors.white,
+                            MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
+                          ]),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                    child: const Center(child: Text("Join (cost : 1 ETH)", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),)),
+                  ) :
                   Container(
                     decoration:  BoxDecoration(
                       border: const Border(top: BorderSide(color: Colors.grey, width: 0.01)),
@@ -490,7 +516,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                     child: _buildTextField(context),
-                  ),
+                  ) ,
                   if (_effectiveController.message.parentId != null &&
                       !widget.hideSendAsDm)
                     Padding(
@@ -738,7 +764,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
           setState(() => _draggingBorder = null);
         },
         child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: 55),
+          constraints: const BoxConstraints(minHeight: 55),
           child: Container(
             //height: 55,
             clipBehavior: Clip.hardEdge,

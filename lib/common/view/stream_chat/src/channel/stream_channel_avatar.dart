@@ -142,6 +142,7 @@ class StreamChannelAvatar extends StatelessWidget {
             builder: (context, user) => StreamUserAvatar(
               borderRadius: borderRadius ?? previewTheme?.borderRadius,
               user: user,
+              channel: channel,
               constraints: constraints ?? previewTheme?.constraints,
               onTap: onTap != null ? (_) => onTap!() : null,
               selected: selected,

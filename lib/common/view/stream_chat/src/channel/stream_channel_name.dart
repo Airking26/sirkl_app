@@ -71,7 +71,10 @@ class StreamChannelName extends StatelessWidget {
               channelName = channel.extraData['nameOfGroup'] as String;
             }
           } else {
-            if(channel.extraData['ens'] == null || channel.extraData['ens'] == "0") {
+            if(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true){
+              channelName = channel.extraData["nameOfGroup"] as String;
+            }
+            else if(channel.extraData['ens'] == null || channel.extraData['ens'] == "0") {
               channelName = "${(channel.extraData['wallet'] as String).substring(0, 6)}...${(channel.extraData['wallet'] as String).substring((channel.extraData['wallet'] as String).length - 4)}";
             } else {
               channelName = channel.extraData["ens"] as String;

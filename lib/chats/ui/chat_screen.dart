@@ -35,7 +35,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     client: StreamChat.of(context).client,
     filter: Filter.and([
       Filter.equal("type", "try"),
-      Filter.in_("members", [_homeController.id.value]),
+      Filter.or([
+        Filter.in_("members", [_homeController.id.value]),
+        Filter.equal("created_by_id", _homeController.id.value),
+      ]),
       Filter.or([
         Filter.and([
           Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
