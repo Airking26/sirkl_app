@@ -81,10 +81,16 @@ class StreamChannelName extends StatelessWidget {
             }
           }
 
-          return Text(
-            channelName,
-            style: textStyle!.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
-            overflow: textOverflow,
+          return Row(
+            children: [
+              Text(
+                channelName ,
+                style: textStyle!.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+                overflow: textOverflow,
+              ),
+              channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == true ? Icon(Icons.lock_outline_rounded, size: 14, color: const Color(0xff00CB7D).withOpacity(0.7),) : const SizedBox(),
+              channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true ? Icon(Icons.attach_money_rounded, size: 16, color: const Color(0xff00CB7D).withOpacity(0.7)) : const SizedBox(),
+            ],
           );
         },
       );

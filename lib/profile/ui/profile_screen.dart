@@ -31,7 +31,6 @@ import 'package:sirkl/profile/ui/settings_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:web3dart/web3dart.dart';
 import '../../common/view/dialog/custom_dial.dart';
-import '../../home/ui/pdf_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -143,21 +142,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     .isEditingProfile.value
                                     ? const SizedBox(width: 42, height: 24,) : IconButton(
                                             onPressed: () async {
-                                              //await web3Controller.query(Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client()));
-                                              await _homeController.connectWallet(context);
-                                              await web3Controller.call(
-                                                  Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client()),
-                                                  "createGroup",
-                                                  ["exams", "dess", BigInt.zero, EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
-                                                  _homeController.connector.value);
-                                              /*pushNewScreen(context,
-                                                      screen:
-                                                          const NotificationScreen())
-                                                  .then((value) =>
-                                                      _profileController
-                                                          .checkIfHasUnreadNotif(
-                                                              _homeController
-                                                                  .id.value));*/
+                                              web3Controller.getGroups(Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client()), []);
+                                              //pushNewScreen(context, screen: const NotificationScreen()).then((value) => _profileController.checkIfHasUnreadNotif(_homeController.id.value));
                                             },
                                             icon: FlutterBadge(
                                               icon: Image.asset(

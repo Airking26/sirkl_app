@@ -15,14 +15,17 @@ class InboxCreationDto {
     required this.createdBy,
     required this.wallets,
     required this.idChannel,
-    this.message,
     required this.isConv,
+    this.message,
     this.nameOfGroup,
     this.picOfGroup,
     this.members,
     this.isGroupPrivate,
     this.isGroupVisible,
-    this.isGroupPaying
+    this.isGroupPaying,
+    this.price,
+    this.tokenAccepted,
+    this.idGroupBlockchain
   });
 
   String createdBy;
@@ -36,6 +39,9 @@ class InboxCreationDto {
   bool? isGroupPrivate;
   bool? isGroupVisible;
   bool? isGroupPaying;
+  double? price;
+  String? tokenAccepted;
+  String? idGroupBlockchain;
 
   factory InboxCreationDto.fromJson(Map<String, dynamic> json) => InboxCreationDto(
     createdBy: json["createdBy"],
@@ -47,6 +53,9 @@ class InboxCreationDto {
     isGroupVisible: json["isGroupVisible"],
     isGroupPaying: json["isGroupPaying"],
     picOfGroup: json["picOfGroup"],
+    price: json["price"],
+    tokenAccepted: json["tokenAccepted"],
+    idGroupBlockchain: json["idGroupBlockchain"],
     members: json["members"] == null ? null : List<String>.from(json["members"].map((x) => x)),
     wallets: List<String>.from(json["wallets"].map((x) => x)),
   );
@@ -60,6 +69,9 @@ class InboxCreationDto {
     "isGroupVisible": isGroupVisible,
     "isGroupPaying": isGroupPaying,
     "picOfGroup": picOfGroup,
+    "price": price,
+    "tokenAccepted": tokenAccepted,
+    "idGroupBlockchain": idGroupBlockchain,
     "nameOfGroup": nameOfGroup,
     "wallets": List<dynamic>.from(wallets.map((x) => x)),
     "members": members == null ? null : List<dynamic>.from(members!.map((x) => x)),

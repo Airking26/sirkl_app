@@ -10,8 +10,12 @@ import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:web3dart/credentials.dart';
+import 'package:web3dart/web3dart.dart';
+import 'package:http/http.dart' as htp;
 
 import '../../navigation/controller/navigation_controller.dart';
 
@@ -29,6 +33,8 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
   final _homeController = Get.put(HomeController());
   final _navigationController = Get.put(NavigationController());
   final _commonController = Get.put(CommonController());
+  final web3Controller = Get.put(Web3Controller());
+  final _priceController = TextEditingController();
   final _utils = Utils();
 
   @override
@@ -230,7 +236,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                   ),
                 ),
               ),
-              /*SizedBox(height: _chatController.groupVisibilityCollapsed.value || _chatController.groupTypeCollapsed.value ? 8 : 24,),
+              SizedBox(height: _chatController.groupVisibilityCollapsed.value || _chatController.groupTypeCollapsed.value ? 8 : 24,),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF113751) : Colors.white,
@@ -313,9 +319,10 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                             Transform.translate(offset: const Offset(0, 8), child: Text("Admission Price : ", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontFamily: "Gilroy", fontWeight: FontWeight.w500, fontSize: 16),)),
                             const Spacer(),
                             Transform.translate(offset: const Offset(0, 3.75),
-                                child: const SizedBox(width: 50,
+                                child:  SizedBox(width: 50,
                                   child: TextField(
-                                    textAlign: TextAlign.center,cursorColor: Color(0xff00CB7D), decoration: InputDecoration(
+                                    controller: _priceController,
+                                    textAlign: TextAlign.center,cursorColor: const Color(0xff00CB7D), decoration: const InputDecoration(
                                       hintText: "0.0", hintStyle: TextStyle(fontWeight: FontWeight.w500, fontFamily: "Gilroy", fontSize: 18),contentPadding: EdgeInsets.only(bottom: 4), isDense: true, enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(color: Colors.grey, width: 0.5),
                                   ), focusedBorder: UnderlineInputBorder(
@@ -330,7 +337,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                     ],
                   ),
                 ),
-              ),*/
+              ),
               const SizedBox(height: 24,),
             ],),
           ),
@@ -391,7 +398,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                   _utils.showToast(context, "Please, enter a name for you group.");
                 } else {
                   if(_chatController.groupPaying.value == 1){
-                    await sendMessageAsGroup();
+                    await createPaidGroup();
                   } else {
                     _navigationController.hideNavBar.value = true;
                     pushNewScreen(
@@ -409,34 +416,55 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
     );
   }
 
-  Future<void> sendMessageAsGroup() async{
-    _chatController.messageSending.value = true;
-    var idChannel = DateTime
-        .now()
-        .millisecondsSinceEpoch
-        .toString();
-    var idChannelCreated = await _chatController.createInbox(
-        InboxCreationDto(
-            isConv: false,
-            createdBy: _homeController.id.value,
-            isGroupPrivate: _chatController.groupType.value == 0 ? false : true,
-            isGroupVisible: _chatController.groupVisibility.value == 0 ? true : false,
-            isGroupPaying: true,
-            wallets: [_homeController.userMe.value.wallet!],
-            nameOfGroup: _chatController.groupTextController.value.text,
-            picOfGroup: _profileController.urlPictureGroup.value,
-            idChannel: idChannel));
-    FocusManager.instance.primaryFocus?.unfocus();
-    _chatController.messageSending.value = false;
-    _profileController.urlPictureGroup.value = "";
-    _chatController.groupTextController.value.text = "";
-    _chatController.fromGroupCreation.value = true;
-    _commonController.refreshInboxes.value = true;
-    Navigator.popUntil(context, (route) => route.isFirst);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: idChannelCreated,)).then((value) => _navigationController.hideNavBar.value = false);
-    });
-//    pushNewScreen(context, screen: const ChatScreen());
+  Future<void> createPaidGroup() async{
+    await _homeController.connectWallet(context);
+    var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
+    var address = await web3Controller.createGroup(
+        client,
+        ["exams", "dess", BigInt.from(10000), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
+        _homeController.connector.value);
+    if(address != null) {
+      //client.getTransactionReceipt(address).asStream().listen((event) async {
+        //if(event != null && event.status != null && event.status!){
+          _chatController.messageSending.value = true;
+          var idChannel = DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString();
+          var idChannelCreated = await _chatController.createInbox(
+              InboxCreationDto(
+                  price: double.parse(_priceController.text),
+                  tokenAccepted: "0x0000000000000000000000000000000000000000",
+                  idGroupBlockchain: "address",
+                  isConv: false,
+                  createdBy: _homeController.id.value,
+                  isGroupPrivate: _chatController.groupType.value == 0
+                      ? false
+                      : true,
+                  isGroupVisible: _chatController.groupVisibility.value == 0
+                      ? true
+                      : false,
+                  isGroupPaying: true,
+                  wallets: [_homeController.userMe.value.wallet!],
+                  nameOfGroup: _chatController.groupTextController.value.text,
+                  picOfGroup: _profileController.urlPictureGroup.value,
+                  idChannel: idChannel));
+          FocusManager.instance.primaryFocus?.unfocus();
+          _chatController.messageSending.value = false;
+          _profileController.urlPictureGroup.value = "";
+          _chatController.groupTextController.value.text = "";
+          _chatController.fromGroupCreation.value = true;
+          _commonController.refreshInboxes.value = true;
+          Navigator.popUntil(context, (route) => route.isFirst);
+          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+            pushNewScreen(context, screen: DetailedChatScreen(
+              create: false, channelId: idChannelCreated,)).then((value) =>
+            _navigationController.hideNavBar.value = false);
+          });
+        //}
+      //});
+
+    }
   }
 
   @override
@@ -445,6 +473,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
     _chatController.groupTypeCollapsed.value = true;
     _chatController.groupType.value = 0;
     _chatController.groupVisibility.value = 0;
+    _priceController.clear();
     super.dispose();
   }
 

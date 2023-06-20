@@ -291,10 +291,10 @@ class HomeController extends GetxController{
   }
 
   getDropDownList(String wallet) async {
-    var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
-    var ethClient = Web3Client('https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2', htp.Client());
-    var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet));
-    if(balance.getInWei > BigInt.zero) {
+    //var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
+    //var ethClient = Web3Client('https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2', htp.Client());
+    //var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet));
+    //if(balance.getInWei > BigInt.zero) {
       dropDownMenuItems.add(DropdownMenuItem(child: Row(
         children: [
           Image.network("https://raw.githubusercontent.com/dappradar/tokens/main/ethereum/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee/logo.png", width: 22, height: 22,),
@@ -303,8 +303,8 @@ class HomeController extends GetxController{
               fontFamily: "Gilroy", fontWeight: FontWeight.w500),)
         ],
       )));
-    }
-    if(request.isOk){
+    //}
+    /*if(request.isOk){
       var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
       tokenContractAddress.result?.tokenBalances?.forEach((element) async {
         if(element.tokenBalance != "0x0000000000000000000000000000000000000000000000000000000000000000"){
@@ -320,7 +320,7 @@ class HomeController extends GetxController{
           )));
         }
       });
-    }
+    }*/
   }
 
   Future<TokenMetadataDTO?> getTokenMetadata(String contractAddress) async {

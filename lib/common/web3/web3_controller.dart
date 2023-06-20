@@ -9,8 +9,8 @@ class Web3Controller extends GetxController{
 
   Future<DeployedContract> getContract() async {
     String abi = await rootBundle.loadString("assets/abi.json");
-    String contractAddress = "0x45dcC4DEC99C37d802Fed2e54fB170E18606A22C";
-    String contractName = "PaidGroups";
+    String contractAddress = "0x9B2044615349Ffe31Cf979F16945D0c785eED7da";
+    String contractName = "PAIDGROUPS";
 
     DeployedContract contract = DeployedContract(
       ContractAbi.fromJson(abi, contractName),
@@ -20,23 +20,32 @@ class Web3Controller extends GetxController{
     return contract;
   }
 
-  Future<List<dynamic>> query(Web3Client ethereumClient) async {
-    DeployedContract contract = await getContract();
-    ContractFunction function = contract.function("getGroupCount");
-    List<dynamic> result = await ethereumClient.call(
-        contract: contract, function: function, params: []);
-    return result;
-  }
-
-  Future<String> call(Web3Client ethereumClient, String functionName, List<dynamic> args, WalletConnect connector) async {
+  Future<String?> query(Web3Client ethereumClient, String functionName, List<dynamic> args, WalletConnect connector) async {
     DeployedContract contract = await getContract();
     ContractFunction function = contract.function(functionName);
     launchUrl(Uri.parse("metamask://"), mode: LaunchMode.externalApplication);
     EthereumWalletConnectProvider provider = EthereumWalletConnectProvider(connector);
     String result = await ethereumClient.sendTransaction(WalletConnectEthereumCredentials(provider: provider),
-        Transaction.callContract(contract: contract, function: function, parameters: args, gasPrice: EtherAmount.inWei(BigInt.one), maxGas: 500000));
+        Transaction.callContract(contract: contract, function: function, parameters: args), chainId: null, fetchChainIdFromNetworkId: true);
+    //TODO : Retrieve the id of the group created
     return result;
   }
 
+
+  Future<List<dynamic>> call(Web3Client web3client, String functionName, List<dynamic> args) async {
+    DeployedContract deployedContract = await getContract();
+    ContractFunction contractFunction = deployedContract.function(functionName);
+    List<dynamic> result = await web3client.call(
+        contract: deployedContract, function: contractFunction, params: args);
+    return result;
+  }
+
+  Future<String?> createGroup(Web3Client ethereumClient, List<dynamic> args, WalletConnect connector) async {
+    return await query(ethereumClient, "createGroup", args, connector);
+  }
+
+  Future<List<dynamic>> getGroups(Web3Client web3client, List<dynamic> args) async {
+    return await call(web3client, "getGroups", args);
+  }
 
 }

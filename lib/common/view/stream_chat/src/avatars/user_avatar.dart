@@ -122,7 +122,8 @@ class StreamUserAvatar extends StatelessWidget {
                   ),
                 ),
               )
-            : TinyAvatar(baseString:isGroup != null && picOfGroup != null &&  !(isGroup as bool) ? picOfGroup as String : userFromJson(json.encode(user.extraData["userDTO"])).wallet!, dimension: 52, circular: true, colourScheme: TinyAvatarColourScheme.seascape,),
+            : TinyAvatar(baseString: isGroup != null && picOfGroup != null &&  !(isGroup as bool) ? picOfGroup as String : (channel?.extraData["isGroupPaying"] != null && (channel?.extraData["isGroupPaying"]) as bool) ?
+        channel?.extraData["nameOfGroup"] as String : userFromJson(json.encode(user.extraData["userDTO"])).wallet!, dimension: 52, circular: true, colourScheme: TinyAvatarColourScheme.seascape,),
       ),
     );
 
