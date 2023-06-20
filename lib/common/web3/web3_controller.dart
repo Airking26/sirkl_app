@@ -20,19 +20,26 @@ class Web3Controller extends GetxController{
     return contract;
   }
 
-  Future<String?> query(Web3Client ethereumClient, String functionName, List<dynamic> args, WalletConnect connector) async {
+  Future<String?> call(Web3Client ethereumClient, String functionName, List<dynamic> args, WalletConnect connector) async {
     DeployedContract contract = await getContract();
     ContractFunction function = contract.function(functionName);
     launchUrl(Uri.parse("metamask://"), mode: LaunchMode.externalApplication);
     EthereumWalletConnectProvider provider = EthereumWalletConnectProvider(connector);
     String result = await ethereumClient.sendTransaction(WalletConnectEthereumCredentials(provider: provider),
         Transaction.callContract(contract: contract, function: function, parameters: args), chainId: null, fetchChainIdFromNetworkId: true);
-    //TODO : Retrieve the id of the group created
+
+    ethereumClient.addedBlocks().listen((event) async {
+      var receipt = await ethereumClient.getTransactionReceipt(result);
+
+    });
+
     return result;
   }
 
 
-  Future<List<dynamic>> call(Web3Client web3client, String functionName, List<dynamic> args) async {
+
+
+  Future<List<dynamic>> query(Web3Client web3client, String functionName, List<dynamic> args) async {
     DeployedContract deployedContract = await getContract();
     ContractFunction contractFunction = deployedContract.function(functionName);
     List<dynamic> result = await web3client.call(
@@ -41,11 +48,11 @@ class Web3Controller extends GetxController{
   }
 
   Future<String?> createGroup(Web3Client ethereumClient, List<dynamic> args, WalletConnect connector) async {
-    return await query(ethereumClient, "createGroup", args, connector);
+    return await call(ethereumClient, "createGroup", args, connector);
   }
 
   Future<List<dynamic>> getGroups(Web3Client web3client, List<dynamic> args) async {
-    return await call(web3client, "getGroups", args);
+    return await query(web3client, "getGroups", args);
   }
 
 }
