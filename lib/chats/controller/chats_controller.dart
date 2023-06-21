@@ -45,6 +45,7 @@ class ChatsController extends GetxController{
   var fromGroupJoin = false.obs;
   var isEditingGroup = false.obs;
   var needToRefresh = false.obs;
+  Rx<bool> isCreatingGroup = false.obs;
   Rx<Channel?> channel = (null as Channel?).obs;
   Rx<Channel?> nestedChannel = (null as Channel?).obs;
   var retryProgress = false.obs;
@@ -52,6 +53,7 @@ class ChatsController extends GetxController{
   Future<String> createInbox(InboxCreationDto inboxCreationDto) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
+ 
     var req = await _chatService.createInbox(accessToken, inboxCreationDtoToJson(inboxCreationDto));
     if(req.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken);
