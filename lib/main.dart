@@ -31,7 +31,6 @@ import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:stream_chat_persistence/stream_chat_persistence.dart';
 import 'chats/ui/settings_group_screen.dart';
-import 'global_getx/dependency_manager.dart';
 import 'navigation/ui/navigation_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
@@ -95,8 +94,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(brightness: Brightness.light, dividerColor: Colors.transparent),
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(),
-      initialBinding: GlobalDependencyManager(),
-      
     );
   }
 }
