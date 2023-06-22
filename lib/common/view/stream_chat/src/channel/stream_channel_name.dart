@@ -61,7 +61,10 @@ class StreamChannelName extends StatelessWidget {
           if (otherMembers.isNotEmpty) {
             if (otherMembers.length == 1) {
               final user = otherMembers.first.user;
-              if (user != null) {
+              if(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true){
+                channelName = channel.extraData["nameOfGroup"] as String;
+              }
+              else if (user != null) {
                 var userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
                 channelName = _homeController.nicknames[userDTO.wallet!] != null ?
                 _homeController.nicknames[userDTO.wallet!] + " (" + (userDTO.userName.isNullOrBlank! ? "${userDTO.wallet!.substring(0, 6)}...${userDTO.wallet!.substring(userDTO.wallet!.length - 4)}" : userDTO.userName!) + ")"
@@ -74,7 +77,7 @@ class StreamChannelName extends StatelessWidget {
             if(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true){
               channelName = channel.extraData["nameOfGroup"] as String;
             }
-            else if(channel.extraData['ens'] == null || channel.extraData['ens'] == "0") {
+             else if(channel.extraData['ens'] == null || channel.extraData['ens'] == "0") {
               channelName = "${(channel.extraData['wallet'] as String).substring(0, 6)}...${(channel.extraData['wallet'] as String).substring((channel.extraData['wallet'] as String).length - 4)}";
             } else {
               channelName = channel.extraData["ens"] as String;
@@ -88,8 +91,8 @@ class StreamChannelName extends StatelessWidget {
                 style: textStyle!.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
                 overflow: textOverflow,
               ),
-              channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == true ? Icon(Icons.lock_outline_rounded, size: 14, color: const Color(0xff00CB7D).withOpacity(0.7),) : const SizedBox(),
-              channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true ? Icon(Icons.attach_money_rounded, size: 16, color: const Color(0xff00CB7D).withOpacity(0.7)) : const SizedBox(),
+              channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true ? Transform.translate(offset: Offset(-12, 0), child: IconButton(icon: Image.asset("assets/images/ethereum.png", color: const Color(0xff00CB7D), width: 16,), onPressed: (){},)) : const SizedBox(),
+              channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == true ? Transform.translate(offset: Offset(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true ? -28 : 4, 0), child: Icon(Icons.lock_outline_rounded, size: 14, color: const Color(0xff00CB7D).withOpacity(0.7),)) : const SizedBox(),
             ],
           );
         },

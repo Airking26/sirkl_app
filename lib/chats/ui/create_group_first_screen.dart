@@ -3,6 +3,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ndialog/ndialog.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/create_group_second_screen.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
@@ -13,7 +14,6 @@ import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
-import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
 
@@ -418,20 +418,30 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
   }
 
   Future<void> createPaidGroup() async{
+    AlertDialog alert = AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: const [
+          Padding(
+            padding: EdgeInsets.only(bottom: 24.0, top: 12),
+            child: CircularProgressIndicator(color: Color(0xFF00CB7D),),
+          ),
+          Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+        ],),
+    );
     await _homeController.connectWallet(context);
     var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
     var address = await web3Controller.createGroup(
         client,
-        [_chatController.groupTextController.value.text, "", BigInt.from(10000), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
-        _homeController.connector.value);
+        [_chatController.groupTextController.value.text, "", BigInt.from(double.parse(_priceController.text) * 1000000000000000000), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
+        _homeController.connector.value, false);
     final contract = await web3Controller.getContract();
     final filter = FilterOptions.events(
       contract: contract,
       event: contract.event('GroupCreated'),
     );
-
     Stream<FilterEvent> eventStream = client.events(filter);
-
+    if(address != null) alert.show(context, barrierDismissible: false);
     eventStream.listen((event) async {
       final decoded = contract.event("GroupCreated").decodeResults(event.topics!, event.data!);
       if(address == event.transactionHash) {
@@ -444,7 +454,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
             InboxCreationDto(
                 price: double.parse(_priceController.text),
                 tokenAccepted: "0x0000000000000000000000000000000000000000",
-                idGroupBlockchain: decoded[2],
+                idGroupBlockchain: decoded[0].toString(),
                 isConv: false,
                 createdBy: _homeController.id.value,
                 isGroupPrivate: _chatController.groupType.value == 0
@@ -458,6 +468,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                 nameOfGroup: _chatController.groupTextController.value.text,
                 picOfGroup: _profileController.urlPictureGroup.value,
                 idChannel: idChannel));
+        Get.back();
         FocusManager.instance.primaryFocus?.unfocus();
         _chatController.messageSending.value = false;
         _profileController.urlPictureGroup.value = "";

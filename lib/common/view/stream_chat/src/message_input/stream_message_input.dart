@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: deprecated_member_use_from_same_package, use_build_context_synchronously
 
 import 'dart:async';
 import 'dart:math';
@@ -6,10 +6,12 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart'
     hide ErrorListener;
 import 'package:desktop_drop/desktop_drop.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart'
     hide debounce;
+import 'package:ndialog/ndialog.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sirkl/common/view/stream_chat/platform_widget_builder/src/platform_widget_builder.dart';
@@ -22,7 +24,10 @@ import 'package:sirkl/common/view/stream_chat/src/message_input/simple_safe_area
 import 'package:sirkl/common/view/stream_chat/src/message_input/tld.dart';
 import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:web3dart/web3dart.dart';
+import 'package:http/http.dart' as htp;
 
 
 const _kCommandTrigger = '/';
@@ -287,6 +292,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
   StreamRestorableMessageInputController? _controller;
 
   final _homeController = Get.put(HomeController());
+  final web3Controller = Get.put(Web3Controller());
 
   void _createLocalController([Message? message]) {
     assert(_controller == null, '');
@@ -488,20 +494,84 @@ class StreamMessageInputState extends State<StreamMessageInput>
                       channel.extraData["isConv"] == false &&
                       channel.extraData["isGroupPaying"] != null &&
                       channel.extraData["isGroupPaying"] == true) ?
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    decoration:  BoxDecoration(
-                      border: const Border(top: BorderSide(color: Colors.grey, width: 0.01)),
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF111D28) : Colors.white,
-                            MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
-                          ]),
+                  InkWell(
+                    onTap: () async {
+                      if(channel.extraData["isGroupPrivate"] == false ){
+                        AlertDialog alert = AlertDialog(
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 24.0, top: 12),
+                                child: CircularProgressIndicator(color: Color(0xFF00CB7D),),
+                              ),
+                              Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+                            ],),
+                        );
+                        await _homeController.connectWallet(context);
+                        var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
+                        var address = await web3Controller.joinGroup(
+                            client,
+                            [BigInt.parse(channel.extraData["idGroupBlockChain"] as String)],
+                            _homeController.connector.value, channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble());
+                        final contract = await web3Controller.getContract();
+                        final filter = FilterOptions.events(
+                          contract: contract,
+                          event: contract.event('GroupCreated'),
+                        );
+                        Stream<FilterEvent> eventStream = client.events(filter);
+                        if(address != null) alert.show(context, barrierDismissible: false);
+                        eventStream.listen((event) async {
+                          if(address == event.transactionHash) {
+                            await channel.addMembers([_homeController.id.value]);
+                            Get.back();
+                          }
+                        });
+                      }
+                      else {
+                        showDialog(context: context,
+                            barrierDismissible: true,
+                            builder: (_) => CupertinoAlertDialog(
+                              title: Text("Join", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                              content: Text("Once approved by the admin, you can join the group by paying a ${channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble()}ETH subscription fee.", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+                              actions: [
+                                CupertinoDialogAction(child: Text("Cancel", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){ Get.back();},),
+                                CupertinoDialogAction(child: Text("Continue", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
+                                  onPressed: () async {
+                                    Get.back();
+                                    showDialog(context: context,
+                                        barrierDismissible: true,
+                                        builder: (_) => CupertinoAlertDialog(
+                                          title: Text("Join", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                                          content: Text("You will receive a notification upon approval of your request. See you soon!", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
+                                          actions: [
+                                            CupertinoDialogAction(child: Text("OK", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
+                                              onPressed: () async {
+                                                Get.back();
+                                              },)
+                                          ],
+                                        ));
+                                  },)
+                              ],
+                            ));
+                      }
+
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration:  BoxDecoration(
+                        border: const Border(top: BorderSide(color: Colors.grey, width: 0.01)),
+                        gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF111D28) : Colors.white,
+                              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
+                            ]),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                      child: Center(child: Text(channel.extraData["isGroupPrivate"] == false ? "Join (cost : ${channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble()}ETH)" : "Request to join", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),)),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                    child: const Center(child: Text("Join (cost : 1 ETH)", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),)),
                   ) :
                   Container(
                     decoration:  BoxDecoration(

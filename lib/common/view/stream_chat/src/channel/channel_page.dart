@@ -33,7 +33,6 @@ class _ChannelPageState extends State<ChannelPage> {
 
   @override
   void dispose() {
-    //_chatController.channel.value = null;
     _focusNode!.dispose();
     super.dispose();
   }
@@ -47,7 +46,15 @@ class _ChannelPageState extends State<ChannelPage> {
         children: <Widget>[
           StreamChannelHeader(commonController: _commonController, fromProfile: widget.fromProfile),
           Expanded(
-            child: StreamMessageListView(
+            child:
+            (StreamChannel.of(context).channel.membership == null &&
+                !StreamChannel.of(context).channel.state!.members
+                    .map((e) => e.userId!)
+                    .contains(StreamChat.of(context).currentUser!.id)) && StreamChannel.of(context).channel.extraData["isGroupPaying"] != null  && StreamChannel.of(context).channel.extraData["isGroupPaying"] == true && StreamChannel.of(context).channel.extraData["isGroupPrivate"] != null  && StreamChannel.of(context).channel.extraData["isGroupPrivate"] == true ? Container(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) :const Color.fromARGB(255, 247, 253, 255) :MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF102437) : const Color.fromARGB(255, 247, 253, 255), child:
+            Center(child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 60.0),
+              child: Image.asset(MediaQuery.of(context).platformBrightness == Brightness.dark ? "assets/images/logo_dark_theme.png" : "assets/images/logo_light_theme.png"),
+            ),),) : StreamMessageListView(
               onMessageSwiped: _reply,
               messageBuilder: (context, details, messages, defaultMessageWidget) {
                 return defaultMessageWidget.copyWith(

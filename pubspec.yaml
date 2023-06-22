@@ -164,6 +164,7 @@ flutter:
      - assets/images/metamask.png
      - assets/images/qrcode.png
      - assets/images/admin.png
+     - assets/images/ethereum.png
      - assets/images/logo_light_theme.png
      - assets/images/logo_dark_theme.png
      - assets/pdf/tc.pdf

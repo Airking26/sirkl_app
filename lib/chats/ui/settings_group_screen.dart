@@ -142,7 +142,9 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                   children: [
                     Icon( (_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value) ? Icons.mode_edit_rounded : Icons.add_rounded, color : MediaQuery.of(context).platformBrightness == Brightness.dark ?  Colors.white : Colors.black),
                     const SizedBox(height: 4),
-                    Text((_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value)? "Edit" : "Join", style: const TextStyle(fontFamily: "Gilroy"),)
+                    Text((_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value)? "Edit" : "Join", style: const TextStyle(fontFamily: "Gilroy"),),
+                    (_chatController.channel.value?.extraData["price"] != null) ?
+                    Text('${_chatController.channel.value?.extraData['price'] as double}ETH', style: const TextStyle(fontFamily: "Gilroy", fontSize: 10),) : const SizedBox(),
                   ],),
               ),
             ),

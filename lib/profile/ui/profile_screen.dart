@@ -142,8 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     .isEditingProfile.value
                                     ? const SizedBox(width: 42, height: 24,) : IconButton(
                                             onPressed: () async {
-                                              web3Controller.getGroups(Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client()), []);
-                                              //pushNewScreen(context, screen: const NotificationScreen()).then((value) => _profileController.checkIfHasUnreadNotif(_homeController.id.value));
+                                              pushNewScreen(context, screen: const NotificationScreen()).then((value) => _profileController.checkIfHasUnreadNotif(_homeController.id.value));
                                             },
                                             icon: FlutterBadge(
                                               icon: Image.asset(

@@ -262,7 +262,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                         .map((e) => e.userId!)
                                         .contains(_homeController.id.value)) &&
                                 channel.extraData["isConv"] != null &&
-                                channel.extraData["isConv"] == false) {
+                                channel.extraData["isConv"] == false && (channel.extraData["isGroupPaying"] == null || channel.extraData["isGroupPaying"] == false)) {
                               _navigationController.hideNavBar.value = true;
                               pushNewScreen(context,
                                       screen: const SettingsGroupScreen())
