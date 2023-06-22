@@ -89,7 +89,7 @@ class HomeController extends GetxController{
     clientMeta: const PeerMeta(
       name: 'SIRKL',
       description: 'SIRKL Login',
-      url: 'https://walletconnect.org',
+      url: 'https://walletconnect.org', 
       icons: [
         'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png'
       ],
@@ -121,6 +121,7 @@ class HomeController extends GetxController{
   connectWallet(BuildContext context) async {
 
     connector.value.on('connect', (session) async{
+      debugPrint('Wallet connected');
       address.value = sessionStatus?.accounts[0];
     });
 
