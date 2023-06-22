@@ -510,10 +510,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
                         );
                         await _homeController.connectWallet(context);
                         var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
-                        var address = await web3Controller.joinGroup(
-                            client,
-                            [BigInt.parse(channel.extraData["idGroupBlockChain"] as String)],
-                            _homeController.connector.value, channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble());
+                        var address = await web3Controller.joinGroup(client, [BigInt.parse(channel.extraData["idGroupBlockChain"] as String)], _homeController.connector.value, channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble());
                         final contract = await web3Controller.getContract();
                         final filter = FilterOptions.events(
                           contract: contract,

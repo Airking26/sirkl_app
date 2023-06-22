@@ -22,6 +22,7 @@ import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/web_wallet_connect_dto.dart';
+import 'package:sirkl/global_getx/wallet/s_wallet_connect.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/home/ui/pdf_screen.dart';
@@ -734,6 +735,7 @@ class _HomeScreenState extends State<HomeScreen> {
             endColor: const Color(0xff0063FB),
             gradientOrientation: GradientOrientation.Horizontal,
             onTap: (finish) async {
+         
               await _homeController.connectWallet(context);
             },
             child: const Text(

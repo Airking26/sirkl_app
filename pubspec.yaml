@@ -86,7 +86,7 @@ dependencies:
   flutter_typeahead: ^4.3.7
   flutter_beep: ^1.0.0
   stream_chat_persistence: ^6.1.0
-
+  web_socket_channel: ^2.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

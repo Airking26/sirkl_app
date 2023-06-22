@@ -14,6 +14,7 @@ import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
 
@@ -433,13 +434,14 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
     var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
     var address = await web3Controller.createGroup(
         client,
-        [_chatController.groupTextController.value.text, "", BigInt.from(double.parse(_priceController.text) * 1000000000000000000), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
-        _homeController.connector.value, false);
+        [_chatController.groupTextController.value.text, "", BigInt.from(10000), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
+        _homeController.connector.value);
     final contract = await web3Controller.getContract();
     final filter = FilterOptions.events(
       contract: contract,
       event: contract.event('GroupCreated'),
     );
+
     Stream<FilterEvent> eventStream = client.events(filter);
     if(address != null) alert.show(context, barrierDismissible: false);
     eventStream.listen((event) async {
@@ -454,7 +456,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
             InboxCreationDto(
                 price: double.parse(_priceController.text),
                 tokenAccepted: "0x0000000000000000000000000000000000000000",
-                idGroupBlockchain: decoded[0].toString(),
+                idGroupBlockchain: decoded[0],
                 isConv: false,
                 createdBy: _homeController.id.value,
                 isGroupPrivate: _chatController.groupType.value == 0

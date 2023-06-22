@@ -1,0 +1,6 @@
+
+
+
+enum ContractResponseStatus {
+  success, fail
+}

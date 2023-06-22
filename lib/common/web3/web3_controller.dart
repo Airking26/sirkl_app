@@ -20,13 +20,13 @@ class Web3Controller extends GetxController{
     return contract;
   }
 
-  Future<String?> query(Web3Client ethereumClient, String functionName, List<dynamic> args, WalletConnect connector, bool haveFee, dynamic fee) async {
+  Future<String?> query(Web3Client ethereumClient, String functionName, List<dynamic> args, WalletConnect connector, bool hasFee, dynamic fee) async {
     DeployedContract contract = await getContract();
     ContractFunction function = contract.function(functionName);
     launchUrl(Uri.parse("metamask://"), mode: LaunchMode.externalApplication);
     EthereumWalletConnectProvider provider = EthereumWalletConnectProvider(connector);
     String result = await ethereumClient.sendTransaction(WalletConnectEthereumCredentials(provider: provider),
-        Transaction.callContract(contract: contract, function: function, parameters: args, value: haveFee ? EtherAmount.fromUnitAndValue(EtherUnit.ether, fee) : null), chainId: null, fetchChainIdFromNetworkId: true);
+        Transaction.callContract(contract: contract, function: function, parameters: args, value: EtherAmount.fromUnitAndValue(EtherUnit.ether, fee)), chainId: null, fetchChainIdFromNetworkId: true);
     return result;
   }
 
@@ -38,38 +38,18 @@ class Web3Controller extends GetxController{
     return result;
   }
 
-  Future<String?> createGroup(Web3Client ethereumClient, List<dynamic> args, WalletConnect connector, dynamic fee) async {
+  Future<String?> createGroup(Web3Client ethereumClient, List<dynamic> args, WalletConnect connector) async {
     return await query(ethereumClient, "createGroup", args, connector, false, null);
   }
 
   Future<String?> joinGroup(Web3Client ethereumClient, List<dynamic> args, WalletConnect connector, dynamic fee) async {
-    return await query(ethereumClient, "joinGroup", args, connector, true, fee);
-  }
-
-  Future<String?> updateGroupInfo(Web3Client web3client, List<dynamic> args, WalletConnect connector) async{
-    return await query(web3client, 'updateGroupInfo', args, connector, false, null);
-  }
-
-  Future<String?> addCreator(Web3Client web3client, List<dynamic> args, WalletConnect connector) async {
-    return await query(web3client, "addCreator", args, connector, false, null);
-  }
-
-  Future<String?> removeCreator(Web3Client web3client, List<dynamic> args, WalletConnect connector) async {
-    return await query(web3client, "removeCreator", args, connector, false, null);
-  }
-
-  Future<String?> transferGroupOwnership(Web3Client web3client, List<dynamic> args, WalletConnect connector) async {
-    return await query(web3client, "transferGroupOwnership", args, connector, false, null);
-  }
-
-  Future<String?> updateCreatorShares(Web3Client web3client, List<dynamic> args, WalletConnect connector) async {
-    return await query(web3client, "updateCreatorShares", args, connector, false, null);
-  }
-
-  Future<List<dynamic>> getCreators(Web3Client web3client, List<dynamic> args) async {
-    return await call(web3client, "getCreators", args);
+    return await query(
+        ethereumClient, "createGroup", args, connector, false, fee);
   }
 
 
+  Future<List<dynamic>> getGroups(Web3Client web3client, List<dynamic> args) async {
+    return await call(web3client, "getGroups", args);
+  }
 
 }
