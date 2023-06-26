@@ -23,10 +23,12 @@ class Web3Controller extends GetxController{
   Future<String?> query(Web3Client ethereumClient, String functionName, List<dynamic> args, WalletConnect connector, bool hasFee, dynamic fee) async {
     DeployedContract contract = await getContract();
     ContractFunction function = contract.function(functionName);
+    bool canOpen = await canLaunchUrl(Uri.parse("metamask://"));
+    if (!canOpen) {await Future.delayed(const Duration(seconds: 3));}
     launchUrl(Uri.parse("metamask://"), mode: LaunchMode.externalApplication);
     EthereumWalletConnectProvider provider = EthereumWalletConnectProvider(connector);
     String result = await ethereumClient.sendTransaction(WalletConnectEthereumCredentials(provider: provider),
-        Transaction.callContract(contract: contract, function: function, parameters: args, value: EtherAmount.fromUnitAndValue(EtherUnit.ether, fee)), chainId: null, fetchChainIdFromNetworkId: true);
+        Transaction.callContract(contract: contract, function: function, parameters: args, value : hasFee ? EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(fee * 1e18)): null) , chainId: null, fetchChainIdFromNetworkId: true);
     return result;
   }
 
@@ -43,8 +45,7 @@ class Web3Controller extends GetxController{
   }
 
   Future<String?> joinGroup(Web3Client ethereumClient, List<dynamic> args, WalletConnect connector, dynamic fee) async {
-    return await query(
-        ethereumClient, "createGroup", args, connector, false, fee);
+    return await query(ethereumClient, "joinGroup", args, connector, true, fee);
   }
 
 

@@ -20,7 +20,8 @@ class NotificationDto {
     this.message,
     this.channelId,
     this.channelName,
-    this.requester
+    this.requester,
+    this.paying
   });
 
   String id;
@@ -38,6 +39,7 @@ class NotificationDto {
   String? channelId;
   String? channelName;
   String? requester;
+  bool? paying;
 
   factory NotificationDto.fromJson(Map<String, dynamic> json) => NotificationDto(
     id: json["id"],
@@ -55,6 +57,7 @@ class NotificationDto {
     channelId: json["channelId"],
     channelName: json["channelName"],
     requester: json["requester"],
+    paying: json['paying']
   );
 
   Map<String, dynamic> toJson() => {
@@ -72,6 +75,7 @@ class NotificationDto {
     "message": message,
     "channelId": channelId,
     "channelName": channelName,
-    "requester": requester
+    "requester": requester,
+    "paying": paying
   };
 }

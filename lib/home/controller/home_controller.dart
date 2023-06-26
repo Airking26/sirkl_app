@@ -119,30 +119,6 @@ class HomeController extends GetxController{
   }
 
   connectWallet(BuildContext context) async {
-
-    connector.value.on('connect', (session) async{
-      debugPrint('Wallet connected');
-      address.value = sessionStatus?.accounts[0];
-    });
-
-    connector.value.on('session_request', (payload) {
-      var k = payload;
-    });
-
-    connector.value.on('disconnect', (session) {
-      connector.value = WalletConnect(
-        bridge: 'https://bridge.walletconnect.org',
-        clientMeta: const PeerMeta(
-          name: 'SIRKL',
-          description: 'SIRKL Login',
-          url: 'https://walletconnect.org',
-          icons: [
-            'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png'
-          ],
-        ),
-      );
-    });
-
     if (!connector.value.connected) {
       sessionStatus = await connector.value.createSession(
         chainId: 5,
@@ -176,6 +152,29 @@ class HomeController extends GetxController{
         },
       );
     }
+
+    connector.value.on('connect', (session) async{
+      debugPrint('Wallet connected');
+      address.value = sessionStatus?.accounts[0];
+    });
+
+    connector.value.on('session_request', (payload) {
+      var k = payload;
+    });
+
+    connector.value.on('disconnect', (session) {
+      connector.value = WalletConnect(
+        bridge: 'https://bridge.walletconnect.org',
+        clientMeta: const PeerMeta(
+          name: 'SIRKL',
+          description: 'SIRKL Login',
+          url: 'https://walletconnect.org',
+          icons: [
+            'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png'
+          ],
+        ),
+      );
+    });
 
   }
 

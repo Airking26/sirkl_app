@@ -69,7 +69,7 @@ class InboxCreationDto {
     "isGroupVisible": isGroupVisible,
     "isGroupPaying": isGroupPaying,
     "picOfGroup": picOfGroup,
-   // "price": price,
+    "price": price,
     "tokenAccepted": tokenAccepted,
     "idGroupBlockchain": idGroupBlockchain,
     "nameOfGroup": nameOfGroup,

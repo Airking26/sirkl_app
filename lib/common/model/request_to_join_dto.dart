@@ -11,6 +11,7 @@ class RequestToJoinDto {
     this.channelId,
     this.channelName,
     this.accept,
+    this.paying
   });
 
   String? receiver;
@@ -18,6 +19,7 @@ class RequestToJoinDto {
   String? channelId;
   String? channelName;
   bool? accept;
+  bool? paying;
 
   factory RequestToJoinDto.fromJson(Map<String, dynamic> json) => RequestToJoinDto(
     receiver: json["receiver"],
@@ -25,6 +27,7 @@ class RequestToJoinDto {
     channelId: json["channelId"],
     channelName: json["channelName"],
     accept: json["accept"],
+    paying: json["paying"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -33,5 +36,6 @@ class RequestToJoinDto {
     "channelId": channelId,
     "channelName": channelName,
     "accept": accept,
+    "paying": paying
   };
 }

@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:ndialog/ndialog.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/chats/controller/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
@@ -14,12 +14,15 @@ import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
+import 'package:http/http.dart' as htp;
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/groups/ui/group_participants_screen.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
+import 'package:web3dart/web3dart.dart';
 
 import 'requests_waiting_for_approval_screen.dart';
 
@@ -40,6 +43,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
   final _chatController = Get.put(ChatsController());
   final _navigationController = Get.put(NavigationController());
   final _nameGroupController = TextEditingController();
+  final web3Controller = Get.put(Web3Controller());
   final utils = Utils();
 
   @override
@@ -112,21 +116,48 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                  if(await _chatController.requestToJoinGroup(RequestToJoinDto(
                       receiver: _chatController.channel.value!.createdBy?.id,
                       requester: _homeController.id.value, channelId: _chatController.channel.value!.id,
-                  channelName: _chatController.channel.value!.extraData["nameOfGroup"] as String))) {
+                  channelName: _chatController.channel.value!.extraData["nameOfGroup"] as String, paying: _chatController.channel.value!.extraData["isGroupPaying"] != null && _chatController.channel.value!.extraData["isGroupPaying"] == true ? true : false))) {
                    utils.showToast(context, "Your request has been sent, you will be notify if it is accepted");
                  } else {
                    utils.showToast(context, "Request already sent");
                  }
                 } else {
-                  await _chatController.channel.value!.addMembers(
-                      [_homeController.id.value]);
-                  Navigator.pop(context);
-                  _chatController.fromGroupJoin.value = true;
-                  pushNewScreen(context, screen: DetailedChatScreen(
-                    create: false,
-                    channelId: _chatController.channel.value!.id,)).then((
-                      value) =>
-                  _navigationController.hideNavBar.value = false);
+                  if (_chatController.channel.value?.extraData["price"] != null) {
+                    AlertDialog alert = AlertDialog(
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 24.0, top: 12),
+                            child: CircularProgressIndicator(color: Color(0xFF00CB7D),),
+                          ),
+                          Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+                        ],),
+                    );
+                    await _homeController.connectWallet(context);
+                    var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
+                    var address = await web3Controller.joinGroup(client, [BigInt.parse(_chatController.channel.value?.extraData["idGroupBlockChain"] as String)], _homeController.connector.value, _chatController.channel.value?.extraData["price"] is double ? _chatController.channel.value?.extraData["price"] as double : (_chatController.channel.value?.extraData["price"] as int).toDouble());
+                    final contract = await web3Controller.getContract();
+                    final filter = FilterOptions.events(contract: contract, event: contract.event('GroupJoined'));
+                    Stream<FilterEvent> eventStream = client.events(filter);
+                    if(address != null) alert.show(context, barrierDismissible: false);
+                    eventStream.listen((event) async {
+                      if(address == event.transactionHash) {
+                        await _chatController.channel.value?.addMembers([_homeController.id.value]);
+                        Get.back();
+                      }
+                    });
+                  } else {
+                    await _chatController.channel.value!.addMembers(
+                        [_homeController.id.value]);
+                    Navigator.pop(context);
+                    _chatController.fromGroupJoin.value = true;
+                    pushNewScreen(context, screen: DetailedChatScreen(
+                      create: false,
+                      channelId: _chatController.channel.value!.id,)).then((
+                        value) =>
+                    _navigationController.hideNavBar.value = false);
+                  }
                 }
               }
             },
@@ -144,7 +175,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                     const SizedBox(height: 4),
                     Text((_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value)? "Edit" : "Join", style: const TextStyle(fontFamily: "Gilroy"),),
                     (_chatController.channel.value?.extraData["price"] != null) ?
-                    Text('${_chatController.channel.value?.extraData['price'] as double}ETH', style: const TextStyle(fontFamily: "Gilroy", fontSize: 10),) : const SizedBox(),
+                    Text('${_chatController.channel.value?.extraData["price"] is double ? _chatController.channel.value?.extraData["price"] as double : (_chatController.channel.value?.extraData["price"] as int).toDouble()}ETH', style: const TextStyle(fontFamily: "Gilroy", fontSize: 10),) : const SizedBox(),
                   ],),
               ),
             ),

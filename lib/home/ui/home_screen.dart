@@ -7,7 +7,6 @@ import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_beep/flutter_beep.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:highlight_text/highlight_text.dart';

@@ -432,9 +432,10 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
     );
     await _homeController.connectWallet(context);
     var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
+    var price = double.parse(_priceController.text) * 1e18;
     var address = await web3Controller.createGroup(
         client,
-        [_chatController.groupTextController.value.text, "", BigInt.from(10000), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
+        [_chatController.groupTextController.value.text, "", BigInt.from(price), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
         _homeController.connector.value);
     final contract = await web3Controller.getContract();
     final filter = FilterOptions.events(
@@ -456,7 +457,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
             InboxCreationDto(
                 price: double.parse(_priceController.text),
                 tokenAccepted: "0x0000000000000000000000000000000000000000",
-                idGroupBlockchain: decoded[0],
+                idGroupBlockchain: decoded[0].toString(),
                 isConv: false,
                 createdBy: _homeController.id.value,
                 isGroupPrivate: _chatController.groupType.value == 0

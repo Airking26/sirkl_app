@@ -249,7 +249,8 @@ class StreamChannelHeader extends StatelessWidget
                                           fromConversation: true,
                                           fromProfile: false));
                                 }
-                                else if (channel.isGroup) {
+                                else if (channel.isGroup || (channel.extraData['isGroupPaying'] != null &&
+                                    channel.extraData['isGroupPaying'] as bool)) {
                                   _chatController.channel.value = channel;
                                   if (channel.extraData['isConv'] != null &&
                                       !(channel.extraData['isConv'] as bool)) {
@@ -330,7 +331,8 @@ class StreamChannelHeader extends StatelessWidget
                                       screen: const SettingsProfileElseScreen(
                                           fromConversation: true,
                                           fromProfile: false));
-                                } else if (channel.isGroup) {
+                                } else if (channel.isGroup|| (channel.extraData['isGroupPaying'] != null &&
+                                    channel.extraData['isGroupPaying'] as bool)) {
                                   _chatController.channel.value = channel;
                                   if (channel.extraData['isConv'] != null &&
                                       !(channel.extraData['isConv'] as bool)) {
@@ -415,7 +417,8 @@ class StreamChannelHeader extends StatelessWidget
                         ],
                       ),
                     ),
-                    channel.isGroup ? Container() :  _chatController.isEditingProfile.value ? Container() : Transform.translate(
+                    channel.isGroup || (channel.extraData['isGroupPaying'] != null &&
+                        channel.extraData['isGroupPaying'] as bool) ? Container() :  _chatController.isEditingProfile.value ? Container() : Transform.translate(
                       offset: const Offset(16, 1),
                       child: IconButton(onPressed: () async {
                         _callController.userCalled.value = userFromJson(

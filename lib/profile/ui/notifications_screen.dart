@@ -138,13 +138,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
             IconButton(onPressed: () async {
-              if(await _chatController.acceptDeclineRequest(RequestToJoinDto(receiver: _homeController.id.value, requester: item.requester, channelName: item.channelName, channelId: item.channelId, accept: true))) {
+              if(await _chatController.acceptDeclineRequest(RequestToJoinDto(receiver: _homeController.id.value, requester: item.requester, channelName: item.channelName, channelId: item.channelId, accept: true, paying: item.paying))) {
                 await _profileController.deleteNotification(item.id);
                 pagingController.refresh();
               }
             }, icon: const Icon(Icons.add, color: Color(0xff00CB7D),)),
             IconButton(onPressed: () async {
-              if(await _chatController.acceptDeclineRequest(RequestToJoinDto(receiver: _homeController.id.value, requester: item.requester, channelName: item.channelName, channelId: item.channelId, accept: false))) {
+              if(await _chatController.acceptDeclineRequest(RequestToJoinDto(receiver: _homeController.id.value, requester: item.requester, channelName: item.channelName, channelId: item.channelId, accept: false, paying: item.paying))) {
                 await _profileController.deleteNotification(item.id);
                 pagingController.refresh();
               }
