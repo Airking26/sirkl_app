@@ -13,6 +13,8 @@ import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../global_getx/home/home_controller.dart';
+
 class StoryViewerScreen extends StatefulWidget {
   const StoryViewerScreen({Key? key}) : super(key: key);
 
@@ -22,7 +24,7 @@ class StoryViewerScreen extends StatefulWidget {
 
 class _StoryViewerScreenState extends State<StoryViewerScreen> {
 
-  final _homeController = Get.put(HomeController());
+   HomeController get _homeController => Get.find<HomeController>();
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
   var controller = StoryController();

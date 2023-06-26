@@ -17,6 +17,8 @@ import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
+import '../../global_getx/home/home_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
 import '../../navigation/controller/navigation_controller.dart';
 
 class AddContactScreen extends StatefulWidget {
@@ -27,10 +29,10 @@ class AddContactScreen extends StatefulWidget {
 }
 
 class _AddContactScreenState extends State<AddContactScreen> {
-  final _profileController = Get.put(ProfileController());
+  ProfileController get _profileController => Get.find<ProfileController>();  
   final _chatController = Get.put(ChatsController());
   final _callController = Get.put(CallsController());
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _commonController = Get.put(CommonController());
   final nicknameController = TextEditingController();
   final userController = TextEditingController();

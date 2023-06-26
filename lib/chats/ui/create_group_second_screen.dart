@@ -23,6 +23,9 @@ import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
+import '../../global_getx/home/home_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
+
 class CreateGroupSecondScreen extends StatefulWidget {
   const CreateGroupSecondScreen({Key? key}) : super(key: key);
 
@@ -37,8 +40,8 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
   final _chatController = Get.put(ChatsController());
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
-  final _homeController = Get.put(HomeController());
-  final _profileController = Get.put(ProfileController());
+ HomeController get _homeController => Get.find<HomeController>();
+  ProfileController get _profileController => Get.find<ProfileController>();  
   final _utils = Utils();
 
   @override

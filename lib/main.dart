@@ -32,6 +32,7 @@ import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:stream_chat_persistence/stream_chat_persistence.dart';
 import 'chats/ui/settings_group_screen.dart';
 import 'global_getx/dependency_manager.dart';
+import 'global_getx/home/home_controller.dart';
 import 'navigation/ui/navigation_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
@@ -111,7 +112,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>{
 
-  final _homeController = Get.put(HomeController());
+   HomeController get _homeController => Get.find<HomeController>();
   final _callController = Get.put(CallsController());
   final _chatController = Get.put(ChatsController());
   final _commonController = Get.put(CommonController());

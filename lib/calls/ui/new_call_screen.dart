@@ -17,6 +17,7 @@ import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../common/view/dialog/custom_dial.dart';
+import '../../global_getx/home/home_controller.dart';
 
 class NewCallScreen extends StatefulWidget {
   const NewCallScreen({Key? key}) : super(key: key);
@@ -28,7 +29,7 @@ class NewCallScreen extends StatefulWidget {
 class _NewCallScreenState extends State<NewCallScreen> {
 
   final _callController = Get.put(CallsController());
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _commonController = Get.put(CommonController());
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();

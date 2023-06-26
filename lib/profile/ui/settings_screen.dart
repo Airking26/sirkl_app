@@ -21,6 +21,9 @@ import 'package:sirkl/profile/ui/my_communities_screen.dart';
 import 'package:sirkl/profile/ui/my_group_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../global_getx/home/home_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
+
 class SettingScreen extends StatefulWidget {
   const SettingScreen({Key? key}) : super(key: key);
 
@@ -31,8 +34,8 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   YYDialog dialogMenu = YYDialog();
 
-  final _profileController = Get.put(ProfileController());
-  final _homeController = Get.put(HomeController());
+  ProfileController get _profileController => Get.find<ProfileController>();  
+ HomeController get _homeController => Get.find<HomeController>();
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
 

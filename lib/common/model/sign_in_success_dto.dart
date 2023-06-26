@@ -5,7 +5,11 @@ import 'package:get/get.dart';
 
 SignInSuccessDto signInSuccessDtoFromJson(String str) => SignInSuccessDto.fromJson(json.decode(str));
 String signInSuccessDtoToJson(SignInSuccessDto data) => json.encode(data.toJson());
-UserDTO userFromJson(String str) => UserDTO.fromJson(json.decode(str));
+UserDTO userFromJson(String str) {
+
+
+  return UserDTO.fromJson(json.decode(str));
+}
 String userToJson(UserDTO user) => json.encode(user.toJson());
 
 class SignInSuccessDto {

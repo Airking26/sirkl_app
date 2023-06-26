@@ -99,7 +99,9 @@ class BaseContract extends GetxController {
   Future<void> initialize() async {
     await _connectContract();
     _completer.complete();
-    _client = Web3Client(bridgeUrl, http.Client(),socketConnector: IOWebSocketChannel.connect(websocketUrl).cast<String>);
+    _client = Web3Client(bridgeUrl, http.Client(),
+    //socketConnector: IOWebSocketChannel.connect(websocketUrl).cast<String>
+    );
   }
    Future<void> _connectContract() async {
     abi = await rootBundle.loadString(abiPath);

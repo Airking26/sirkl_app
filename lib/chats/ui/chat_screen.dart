@@ -16,6 +16,8 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 
+import '../../global_getx/home/home_controller.dart';
+
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
 
@@ -24,8 +26,11 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
-  final _chatController = Get.put(ChatsController());
-  final _homeController = Get.put(HomeController());
+  final _chatController = Get.put(ChatsController(), permanent: false);
+  // final _homeController = Get.put(HomeController());
+  // final _commonController = Get.put(CommonController());
+  // final _navigationController = Get.put(NavigationController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
   final _floatingSearchBarController = FloatingSearchBarController();
@@ -80,18 +85,33 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   void initState() {
     _controllerFriend.doInitialLoad();
     _controllerOther.doInitialLoad();
+        tabController = TabController(length: 2, vsync: this);
+    tabController.index = _chatController.index.value;
+    tabController.addListener(indexChangeListener);
+
     super.initState();
+  }
+  void indexChangeListener() {
+       if (tabController.indexIsChanging) {
+        _chatController.index.value = tabController.index;
+      }
   }
 
   @override
+void dispose() {
+	// your dispose part
+	super.dispose();
+  tabController.removeListener(indexChangeListener);
+      _controllerOther.dispose();
+    _controllerFriend.dispose();
+    _chatController.index.value = 0;
+    super.dispose();
+}
+
+
+  @override
   Widget build(BuildContext context) {
-    tabController = TabController(length: 2, vsync: this);
-    tabController.index = _chatController.index.value;
-    tabController.addListener(() {
-      if (tabController.indexIsChanging) {
-        _chatController.index.value = tabController.index;
-      }
-    });
+
 
     return Obx(() {
       if (_commonController.refreshInboxes.value) {
@@ -256,7 +276,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           ) : _controllerFriend,
                           onChannelTap: (channel) async {
                             _chatController.channel.value = channel;
-                            _navigationController.hideNavBar.value = true;
+                           // _navigationController.hideNavBar.value = true;
                             if ((channel.membership == null &&
                                     !channel.state!.members
                                         .map((e) => e.userId!)
@@ -264,8 +284,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 channel.extraData["isConv"] != null &&
                                 channel.extraData["isConv"] == false) {
                               _navigationController.hideNavBar.value = true;
+                        
                               pushNewScreen(context,
+                                   withNavBar: false,
                                       screen: const SettingsGroupScreen())
+                                      
                                   .then((value) {
                                 _controllerFriend.refresh();
                                 _navigationController.hideNavBar.value =
@@ -273,9 +296,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 _chatController.fromGroupJoin.value = false;
                               });
                             } else {
+             
                               pushNewScreen(context,
+                              withNavBar: false,
                                       screen: StreamChannel(
                                           channel: channel,
+                                          
                                           child: const ChannelPage()))
                                   .then((value) async{
                                 _navigationController.hideNavBar.value = false;
@@ -398,8 +424,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             limit: 10,): _controllerOther,
                           onChannelTap: (channel) {
                             _chatController.channel.value = channel;
-                            _navigationController.hideNavBar.value = true;
+                          //  _navigationController.hideNavBar.value = true;
+                          
                             pushNewScreen(context,
+                            withNavBar: false,
                                     screen: StreamChannel(
                                         channel: channel,
                                         child: const ChannelPage()))
@@ -605,8 +633,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     ),
                     IconButton(
                         onPressed: () {
-                          _navigationController.hideNavBar.value = true;
+                         //_navigationController.hideNavBar.value = true;
+                            
                           pushNewScreen(context,
+                          withNavBar: false,
                                   screen: const NewMessageScreen())
                               .then((value) {
                             _navigationController.hideNavBar.value =
@@ -836,11 +866,4 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  @override
-  void dispose() {
-    _controllerOther.dispose();
-    _controllerFriend.dispose();
-    _chatController.index.value = 0;
-    super.dispose();
-  }
 }

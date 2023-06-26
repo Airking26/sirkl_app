@@ -8,6 +8,8 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../../../../global_getx/home/home_controller.dart';
+
 /// {@template streamUserAvatar}
 /// Displays a user's avatar.
 /// {@endtemplate}
@@ -31,7 +33,7 @@ class StreamUserAvatar extends StatelessWidget {
     this.channel,
   });
 
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
 
   final bool memberPage;
 
@@ -80,10 +82,10 @@ class StreamUserAvatar extends StatelessWidget {
 
   /// {@macro placeholderUserImage}
   final PlaceholderUserImage? placeholder;
-
+  UserDTO get userDTO => userFromJson(json.encode(user.extraData["userDTO"]));
   @override
   Widget build(BuildContext context) {
-    final userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
+    
     final haveNotPicture = userDTO.picture.isNullOrBlank!;
     final notYetUser = userDTO.id == _homeController.id.value;
     final isGroup = channel?.extraData["isConv"];

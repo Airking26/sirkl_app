@@ -31,6 +31,8 @@ import 'package:sirkl/profile/ui/settings_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:web3dart/web3dart.dart';
 import '../../common/view/dialog/custom_dial.dart';
+import '../../global_getx/home/home_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -42,7 +44,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   late final GalleryController controller;
   final _profileController = Get.put(ProfileController());
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _navigationController = Get.put(NavigationController());
   final web3Controller = Get.put(Web3Controller());
 
@@ -585,8 +587,8 @@ class CardNFT extends StatefulWidget {
 }
 
 class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
-  final profileController = Get.put(ProfileController());
-  final homeController = Get.put(HomeController());
+  ProfileController get _profileController => Get.find<ProfileController>();  
+ HomeController get homeController => Get.find<HomeController>();
   final groupController = Get.put(GroupsController());
 
   @override
@@ -655,7 +657,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                     }
                     // ignore: invalid_use_of_protected_member
                     widget.pagingController.notifyListeners();
-                    await profileController.updateNft(
+                    await _profileController.updateNft(
                         NftModificationDto(
                             contractAddress: widget.nftDto.contractAddress!,
                             id: homeController.id.value,
@@ -696,8 +698,8 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
                         child: InkWell(
                           onTap: () {
-                            if (profileController.isEditingProfile.value) {
-                              profileController.urlPicture.value =
+                            if (_profileController.isEditingProfile.value) {
+                              _profileController.urlPicture.value =
                                   widget.nftDto.images![i];
                             }
                           },

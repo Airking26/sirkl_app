@@ -26,6 +26,8 @@ import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../common/view/dialog/custom_dial.dart';
+import '../../global_getx/home/home_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
 import '../controller/chats_controller.dart';
 
 class NewMessageScreen extends StatefulWidget {
@@ -38,8 +40,8 @@ class NewMessageScreen extends StatefulWidget {
 class _NewMessageScreenState extends State<NewMessageScreen> {
 
   final _chatController = Get.put(ChatsController());
-  final _homeController = Get.put(HomeController());
-  final _profileController = Get.put(ProfileController());
+ HomeController get _homeController => Get.find<HomeController>();
+  ProfileController get _profileController => Get.find<ProfileController>();  
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
   YYDialog dialogMenu = YYDialog();

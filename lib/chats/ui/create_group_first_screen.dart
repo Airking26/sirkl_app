@@ -20,6 +20,8 @@ import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
 import 'package:web_socket_channel/io.dart';
 
+import '../../global_getx/home/home_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
 import '../../models/contract_response.model.dart';
 import '../../navigation/controller/navigation_controller.dart';
 
@@ -32,9 +34,9 @@ class CreateGroupFirstScreen extends StatefulWidget {
 
 class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
 
-  final _profileController = Get.put(ProfileController());
+  ProfileController get _profileController => Get.find<ProfileController>();  
   final _chatController = Get.put(ChatsController());
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _navigationController = Get.put(NavigationController());
   final _commonController = Get.put(CommonController());
   final web3Controller = Get.put(Web3Controller());

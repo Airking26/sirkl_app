@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/global_getx/home/home_controller.dart';
+import 'package:sirkl/global_getx/profile/profile_controller.dart';
 import 'package:sirkl/global_getx/wallet/s_wallet_connect.dart';
 
 import '../config/s_config.dart';
@@ -17,5 +19,7 @@ class GlobalDependencyManager extends Bindings {
     Get.put(PaidGroupContract(SConfig.paidGroupContract),
         permanent: _permanent);
     Get.put(SWalletConnectController(chainId: 5), permanent: _permanent);
+    Get.put(HomeController(), permanent: _permanent);
+    Get.put(ProfileController(), permanent: _permanent);
   }
 }

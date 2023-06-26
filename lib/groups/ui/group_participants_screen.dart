@@ -16,6 +16,8 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
+import '../../global_getx/home/home_controller.dart';
+
 
 class GroupParticipantScreen extends StatefulWidget {
   bool fromChat;
@@ -29,7 +31,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
 
   final _chatController = Get.put(ChatsController());
   final _groupController = Get.put(GroupsController());
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _commonController = Get.put(CommonController());
 
   late final StreamMemberListController _memberListController =

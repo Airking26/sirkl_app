@@ -7,6 +7,8 @@ import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 
+import '../../global_getx/home/home_controller.dart';
+
 class MyGroupScreen extends StatefulWidget {
   const MyGroupScreen({Key? key}) : super(key: key);
 
@@ -17,7 +19,7 @@ class MyGroupScreen extends StatefulWidget {
 class _MyGroupScreenState extends State<MyGroupScreen> {
 
   StreamChannelListController? streamChannelListControllerGroups;
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _chatController = Get.put(ChatsController());
   final utils = Utils();
 

@@ -23,6 +23,9 @@ import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
+import '../../global_getx/home/home_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
+
 
 class SettingsProfileElseScreen extends StatefulWidget {
   const SettingsProfileElseScreen({Key? key, required this.fromConversation, required this.fromProfile}) : super(key: key);
@@ -36,8 +39,8 @@ class SettingsProfileElseScreen extends StatefulWidget {
 class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
 
 
-  final _profileController = Get.put(ProfileController());
-  final _homeController = Get.put(HomeController());
+  ProfileController get _profileController => Get.find<ProfileController>();  
+ HomeController get _homeController => Get.find<HomeController>();
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
   final _callController = Get.put(CallsController());

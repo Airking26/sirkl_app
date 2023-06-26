@@ -24,6 +24,8 @@ import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.da
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 
+import '../../../../../global_getx/home/home_controller.dart';
+
 
 const _kCommandTrigger = '/';
 const _kMentionTrigger = '@';
@@ -286,7 +288,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
       widget.messageInputController ?? _controller!.value;
   StreamRestorableMessageInputController? _controller;
 
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
 
   void _createLocalController([Message? message]) {
     assert(_controller == null, '');

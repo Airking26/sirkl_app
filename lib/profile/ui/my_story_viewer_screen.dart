@@ -11,6 +11,7 @@ import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
+import 'package:sirkl/global_getx/profile/profile_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
@@ -18,6 +19,8 @@ import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
+import '../../global_getx/home/home_controller.dart';
 
 class MyStoryViewerScreen extends StatefulWidget {
   const MyStoryViewerScreen({Key? key}) : super(key: key);
@@ -29,8 +32,8 @@ class MyStoryViewerScreen extends StatefulWidget {
 class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
 
   final _navigationController = Get.put(NavigationController());
-  final _profileController = Get.put(ProfileController());
-  final _homeController = Get.put(HomeController());
+  ProfileController get _profileController => Get.find<ProfileController>();  
+ HomeController get _homeController => Get.find<HomeController>();
   var controller = StoryController();
   List<StoryItem> storyItems = [];
   var currentIndex = -1;

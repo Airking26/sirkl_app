@@ -7,6 +7,7 @@ import 'package:sirkl/home/controller/home_controller.dart';
 
 import '../../common/view/nav_bar/persistent-tab-view.dart';
 import '../../common/view/stream_chat/src/channel/channel_page.dart';
+import '../../global_getx/home/home_controller.dart';
 
 class MyCommunityScreen extends StatefulWidget {
   const MyCommunityScreen({Key? key}) : super(key: key);
@@ -17,7 +18,7 @@ class MyCommunityScreen extends StatefulWidget {
 
 class _MyCommunityScreenState extends State<MyCommunityScreen> {
 
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _chatController = Get.put(ChatsController());
   final utils = Utils();
 

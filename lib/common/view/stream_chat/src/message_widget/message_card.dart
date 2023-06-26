@@ -13,6 +13,8 @@ import 'package:sirkl/common/view/stream_chat/src/theme/message_theme.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 
+import '../../../../../global_getx/home/home_controller.dart';
+
 /// {@template messageCard}
 /// The widget containing a quoted message.
 ///
@@ -169,7 +171,7 @@ class _MessageCardState extends State<MessageCard> {
   final GlobalKey linksKey = GlobalKey();
   double? widthLimit;
 
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
 
   @override
   void initState() {

@@ -9,6 +9,8 @@ import 'package:sirkl/chats/ui/chat_screen.dart';
 import 'package:sirkl/common/controller/common_controller.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
+import '../../global_getx/home/home_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
 import '../../groups/ui/groups_screen.dart';
 import '../../home/ui/home_screen.dart';
 import '../../profile/ui/profile_screen.dart';
@@ -28,15 +30,15 @@ class _NavigationScreenState extends State<NavigationScreen> {
   final _navigationController = Get.put(NavigationController());
   final _callController = Get.put(CallsController());
   final _commonController = Get.put(CommonController());
-  final _homeController = Get.put(HomeController());
-  final _profileController = Get.put(ProfileController());
+ HomeController get _homeController => Get.find<HomeController>();
+  ProfileController get _profileController => Get.find<ProfileController>();  
 
 
   late final List<Widget> _pages = [
     const HomeScreen(),
     const CallsScreen(),
     const GroupsScreen(),
-    const ChatScreen(),
+    const ChatScreen(), 
     const ProfileScreen()
   ];
 
@@ -124,6 +126,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
           popAllScreensOnTapOfSelectedTab: true,
           navBarStyle: NavBarStyle.simple,
           onItemSelected: (index) async{
+            
             Navigator.popUntil(context, (route) => route.isFirst);
             if(index == 0) {
               _profileController.isEditingProfile.value = false;
