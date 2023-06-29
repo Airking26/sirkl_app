@@ -3,7 +3,7 @@ import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/story_insta/animations/animations.dart';
 import 'package:sirkl/common/view/story_insta/camera/src/widgets/ui_handler.dart';
 import 'package:flutter/material.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 
 ///
 /// Widget to pick media using camera
@@ -49,7 +49,7 @@ class CameraViewField extends StatelessWidget {
   ///
   /// Triggered when picker capture media
   final void Function(List<DrishyaEntity> entities)? onCapture;
-  final _navigationController = Get.put(NavigationController());
+   NavigationController get _navigationController => Get.find<NavigationController>();
 
   @override
   Widget build(BuildContext context) {

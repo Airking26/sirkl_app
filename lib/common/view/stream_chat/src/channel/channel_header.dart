@@ -5,29 +5,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/global_getx/calls/calls_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/chats/ui/settings_group_screen.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/model/nft_modification_dto.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/groups/controller/groups_controller.dart';
+import 'package:sirkl/global_getx/groups/groups_controller.dart';
 import 'package:sirkl/groups/ui/community_settings_screen.dart';
-import 'package:sirkl/groups/ui/group_participants_screen.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/profile/ui/settings_profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
-import 'package:sirkl/common/constants.dart' as con;
 
 import '../../../../../global_getx/home/home_controller.dart';
 import '../../../../../global_getx/profile/profile_controller.dart';
@@ -156,13 +148,13 @@ class StreamChannelHeader extends StatelessWidget
   final Size preferredSize;
 
   YYDialog dialogMenu = YYDialog();
-  final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
- HomeController get _homeController => Get.find<HomeController>();
-  final _chatController = Get.put(ChatsController());
-  final _groupController = Get.put(GroupsController());
-  ProfileController get _profileController => Get.find<ProfileController>();  
-  final _callController = Get.put(CallsController());
+
+  CommonController get _commonController => Get.find<CommonController>();
+  HomeController get _homeController => Get.find<HomeController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
+  ProfileController get _profileController => Get.find<ProfileController>();
+  CallsController get _callController => Get.find<CallsController>();
+
   final utils = Utils();
 
 

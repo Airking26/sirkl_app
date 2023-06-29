@@ -6,19 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+import 'package:sirkl/global_getx/calls/calls_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -40,11 +37,10 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
 
 
   ProfileController get _profileController => Get.find<ProfileController>();  
- HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
-  final _callController = Get.put(CallsController());
-  final _chatController = Get.put(ChatsController());
+  HomeController get _homeController => Get.find<HomeController>();
+  CallsController get _callController => Get.find<CallsController>();
+  CommonController get _commonController => Get.find<CommonController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
 
   final utils = Utils();
 
@@ -151,11 +147,10 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                   onTap: () async {
                     _commonController.userClicked.value =
                     _commonController.userClicked.value!;
-                    _navigationController.hideNavBar.value = true;
                     widget.fromConversation ? Navigator.pop(context) : pushNewScreen(context,
                         screen:
                         const NestedDetailedChatScreen(
-                            create: true, fromProfile: true,))
+                            create: true, fromProfile: true,), withNavBar: false)
                         .then((value) => _navigationController.hideNavBar.value = true);
                   },
                   child: Material(

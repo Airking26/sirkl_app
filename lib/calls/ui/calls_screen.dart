@@ -8,14 +8,13 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/calls/ui/new_call_screen.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/call_dto.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -31,10 +30,10 @@ class CallsScreen extends StatefulWidget {
 
 class _CallsScreenState extends State<CallsScreen> {
 
-  final _callController = Get.put(CallsController());
- HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
+  CallsController get _callController => Get.find<CallsController>();
+  HomeController get _homeController => Get.find<HomeController>();
+  CommonController get _commonController => Get.find<CommonController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
   final PagingController<int, CallDto> pagingSearchController = PagingController(firstPageKey: 0);
 
 
@@ -307,8 +306,7 @@ class _CallsScreenState extends State<CallsScreen> {
                 InkWell(
                   onTap: () {
                     _commonController.userClicked.value = callDto.called;
-                    _navigationController.hideNavBar.value = true;
-                    pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) =>
+                    pushNewScreen(context, screen: const DetailedChatScreen(create: true),withNavBar: false).then((value) =>
                     _navigationController.hideNavBar.value = false).then((value) =>
                         _callController.pagingController.value.notifyListeners());
                   },

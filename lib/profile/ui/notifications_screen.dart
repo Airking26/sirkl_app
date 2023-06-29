@@ -4,21 +4,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/notification_dto.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
-import '../../common/utils.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
-import '../controller/profile_controller.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key}) : super(key: key);
@@ -30,9 +26,9 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
 
   ProfileController get _profileController => Get.find<ProfileController>();  
- HomeController get _homeController => Get.find<HomeController>();
-  final _chatController = Get.put(ChatsController());
-  final _commonController = Get.put(CommonController());
+  HomeController get _homeController => Get.find<HomeController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
+  CommonController get _commonController => Get.find<CommonController>();
   final PagingController<int, NotificationDto> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 class StreamMessageSearchPage extends StatefulWidget {
@@ -17,7 +17,7 @@ class StreamMessageSearchPage extends StatefulWidget {
 
 class _StreamMessageSearchState extends State<StreamMessageSearchPage> {
 
-  final _chatController = Get.put(ChatsController());
+  ChatsController get _chatController => Get.find<ChatsController>();
   late final _controller = StreamMessageSearchListController(
     client: widget.client,
     limit: 20,

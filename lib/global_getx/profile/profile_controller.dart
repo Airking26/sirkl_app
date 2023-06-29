@@ -19,7 +19,6 @@ import 'package:sirkl/common/model/story_creation_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 
@@ -30,7 +29,7 @@ class ProfileController extends GetxController{
   final box = GetStorage();
   final _profileService = ProfileService();
   final _homeService = HomeService();
- HomeController get _homeController => Get.find<HomeController>();
+  HomeController get _homeController => Get.find<HomeController>();
   Rx<UserDTO?> isUserExists = (null as UserDTO?).obs;
   Rx<List<StoryDto>?> myStories = (null as List<StoryDto>?).obs;
   Rx<List<UserDTO>?> readers = (null as List<UserDTO>?).obs;

@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/utils.dart';
@@ -18,9 +18,7 @@ import 'package:http/http.dart' as htp;
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/groups/ui/group_participants_screen.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -40,10 +38,11 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
 
 
   ProfileController get _profileController => Get.find<ProfileController>();  
- HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
-  final _chatController = Get.put(ChatsController());
-  final _navigationController = Get.put(NavigationController());
+  HomeController get _homeController => Get.find<HomeController>();
+  CommonController get _commonController => Get.find<CommonController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
+
   final _nameGroupController = TextEditingController();
   final web3Controller = Get.put(Web3Controller());
   final utils = Utils();
@@ -277,8 +276,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
             _chatController.channel.value?.createdBy?.id != _homeController.id.value ? InkWell(
               onTap: () async {
                 await _commonController.getUserById(_chatController.channel.value!.createdBy!.id);
-                _navigationController.hideNavBar.value = true;
-                pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = true);
+                pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true), withNavBar: false).then((value) => _navigationController.hideNavBar.value = true);
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),

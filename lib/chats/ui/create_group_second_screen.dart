@@ -9,17 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
-import 'package:sirkl/chats/ui/chat_screen.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
@@ -37,9 +34,9 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
 
   final _searchController = FloatingSearchBarController();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
-  final _chatController = Get.put(ChatsController());
-  final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
+  ChatsController get _chatController => Get.find<ChatsController>();
+  CommonController get _commonController => Get.find<CommonController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
  HomeController get _homeController => Get.find<HomeController>();
   ProfileController get _profileController => Get.find<ProfileController>();  
   final _utils = Utils();

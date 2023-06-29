@@ -21,7 +21,7 @@ import 'package:sirkl/common/model/call_modification_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/home/service/home_service.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
@@ -31,7 +31,7 @@ class CallsController extends GetxController{
   final _callService = CallService();
   final _homeService = HomeService();
   final _profileService = ProfileService();
-  final _navigationController = Get.put(NavigationController());
+  NavigationController get _navigationController => Get.find<NavigationController>();
   final box = GetStorage();
   final agoraEngine = (null as RtcEngine?).obs;
   var tokenAgoraRTC = "".obs;
@@ -60,9 +60,8 @@ class CallsController extends GetxController{
     agoraEngine.value?.setEventHandler(
       RtcEngineEventHandler(
         joinChannelSuccess: (String x, int y, int elapsed) {
-          _navigationController.hideNavBar.value = true;
           playRingback(1);
-          pushNewScreen(context, screen: const CallInviteSendingScreen()).then((value) {
+          pushNewScreen(context, screen: const CallInviteSendingScreen(), withNavBar: false).then((value) {
             pageKey.value = 0;
             pagingController.value.refresh();
             _navigationController.hideNavBar.value = isFromConv.value;

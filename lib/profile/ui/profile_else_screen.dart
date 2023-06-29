@@ -10,12 +10,11 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/profile/ui/settings_profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
@@ -32,9 +31,9 @@ class ProfileElseScreen extends StatefulWidget {
 
 class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
- HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
+  HomeController get _homeController => Get.find<HomeController>();
+  CommonController get _commonController => Get.find<CommonController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
   final utils = Utils();
   final PagingController<int, NftDto> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
@@ -112,8 +111,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                           ),
                           InkWell(
                             onTap: (){
-                              _navigationController.hideNavBar.value = true;
-                              pushNewScreen(context, screen: const SettingsProfileElseScreen(fromConversation: false, fromProfile: true)).then((value) => _navigationController.hideNavBar.value = !widget.fromNested);
+                              pushNewScreen(context, screen: const SettingsProfileElseScreen(fromConversation: false, fromProfile: true), withNavBar: false).then((value) => _navigationController.hideNavBar.value = !widget.fromNested);
                             },
                             child: SizedBox(
                               height: 75,
@@ -133,8 +131,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                               }
                             } else {
                               widget.fromConversation ? Navigator.of(context).pop():
-                              _navigationController.hideNavBar.value = true;
-                              pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true, fromProfile: true,)).then((value) => _navigationController.hideNavBar.value = !widget.fromNested);
+                              pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true, fromProfile: true), withNavBar: false).then((value) => _navigationController.hideNavBar.value = !widget.fromNested);
                             }
                           }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :const Color(0xff00CB7D), height: 28, width: 28,)),
                         ],),
@@ -222,9 +219,9 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
 class CardNFT extends StatefulWidget {
   final NftDto nftDto;
-  final CommonController profileController;
+  final CommonController commonController;
   final int index;
-  const CardNFT(this.nftDto, this.profileController, this.index, {Key? key}) : super(key: key);
+  const CardNFT(this.nftDto, this.commonController, this.index, {Key? key}) : super(key: key);
 
   @override
   State<CardNFT> createState() => _CardNFTState();
@@ -258,11 +255,11 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             subtitle: Text("${widget.nftDto.images!.length} available", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
             onExpansionChanged: (expanded){
               if(expanded) {
-                widget.profileController.isCardExpandedList.assign(widget.index);
+                widget.commonController.isCardExpandedList.assign(widget.index);
               } else {
-                widget.profileController.isCardExpandedList.remove(widget.index);
+                widget.commonController.isCardExpandedList.remove(widget.index);
               }
-              widget.profileController.isCardExpandedList.refresh();
+              widget.commonController.isCardExpandedList.refresh();
             },
             children: [
               Padding(

@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:simple_s3/simple_s3.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/common/model/admin_dto.dart';
 import 'package:sirkl/common/model/collection_dto.dart';
 import 'package:sirkl/common/model/contract_address_dto.dart';
@@ -32,7 +32,7 @@ class GroupsController extends GetxController{
   final _homeService = HomeService();
   final box = GetStorage();
   var nftAvailable = <CollectionDbDto>[].obs;
-  final _chatController = Get.put(ChatsController());
+  ChatsController get _chatController => Get.find<ChatsController>();
   var isLoadingAvailableNFT = true.obs;
   var refreshGroups = false.obs;
   var retryProgress = false.obs;

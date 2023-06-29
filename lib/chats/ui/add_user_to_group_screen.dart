@@ -7,21 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
-
-import '../../common/view/dialog/custom_dial.dart';
 
 class AddUserToGroupScreen extends StatefulWidget {
   const AddUserToGroupScreen({Key? key}) : super(key: key);
@@ -32,9 +28,9 @@ class AddUserToGroupScreen extends StatefulWidget {
 
 class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
 
-  final _callController = Get.put(CallsController());
-  final _chatController = Get.put(ChatsController());
-  final _commonController = Get.put(CommonController());
+  CallsController get _callController => Get.find<CallsController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
+  CommonController get _commonController => Get.find<CommonController>();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
   final _searchController = FloatingSearchBarController();

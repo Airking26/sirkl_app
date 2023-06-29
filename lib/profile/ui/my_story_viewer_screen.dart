@@ -5,20 +5,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/model/story_dto.dart';
-import 'package:sirkl/common/model/story_modification_dto.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/global_getx/profile/profile_controller.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 import '../../global_getx/home/home_controller.dart';
 
@@ -31,14 +26,15 @@ class MyStoryViewerScreen extends StatefulWidget {
 
 class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
 
-  final _navigationController = Get.put(NavigationController());
+  NavigationController get _navigationController => Get.find<NavigationController>();
   ProfileController get _profileController => Get.find<ProfileController>();  
- HomeController get _homeController => Get.find<HomeController>();
+  HomeController get _homeController => Get.find<HomeController>();
+  CallsController get _callController => Get.find<CallsController>();
+
   var controller = StoryController();
   List<StoryItem> storyItems = [];
   var currentIndex = -1;
-  final _commonController = Get.put(CommonController());
-  final _callController = Get.put(CallsController());
+  CommonController get _commonController => Get.find<CommonController>();
 
   @override
   void initState() {
@@ -232,9 +228,8 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
                         onTap: () {
                           _commonController.userClicked.value =
                           _profileController.readers.value?[index];
-                          _navigationController.hideNavBar.value = false;
                           pushNewScreen(context,
-                              screen: const ProfileElseScreen(fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
+                              screen: const ProfileElseScreen(fromConversation: false), withNavBar: true).then((value) => _navigationController.hideNavBar.value = true);
                         },
                         child: _profileController.readers.value?[index].picture == null
                             ? SizedBox(
@@ -313,10 +308,9 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
                           onTap: () {
                             _commonController.userClicked.value =
                             _profileController.readers.value?[index];
-                            _navigationController.hideNavBar.value = false;
                             pushNewScreen(context,
                                 screen:
-                                const ProfileElseScreen(fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
+                                const ProfileElseScreen(fromConversation: false), withNavBar: true).then((value) => _navigationController.hideNavBar.value = true);
                           },
                           child: Transform.translate(
                               offset: const Offset(-8, 0),
@@ -340,10 +334,9 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
                           onTap: () {
                             _commonController.userClicked.value =
                             _profileController.readers.value![index];
-                            _navigationController.hideNavBar.value = false;
                             pushNewScreen(context,
                                 screen: const ProfileElseScreen(
-                                    fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
+                                    fromConversation: false), withNavBar: true).then((value) => _navigationController.hideNavBar.value = true);
                           },
                           child: Transform.translate(
                               offset: const Offset(-8, 0),

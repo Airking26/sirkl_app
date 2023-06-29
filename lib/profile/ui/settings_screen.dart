@@ -7,15 +7,12 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/common/model/update_me_dto.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/ui/pdf_screen.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/profile/ui/my_communities_screen.dart';
 import 'package:sirkl/profile/ui/my_group_screen.dart';
@@ -35,9 +32,9 @@ class _SettingScreenState extends State<SettingScreen> {
   YYDialog dialogMenu = YYDialog();
 
   ProfileController get _profileController => Get.find<ProfileController>();  
- HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
+  HomeController get _homeController => Get.find<HomeController>();
+  CommonController get _commonController => Get.find<CommonController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
 
   @override
   Widget build(BuildContext context) {

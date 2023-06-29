@@ -3,18 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/calls/ui/calls_screen.dart';
 import 'package:sirkl/chats/ui/chat_screen.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import '../../groups/ui/groups_screen.dart';
 import '../../home/ui/home_screen.dart';
 import '../../profile/ui/profile_screen.dart';
-import '../controller/navigation_controller.dart';
+import '../../global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
 class NavigationScreen extends StatefulWidget {
@@ -27,10 +25,10 @@ class NavigationScreen extends StatefulWidget {
 
 class _NavigationScreenState extends State<NavigationScreen> {
 
-  final _navigationController = Get.put(NavigationController());
-  final _callController = Get.put(CallsController());
-  final _commonController = Get.put(CommonController());
- HomeController get _homeController => Get.find<HomeController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
+  CallsController get _callController => Get.find<CallsController>();
+  CommonController get _commonController => Get.find<CommonController>();
+  HomeController get _homeController => Get.find<HomeController>();
   ProfileController get _profileController => Get.find<ProfileController>();  
 
 

@@ -13,22 +13,18 @@ import 'package:sirkl/chats/ui/create_group_first_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/groups/controller/groups_controller.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../common/view/dialog/custom_dial.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
-import '../controller/chats_controller.dart';
+import '../../global_getx/chats/chats_controller.dart';
 
 class NewMessageScreen extends StatefulWidget {
   const NewMessageScreen({Key? key}) : super(key: key);
@@ -39,11 +35,11 @@ class NewMessageScreen extends StatefulWidget {
 
 class _NewMessageScreenState extends State<NewMessageScreen> {
 
-  final _chatController = Get.put(ChatsController());
- HomeController get _homeController => Get.find<HomeController>();
-  ProfileController get _profileController => Get.find<ProfileController>();  
-  final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
+  ChatsController get _chatController => Get.find<ChatsController>();
+  HomeController get _homeController => Get.find<HomeController>();
+  ProfileController get _profileController => Get.find<ProfileController>();
+  CommonController get _commonController => Get.find<CommonController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
   YYDialog dialogMenu = YYDialog();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
@@ -622,14 +618,12 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         if (_chatController.chipsList.value.length == 1) {
           Navigator.pop(context);
           if (element.id.isNullOrBlank!) {
-            _navigationController.hideNavBar.value = true;
             pushNewScreen(context, screen: DetailedChatScreen(
-                create: false, channelId: idChannelCreated)).then((value) => _navigationController.hideNavBar.value = false);
+                create: false, channelId: idChannelCreated), withNavBar: false).then((value) => _navigationController.hideNavBar.value = false);
           } else {
             _commonController.userClicked.value =
             _chatController.chipsList[0];
-            _navigationController.hideNavBar.value = true;
-            pushNewScreen(context, screen: const DetailedChatScreen(create: true)).then((value) => _navigationController.hideNavBar.value = false);
+            pushNewScreen(context, screen: const DetailedChatScreen(create: true), withNavBar: false).then((value) => _navigationController.hideNavBar.value = false);
           }
         }
         else {

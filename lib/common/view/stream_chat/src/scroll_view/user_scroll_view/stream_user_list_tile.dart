@@ -3,11 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 
 import '../../../../../../global_getx/home/home_controller.dart';
 
@@ -110,8 +109,8 @@ class StreamUserListTile extends StatelessWidget {
   /// If null, `EdgeInsets.symmetric(horizontal: 16.0)` is used.
   final EdgeInsetsGeometry contentPadding;
 
- HomeController get _homeController => Get.find<HomeController>();
-  final _chatController = Get.put(ChatsController());
+  HomeController get _homeController => Get.find<HomeController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
 
   /// Creates a copy of this tile but with the given fields replaced with
   /// the new values.

@@ -4,7 +4,7 @@ import 'package:dart_vlc/channel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_error_widget.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_load_more_error.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_load_more_indicator.dart';

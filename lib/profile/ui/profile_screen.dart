@@ -4,14 +4,11 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:defer_pointer/defer_pointer.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_badged/flutter_badge.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
-import 'package:http/http.dart' as htp;
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/nft_dto.dart';
@@ -21,15 +18,12 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/common/web3/web3_controller.dart';
-import 'package:sirkl/groups/controller/groups_controller.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/global_getx/groups/groups_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/profile/ui/my_story_viewer_screen.dart';
 import 'package:sirkl/profile/ui/notifications_screen.dart';
 import 'package:sirkl/profile/ui/settings_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
-import 'package:web3dart/web3dart.dart';
 import '../../common/view/dialog/custom_dial.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
@@ -42,10 +36,11 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+
   late final GalleryController controller;
-  final _profileController = Get.put(ProfileController());
- HomeController get _homeController => Get.find<HomeController>();
-  final _navigationController = Get.put(NavigationController());
+  ProfileController get _profileController => Get.find<ProfileController>();
+  HomeController get _homeController => Get.find<HomeController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
   final web3Controller = Get.put(Web3Controller());
 
   final PagingController<int, NftDto> pagingController =
@@ -281,8 +276,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ) :IconButton(
                                     onPressed: () async {
-                                      _navigationController.hideNavBar.value = true;
-                                      pushNewScreen(context, screen: const SettingScreen()).then((value) => _navigationController.hideNavBar.value = false);
+                                      pushNewScreen(context, screen: const SettingScreen(), withNavBar: false).then((value) => _navigationController.hideNavBar.value = false);
                                     },
                                     icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
                               ],
@@ -313,8 +307,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           await _profileController.getImageForProfile();
                                         }
                                         else if(_profileController.myStories.value != null && _profileController.myStories.value!.isNotEmpty){
-                                          _navigationController.hideNavBar.value = true;
-                                          pushNewScreen(context, screen: const MyStoryViewerScreen()).then((value) {
+                                          pushNewScreen(context, screen: const MyStoryViewerScreen(), withNavBar: false).then((value) {
                                                 if(value == null){
                                                   _navigationController.hideNavBar.value = false;
                                                 }
@@ -586,9 +579,10 @@ class CardNFT extends StatefulWidget {
 }
 
 class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
+
   ProfileController get _profileController => Get.find<ProfileController>();  
- HomeController get homeController => Get.find<HomeController>();
-  final groupController = Get.put(GroupsController());
+  HomeController get homeController => Get.find<HomeController>();
+  GroupsController get _groupController => Get.find<GroupsController>();
 
   @override
   bool get wantKeepAlive => true;
@@ -667,7 +661,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                     } else {
                       await StreamChat.of(context).client.updateChannelPartial(widget.nftDto.contractAddress!, 'try', unset: ["${homeController.id.value}_favorite"]);
                     }
-                    groupController.refreshGroups.value = true;
+                    _groupController.refreshGroups.value = true;
                   },
                 )),
           title: Text(widget.nftDto.title!,

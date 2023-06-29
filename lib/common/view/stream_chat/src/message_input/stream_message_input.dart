@@ -25,7 +25,7 @@ import 'package:sirkl/common/view/stream_chat/src/message_input/tld.dart';
 import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/common/web3/web3_controller.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/global_getx/home/home_controller.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
 
@@ -291,7 +291,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
       widget.messageInputController ?? _controller!.value;
   StreamRestorableMessageInputController? _controller;
 
-  final _homeController = Get.put(HomeController());
+  HomeController get _homeController => Get.find<HomeController>();
   final web3Controller = Get.put(Web3Controller());
 
   void _createLocalController([Message? message]) {

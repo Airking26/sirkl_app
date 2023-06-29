@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 
 import '../../global_getx/home/home_controller.dart';
 
@@ -19,8 +18,8 @@ class MyGroupScreen extends StatefulWidget {
 class _MyGroupScreenState extends State<MyGroupScreen> {
 
   StreamChannelListController? streamChannelListControllerGroups;
- HomeController get _homeController => Get.find<HomeController>();
-  final _chatController = Get.put(ChatsController());
+  HomeController get _homeController => Get.find<HomeController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
   final utils = Utils();
 
   StreamChannelListController buildStreamChannelListController(){

@@ -6,13 +6,11 @@ import 'package:sirkl/chats/ui/add_user_to_group_screen.dart';
 import 'package:sirkl/common/model/admin_dto.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/member_scroll_view/stream_member_list_view.dart';
-import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
-import 'package:sirkl/groups/controller/groups_controller.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
+import 'package:sirkl/global_getx/groups/groups_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
@@ -29,10 +27,10 @@ class GroupParticipantScreen extends StatefulWidget {
 
 class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
 
-  final _chatController = Get.put(ChatsController());
-  final _groupController = Get.put(GroupsController());
- HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
+  ChatsController get _chatController => Get.find<ChatsController>();
+  GroupsController get _groupController => Get.find<GroupsController>();
+  HomeController get _homeController => Get.find<HomeController>();
+  CommonController get _commonController => Get.find<CommonController>();
 
   late final StreamMemberListController _memberListController =
   StreamMemberListController(

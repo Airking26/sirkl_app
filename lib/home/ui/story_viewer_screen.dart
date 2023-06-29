@@ -2,12 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -25,8 +23,8 @@ class StoryViewerScreen extends StatefulWidget {
 class _StoryViewerScreenState extends State<StoryViewerScreen> {
 
    HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
+   CommonController get _commonController => Get.find<CommonController>();
+   NavigationController get _navigationController => Get.find<NavigationController>();
   var controller = StoryController();
   List<StoryItem> storyItems = [];
 
@@ -99,8 +97,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
     return InkWell(
       onTap: (){
         _commonController.userClicked.value = story.createdBy;
-        _navigationController.hideNavBar.value = false;
-        pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false)).then((value) => _navigationController.hideNavBar.value = true);
+        pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false), withNavBar: true).then((value) => _navigationController.hideNavBar.value = true);
       },
       child: Padding(
         padding: const EdgeInsets.only(top: 8.0),

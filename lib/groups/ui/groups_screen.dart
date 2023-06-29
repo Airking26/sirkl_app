@@ -9,17 +9,15 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/group_creation_dto.dart';
 import 'package:sirkl/common/model/nft_modification_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/groups/controller/groups_controller.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/global_getx/groups/groups_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import '../../common/view/dialog/custom_dial.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
@@ -35,10 +33,10 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   YYDialog dialogMenu = YYDialog();
   late TabController tabController;
-  final _groupController = Get.put(GroupsController());
+  GroupsController get _groupController => Get.find<GroupsController>();
   HomeController get _homeController => Get.find<HomeController>();
-  final _chatController = Get.put(ChatsController());
-  final _navigationController = Get.put(NavigationController());
+  ChatsController get _chatController => Get.find<ChatsController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
   final _floatingSearchBarController = FloatingSearchBarController();
   ProfileController get _profileController => Get.find<ProfileController>();  
   late final _controllerCommunitiesFav = StreamChannelListController(
@@ -180,12 +178,9 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                               }
                             }
                             );
-                            _navigationController.hideNavBar.value = true;
                             pushNewScreen(context, screen: StreamChannel(
-                                channel: channel, child: const ChannelPage()))
+                                channel: channel, child: const ChannelPage()), withNavBar: false)
                                 .then((value) {
-                              //streamChannelListControllerGroups?.refresh();
-                              //streamChannelListControllerGroupsFav?.refresh();
                               _navigationController.hideNavBar.value = false;
                             });
                           }
@@ -232,11 +227,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           channel.queryMembers(filter: Filter.equal("id", _homeController.id.value)).then((value) {
                             if(value.members.isEmpty) channel.addMembers([_homeController.id.value]);}
                           );
-                          _navigationController.hideNavBar.value = true;
-                          pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage())).then((value){
+                          pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage()), withNavBar: false).then((value){
                             _navigationController.hideNavBar.value = false;
-                            //streamChannelListControllerGroups?.refresh();
-                            //streamChannelListControllerGroupsFav?.refresh();
                           });
                       }},
                       ),
@@ -448,8 +440,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     child: ListTile(
                       onTap: ()async{
                         await _groupController.createGroup(StreamChat.of(context).client, GroupCreationDto(name: _groupController.nftAvailable[index].collectionName, picture: _groupController.nftAvailable[index].collectionImage, contractAddress: _groupController.nftAvailable[index].contractAddress));
-                        _navigationController.hideNavBar.value = true;
-                        pushNewScreen(context, screen: const DetailedChatScreen(create: false)).then((value) => _navigationController.hideNavBar.value = false);
+                        pushNewScreen(context, screen: const DetailedChatScreen(create: false), withNavBar: false).then((value) => _navigationController.hideNavBar.value = false);
                       },
                       leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftAvailable[index].collectionImage, width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
 

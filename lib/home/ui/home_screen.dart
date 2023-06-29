@@ -16,16 +16,15 @@ import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/chats/ui/add_contact_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/calls/calls_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/web_wallet_connect_dto.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/home/ui/pdf_screen.dart';
 import 'package:sirkl/home/ui/story_viewer_screen.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:slider_button/slider_button.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/story_view.dart';
@@ -45,9 +44,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
-  final _callController = Get.put(CallsController());
-  final _navigationController = Get.put(NavigationController());
+  CommonController get _commonController => Get.find<CommonController>();
+  CallsController get _callController => Get.find<CallsController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
   final utils = Utils();
   final storyController = StoryController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -205,9 +204,8 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         InkWell(
           onTap: () {
-            _navigationController.hideNavBar.value = true;
             _homeController.indexStory.value = index;
-            pushNewScreen(context, screen: const StoryViewerScreen()).then(
+            pushNewScreen(context, screen: const StoryViewerScreen(), withNavBar: false).then(
                 (value) {
                   if(value == null){
                     _navigationController.hideNavBar.value = false;
@@ -503,10 +501,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             _commonController.userClicked.value =
                                 _commonController.users[index];
-                            _navigationController.hideNavBar.value = true;
                             pushNewScreen(context,
                                     screen:
-                                        const DetailedChatScreen(create: true))
+                                        const DetailedChatScreen(create: true), withNavBar: false)
                                 .then((value) => _navigationController
                                     .hideNavBar.value = false);
                           },

@@ -4,22 +4,18 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/calls/calls_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
-import '../../navigation/controller/navigation_controller.dart';
 
 class AddContactScreen extends StatefulWidget {
   const AddContactScreen({Key? key}) : super(key: key);
@@ -29,11 +25,11 @@ class AddContactScreen extends StatefulWidget {
 }
 
 class _AddContactScreenState extends State<AddContactScreen> {
-  ProfileController get _profileController => Get.find<ProfileController>();  
-  final _chatController = Get.put(ChatsController());
-  final _callController = Get.put(CallsController());
- HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
+  ProfileController get _profileController => Get.find<ProfileController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
+  CallsController get _callController => Get.find<CallsController>();
+  HomeController get _homeController => Get.find<HomeController>();
+  CommonController get _commonController => Get.find<CommonController>();
   final nicknameController = TextEditingController();
   final userController = TextEditingController();
   final _utils = Utils();

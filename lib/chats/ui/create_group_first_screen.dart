@@ -4,21 +4,21 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ndialog/ndialog.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/chats/ui/create_group_second_screen.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/web3/web3_controller.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
+import 'package:sirkl/global_getx/home/home_controller.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
 
-import '../../navigation/controller/navigation_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
+import '../../global_getx/navigation/navigation_controller.dart';
 
 class CreateGroupFirstScreen extends StatefulWidget {
   const CreateGroupFirstScreen({Key? key}) : super(key: key);
@@ -29,11 +29,11 @@ class CreateGroupFirstScreen extends StatefulWidget {
 
 class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
 
-  final _profileController = Get.put(ProfileController());
-  final _chatController = Get.put(ChatsController());
-  final _homeController = Get.put(HomeController());
-  final _navigationController = Get.put(NavigationController());
-  final _commonController = Get.put(CommonController());
+  ProfileController get _profileController => Get.find<ProfileController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
+  HomeController get _homeController => Get.find<HomeController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
+  CommonController get _commonController => Get.find<CommonController>();
   final web3Controller = Get.put(Web3Controller());
   final _priceController = TextEditingController();
   final _utils = Utils();
@@ -402,9 +402,8 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                   if(_chatController.groupPaying.value == 1){
                     await createPaidGroup();
                   } else {
-                    _navigationController.hideNavBar.value = true;
                     pushNewScreen(
-                        context, screen: const CreateGroupSecondScreen()).then((
+                        context, screen: const CreateGroupSecondScreen(), withNavBar: false).then((
                         value) {
                       _navigationController.hideNavBar.value = true;
                     });

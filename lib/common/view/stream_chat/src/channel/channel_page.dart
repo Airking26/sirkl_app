@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/view/stream_chat/src/utils/audio_loading_message.dart';
 import 'package:sirkl/common/view/stream_chat/src/utils/audio_player_message.dart';
 import 'package:sirkl/common/view/stream_chat/src/utils/record_button.dart';
@@ -23,7 +23,7 @@ class _ChannelPageState extends State<ChannelPage> {
 
   FocusNode? _focusNode;
   final StreamMessageInputController _messageInputController = StreamMessageInputController();
-  final _commonController = Get.put(CommonController());
+  CommonController get _commonController => Get.find<CommonController>();
 
   @override
   void initState() {

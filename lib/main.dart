@@ -13,20 +13,19 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/common/model/notification_register_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/global_getx/calls/calls_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/language.dart';
 import 'package:sirkl/common/local_notification_initialize.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/home/utils/analyticService.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:stream_chat_persistence/stream_chat_persistence.dart';
@@ -84,7 +83,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-
       translations: Language(),
       locale: const Locale('en'),
       builder: (context, child){
@@ -97,7 +95,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(),
       initialBinding: GlobalDependencyManager(),
-      
     );
   }
 }
@@ -112,11 +109,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>{
 
-   HomeController get _homeController => Get.find<HomeController>();
-  final _callController = Get.put(CallsController());
-  final _chatController = Get.put(ChatsController());
-  final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
+  HomeController get _homeController => Get.find<HomeController>();
+  CallsController get _callController => Get.find<CallsController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
+  CommonController get _commonController => Get.find<CommonController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
@@ -213,18 +210,16 @@ class _MyHomePageState extends State<MyHomePage>{
               channelId: (event.data["cid"] as String).replaceFirst(
                   'try:', ''));
           if (response.members!.length > 2) {
-            _navigationController.hideNavBar.value = true;
             pushNewScreen(context, screen: DetailedChatScreen(create: false,
                 channelId: (event.data["cid"] as String).replaceFirst(
-                    'try:', ''))).then((value) =>
+                    'try:', '')), withNavBar: false).then((value) =>
             _navigationController.hideNavBar.value = false);
           } else {
             final user = response.members!.where((element) =>
             element.user!.id != event.data["receiver_id"]).toList()[0];
             await _commonController.getUserById(user.user!.id);
-            _navigationController.hideNavBar.value = true;
             pushNewScreen(
-                context, screen: const DetailedChatScreen(create: true)).then((
+                context, screen: const DetailedChatScreen(create: true), withNavBar: false).then((
                 value) => _navigationController.hideNavBar.value = false);
           }
         }
@@ -252,18 +247,16 @@ class _MyHomePageState extends State<MyHomePage>{
                 channelId: (event.data["cid"] as String).replaceFirst(
                     'try:', ''));
             if (response.members!.length > 2) {
-              _navigationController.hideNavBar.value = true;
               pushNewScreen(context, screen: DetailedChatScreen(create: false,
                   channelId: (event.data["cid"] as String).replaceFirst(
-                      'try:', ''))).then((value) =>
+                      'try:', '')), withNavBar: false).then((value) =>
               _navigationController.hideNavBar.value = false);
             } else {
               final user = response.members!.where((element) =>
               element.user!.id != event.data["receiver_id"]).toList()[0];
               await _commonController.getUserById(user.user!.id);
-              _navigationController.hideNavBar.value = true;
               pushNewScreen(
-                  context, screen: const DetailedChatScreen(create: true))
+                  context, screen: const DetailedChatScreen(create: true), withNavBar: false)
                   .then((value) =>
               _navigationController.hideNavBar.value = false);
             }

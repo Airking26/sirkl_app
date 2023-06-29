@@ -6,12 +6,9 @@ import 'package:get/get.dart'
     hide GetStringUtils;
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/bottom_row.dart';
-import 'package:sirkl/common/view/stream_chat/src/message_widget/message_widget.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/parse_attachments.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/quoted_message.dart';
-import 'package:sirkl/common/view/stream_chat/src/theme/message_theme.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
 
 import '../../../../../global_getx/home/home_controller.dart';
 

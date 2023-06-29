@@ -5,7 +5,7 @@ import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/common/size_config.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
@@ -18,7 +18,7 @@ class CallInviteSendingScreen extends StatefulWidget {
 
 class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
 
-  final _callController = Get.put(CallsController());
+  CallsController get _callController => Get.find<CallsController>();
   late Timer timer ;
 
   @override

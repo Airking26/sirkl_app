@@ -7,14 +7,13 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/chats/ui/settings_group_screen.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/chats/ui/new_message_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 
 import '../../global_getx/home/home_controller.dart';
 
@@ -26,13 +25,12 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
-  final _chatController = Get.put(ChatsController(), permanent: false);
-  // final _homeController = Get.put(HomeController());
-  // final _commonController = Get.put(CommonController());
-  // final _navigationController = Get.put(NavigationController());
- HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
-  final _navigationController = Get.put(NavigationController());
+
+  ChatsController get _chatController => Get.find<ChatsController>();
+  HomeController get _homeController => Get.find<HomeController>();
+  CommonController get _commonController => Get.find<CommonController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
+
   final _floatingSearchBarController = FloatingSearchBarController();
   late TabController tabController;
 
@@ -98,7 +96,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   @override
-void dispose() {
+  void dispose() {
 	// your dispose part
 	super.dispose();
   tabController.removeListener(indexChangeListener);
@@ -276,19 +274,15 @@ void dispose() {
                           ) : _controllerFriend,
                           onChannelTap: (channel) async {
                             _chatController.channel.value = channel;
-                           // _navigationController.hideNavBar.value = true;
                             if ((channel.membership == null &&
                                     !channel.state!.members
                                         .map((e) => e.userId!)
                                         .contains(_homeController.id.value)) &&
                                 channel.extraData["isConv"] != null &&
                                 channel.extraData["isConv"] == false && (channel.extraData["isGroupPaying"] == null || channel.extraData["isGroupPaying"] == false)) {
-                              _navigationController.hideNavBar.value = true;
-                        
                               pushNewScreen(context,
                                    withNavBar: false,
                                       screen: const SettingsGroupScreen())
-                                      
                                   .then((value) {
                                 _controllerFriend.refresh();
                                 _navigationController.hideNavBar.value =
@@ -296,7 +290,6 @@ void dispose() {
                                 _chatController.fromGroupJoin.value = false;
                               });
                             } else {
-             
                               pushNewScreen(context,
                               withNavBar: false,
                                       screen: StreamChannel(
@@ -424,8 +417,6 @@ void dispose() {
                             limit: 10,): _controllerOther,
                           onChannelTap: (channel) {
                             _chatController.channel.value = channel;
-                          //  _navigationController.hideNavBar.value = true;
-                          
                             pushNewScreen(context,
                             withNavBar: false,
                                     screen: StreamChannel(
@@ -633,8 +624,6 @@ void dispose() {
                     ),
                     IconButton(
                         onPressed: () {
-                         //_navigationController.hideNavBar.value = true;
-                            
                           pushNewScreen(context,
                           withNavBar: false,
                                   screen: const NewMessageScreen())

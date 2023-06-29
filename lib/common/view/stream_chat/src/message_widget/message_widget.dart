@@ -14,7 +14,6 @@ import 'package:sirkl/common/view/stream_chat/src/message_widget/message_widget_
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import '../../../../../global_getx/home/home_controller.dart';
-import '../../../../../home/controller/home_controller.dart';
 
 /// The display behaviour of a widget
 enum DisplayWidget {

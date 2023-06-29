@@ -13,7 +13,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/chats/service/chats_service.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/contract_address_dto.dart';
 import 'package:sirkl/common/model/nft_alchemy_dto.dart';
 import 'package:sirkl/common/model/nft_dto.dart';
@@ -28,7 +28,7 @@ import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/service/home_service.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -46,8 +46,8 @@ class HomeController extends GetxController{
   final ProfileService _profileService = ProfileService();
   final ChatsService _chatService = ChatsService();
 
-  final _navigationController = Get.put(NavigationController());
-  final _commonController = Get.put(CommonController());
+  NavigationController get _navigationController => Get.find<NavigationController>();
+  CommonController get _commonController => Get.find<CommonController>();
 
   final box = GetStorage();
 

@@ -6,17 +6,14 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/calls/controller/calls_controller.dart';
+import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
-import '../../common/view/dialog/custom_dial.dart';
 import '../../global_getx/home/home_controller.dart';
 
 class NewCallScreen extends StatefulWidget {
@@ -28,9 +25,9 @@ class NewCallScreen extends StatefulWidget {
 
 class _NewCallScreenState extends State<NewCallScreen> {
 
-  final _callController = Get.put(CallsController());
- HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
+  CallsController get _callController => Get.find<CallsController>();
+  HomeController get _homeController => Get.find<HomeController>();
+  CommonController get _commonController => Get.find<CommonController>();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
   final _searchController = FloatingSearchBarController();

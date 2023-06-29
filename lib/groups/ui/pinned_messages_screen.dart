@@ -1,21 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:sirkl/chats/controller/chats_controller.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
-import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
-import 'package:sirkl/common/controller/common_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/groups/controller/groups_controller.dart';
-import 'package:sirkl/groups/ui/group_participants_screen.dart';
-import 'package:sirkl/home/controller/home_controller.dart';
-import 'package:sirkl/navigation/controller/navigation_controller.dart';
-import 'package:sirkl/profile/controller/profile_controller.dart';
-import 'package:tiny_avatar/tiny_avatar.dart';
+import 'package:sirkl/global_getx/groups/groups_controller.dart';
 
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
@@ -29,11 +19,7 @@ class PinnedMessageScreen extends StatefulWidget {
 
 class _PinnedMessageScreenState extends State<PinnedMessageScreen> {
 
-  ProfileController get _profileController => Get.find<ProfileController>();  
-  HomeController get _homeController => Get.find<HomeController>();
-  final _commonController = Get.put(CommonController());
-  final _chatController = Get.put(ChatsController());
-  final _groupController = Get.put(GroupsController());
+  ChatsController get _chatController => Get.find<ChatsController>();
   final utils = Utils();
 
 
