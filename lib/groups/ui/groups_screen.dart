@@ -21,6 +21,8 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import '../../common/view/dialog/custom_dial.dart';
+import '../../global_getx/home/home_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
 
 class GroupsScreen extends StatefulWidget {
   const GroupsScreen({Key? key}) : super(key: key);
@@ -34,11 +36,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
   YYDialog dialogMenu = YYDialog();
   late TabController tabController;
   final _groupController = Get.put(GroupsController());
-  final _homeController = Get.put(HomeController());
+  HomeController get _homeController => Get.find<HomeController>();
   final _chatController = Get.put(ChatsController());
   final _navigationController = Get.put(NavigationController());
   final _floatingSearchBarController = FloatingSearchBarController();
-  final _profileController = Get.put(ProfileController());
+  ProfileController get _profileController => Get.find<ProfileController>();  
   late final _controllerCommunitiesFav = StreamChannelListController(
     client: StreamChat.of(context).client,
     filter:
@@ -77,27 +79,29 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
     _controllerCommunitiesFav.doInitialLoad();
     _controllerCommunitiesOther.doInitialLoad();
     _groupController.index.value = _homeController.isInFav.isEmpty ? 1 : 0;
+        tabController = TabController(length: 2, vsync: this);
+    tabController.index = _groupController.index.value;
+    tabController.addListener(indexChangingListener);
     super.initState();
   }
-
+  void indexChangingListener() {
+          if (tabController.indexIsChanging) {
+        _groupController.index.value = tabController.index;
+      }
+  }
   @override
   void dispose() {
     _controllerCommunitiesOther.dispose();
     _controllerCommunitiesFav.dispose();
     _groupController.index.value = 0;
+     tabController.removeListener(indexChangingListener);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
 
-    tabController = TabController(length: 2, vsync: this);
-    tabController.index = _groupController.index.value;
-    tabController.addListener(() {
-      if (tabController.indexIsChanging) {
-        _groupController.index.value = tabController.index;
-      }
-    });
+
 
     return Scaffold(
         resizeToAvoidBottomInset: false,

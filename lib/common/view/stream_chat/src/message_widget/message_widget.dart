@@ -13,6 +13,7 @@ import 'package:sirkl/common/view/stream_chat/src/message_actions_modal/message_
 import 'package:sirkl/common/view/stream_chat/src/message_widget/message_widget_content.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../global_getx/home/home_controller.dart';
 import '../../../../../home/controller/home_controller.dart';
 
 /// The display behaviour of a widget
@@ -773,7 +774,7 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
   late StreamChatThemeData _streamChatTheme;
   late StreamChatState _streamChat;
 
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
 
   @override
   void didChangeDependencies() {

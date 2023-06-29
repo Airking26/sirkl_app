@@ -21,6 +21,9 @@ import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/controller/profile_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../global_getx/home/home_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
+
 class CommunitySettingScreen extends StatefulWidget {
   const CommunitySettingScreen({Key? key}) : super(key: key);
 
@@ -30,8 +33,8 @@ class CommunitySettingScreen extends StatefulWidget {
 
 class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
 
-  final _profileController = Get.put(ProfileController());
-  final _homeController = Get.put(HomeController());
+  ProfileController get _profileController => Get.find<ProfileController>();  
+ HomeController get _homeController => Get.find<HomeController>();
   final _commonController = Get.put(CommonController());
   final _chatController = Get.put(ChatsController());
   final _groupController = Get.put(GroupsController());

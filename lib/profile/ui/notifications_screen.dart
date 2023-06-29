@@ -16,6 +16,8 @@ import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/utils.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import '../../global_getx/home/home_controller.dart';
+import '../../global_getx/profile/profile_controller.dart';
 import '../controller/profile_controller.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -27,8 +29,8 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
 
-  final _profileController = Get.put(ProfileController());
-  final _homeController = Get.put(HomeController());
+  ProfileController get _profileController => Get.find<ProfileController>();  
+ HomeController get _homeController => Get.find<HomeController>();
   final _chatController = Get.put(ChatsController());
   final _commonController = Get.put(CommonController());
   final PagingController<int, NotificationDto> pagingController = PagingController(firstPageKey: 0);

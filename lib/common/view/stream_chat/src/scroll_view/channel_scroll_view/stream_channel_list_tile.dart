@@ -6,6 +6,8 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../../../../../global_getx/home/home_controller.dart';
+
 /// A widget that displays a channel preview.
 ///
 /// This widget is intended to be used as a Tile in [StreamChannelListView]
@@ -164,12 +166,12 @@ class StreamChannelListTile extends StatelessWidget {
       selectedTileColor: selectedTileColor ?? this.selectedTileColor,
     );
   }
-
+   HomeController get _homeController => Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     final channelState = channel.state!;
     final currentUser = channel.client.state.currentUser!;
-    final _homeController = Get.put(HomeController());
+
 
     final channelPreviewTheme = StreamChannelPreviewTheme.of(context);
 

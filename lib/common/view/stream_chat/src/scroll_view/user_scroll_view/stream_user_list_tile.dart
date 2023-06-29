@@ -9,6 +9,8 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 
+import '../../../../../../global_getx/home/home_controller.dart';
+
 /// A widget that displays a user.
 ///
 /// This widget is intended to be used as a Tile in [StreamUserListView]
@@ -108,7 +110,7 @@ class StreamUserListTile extends StatelessWidget {
   /// If null, `EdgeInsets.symmetric(horizontal: 16.0)` is used.
   final EdgeInsetsGeometry contentPadding;
 
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _chatController = Get.put(ChatsController());
 
   /// Creates a copy of this tile but with the given fields replaced with

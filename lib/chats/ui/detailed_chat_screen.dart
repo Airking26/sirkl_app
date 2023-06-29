@@ -11,6 +11,8 @@ import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 
+import '../../global_getx/home/home_controller.dart';
+
 class DetailedChatScreen extends StatefulWidget {
 
   const DetailedChatScreen({Key? key, required this.create, this.fromProfile = false, this.channelId}) : super(key: key);
@@ -28,7 +30,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
   YYDialog dialogMenu = YYDialog();
   final _commonController = Get.put(CommonController());
   final _chatController = Get.put(ChatsController());
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _navigationController = Get.put(NavigationController());
 
   @override

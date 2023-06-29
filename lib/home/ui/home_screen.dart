@@ -33,6 +33,7 @@ import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:widget_circular_animator/widget_circular_animator.dart';
 
 import '../../common/utils.dart';
+import '../../global_getx/home/home_controller.dart';
 import '../../profile/ui/profile_else_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -43,7 +44,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _homeController = Get.put(HomeController());
+  HomeController get _homeController => Get.find<HomeController>();
   final _commonController = Get.put(CommonController());
   final _callController = Get.put(CallsController());
   final _navigationController = Get.put(NavigationController());

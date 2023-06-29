@@ -20,6 +20,8 @@ import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../global_getx/home/home_controller.dart';
+
 class CallsScreen extends StatefulWidget {
   const CallsScreen({Key? key}) : super(key: key);
 
@@ -30,7 +32,7 @@ class CallsScreen extends StatefulWidget {
 class _CallsScreenState extends State<CallsScreen> {
 
   final _callController = Get.put(CallsController());
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
   final PagingController<int, CallDto> pagingSearchController = PagingController(firstPageKey: 0);

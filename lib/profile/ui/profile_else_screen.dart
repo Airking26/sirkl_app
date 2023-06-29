@@ -19,6 +19,8 @@ import 'package:sirkl/navigation/controller/navigation_controller.dart';
 import 'package:sirkl/profile/ui/settings_profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../global_getx/home/home_controller.dart';
+
 class ProfileElseScreen extends StatefulWidget {
   const ProfileElseScreen({Key? key, required this.fromConversation, this.fromNested = false}) : super(key: key);
   final bool fromConversation;
@@ -30,7 +32,7 @@ class ProfileElseScreen extends StatefulWidget {
 
 class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
   final utils = Utils();

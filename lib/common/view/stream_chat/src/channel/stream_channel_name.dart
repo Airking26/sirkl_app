@@ -7,6 +7,8 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 
+import '../../../../../global_getx/home/home_controller.dart';
+
 /// It shows the current [Channel] name using a [Text] widget.
 ///
 /// The widget uses a [StreamBuilder] to render the channel information
@@ -32,7 +34,7 @@ class StreamChannelName extends StatelessWidget {
   /// How visual overflow should be handled.
   final TextOverflow textOverflow;
 
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) => BetterStreamBuilder<String>(

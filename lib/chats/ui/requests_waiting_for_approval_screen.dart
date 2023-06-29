@@ -10,6 +10,8 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/controller/home_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../global_getx/home/home_controller.dart';
+
 class RequestWaitingForApprovalScreen extends StatefulWidget {
   const RequestWaitingForApprovalScreen({Key? key}) : super(key: key);
 
@@ -19,7 +21,7 @@ class RequestWaitingForApprovalScreen extends StatefulWidget {
 
 class _RequestWaitingForApprovalScreenState extends State<RequestWaitingForApprovalScreen> {
 
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _chatController = Get.put(ChatsController());
   final utils = Utils();
 

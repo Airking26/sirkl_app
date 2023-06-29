@@ -1,0 +1,46 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "sirkl",
+            "request": "launch",
+            "type": "dart",
+          //     "flutterMode": "profile"
+        },
+        {
+            "name": "sirkl (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "sirkl (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "dynamic_theme",
+            "cwd": "packages/dynamic_theme",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "dynamic_theme (profile mode)",
+            "cwd": "packages/dynamic_theme",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "dynamic_theme (release mode)",
+            "cwd": "packages/dynamic_theme",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

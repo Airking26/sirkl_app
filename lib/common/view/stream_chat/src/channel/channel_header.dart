@@ -29,6 +29,9 @@ import 'package:sirkl/profile/ui/settings_profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
+import '../../../../../global_getx/home/home_controller.dart';
+import '../../../../../global_getx/profile/profile_controller.dart';
+
 /// {@template streamChannelHeader}
 /// ![screenshot](https://raw.githubusercontent.com/GetStream/stream-chat-flutter/master/packages/stream_chat_flutter/screenshots/channel_header.png)
 /// ![screenshot](https://raw.githubusercontent.com/GetStream/stream-chat-flutter/master/packages/stream_chat_flutter/screenshots/channel_header_paint.png)
@@ -155,10 +158,10 @@ class StreamChannelHeader extends StatelessWidget
   YYDialog dialogMenu = YYDialog();
   final _commonController = Get.put(CommonController());
   final _navigationController = Get.put(NavigationController());
-  final _homeController = Get.put(HomeController());
+ HomeController get _homeController => Get.find<HomeController>();
   final _chatController = Get.put(ChatsController());
   final _groupController = Get.put(GroupsController());
-  final _profileController = Get.put(ProfileController());
+  ProfileController get _profileController => Get.find<ProfileController>();  
   final _callController = Get.put(CallsController());
   final utils = Utils();
 
