@@ -84,7 +84,7 @@ class HomeController extends GetxController{
   var notificationActive = true.obs;
   var streamChatToken = "".obs;
 
-  var connector = WalletConnect(
+  late final connector = WalletConnect(
     bridge: 'https://bridge.walletconnect.org',
     clientMeta: const PeerMeta(
       name: 'SIRKL',

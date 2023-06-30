@@ -83,6 +83,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   void initState() {
     _controllerFriend.doInitialLoad();
     _controllerOther.doInitialLoad();
+    _commonController.controllerFriend = _controllerFriend;
+    _commonController.controllerOthers = _controllerOther;
         tabController = TabController(length: 2, vsync: this);
     tabController.index = _chatController.index.value;
     tabController.addListener(indexChangeListener);
@@ -112,11 +114,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
 
     return Obx(() {
-      if (_commonController.refreshInboxes.value) {
-        _controllerFriend.refresh();
-        _controllerOther.refresh();
-        _commonController.refreshInboxes.value = false;
-      }
       return Scaffold(
           backgroundColor:
               MediaQuery.of(context).platformBrightness == Brightness.dark
@@ -228,14 +225,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                                 channel.extraData['isConv'] ==
                                                     true) {
                                               channel.extraData['isConv'] == true ? await channel.truncate(skipPush: false) : await channel.delete();
-                                              _commonController
-                                                  .refreshInboxes.value = true;
+                                              _commonController.refreshAllInbox();
                                               Get.back();
                                             } else {
                                               await channel.removeMembers(
                                                   [_homeController.id.value]);
-                                              _commonController
-                                                  .refreshInboxes.value = true;
+                                                _commonController.refreshAllInbox();
                                               Get.back();
                                             }
                                           },
@@ -374,8 +369,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                               await _chatController
                                                   .deleteInbox(channel.id!);
                                             }
-                                            _commonController
-                                                .refreshInboxes.value = true;
+                                                   _commonController.refreshAllInbox();
                                             Get.back();
                                           },
                                         )
@@ -385,7 +379,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           onChannelAddPressed: (context, id, client) async {
                             await _commonController.addUserToSirkl(
                                 id, client, _homeController.id.value);
-                            _commonController.refreshInboxes.value = true;
+                                       _commonController.refreshAllInbox();
                           },
                           channelConv: true,
                           channelFriends: false,

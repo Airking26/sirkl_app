@@ -22,7 +22,7 @@ class MultiLoadUtil {
       _makeCompleterSafeStop();
     }
   }
-  Future<void> makeSafe() async {
+  Future<void> isDone() async {
     await _completer.future;
   }
   _makeCompleterSafeStop() {

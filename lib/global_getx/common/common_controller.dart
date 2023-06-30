@@ -15,11 +15,15 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/home/service/home_service.dart';
 import 'package:sirkl/profile/service/profile_service.dart';
+import 'package:sirkl/util/multi_load.util.dart';
 
 import '../../common/model/refresh_token_dto.dart';
+import '../home/home_controller.dart';
 
-class CommonController extends GetxController{
-
+class CommonController extends GetxController {
+  ChatsController get _chatController => Get.find<ChatsController>();
+  HomeController get _homeController => Get.find<HomeController>();
+  CommonController get _commonController => Get.find<CommonController>();
   final HomeService _homeService = HomeService();
   final CommonService _commonService = CommonService();
   final ProfileService _profileService = ProfileService();
@@ -34,30 +38,58 @@ class CommonController extends GetxController{
   var query = "".obs;
   var queryHasChanged = false.obs;
   var inboxClicked = InboxDto().obs;
-  var refreshInboxes = false.obs;
+  // TODO: SAM, We potentialy dont need to use Rx variable, we should prefer functions if we are not updating state of UI.
+  //Rx<bool> refreshInboxes = false.obs;
   var contactAddLoading = false.obs;
+  late StreamChannelListController controllerFriend;
+  late StreamChannelListController controllerOthers;
 
-  Future<bool> addUserToSirkl(String id, StreamChatClient streamChatClient, String myId) async{
+  void refreshAllInbox() async {
+    List<StreamChannelListController> chatStreamControllers = [
+      controllerFriend,
+      controllerOthers
+    ];
+    MultiLoadUtil multiLoad = MultiLoadUtil();
+    //refreshInboxes.value = true;
+
+    chatStreamControllers.forEach((element) {
+      multiLoad.startLoading();
+      element.refresh().then((value) => multiLoad.stopLoading());
+    });
+    await multiLoad.isDone();
+   // refreshInboxes.value = false;
+  }
+
+  Future<bool> addUserToSirkl(
+      String id, StreamChatClient streamChatClient, String myId) async {
     contactAddLoading.value = true;
-    var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, myId], "isConv": true});
-    var meFollow = channel.channel?.extraData["${myId}_follow_channel"] as dynamic;
-    if(meFollow == null || (meFollow != null && meFollow == false)) {
+    var channel = await streamChatClient.queryChannel("try", channelData: {
+      "members": [id, myId],
+      "isConv": true
+    });
+    var meFollow =
+        channel.channel?.extraData["${myId}_follow_channel"] as dynamic;
+    if (meFollow == null || (meFollow != null && meFollow == false)) {
       meFollow = true;
     }
-    await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"${myId}_follow_channel" : meFollow});
+    await streamChatClient.updateChannelPartial(channel.channel!.id, "try",
+        set: {"${myId}_follow_channel": meFollow});
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _commonService.addUserToSirkl(accessToken, id);
-    if(request.statusCode == 401){
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      var refreshTokenDto =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _commonService.addUserToSirkl(accessToken, id);
-      if(request.isOk) {
+      if (request.isOk) {
         contactAddLoading.value = false;
-        refreshInboxes.value = true;
-        if(!users.map((element) => element.id).contains(userFromJson(json.encode(request.body)).id)) {
+        refreshAllInbox();
+        if (!users
+            .map((element) => element.id)
+            .contains(userFromJson(json.encode(request.body)).id)) {
           users.add(userFromJson(json.encode(request.body)));
         }
         userClickedFollowStatus.value = true;
@@ -66,10 +98,12 @@ class CommonController extends GetxController{
         contactAddLoading.value = false;
         return false;
       }
-    } else if(request.isOk) {
+    } else if (request.isOk) {
       contactAddLoading.value = false;
-      refreshInboxes.value = true;
-      if(!users.map((element) => element.id).contains(userFromJson(json.encode(request.body)).id)) {
+      refreshAllInbox();
+      if (!users
+          .map((element) => element.id)
+          .contains(userFromJson(json.encode(request.body)).id)) {
         users.add(userFromJson(json.encode(request.body)));
       }
       userClickedFollowStatus.value = true;
@@ -80,36 +114,48 @@ class CommonController extends GetxController{
     }
   }
 
-  Future<bool> removeUserToSirkl(String id, StreamChatClient streamChatClient, String value) async{
-    var channel = await streamChatClient.queryChannel("try", channelData: {"members": [id, value]});
-    var meFollow = channel.channel?.extraData["${value}_follow_channel"] as dynamic;
-    if(meFollow == null || (meFollow != null && meFollow == true)) {
+  Future<bool> removeUserToSirkl(
+      String id, StreamChatClient streamChatClient, String value) async {
+    var channel = await streamChatClient.queryChannel("try", channelData: {
+      "members": [id, value]
+    });
+    var meFollow =
+        channel.channel?.extraData["${value}_follow_channel"] as dynamic;
+    if (meFollow == null || (meFollow != null && meFollow == true)) {
       meFollow = false;
     }
-    await streamChatClient.updateChannelPartial(channel.channel!.id, "try", set: {"${value}_follow_channel" : meFollow});
+    await streamChatClient.updateChannelPartial(channel.channel!.id, "try",
+        set: {"${value}_follow_channel": meFollow});
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _commonService.removeUserToSirkl(accessToken, id);
-    if(request.statusCode == 401){
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      var refreshTokenDto =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _commonService.removeUserToSirkl(accessToken, id);
-      if(request.isOk) {
-        refreshInboxes.value = true;
-        if(users.map((element) => element.id).contains(userFromJson(json.encode(request.body)).id)) {
-          users.removeWhere((e) => e.id == userFromJson(json.encode(request.body)).id);
+      if (request.isOk) {
+        refreshAllInbox();
+        if (users
+            .map((element) => element.id)
+            .contains(userFromJson(json.encode(request.body)).id)) {
+          users.removeWhere(
+              (e) => e.id == userFromJson(json.encode(request.body)).id);
         }
         userClickedFollowStatus.value = false;
-       return true;
+        return true;
       } else {
         return false;
       }
-    } else if(request.isOk) {
-      refreshInboxes.value = true;
-      if(users.map((element) => element.id).contains(userFromJson(json.encode(request.body)).id)) {
-        users.removeWhere((e) => e.id == userFromJson(json.encode(request.body)).id);
+    } else if (request.isOk) {
+      refreshAllInbox();
+      if (users
+          .map((element) => element.id)
+          .contains(userFromJson(json.encode(request.body)).id)) {
+        users.removeWhere(
+            (e) => e.id == userFromJson(json.encode(request.body)).id);
       }
       userClickedFollowStatus.value = false;
       return true;
@@ -118,57 +164,70 @@ class CommonController extends GetxController{
     }
   }
 
-  showSirklUsers(String id) async{
+  showSirklUsers(String id) async {
     gettingStoryAndContacts.value = true;
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     Response<List<dynamic>> request;
-    try{
+    try {
       request = await _commonService.getSirklUsers(accessToken, id);
-      if(request.isOk) {
+      if (request.isOk) {
         users.clear();
-        users.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
-        users.sort((a,b){ return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());});
+        users.value = request.body!
+            .map<UserDTO>((user) => userFromJson(json.encode(user)))
+            .toList();
+        users.sort((a, b) {
+          return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());
+        });
         users.refresh();
       } else {
         gettingStoryAndContacts.value = false;
       }
-    } on Error{
-        var requestToken = await _homeService.refreshToken(refreshToken!);
-        var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-        accessToken = refreshTokenDto.accessToken!;
-        box.write(con.ACCESS_TOKEN, accessToken);
-        try {
-          request = await _commonService.getSirklUsers(accessToken, id);
-          if(request.isOk) {
-            users.clear();
-            users.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
-            users.sort((a,b){ return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());});
-            users.refresh();
-          }
-          else {
-            gettingStoryAndContacts.value = false;
-          }
-        } on Error{
+    } on Error {
+      var requestToken = await _homeService.refreshToken(refreshToken!);
+      var refreshTokenDto =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
+      accessToken = refreshTokenDto.accessToken!;
+      box.write(con.ACCESS_TOKEN, accessToken);
+      try {
+        request = await _commonService.getSirklUsers(accessToken, id);
+        if (request.isOk) {
+          users.clear();
+          users.value = request.body!
+              .map<UserDTO>((user) => userFromJson(json.encode(user)))
+              .toList();
+          users.sort((a, b) {
+            return a.userName!
+                .toLowerCase()
+                .compareTo(b.userName!.toLowerCase());
+          });
+          users.refresh();
+        } else {
           gettingStoryAndContacts.value = false;
         }
+      } on Error {
+        gettingStoryAndContacts.value = false;
+      }
     }
 
     gettingStoryAndContacts.value = false;
   }
 
-  checkUserIsInFollowing() async{
+  checkUserIsInFollowing() async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.checkUserIsInFollowing(accessToken, userClicked.value!.id!);
-    if(request.statusCode == 401){
+    var request = await _commonService.checkUserIsInFollowing(
+        accessToken, userClicked.value!.id!);
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      var refreshTokenDto =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _commonService.checkUserIsInFollowing(accessToken, userClicked.value!.id!);
+      request = await _commonService.checkUserIsInFollowing(
+          accessToken, userClicked.value!.id!);
       userClickedFollowStatus.value = request.body == "false" ? false : true;
-    } else if(request.isOk){
+    } else if (request.isOk) {
       userClickedFollowStatus.value = request.body == "false" ? false : true;
     }
   }
@@ -177,58 +236,70 @@ class CommonController extends GetxController{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _profileService.getUserByID(accessToken, id);
-    if(request.statusCode == 401){
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
+      var refreshTokenDto =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _profileService.getUserByID(accessToken, id);
-      if(request.isOk) userClicked.value = userFromJson(json.encode(request.body));
-    } else if(request.isOk) {
+      if (request.isOk)
+        userClicked.value = userFromJson(json.encode(request.body));
+    } else if (request.isOk) {
       userClicked.value = userFromJson(json.encode(request.body));
     }
   }
 
-  notifyAddedInGroup(NotificationAddedAdminDto notificationAddedAdminDto) async {
+  notifyAddedInGroup(
+      NotificationAddedAdminDto notificationAddedAdminDto) async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.notifyAddedInGroup(accessToken, notificationAddedAdminDtoToJson(notificationAddedAdminDto));
-    if(request.statusCode == 401){
+    var request = await _commonService.notifyAddedInGroup(accessToken,
+        notificationAddedAdminDtoToJson(notificationAddedAdminDto));
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
-      request = await _commonService.notifyAddedInGroup(accessToken, notificationAddedAdminDtoToJson(notificationAddedAdminDto));
+      request = await _commonService.notifyAddedInGroup(accessToken,
+          notificationAddedAdminDtoToJson(notificationAddedAdminDto));
     }
   }
 
   notifyUserAsAdmin(NotificationAddedAdminDto notificationAddedAdminDto) async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.notifyUserAsAdmin(accessToken, notificationAddedAdminDtoToJson(notificationAddedAdminDto));
-    if(request.statusCode == 401){
+    var request = await _commonService.notifyUserAsAdmin(accessToken,
+        notificationAddedAdminDtoToJson(notificationAddedAdminDto));
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
-      request = await _commonService.notifyUserAsAdmin(accessToken, notificationAddedAdminDtoToJson(notificationAddedAdminDto));
+      request = await _commonService.notifyUserAsAdmin(accessToken,
+          notificationAddedAdminDtoToJson(notificationAddedAdminDto));
     }
   }
 
-  report(BuildContext context, ReportDto reportDTO, Utils utils) async{
+  report(BuildContext context, ReportDto reportDTO, Utils utils) async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.report(accessToken, reportDtoToJson(reportDTO));
-    if(request.statusCode == 401){
+    var request =
+        await _commonService.report(accessToken, reportDtoToJson(reportDTO));
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
-      request =await _commonService.report(accessToken, reportDtoToJson(reportDTO));
-      if(request.isOk) {
-        utils.showToast(context, "Thank you! Your report has been correctly sent.");
+      request =
+          await _commonService.report(accessToken, reportDtoToJson(reportDTO));
+      if (request.isOk) {
+        utils.showToast(
+            context, "Thank you! Your report has been correctly sent.");
       }
-    } else if(request.isOk) {
-      utils.showToast(context, "Thank you! Your report has been correctly sent.");
+    } else if (request.isOk) {
+      utils.showToast(
+          context, "Thank you! Your report has been correctly sent.");
     }
   }
-
 }

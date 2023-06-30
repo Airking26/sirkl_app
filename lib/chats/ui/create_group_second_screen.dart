@@ -274,7 +274,7 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
     _profileController.urlPictureGroup.value = "";
     _chatController.groupTextController.value.text = "";
     _chatController.fromGroupCreation.value = true;
-    _commonController.refreshInboxes.value = true;
+    _commonController.refreshAllInbox();
     Navigator.popUntil(context, (route) => route.isFirst);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       pushNewScreen(context, screen: DetailedChatScreen(create: false, channelId: idChannelCreated,)).then((value) => _navigationController.hideNavBar.value = false);
