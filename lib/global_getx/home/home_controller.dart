@@ -122,9 +122,7 @@ class HomeController extends GetxController{
       address.value = sessionStatus?.accounts[0];
     });
 
-    connector.value.on('session_request', (payload) {
-      var k = payload;
-    });
+    connector.value.on('session_request', (payload) {});
 
     connector.value.on('disconnect', (session) {
       connector.value = WalletConnect(
@@ -142,7 +140,7 @@ class HomeController extends GetxController{
 
     if (!connector.value.connected) {
       sessionStatus = await connector.value.createSession(
-        chainId: 5,
+        chainId: 4160,
         onDisplayUri: (uri) async {
           _uri = uri;
           try{
