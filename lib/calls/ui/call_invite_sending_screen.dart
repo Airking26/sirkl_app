@@ -142,7 +142,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                               icon: Icon(_callController.isCallMuted.value ? Icons.mic_off_rounded: Icons.mic, color: Colors.black87),
                               onPressed: () async {
                                 _callController.isCallMuted.value = !_callController.isCallMuted.value;
-                                _callController.isCallMuted.value ? _callController.agoraEngine.value?.disableAudio() : _callController.agoraEngine.value?.enableAudio();
+                                _callController.isCallMuted.value ? _callController.rtcEngine?.disableAudio() : _callController.rtcEngine?.enableAudio();
                               }),
                         ),
                         InkWell(
@@ -154,7 +154,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                             } else {
                               await _callController.missedCallNotification(_callController.userCalled.value.id!);
                               await FlutterCallkitIncoming.endAllCalls();
-                              await _callController.endCall(_callController.userCalled.value.id!, _callController.currentCallId.value);
+                              await _callController.endCall(_callController.userCalled.value.id!, _callController.currentCallID ?? '');
                               await _callController.leaveChannel();
                             }
                           },
@@ -174,7 +174,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                               icon: Icon(_callController.isCallOnSpeaker.value ? Icons.volume_up_rounded : Icons.volume_down_rounded, color: Colors.black87,),
                               onPressed: () async {
                                 _callController.isCallOnSpeaker.value = !_callController.isCallOnSpeaker.value;
-                                _callController.agoraEngine.value?.setEnableSpeakerphone(_callController.isCallOnSpeaker.value);
+                                _callController.rtcEngine?.setEnableSpeakerphone(_callController.isCallOnSpeaker.value);
                               }),
                         ),
                       ],

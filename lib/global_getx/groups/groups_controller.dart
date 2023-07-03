@@ -24,15 +24,17 @@ import 'package:sirkl/home/service/home_service.dart';
 
 class GroupsController extends GetxController{
 
-  var searchIsActive = false.obs;
-  var query = "".obs;
-  var index = 0.obs;
-  var addAGroup = false.obs;
   final _groupService = GroupService();
   final _homeService = HomeService();
   final box = GetStorage();
-  var nftAvailable = <CollectionDbDto>[].obs;
+
   ChatsController get _chatController => Get.find<ChatsController>();
+  var nftAvailable = <CollectionDbDto>[].obs;
+
+  var query = "".obs;
+  var index = 0.obs;
+  var addAGroup = false.obs;
+  var searchIsActive = false.obs;
   var isLoadingAvailableNFT = true.obs;
   var refreshGroups = false.obs;
   var retryProgress = false.obs;

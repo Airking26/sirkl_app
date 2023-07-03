@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -27,25 +26,24 @@ import '../../global_getx/home/home_controller.dart';
 class ProfileController extends GetxController{
 
   final box = GetStorage();
+
   final _profileService = ProfileService();
   final _homeService = HomeService();
+
   HomeController get _homeController => Get.find<HomeController>();
+
   Rx<UserDTO?> isUserExists = (null as UserDTO?).obs;
   Rx<List<StoryDto>?> myStories = (null as List<StoryDto>?).obs;
   Rx<List<UserDTO>?> readers = (null as List<UserDTO>?).obs;
-  var isCardExpanded = false.obs;
-  Rx<Uint8List?> videoThumbnail = Uint8List(0).obs;
+
+  var usernameElseTextEditingController = TextEditingController().obs;
+
   var isEditingProfile = false.obs;
   var isEditingProfileElse = false.obs;
   var isLoadingPicture = false.obs;
-  var usernameTextEditingController = TextEditingController().obs;
-  var descriptionTextEditingController = TextEditingController().obs;
-  var usernameElseTextEditingController = TextEditingController().obs;
   var urlPicture = "".obs;
   var urlPictureGroup = "".obs;
   var hasUnreadNotif = false.obs;
-  var isStoryPosting = false.obs;
-  var simpleS3 = SimpleS3().obs;
   var contactUsClicked = false.obs;
 
   updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
@@ -74,7 +72,6 @@ class ProfileController extends GetxController{
               following: _homeController.userMe.value.following,
               isInFollowing: _homeController.userMe.value.isInFollowing);
           await streamChatClient.updateUser(User(id: _homeController.id.value, name: _homeController.userMe.value.userName!, extraData: {"userDTO": userToPass}));
-          descriptionTextEditingController.value.clear();
         }
         isEditingProfile.value = false;
         isLoadingPicture.value = false;
@@ -96,7 +93,6 @@ class ProfileController extends GetxController{
             following: _homeController.userMe.value.following,
             isInFollowing: _homeController.userMe.value.isInFollowing);
         await streamChatClient.updateUser(User(id: _homeController.id.value, name: _homeController.userMe.value.userName!, extraData: {"userDTO": userToPass}));
-        descriptionTextEditingController.value.clear();
       }
       isEditingProfile.value = false;
       isLoadingPicture.value = false;
@@ -139,7 +135,7 @@ class ProfileController extends GetxController{
         textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
         fontSize: 16.0
     );
-    var uri = await simpleS3.value.uploadFile(file, "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
+    var uri = await SimpleS3().uploadFile(file, "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
     var storyCreationDto = StoryCreationDto(url: uri, type: type);
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);

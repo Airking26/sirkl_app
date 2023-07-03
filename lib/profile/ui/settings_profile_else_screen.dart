@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/report_dto.dart';

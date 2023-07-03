@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:get/state_manager.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 

@@ -65,12 +65,9 @@ class HomeController extends GetxController{
   var accessToken = "".obs;
   var userMe = UserDTO().obs;
   var userAdded = UserDTO().obs;
-  var nicknameUser = "".obs;
-  var isLoadingNfts = true.obs;
   var address = "".obs;
   var indexStory = 0.obs;
   var actualStoryIndex = 0.obs;
-  var controllerConnected = false.obs;
   var loadingStories = true.obs;
   var isFirstConnexion = false.obs;
   var pageKey = 0.obs;
@@ -529,7 +526,6 @@ class HomeController extends GetxController{
                       ? userMe.value.wallet
                       : userMe.value.userName!,
                   extraData: {"userDTO": userToPass}), request.body!);
-              controllerConnected.value = true;
               if (DateTime.now().difference(userMe.value.createdAt!) <
                   const Duration(minutes: 1)) {
                 await _commonController.addUserToSirkl(
@@ -543,7 +539,6 @@ class HomeController extends GetxController{
                     ? userMe.value.wallet
                     : userMe.value.userName!,
                 extraData: {"userDTO": userToPass}), request.body!);
-            controllerConnected.value = true;
             if (DateTime.now().difference(userMe.value.createdAt!) <
                 const Duration(minutes: 1)) {
               await _commonController.addUserToSirkl(
@@ -553,7 +548,6 @@ class HomeController extends GetxController{
           }
         } else {
           await client.connectUser(User(id: id.value), streamChatToken.value);
-          controllerConnected.value = true;
         }
       }
     }

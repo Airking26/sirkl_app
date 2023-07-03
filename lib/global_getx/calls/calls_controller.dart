@@ -31,33 +31,39 @@ class CallsController extends GetxController{
   final _callService = CallService();
   final _homeService = HomeService();
   final _profileService = ProfileService();
-  NavigationController get _navigationController => Get.find<NavigationController>();
   final box = GetStorage();
-  final agoraEngine = (null as RtcEngine?).obs;
-  var tokenAgoraRTC = "".obs;
+
+  NavigationController get _navigationController => Get.find<NavigationController>();
+  Rx<PagingController<int, CallDto>> pagingController = PagingController<int, CallDto>(firstPageKey: 0).obs;
+
+  late RtcEngine? rtcEngine;
+  late String? tokenAgoraRTC;
+  late Timer? timerRing;
+  late String? currentCallID;
+
   var callList = (null as List<CallDto>?).obs;
+
   var userCalled = UserDTO().obs;
-  var userJoinedCall = false.obs;
   var timer = StopWatchTimer().obs;
-  var currentCallId = "".obs;
+
+  var callQuery = "".obs;
+  var pageKey = 0.obs;
+
+  var isFromConv = false.obs;
   var isCallMuted = false.obs;
   var isCallOnSpeaker = false.obs;
   var isSearchIsActive = false.obs;
-  var callQuery = "".obs;
-  Rx<PagingController<int, CallDto>> pagingController = PagingController<int, CallDto>(firstPageKey: 0).obs;
-  var pageKey = 0.obs;
-  var isFromConv = false.obs;
-  late Timer timerRing;
+  var userJoinedCall = false.obs;
 
   Future<void> setupVoiceSDKEngine(BuildContext context) async {
     await [Permission.microphone].request();
 
-    agoraEngine.value = await RtcEngine.create("13d8acd177bf4c35a0d07bdd18c8e84e");
-    await agoraEngine.value?.enableAudio();
-    await agoraEngine.value?.leaveChannel();
+    rtcEngine = await RtcEngine.create("13d8acd177bf4c35a0d07bdd18c8e84e");
+    await rtcEngine?.enableAudio();
+    await rtcEngine?.leaveChannel();
 
 
-    agoraEngine.value?.setEventHandler(
+    rtcEngine?.setEventHandler(
       RtcEngineEventHandler(
         joinChannelSuccess: (String x, int y, int elapsed) {
           playRingback(1);
@@ -91,7 +97,7 @@ class CallsController extends GetxController{
               FlutterBeep.playSysSound(37);
             });
           } else {
-            timerRing.cancel();
+            timerRing?.cancel();
           }
       });
 
@@ -100,7 +106,7 @@ class CallsController extends GetxController{
 
   leaveChannel() async{
     userJoinedCall.value = false;
-    await agoraEngine.value?.leaveChannel();
+    await rtcEngine?.leaveChannel();
     Get.back();
   }
 
@@ -114,31 +120,31 @@ class CallsController extends GetxController{
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _profileService.retrieveTokenAgoraRTC(accessToken, channel, role, tokenType, id);
-      if(request.isOk) tokenAgoraRTC.value = request.body!;
+      if(request.isOk) tokenAgoraRTC = request.body!;
     } else if(request.isOk) {
-      tokenAgoraRTC.value = request.body!;
+      tokenAgoraRTC = request.body!;
     }
   }
 
   inviteCall(UserDTO user, String channel, String myID) async {
     userCalled.value = user;
-    currentCallId.value = channel;
+    currentCallID = channel;
     await createCall(CallCreationDto(updatedAt: DateTime.now(), called: user.id!, status: 0, channel: channel));
     await retrieveTokenAgoraRTC(channel, "publisher", "userAccount", myID);
-    await agoraEngine.value?.joinChannelWithUserAccount(tokenAgoraRTC.value, channel, myID);
+    await rtcEngine?.joinChannelWithUserAccount(tokenAgoraRTC, channel, myID);
   }
 
   join(String channelName, String id, String userCallingId) async {
     await getUserById(userCallingId);
     await retrieveTokenAgoraRTC(channelName, "audience", "userAccount", id);
-    await agoraEngine.value?.joinChannelWithUserAccount(tokenAgoraRTC.value, channelName, id);
+    await rtcEngine?.joinChannelWithUserAccount(tokenAgoraRTC, channelName, id);
   }
 
   listenCall() {
     FlutterCallkitIncoming.onEvent.listen((event) async{
       switch (event!.event) {
         case Event.actionCallIncoming:
-          currentCallId.value = event.body['id'];
+          currentCallID = event.body['id'];
           break;
         case Event.actionCallStart:
           break;

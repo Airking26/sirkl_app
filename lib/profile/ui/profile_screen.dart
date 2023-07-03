@@ -42,6 +42,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
   final web3Controller = Get.put(Web3Controller());
+  final TextEditingController usernameTextEditingController = TextEditingController();
+  final TextEditingController descriptionTextEditingController = TextEditingController();
 
   final PagingController<int, NftDto> pagingController =
       PagingController(firstPageKey: 0);
@@ -54,11 +56,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     controller = GalleryController();
     _profileController.retrieveMyStories();
     pagingController.addPageRequestListener((pageKey) {fetchNFTs();});
-    _profileController.usernameTextEditingController.value.text =
+    usernameTextEditingController.text =
         _homeController.userMe.value.userName!.isEmpty
             ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
             : _homeController.userMe.value.userName!;
-    _profileController.descriptionTextEditingController.value.text =
+    descriptionTextEditingController.text =
         _homeController.userMe.value.description.isNullOrBlank!
             ? ""
             : _homeController.userMe.value.description!;
@@ -174,9 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: TextField(
                                       //autofocus: true,
                                       maxLines: 1,
-                                      controller: _profileController
-                                          .usernameTextEditingController
-                                          .value,
+                                      controller: usernameTextEditingController,
                                       maxLength: 13,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
@@ -228,31 +228,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     )) :
                                 _profileController.isEditingProfile.value
                                     ? InkWell(
-                                  onTap: () {
-                                    _profileController.updateMe(
+                                  onTap: () async {
+                                    await _profileController.updateMe(
                                         UpdateMeDto(
-                                            userName: _profileController
-                                                .usernameTextEditingController
-                                                .value
+                                            userName: usernameTextEditingController
                                                 .text
                                                 .isEmpty
                                                 ? "${_homeController
                                                 .userMe
                                                 .value
                                                 .wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
-                                                : _profileController
-                                                .usernameTextEditingController
-                                                .value
+                                                : usernameTextEditingController
                                                 .text,
-                                            description: _profileController
-                                                .descriptionTextEditingController
-                                                .value
+                                            description: descriptionTextEditingController
                                                 .text
                                                 .isEmpty
                                                 ? ""
-                                                : _profileController
-                                                .descriptionTextEditingController
-                                                .value
+                                                : descriptionTextEditingController
                                                 .text,
                                             picture:
                                             _profileController
@@ -260,6 +252,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 .value),
                                         StreamChat.of(context)
                                             .client);
+                                    usernameTextEditingController.clear();
+                                    descriptionTextEditingController.clear();
                                   },
                                   child: const Padding(
                                     padding: EdgeInsets.only(
@@ -436,8 +430,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: _profileController.isEditingProfile.value
                       ? TextField(
                           maxLines: 2,
-                          controller: _profileController
-                              .descriptionTextEditingController.value,
+                          controller: descriptionTextEditingController,
                           maxLength: 120,
                           textAlign: TextAlign.center,
                           style: TextStyle(

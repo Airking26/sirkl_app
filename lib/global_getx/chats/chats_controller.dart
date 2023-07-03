@@ -17,6 +17,11 @@ import '../profile/profile_controller.dart';
 class ChatsController extends GetxController{
 
   final box = GetStorage();
+  final _chatService = ChatsService();
+  final _homeService = HomeService();
+
+  ProfileController get _profileController => Get.find<ProfileController>();
+
   var index = 0.obs;
   var searchIsActive = false.obs;
   var searchIsActiveInCompose = false.obs;
@@ -24,21 +29,10 @@ class ChatsController extends GetxController{
   var chipsListAddUsers = <UserDTO>[].obs;
   var requestsWaiting = <UserDTO>[].obs;
   var query = "".obs;
-  final _chatService = ChatsService();
-  final _homeService = HomeService();
-  ProfileController get _profileController => Get.find<ProfileController>();  
   var messageSending = false.obs;
   var isEditingProfile = false.obs;
   var usernameElseTextEditingController = TextEditingController().obs;
-  var isBroadcastList = false.obs;
   var addUserQuery = "".obs;
-  var sendingMessageMode = 0.obs;
-  var groupType = 0.obs;
-  var groupVisibility = 0.obs;
-  var groupPaying = 0.obs;
-  var groupTypeCollapsed = true.obs;
-  var groupVisibilityCollapsed = true.obs;
-  var groupPayingCollapsed = true.obs;
   var groupNameIsEmpty = true.obs;
   var contactAddIsEmpty = true.obs;
   var groupTextController = TextEditingController().obs;
@@ -46,10 +40,17 @@ class ChatsController extends GetxController{
   var fromGroupJoin = false.obs;
   var isEditingGroup = false.obs;
   var needToRefresh = false.obs;
-  Rx<bool> isCreatingGroup = false.obs;
   Rx<Channel?> channel = (null as Channel?).obs;
   Rx<Channel?> nestedChannel = (null as Channel?).obs;
   var retryProgress = false.obs;
+
+  var sendingMessageMode = 0.obs;
+  var groupType = 0.obs;
+  var groupVisibility = 0.obs;
+  var groupPaying = 0.obs;
+  var groupTypeCollapsed = true.obs;
+  var groupVisibilityCollapsed = true.obs;
+  var groupPayingCollapsed = true.obs;
 
   Future<String> createInbox(InboxCreationDto inboxCreationDto) async{
     var accessToken = box.read(con.ACCESS_TOKEN);
@@ -65,7 +66,6 @@ class ChatsController extends GetxController{
     }
     return req.body!;
   }
-
 
   checkOrCreateChannel(String himId, StreamChatClient client, String myId, bool nested) async{
     if(nested){

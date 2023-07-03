@@ -18,12 +18,9 @@ import 'package:sirkl/profile/service/profile_service.dart';
 import 'package:sirkl/util/multi_load.util.dart';
 
 import '../../common/model/refresh_token_dto.dart';
-import '../home/home_controller.dart';
 
 class CommonController extends GetxController {
-  ChatsController get _chatController => Get.find<ChatsController>();
-  HomeController get _homeController => Get.find<HomeController>();
-  CommonController get _commonController => Get.find<CommonController>();
+
   final HomeService _homeService = HomeService();
   final CommonService _commonService = CommonService();
   final ProfileService _profileService = ProfileService();
@@ -36,10 +33,6 @@ class CommonController extends GetxController {
   var users = <UserDTO>[].obs;
   var gettingStoryAndContacts = true.obs;
   var query = "".obs;
-  var queryHasChanged = false.obs;
-  var inboxClicked = InboxDto().obs;
-  // TODO: SAM, We potentialy dont need to use Rx variable, we should prefer functions if we are not updating state of UI.
-  //Rx<bool> refreshInboxes = false.obs;
   var contactAddLoading = false.obs;
   late StreamChannelListController controllerFriend;
   late StreamChannelListController controllerOthers;
@@ -50,14 +43,12 @@ class CommonController extends GetxController {
       controllerOthers
     ];
     MultiLoadUtil multiLoad = MultiLoadUtil();
-    //refreshInboxes.value = true;
 
     chatStreamControllers.forEach((element) {
       multiLoad.startLoading();
       element.refresh().then((value) => multiLoad.stopLoading());
     });
     await multiLoad.isDone();
-   // refreshInboxes.value = false;
   }
 
   Future<bool> addUserToSirkl(
