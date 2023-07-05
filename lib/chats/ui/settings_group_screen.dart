@@ -137,16 +137,16 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                     );
                     await _homeController.connectWallet(context);
                     var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
-                    var address = await web3Controller.joinGroup(client, [BigInt.parse(_chatController.channel.value?.extraData["idGroupBlockChain"] as String)], _homeController.connector.value, _chatController.channel.value?.extraData["price"] is double ? _chatController.channel.value?.extraData["price"] as double : (_chatController.channel.value?.extraData["price"] as int).toDouble());
+                  //  var address = await web3Controller.joinGroup(client, [BigInt.parse(_chatController.channel.value?.extraData["idGroupBlockChain"] as String)], _homeController.connector.value, _chatController.channel.value?.extraData["price"] is double ? _chatController.channel.value?.extraData["price"] as double : (_chatController.channel.value?.extraData["price"] as int).toDouble());
                     final contract = await web3Controller.getContract();
                     final filter = FilterOptions.events(contract: contract, event: contract.event('GroupJoined'));
                     Stream<FilterEvent> eventStream = client.events(filter);
-                    if(address != null) alert.show(context, barrierDismissible: false);
+                  //  if(address != null) alert.show(context, barrierDismissible: false);
                     eventStream.listen((event) async {
-                      if(address == event.transactionHash) {
-                        await _chatController.channel.value?.addMembers([_homeController.id.value]);
+                   //   if(address == event.transactionHash) {
+                     //   await _chatController.channel.value?.addMembers([_homeController.id.value]);
                         Get.back();
-                      }
+                     // }
                     });
                   } else {
                     await _chatController.channel.value!.addMembers(

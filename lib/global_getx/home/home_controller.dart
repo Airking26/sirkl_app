@@ -34,6 +34,11 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:walletconnect_flutter_v2/apis/core/pairing/utils/pairing_models.dart';
+import 'package:walletconnect_flutter_v2/apis/sign_api/models/proposal_models.dart';
+import 'package:walletconnect_flutter_v2/apis/sign_api/models/session_models.dart';
+import 'package:walletconnect_flutter_v2/apis/sign_api/models/sign_client_models.dart';
+import 'package:walletconnect_flutter_v2/apis/web3app/web3app.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -81,17 +86,7 @@ class HomeController extends GetxController{
   var notificationActive = true.obs;
   var streamChatToken = "".obs;
 
-  late final connector = WalletConnect(
-    bridge: 'https://bridge.walletconnect.org',
-    clientMeta: const PeerMeta(
-      name: 'SIRKL',
-      description: 'SIRKL Login',
-      url: 'https://walletconnect.org', 
-      icons: [
-        'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png'
-      ],
-    ),
-  ).obs;
+  Web3App? connector;
 
   retrieveAccessToken(){
     var accessTok = box.read(con.ACCESS_TOKEN);
@@ -114,37 +109,40 @@ class HomeController extends GetxController{
     await box.write(con.NOTIFICATION_ACTIVE, active);
     notificationActive.value = active;
   }
-
+  
   connectWallet(BuildContext context) async {
 
-    connector.value.on('connect', (session) async{
-      debugPrint('Wallet connected');
-      address.value = sessionStatus?.accounts[0];
+    connector ??= await Web3App.createInstance(
+  //relayUrl: 'wss://relay.walletconnect.com', // The relay websocket URL, leave blank to use the default
+      projectId: 'c718fbc5856d92e4a54160117ef81345',
+      metadata: PairingMetadata(
+        name: 'SIRKL',
+        description: 'SIRKL Login',
+        url: 'https://walletconnect.com',
+        icons: ['https://avatars.githubusercontent.com/u/37784886'],
+      ),
+    );
+
+    connector!.onSessionConnect.subscribe((args) {
+      address.value = args!.session.namespaces['eip155']!.accounts.first;
+      debugPrint('Session $address.value');
     });
 
-    connector.value.on('session_request', (payload) {});
-
-    connector.value.on('disconnect', (session) {
-      connector.value = WalletConnect(
-        bridge: 'https://bridge.walletconnect.org',
-        clientMeta: const PeerMeta(
-          name: 'SIRKL',
-          description: 'SIRKL Login',
-          url: 'https://walletconnect.org',
-          icons: [
-            'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png'
-          ],
-        ),
-      );
-    });
-
-    if (!connector.value.connected) {
-      sessionStatus = await connector.value.createSession(
-        chainId: 4160,
-        onDisplayUri: (uri) async {
-          _uri = uri;
+    if (true) {
+             ConnectResponse res = await connector!.connect(
+      requiredNamespaces: {
+          'eip155': RequiredNamespace(
+            events: ['session_request'],
+      chains: ['eip155:1'], // Ethereum chain
+      methods: ['eth_signTransaction'], // Requestable Methods
+    ),
+      }
+    );
+   
+ 
+           
           try{
-            var t = await launchUrl(Uri.parse(uri), mode: LaunchMode.externalApplication);
+            var t = await launchUrl(res.uri!, mode: LaunchMode.externalApplication);
             if(t == false) {
               Fluttertoast.showToast(
                 msg: "Not wallet was found, please create one in order to continue",
@@ -168,8 +166,9 @@ class HomeController extends GetxController{
                 fontSize: 16.0
             );
           }
-        },
-      );
+  
+      
+    
     }
 
   }
@@ -183,20 +182,20 @@ class HomeController extends GetxController{
   }
 
   signMessageWithMetamask(BuildContext context) async {
-    if (connector.value.connected) {
-      try {
-        var message = generateSessionMessage(address.value);
-        EthereumWalletConnectProvider provider =
-        EthereumWalletConnectProvider(connector.value);
-        launchUrlString(_uri, mode: LaunchMode.externalApplication);
-        var signature = await provider.personalSign(message: message, address: address.value, password: "");
-        await loginWithWallet(context, address.value, message, signature);
-      } catch (exp) {
-        if (kDebugMode) {
-          print(exp);
-        }
-      }
-    }
+    // if (connector.value.connected) {
+    //   try {
+    //     var message = generateSessionMessage(address.value);
+    //     EthereumWalletConnectProvider provider =
+    //     EthereumWalletConnectProvider(connector.value);
+    //     launchUrlString(_uri, mode: LaunchMode.externalApplication);
+    //     var signature = await provider.personalSign(message: message, address: address.value, password: "");
+    //     await loginWithWallet(context, address.value, message, signature);
+    //   } catch (exp) {
+    //     if (kDebugMode) {
+    //       print(exp);
+    //     }
+    //   }
+    // }
   }
   loginWithWallet(BuildContext context, String wallet, String message, String signature) async{
     var request = await _homeService.verifySignature(walletConnectDtoToJson(WalletConnectDto(wallet: wallet, message: message, signature: signature, platform: defaultTargetPlatform == TargetPlatform.android
