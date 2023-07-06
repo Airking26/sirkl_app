@@ -4,7 +4,7 @@ import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 class NavigationController extends GetxController{
 
   var hideNavBar = false.obs;
-  var controller = PersistentTabController(initialIndex: 0).obs;
+  var controller = PersistentTabController(initialIndex: 4).obs;
 
 
 }

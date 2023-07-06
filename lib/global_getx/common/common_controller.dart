@@ -44,10 +44,10 @@ class CommonController extends GetxController {
     ];
     MultiLoadUtil multiLoad = MultiLoadUtil();
 
-    chatStreamControllers.forEach((element) {
+    for (var element in chatStreamControllers) {
       multiLoad.startLoading();
       element.refresh().then((value) => multiLoad.stopLoading());
-    });
+    }
     await multiLoad.isDone();
   }
 

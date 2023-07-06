@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/chats/service/chats_service.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/contract_address_dto.dart';
 import 'package:sirkl/common/model/nft_alchemy_dto.dart';
@@ -39,22 +40,24 @@ import 'package:walletconnect_flutter_v2/apis/sign_api/models/proposal_models.da
 import 'package:walletconnect_flutter_v2/apis/sign_api/models/session_models.dart';
 import 'package:walletconnect_flutter_v2/apis/sign_api/models/sign_client_models.dart';
 import 'package:walletconnect_flutter_v2/apis/web3app/web3app.dart';
+import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../../common/model/refresh_token_dto.dart';
 import '../../common/model/update_fcm_dto.dart';
 
-class HomeController extends GetxController{
-
+class HomeController extends GetxController {
   final HomeService _homeService = HomeService();
   final ProfileService _profileService = ProfileService();
   final ChatsService _chatService = ChatsService();
 
   NavigationController get _navigationController => Get.find<NavigationController>();
   CommonController get _commonController => Get.find<CommonController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
 
   final box = GetStorage();
+  static SessionData? _sessionData;
 
   var sessionStatus;
   var _uri;
@@ -62,8 +65,8 @@ class HomeController extends GetxController{
   Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
   RxList<String> contractAddresses = <String>[].obs;
   RxList<DropdownMenuItem> dropDownMenuItems = <DropdownMenuItem>[].obs;
-  Rx<PagingController<int, List<StoryDto?>?>> pagingController = PagingController<int, List<StoryDto?>?>(firstPageKey: 0).obs;
-
+  Rx<PagingController<int, List<StoryDto?>?>> pagingController =
+      PagingController<int, List<StoryDto?>?>(firstPageKey: 0).obs;
 
   var id = "".obs;
   var isConfiguring = false.obs;
@@ -88,34 +91,35 @@ class HomeController extends GetxController{
 
   Web3App? connector;
 
-  retrieveAccessToken(){
+  retrieveAccessToken() {
     var accessTok = box.read(con.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
     streamChatToken.value = box.read(con.STREAM_CHAT_TOKEN) ?? "";
     var checkBoxRead = box.read(con.contractAddresses);
     notificationActive.value = box.read(con.NOTIFICATION_ACTIVE) ?? true;
-    if(checkBoxRead != null) {
-      contractAddresses.value = box.read(con.contractAddresses).cast<String>() ?? [];
+    if (checkBoxRead != null) {
+      contractAddresses.value =
+          box.read(con.contractAddresses).cast<String>() ?? [];
     } else {
       contractAddresses.value = [];
     }
     var user = box.read(con.USER);
-    userMe.value = user != null ? userFromJson(box.read(con.USER) ?? "") : UserDTO();
-    id.value = user != null ? userFromJson(box.read(con.USER) ?? "").id ?? "": "";
+    userMe.value =
+        user != null ? userFromJson(box.read(con.USER) ?? "") : UserDTO();
+    id.value =
+        user != null ? userFromJson(box.read(con.USER) ?? "").id ?? "" : "";
     userBlocked.value = box.read(con.USER_BLOCKED) ?? [];
   }
 
-  switchActiveNotification(bool active) async{
+  switchActiveNotification(bool active) async {
     await box.write(con.NOTIFICATION_ACTIVE, active);
     notificationActive.value = active;
   }
-  
-  connectWallet(BuildContext context) async {
 
+  connectWallet(BuildContext context) async {
     connector ??= await Web3App.createInstance(
-  //relayUrl: 'wss://relay.walletconnect.com', // The relay websocket URL, leave blank to use the default
       projectId: 'c718fbc5856d92e4a54160117ef81345',
-      metadata: PairingMetadata(
+      metadata: const PairingMetadata(
         name: 'SIRKL',
         description: 'SIRKL Login',
         url: 'https://walletconnect.com',
@@ -123,58 +127,73 @@ class HomeController extends GetxController{
       ),
     );
 
+    ConnectResponse res = await connector!.connect(requiredNamespaces: {
+      'eip155': const RequiredNamespace(
+        events: ['session_request','chainChanged',
+          'accountsChanged',],
+        chains: ['eip155:1'], // Ethereum chain
+        methods: [
+          'personal_sign',
+          'eth_sign',
+          'eth_signTransaction',
+          'eth_signTypedData',
+          'eth_sendTransaction',
+        ], // Requestable Methods
+      ),
+    });
+    try {
+      _uri = res.uri!;
+      var hasLaunched = await launchUrl(res.uri!, mode: LaunchMode.externalApplication);
+      _sessionData = await res.session.future;
+      if (hasLaunched == false) {
+        Fluttertoast.showToast(
+            msg: "Not wallet was found, please create one in order to continue",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 2,
+            backgroundColor: SchedulerBinding
+                        .instance.platformDispatcher.platformBrightness ==
+                    Brightness.dark
+                ? Colors.white
+                : const Color(0xFF102437),
+            textColor: SchedulerBinding
+                        .instance.platformDispatcher.platformBrightness ==
+                    Brightness.dark
+                ? Colors.black
+                : Colors.white,
+            fontSize: 16.0);
+      }
+    } on Exception {
+      debugPrint("II");
+      Fluttertoast.showToast(
+          msg: "Not wallet was found, please create one in order to continue",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 10,
+          backgroundColor:
+              SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+                      Brightness.dark
+                  ? Colors.white
+                  : const Color(0xFF102437),
+          textColor:
+              SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+                      Brightness.dark
+                  ? Colors.black
+                  : Colors.white,
+          fontSize: 16.0);
+    }
+
     connector!.onSessionConnect.subscribe((args) {
-      address.value = args!.session.namespaces['eip155']!.accounts.first;
+      address.value = args!.session.namespaces['eip155']!.accounts.first.split("eip155:1:")[1].toLowerCase();
       debugPrint('Session $address.value');
     });
 
-    if (true) {
-             ConnectResponse res = await connector!.connect(
-      requiredNamespaces: {
-          'eip155': RequiredNamespace(
-            events: ['session_request'],
-      chains: ['eip155:1'], // Ethereum chain
-      methods: ['eth_signTransaction'], // Requestable Methods
-    ),
-      }
-    );
-   
- 
-           
-          try{
-            var t = await launchUrl(res.uri!, mode: LaunchMode.externalApplication);
-            if(t == false) {
-              Fluttertoast.showToast(
-                msg: "Not wallet was found, please create one in order to continue",
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                timeInSecForIosWeb: 2,
-                backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
-                textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
-                fontSize: 16.0
-            );
-            }
-          } on Exception {
-            debugPrint("II");
-            Fluttertoast.showToast(
-                msg: "Not wallet was found, please create one in order to continue",
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                timeInSecForIosWeb: 10,
-                backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
-                textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
-                fontSize: 16.0
-            );
-          }
-  
-      
-    
-    }
 
   }
 
   String generateSessionMessage(String accountAddress) {
-    String message = 'Hello $accountAddress, welcome to our app. By signing this message you agree to learn and have fun with blockchain';
+    String message =
+        'Hello $accountAddress, welcome to our app. By signing this message you agree to learn and have fun with blockchain';
     var hash = keccakUtf8(message);
     final hashString = '0x${bytesToHex(hash).toString()}';
 
@@ -182,25 +201,29 @@ class HomeController extends GetxController{
   }
 
   signMessageWithMetamask(BuildContext context) async {
-    // if (connector.value.connected) {
-    //   try {
-    //     var message = generateSessionMessage(address.value);
-    //     EthereumWalletConnectProvider provider =
-    //     EthereumWalletConnectProvider(connector.value);
-    //     launchUrlString(_uri, mode: LaunchMode.externalApplication);
-    //     var signature = await provider.personalSign(message: message, address: address.value, password: "");
-    //     await loginWithWallet(context, address.value, message, signature);
-    //   } catch (exp) {
-    //     if (kDebugMode) {
-    //       print(exp);
-    //     }
-    //   }
-    // }
+       try {
+         var message = generateSessionMessage(address.value);
+         launchUrl(_uri, mode: LaunchMode.externalApplication);
+         var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:1", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex, message]));
+         await loginWithWallet(context, address.value, message, signature);
+       } catch (exp) {
+         if (kDebugMode) {
+           print(exp);
+         }
+     }
   }
-  loginWithWallet(BuildContext context, String wallet, String message, String signature) async{
-    var request = await _homeService.verifySignature(walletConnectDtoToJson(WalletConnectDto(wallet: wallet, message: message, signature: signature, platform: defaultTargetPlatform == TargetPlatform.android
-        ? "android": "iOS")));
-    if(request.isOk){
+
+  loginWithWallet(BuildContext context, String wallet, String message,
+      String signature) async {
+    var request = await _homeService.verifySignature(walletConnectDtoToJson(
+        WalletConnectDto(
+            wallet: wallet,
+            message: message,
+            signature: signature,
+            platform: defaultTargetPlatform == TargetPlatform.android
+                ? "android"
+                : "iOS")));
+    if (request.isOk) {
       _navigationController.hideNavBar.value = false;
       var signSuccess = signInSuccessDtoFromJson(json.encode(request.body));
       userMe.value = signSuccess.user!;
@@ -217,45 +240,50 @@ class HomeController extends GetxController{
     }
   }
 
-  putFCMToken(BuildContext context, StreamChatClient client,bool isLogged) async {
-    if(accessToken.value.isNotEmpty) {
+  putFCMToken(
+      BuildContext context, StreamChatClient client, bool isLogged) async {
+    if (accessToken.value.isNotEmpty) {
       final firebaseMessaging = await FirebaseMessaging.instance.getToken();
       var accessToken = box.read(con.ACCESS_TOKEN);
       var refreshToken = box.read(con.REFRESH_TOKEN);
       var fcm = defaultTargetPlatform == TargetPlatform.android
           ? updateFcmdtoToJson(
-          UpdateFcmdto(token: firebaseMessaging, platform: 'android'))
+              UpdateFcmdto(token: firebaseMessaging, platform: 'android'))
           : updateFcmdtoToJson(
-          UpdateFcmdto(token: firebaseMessaging, platform: 'iOS'));
+              UpdateFcmdto(token: firebaseMessaging, platform: 'iOS'));
       var request = await _homeService.uploadFCMToken(accessToken!, fcm);
       if (request.statusCode == 401) {
         var requestToken = await _homeService.refreshToken(refreshToken!);
-        var refreshTokenDto = refreshTokenDtoFromJson(
-            json.encode(requestToken.body));
+        var refreshTokenDto =
+            refreshTokenDtoFromJson(json.encode(requestToken.body));
         accessToken = refreshTokenDto.accessToken!;
         box.write(con.ACCESS_TOKEN, accessToken);
         request = await _homeService.uploadFCMToken(accessToken, fcm);
-        if(request.isOk){
+        if (request.isOk) {
           userMe.value = userFromJson(json.encode(request.body));
-          box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
+          box.write(
+              con.USER, userToJson(userFromJson(json.encode(request.body))));
           await retrieveNicknames();
           await _commonController.showSirklUsers(id.value);
-          await client.addDevice(firebaseMessaging!, PushProvider.firebase, pushProviderName: "Firebase_Config");
-          if(isLogged) updateAllNftConfig();
-          if(Platform.isIOS) {
+          await client.addDevice(firebaseMessaging!, PushProvider.firebase,
+              pushProviderName: "Firebase_Config");
+          if (isLogged) updateAllNftConfig();
+          if (Platform.isIOS) {
             var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
             await _homeService.uploadAPNToken(accessToken, token);
           }
           await getTokenContractAddress(client, userMe.value.wallet!);
         }
-      } else if(request.isOk){
+      } else if (request.isOk) {
         userMe.value = userFromJson(json.encode(request.body));
-        box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
+        box.write(
+            con.USER, userToJson(userFromJson(json.encode(request.body))));
         await retrieveNicknames();
         await _commonController.showSirklUsers(id.value);
-        await client.addDevice(firebaseMessaging!, PushProvider.firebase, pushProviderName: "Firebase_Config");
-        if(isLogged) updateAllNftConfig();
-        if(Platform.isIOS) {
+        await client.addDevice(firebaseMessaging!, PushProvider.firebase,
+            pushProviderName: "Firebase_Config");
+        if (isLogged) updateAllNftConfig();
+        if (Platform.isIOS) {
           var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
           await _homeService.uploadAPNToken(accessToken, token);
         }
@@ -268,15 +296,26 @@ class HomeController extends GetxController{
   }
 
   getTokenContractAddress(StreamChatClient? client, String wallet) async {
-    var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
-    var ethClient = Web3Client('https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2', htp.Client());
-    var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet.toLowerCase()));
-    if(balance.getInWei > BigInt.zero && !contractAddresses.contains("0x0000000000000000000000000000000000000000")) contractAddresses.add("0x0000000000000000000000000000000000000000");
-    if(request.isOk){
+    var request =
+        await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
+    var ethClient = Web3Client(
+        'https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2',
+        htp.Client());
+    var balance = await ethClient
+        .getBalance(EthereumAddress.fromHex(wallet.toLowerCase()));
+    if (balance.getInWei > BigInt.zero &&
+        !contractAddresses
+            .contains("0x0000000000000000000000000000000000000000")) {
+      contractAddresses.add("0x0000000000000000000000000000000000000000");
+    }
+    if (request.isOk) {
       var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
       tokenContractAddress.result?.tokenBalances?.forEach((element) {
-        if(element.tokenBalance != "0x0000000000000000000000000000000000000000000000000000000000000000"){
-          if(!contractAddresses.contains(element.contractAddress)) contractAddresses.add(element.contractAddress!);
+        if (element.tokenBalance !=
+            "0x0000000000000000000000000000000000000000000000000000000000000000") {
+          if (!contractAddresses.contains(element.contractAddress)) {
+            contractAddresses.add(element.contractAddress!);
+          }
         } else {
           contractAddresses.remove(element.contractAddress!);
         }
@@ -290,14 +329,23 @@ class HomeController extends GetxController{
     //var ethClient = Web3Client('https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2', htp.Client());
     //var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet));
     //if(balance.getInWei > BigInt.zero) {
-      dropDownMenuItems.add(DropdownMenuItem(child: Row(
-        children: [
-          Image.network("https://raw.githubusercontent.com/dappradar/tokens/main/ethereum/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee/logo.png", width: 22, height: 22,),
-          const SizedBox(width: 4,),
-          const Text("ETH", style: TextStyle(
-              fontFamily: "Gilroy", fontWeight: FontWeight.w500),)
-        ],
-      )));
+    dropDownMenuItems.add(DropdownMenuItem(
+        child: Row(
+      children: [
+        Image.network(
+          "https://raw.githubusercontent.com/dappradar/tokens/main/ethereum/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee/logo.png",
+          width: 22,
+          height: 22,
+        ),
+        const SizedBox(
+          width: 4,
+        ),
+        const Text(
+          "ETH",
+          style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),
+        )
+      ],
+    )));
     //}
     /*if(request.isOk){
       var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
@@ -321,81 +369,103 @@ class HomeController extends GetxController{
   Future<TokenMetadataDTO?> getTokenMetadata(String contractAddress) async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.getTokenMetadataWithAlchemy(contractAddress);
+    var request =
+        await _homeService.getTokenMetadataWithAlchemy(contractAddress);
     if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _homeService.getTokenMetadataWithAlchemy(contractAddress);
-      if(request.isOk){
+      if (request.isOk) {
         return tokenMetadataFromJson(json.encode(request.body));
       }
-    } else if(request.isOk){
+    } else if (request.isOk) {
       return tokenMetadataFromJson(json.encode(request.body));
     }
     return null;
   }
 
-  getNFTsContractAddresses(StreamChatClient? client, String wallet) async{
+  getNFTsContractAddresses(StreamChatClient? client, String wallet) async {
     var req = await _homeService.getContractAddressesWithAlchemy(wallet, "");
-    if(req.body != null){
-    var initialArray = contractAddressDtoFromJson(json.encode(req.body)).contracts!;
-    if(contractAddressDtoFromJson(json.encode(req.body)).pageKey != null) {
-      var cursor = contractAddressDtoFromJson(json.encode(req.body)).pageKey;
-      while (cursor != null) {
-        var newReq = await _homeService.getContractAddressesWithAlchemy(wallet, "&pageKey=$cursor");
-        initialArray.addAll(contractAddressDtoFromJson(json.encode(newReq.body)).contracts!);
-        cursor = contractAddressDtoFromJson(json.encode(newReq.body)).pageKey;
+    if (req.body != null) {
+      var initialArray =
+          contractAddressDtoFromJson(json.encode(req.body)).contracts!;
+      if (contractAddressDtoFromJson(json.encode(req.body)).pageKey != null) {
+        var cursor = contractAddressDtoFromJson(json.encode(req.body)).pageKey;
+        while (cursor != null) {
+          var newReq = await _homeService.getContractAddressesWithAlchemy(
+              wallet, "&pageKey=$cursor");
+          initialArray.addAll(
+              contractAddressDtoFromJson(json.encode(newReq.body)).contracts!);
+          cursor = contractAddressDtoFromJson(json.encode(newReq.body)).pageKey;
+        }
       }
-    }
 
-    initialArray.removeWhere((element) => element.title == null || element.title!.isEmpty || element.opensea == null || element.opensea!.imageUrl == null || element.opensea!.imageUrl!.isEmpty  ||  element.opensea!.collectionName == null || element.opensea!.collectionName!.isEmpty || element.tokenType == TokenType.UNKNOWN || (element.tokenType == TokenType.ERC1155 && element.opensea?.safelistRequestStatus == SafelistRequestStatus.NOT_REQUESTED));
+      initialArray.removeWhere((element) =>
+          element.title == null ||
+          element.title!.isEmpty ||
+          element.opensea == null ||
+          element.opensea!.imageUrl == null ||
+          element.opensea!.imageUrl!.isEmpty ||
+          element.opensea!.collectionName == null ||
+          element.opensea!.collectionName!.isEmpty ||
+          element.tokenType == TokenType.UNKNOWN ||
+          (element.tokenType == TokenType.ERC1155 &&
+              element.opensea?.safelistRequestStatus ==
+                  SafelistRequestStatus.NOT_REQUESTED));
 
-     for (var element in initialArray) {
-       if(!contractAddresses.contains(element.address?.toLowerCase())) contractAddresses.add(element.address!.toLowerCase());
-     }
+      for (var element in initialArray) {
+        if (!contractAddresses.contains(element.address?.toLowerCase())) {
+          contractAddresses.add(element.address!.toLowerCase());
+        }
+      }
 
       box.write(con.contractAddresses, contractAddresses);
     }
   }
 
-
-  getAllNftConfig() async{
+  getAllNftConfig() async {
     await _homeService.getAllNFTConfig(accessToken.value);
   }
+
   updateAllNftConfig() {
     _homeService.updateAllNFTConfig(accessToken.value);
   }
 
-  getNFT(String id, bool isFav, int offset) async{
-    if(offset == 0) isInFav.clear();
+  getNFT(String id, bool isFav, int offset) async {
+    if (offset == 0) isInFav.clear();
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     Response<List<dynamic>> request;
-    try{
-      request = await _homeService.retrieveNFTs(accessToken, id, isFav, offset.toString());
+    try {
+      request = await _homeService.retrieveNFTs(
+          accessToken, id, isFav, offset.toString());
     } on Error {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _homeService.retrieveNFTs(accessToken, id, isFav, offset.toString());
+      request = await _homeService.retrieveNFTs(
+          accessToken, id, isFav, offset.toString());
     }
 
-    if(request.isOk){
-      if(request.body != null && request.body!.isNotEmpty){
-        if(id == this.id.value) {
+    if (request.isOk) {
+      if (request.body != null && request.body!.isNotEmpty) {
+        if (id == this.id.value) {
           iHaveNft.value = true;
         } else {
           heHasNft.value = true;
         }
       }
       var nft = nftDtoFromJson(json.encode(request.body));
-      isInFav.addAll(nft.where((element) => element.isFav!).map((e) => e.contractAddress!).toList());
-     return nft;
+      isInFav.addAll(nft
+          .where((element) => element.isFav!)
+          .map((e) => e.contractAddress!)
+          .toList());
+      return nft;
     }
   }
 
@@ -406,36 +476,45 @@ class HomeController extends GetxController{
         accessToken, updateMeDtoToJson(updateMeDto));
     if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _profileService.modifyUser(
           accessToken, updateMeDtoToJson(updateMeDto));
       if (request.isOk) {
         userMe.value = userFromJson(json.encode(request.body));
-      }}
-    else if (request.isOk) {
+      }
+    } else if (request.isOk) {
       userMe.value = userFromJson(json.encode(request.body));
     }
   }
+
   updateStory(StoryModificationDto storyModificationDto) async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.updateStory(accessToken, storyModificationDtoToJson(storyModificationDto));
-    if(request.statusCode == 401) {
+    var request = await _homeService.updateStory(
+        accessToken, storyModificationDtoToJson(storyModificationDto));
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _homeService.updateStory(accessToken, storyModificationDtoToJson(storyModificationDto));
-      if(request.isOk) {
-        stories.value?[actualStoryIndex.value]?.where((element) => element?.id == storyModificationDto.id).first?.readers = storyModificationDto.readers;
+      request = await _homeService.updateStory(
+          accessToken, storyModificationDtoToJson(storyModificationDto));
+      if (request.isOk) {
+        stories.value?[actualStoryIndex.value]
+            ?.where((element) => element?.id == storyModificationDto.id)
+            .first
+            ?.readers = storyModificationDto.readers;
         stories.refresh();
       }
-    } else if(request.isOk) {
-      stories.value?[actualStoryIndex.value]?.where((element) => element?.id == storyModificationDto.id).first?.readers = storyModificationDto.readers;
+    } else if (request.isOk) {
+      stories.value?[actualStoryIndex.value]
+          ?.where((element) => element?.id == storyModificationDto.id)
+          .first
+          ?.readers = storyModificationDto.readers;
       stories.refresh();
     }
   }
@@ -444,10 +523,10 @@ class HomeController extends GetxController{
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _homeService.deleteStory(accessToken, createdBy, id);
-    if(request.statusCode == 401){
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _homeService.deleteStory(accessToken, createdBy, id);
@@ -455,51 +534,53 @@ class HomeController extends GetxController{
   }
 
   updateNickname(String wallet, String nickname) async {
-    if(nicknames[wallet] != nickname) {
+    if (nicknames[wallet] != nickname) {
       nicknames[wallet] = nickname;
       nicknames.refresh();
       _commonController.users.refresh();
       var accessToken = box.read(con.ACCESS_TOKEN);
       var refreshToken = box.read(con.REFRESH_TOKEN);
-      var request = await _homeService.updateNicknames(
-          accessToken, wallet, nicknameCreationDtoToJson(NicknameCreationDto(nickname: nickname)));
+      var request = await _homeService.updateNicknames(accessToken, wallet,
+          nicknameCreationDtoToJson(NicknameCreationDto(nickname: nickname)));
       if (request.statusCode == 401) {
         var requestToken = await _homeService.refreshToken(refreshToken);
-        var refreshTokenDTO = refreshTokenDtoFromJson(
-            json.encode(requestToken.body));
+        var refreshTokenDTO =
+            refreshTokenDtoFromJson(json.encode(requestToken.body));
         accessToken = refreshTokenDTO.accessToken!;
         box.write(con.ACCESS_TOKEN, accessToken);
-        await _homeService.updateNicknames(accessToken, wallet, nicknameCreationDtoToJson(NicknameCreationDto(nickname: nickname)));
+        await _homeService.updateNicknames(accessToken, wallet,
+            nicknameCreationDtoToJson(NicknameCreationDto(nickname: nickname)));
       }
     }
   }
 
-  getWelcomeMessage() async{
+  getWelcomeMessage() async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _homeService.receiveWelcomeMessage(accessToken);
-    if(request.statusCode == 401){
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       request = await _homeService.receiveWelcomeMessage(accessToken);
     }
   }
 
-  Future<void> connectUser(StreamChatClient client) async{
+  Future<void> connectUser(StreamChatClient client) async {
     retrieveAccessToken();
-    if(accessToken.value.isNotEmpty) {
+    if (accessToken.value.isNotEmpty) {
       if (client.wsConnectionStatus != ConnectionStatus.connected) {
         var accessToken = box.read(con.ACCESS_TOKEN);
         var refreshToken = box.read(con.REFRESH_TOKEN);
         if (streamChatToken.value.isNullOrBlank!) {
-          var request = await _profileService.retrieveTokenStreamChat(
-              accessToken);
+          var request =
+              await _profileService.retrieveTokenStreamChat(accessToken);
           streamChatToken.value = request.body!;
           await box.write(con.STREAM_CHAT_TOKEN, request.body);
-          var userToPass = UserDTO(id: userMe.value.id,
+          var userToPass = UserDTO(
+              id: userMe.value.id,
               userName: userMe.value.userName,
               picture: userMe.value.picture,
               isAdmin: userMe.value.isAdmin,
@@ -511,104 +592,120 @@ class HomeController extends GetxController{
               isInFollowing: userMe.value.isInFollowing);
           if (request.statusCode == 401) {
             var requestToken = await _homeService.refreshToken(refreshToken);
-            var refreshTokenDTO = refreshTokenDtoFromJson(
-                json.encode(requestToken.body));
+            var refreshTokenDTO =
+                refreshTokenDtoFromJson(json.encode(requestToken.body));
             accessToken = refreshTokenDTO.accessToken!;
             box.write(con.ACCESS_TOKEN, accessToken);
             request =
-            await _profileService.retrieveTokenStreamChat(accessToken);
+                await _profileService.retrieveTokenStreamChat(accessToken);
             if (request.isOk) {
-              await client.connectUser(User(id: id.value,
-                  name: userMe.value.userName.isNullOrBlank!
-                      ? userMe.value.wallet
-                      : userMe.value.userName!,
-                  extraData: {"userDTO": userToPass}), request.body!);
+              await client.connectUser(
+                  User(
+                      id: id.value,
+                      name: userMe.value.userName.isNullOrBlank!
+                          ? userMe.value.wallet
+                          : userMe.value.userName!,
+                      extraData: {"userDTO": userToPass}),
+                  request.body!);
               if (DateTime.now().difference(userMe.value.createdAt!) <
                   const Duration(minutes: 1)) {
                 await _commonController.addUserToSirkl(
                     "63f78a6188f7d4001f68699a", client, id.value);
                 await getWelcomeMessage();
+                await checkIfHasMessage(client);
               }
             }
           } else if (request.isOk) {
-            await client.connectUser(User(id: id.value,
-                name: userMe.value.userName.isNullOrBlank!
-                    ? userMe.value.wallet
-                    : userMe.value.userName!,
-                extraData: {"userDTO": userToPass}), request.body!);
+            await client.connectUser(
+                User(
+                    id: id.value,
+                    name: userMe.value.userName.isNullOrBlank!
+                        ? userMe.value.wallet
+                        : userMe.value.userName!,
+                    extraData: {"userDTO": userToPass}),
+                request.body!);
             if (DateTime.now().difference(userMe.value.createdAt!) <
                 const Duration(minutes: 1)) {
               await _commonController.addUserToSirkl(
                   "63f78a6188f7d4001f68699a", client, id.value);
               await getWelcomeMessage();
+              await checkIfHasMessage(client);
             }
           }
         } else {
           await client.connectUser(User(id: id.value), streamChatToken.value);
+          await checkIfHasMessage(client);
         }
       }
     }
   }
+
   retrieveNicknames() async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var request = await _homeService.retrieveNicknames(accessToken);
-    if(request.statusCode == 401){
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      if(request.isOk) nicknames.value = request.body!;
-    } else if(request.isOk) {
+      if (request.isOk) nicknames.value = request.body!;
+    } else if (request.isOk) {
       nicknames.value = request.body!;
     }
   }
+
   retrieveStories(int offset) async {
-    if(offset == 0) stories.value?.clear();
+    if (offset == 0) stories.value?.clear();
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     Response<List> request;
-    try{
-      request = await _homeService.retrieveStories(accessToken, offset.toString());
-    } on Error{
+    try {
+      request =
+          await _homeService.retrieveStories(accessToken, offset.toString());
+    } on Error {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
-      request =  await _homeService.retrieveStories(accessToken, offset.toString());
+      request =
+          await _homeService.retrieveStories(accessToken, offset.toString());
     }
-    if(request.isOk) {
+    if (request.isOk) {
       loadingStories.value = false;
-      if(stories.value == null) {
+      if (stories.value == null) {
         stories.value = storyDtoFromJson(json.encode(request.body));
       } else {
-        stories.value = stories.value! + storyDtoFromJson(json.encode(request.body));
+        stories.value =
+            stories.value! + storyDtoFromJson(json.encode(request.body));
       }
       return storyDtoFromJson(json.encode(request.body));
     } else {
       loadingStories.value = false;
     }
   }
-  retrieveInboxes() async{
+
+  retrieveInboxes() async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
     var req = await _chatService.walletsToMessages(accessToken);
-    if(req.statusCode == 401){
+    if (req.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
       box.write(con.ACCESS_TOKEN, accessToken);
       req = await _chatService.walletsToMessages(accessToken);
-      if(req.isOk) {
+      if (req.isOk) {
         isConfiguring.value = false;
         isFirstConnexion.value = false;
       } else {
         isConfiguring.value = false;
         isFirstConnexion.value = false;
       }
-    } else if(req.isOk) {
+    } else if (req.isOk) {
       isConfiguring.value = false;
       isFirstConnexion.value = false;
     } else {
@@ -620,12 +717,15 @@ class HomeController extends GetxController{
   registerNotification(NotificationRegisterDto notificationRegisterDto) async {
     var accessToken = box.read(con.ACCESS_TOKEN);
     var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.registerNotification(accessToken, notificationRegisterDtoToJson(notificationRegisterDto));
-    if(request.statusCode == 401){
+    var request = await _homeService.registerNotification(
+        accessToken, notificationRegisterDtoToJson(notificationRegisterDto));
+    if (request.statusCode == 401) {
       var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
+      var refreshTokenDTO =
+          refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDTO.accessToken!;
-      request = await _homeService.registerNotification(accessToken, notificationRegisterDtoToJson(notificationRegisterDto));
+      request = await _homeService.registerNotification(
+          accessToken, notificationRegisterDtoToJson(notificationRegisterDto));
     }
   }
 
@@ -633,11 +733,59 @@ class HomeController extends GetxController{
     var notifications = GetStorage().read(con.notificationSaved) ?? [];
     var notificationsToDelete = [];
     for (var notification in (notifications as List<dynamic>)) {
-      await registerNotification(NotificationRegisterDto(message: notification));
+      await registerNotification(
+          NotificationRegisterDto(message: notification));
       notificationsToDelete.add(notification);
     }
-    var notificationsToSave = notifications.toSet().difference(notificationsToDelete.toSet()).toList();
+    var notificationsToSave = notifications
+        .toSet()
+        .difference(notificationsToDelete.toSet())
+        .toList();
     await GetStorage().write(con.notificationSaved, notificationsToSave);
   }
 
+  checkIfHasMessage(StreamChatClient client) async {
+    client.queryChannels(filter: Filter.and([
+      Filter.equal("type", "try"),
+      Filter.or([
+        Filter.in_("members", [id.value]),
+        Filter.equal("created_by_id", id.value),
+      ]),
+      Filter.or([
+        Filter.and([
+          Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
+          Filter.exists("${id.value}_follow_channel"),
+          Filter.equal("${id.value}_follow_channel", true),
+          Filter.equal('isConv', true),
+        ]),
+        Filter.equal('isConv', false),
+      ]),
+    ]), channelStateSort: const [SortOption('last_message_at')], paginationParams: const PaginationParams(limit: 1)).listen((event) {
+      if(event.first.state != null && event.first.state!.unreadCount > 0){
+        _chatController.index.value = 0;
+        _navigationController.controller.value.index = 3;
+      } else {
+        client.queryChannels(filter: Filter.and([
+          Filter.equal("type", "try"),
+          Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
+          Filter.equal('isConv', true),
+          Filter.or([
+            Filter.equal("created_by_id", id.value),
+            Filter.in_("members", [id.value]),
+          ]),
+          Filter.or([
+            Filter.notExists(
+                "${id.value}_follow_channel"),
+            Filter.equal(
+                "${id.value}_follow_channel", false)
+          ])
+        ]), channelStateSort: const [SortOption('last_message_at')], paginationParams: const PaginationParams(limit: 1)).listen((event) {
+          if(event.first.state != null && event.first.state!.unreadCount > 0) {
+            _chatController.index.value = 1;
+            _navigationController.controller.value.index = 3;
+          }
+        });
+        }
+    });
+  }
 }

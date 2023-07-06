@@ -91,6 +91,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
     super.initState();
   }
+
   void indexChangeListener() {
        if (tabController.indexIsChanging) {
         _chatController.index.value = tabController.index;
@@ -99,7 +100,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-	// your dispose part
 	super.dispose();
   tabController.removeListener(indexChangeListener);
       _controllerOther.dispose();

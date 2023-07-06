@@ -1,5 +1,4 @@
 import 'package:sirkl/models/contract_config.model.dart';
-import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../../models/contract_response.model.dart';
