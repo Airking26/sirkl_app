@@ -418,73 +418,74 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
   }
 
   Future<void> createPaidGroup() async{
-    AlertDialog alert = AlertDialog(
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: const [
-          Padding(
-            padding: EdgeInsets.only(bottom: 24.0, top: 12),
-            child: CircularProgressIndicator(color: Color(0xFF00CB7D),),
-          ),
-          Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
-        ],),
-    );
-    await _homeController.connectWallet(context);
-    var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
-    var price = double.parse(_priceController.text) * 1e18;
-    var address = await web3Controller.createGroup(
-        client,
-        [_chatController.groupTextController.value.text, "", BigInt.from(price), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
-        _homeController.connector.value);
-    final contract = await web3Controller.getContract();
-    final filter = FilterOptions.events(
-      contract: contract,
-      event: contract.event('GroupCreated'),
-    );
+  
+    // AlertDialog alert = AlertDialog(
+    //   content: Column(
+    //     mainAxisSize: MainAxisSize.min,
+    //     children: const [
+    //       Padding(
+    //         padding: EdgeInsets.only(bottom: 24.0, top: 12),
+    //         child: CircularProgressIndicator(color: Color(0xFF00CB7D),),
+    //       ),
+    //       Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+    //     ],),
+    // );
+    // await _homeController.connectWallet(context);
+    // var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
+    // var price = double.parse(_priceController.text) * 1e18;
+    // var address = await web3Controller.createGroup(
+    //     client,
+    //     [_chatController.groupTextController.value.text, "", BigInt.from(price), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
+    //     _homeController.connector.value);
+    // final contract = await web3Controller.getContract();
+    // final filter = FilterOptions.events(
+    //   contract: contract,
+    //   event: contract.event('GroupCreated'),
+    // );
 
-    Stream<FilterEvent> eventStream = client.events(filter);
-    if(address != null) alert.show(context, barrierDismissible: false);
-    eventStream.listen((event) async {
-      final decoded = contract.event("GroupCreated").decodeResults(event.topics!, event.data!);
-      if(address == event.transactionHash) {
-        _chatController.messageSending.value = true;
-        var idChannel = DateTime
-            .now()
-            .millisecondsSinceEpoch
-            .toString();
-        var idChannelCreated = await _chatController.createInbox(
-            InboxCreationDto(
-                price: double.parse(_priceController.text),
-                tokenAccepted: "0x0000000000000000000000000000000000000000",
-                idGroupBlockchain: decoded[0].toString(),
-                isConv: false,
-                createdBy: _homeController.id.value,
-                isGroupPrivate: _chatController.groupType.value == 0
-                    ? false
-                    : true,
-                isGroupVisible: _chatController.groupVisibility.value == 0
-                    ? true
-                    : false,
-                isGroupPaying: true,
-                wallets: [_homeController.userMe.value.wallet!],
-                nameOfGroup: _chatController.groupTextController.value.text,
-                picOfGroup: _profileController.urlPictureGroup.value,
-                idChannel: idChannel));
-        Get.back();
-        FocusManager.instance.primaryFocus?.unfocus();
-        _chatController.messageSending.value = false;
-        _profileController.urlPictureGroup.value = "";
-        _chatController.groupTextController.value.text = "";
-        _chatController.fromGroupCreation.value = true;
-        _commonController.refreshAllInbox();
-        Navigator.popUntil(context, (route) => route.isFirst);
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          pushNewScreen(context, screen: DetailedChatScreen(
-            create: false, channelId: idChannelCreated,)).then((value) =>
-          _navigationController.hideNavBar.value = false);
-        });
-      }
-    });
+    // Stream<FilterEvent> eventStream = client.events(filter);
+    // if(address != null) alert.show(context, barrierDismissible: false);
+    // eventStream.listen((event) async {
+    //   final decoded = contract.event("GroupCreated").decodeResults(event.topics!, event.data!);
+    //   if(address == event.transactionHash) {
+    //     _chatController.messageSending.value = true;
+    //     var idChannel = DateTime
+    //         .now()
+    //         .millisecondsSinceEpoch
+    //         .toString();
+    //     var idChannelCreated = await _chatController.createInbox(
+    //         InboxCreationDto(
+    //             price: double.parse(_priceController.text),
+    //             tokenAccepted: "0x0000000000000000000000000000000000000000",
+    //             idGroupBlockchain: decoded[0].toString(),
+    //             isConv: false,
+    //             createdBy: _homeController.id.value,
+    //             isGroupPrivate: _chatController.groupType.value == 0
+    //                 ? false
+    //                 : true,
+    //             isGroupVisible: _chatController.groupVisibility.value == 0
+    //                 ? true
+    //                 : false,
+    //             isGroupPaying: true,
+    //             wallets: [_homeController.userMe.value.wallet!],
+    //             nameOfGroup: _chatController.groupTextController.value.text,
+    //             picOfGroup: _profileController.urlPictureGroup.value,
+    //             idChannel: idChannel));
+    //     Get.back();
+    //     FocusManager.instance.primaryFocus?.unfocus();
+    //     _chatController.messageSending.value = false;
+    //     _profileController.urlPictureGroup.value = "";
+    //     _chatController.groupTextController.value.text = "";
+    //     _chatController.fromGroupCreation.value = true;
+    //     _commonController.refreshAllInbox();
+    //     Navigator.popUntil(context, (route) => route.isFirst);
+    //     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //       pushNewScreen(context, screen: DetailedChatScreen(
+    //         create: false, channelId: idChannelCreated,)).then((value) =>
+    //       _navigationController.hideNavBar.value = false);
+    //     });
+    //   }
+    // });
 
   }
 
