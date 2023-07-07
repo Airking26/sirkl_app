@@ -84,9 +84,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
                             //enabled: _chatController.contactAddIsEmpty.value,
                             cursorColor: const Color(0xFF00CB7D),
                             autofocus: true,
-                            style: DefaultTextStyle.of(context).style.copyWith(
-                                fontStyle: FontStyle.normal,
-                                fontFamily: "Gilroy"),
                             decoration: InputDecoration(
                                 hintText:
                                 "Paste a wallet, an ENS or a username",
@@ -254,8 +251,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 child: TextField(
                   maxLength: 13,
                   controller: nicknameController,
-                  style: DefaultTextStyle.of(context).style.copyWith(
-                      fontStyle: FontStyle.normal, fontFamily: "Gilroy"),
                   decoration: InputDecoration(
                       hintText: 'Only you will see it',
 

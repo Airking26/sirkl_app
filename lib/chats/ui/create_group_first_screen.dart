@@ -237,7 +237,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: _chatController.groupVisibilityCollapsed.value || _chatController.groupTypeCollapsed.value ? 8 : 24,),
+              /*SizedBox(height: _chatController.groupVisibilityCollapsed.value || _chatController.groupTypeCollapsed.value ? 8 : 24,),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF113751) : Colors.white,
@@ -339,7 +339,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                     ],
                   ),
                 ),
-              ),
+              ),*/
               const SizedBox(height: 24,),
             ],),
           ),

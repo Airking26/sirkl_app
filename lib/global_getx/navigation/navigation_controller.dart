@@ -5,6 +5,4 @@ class NavigationController extends GetxController{
 
   var hideNavBar = false.obs;
   var controller = PersistentTabController(initialIndex: 4).obs;
-
-
 }

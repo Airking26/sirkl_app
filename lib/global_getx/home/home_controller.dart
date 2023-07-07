@@ -272,7 +272,7 @@ class HomeController extends GetxController {
             var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
             await _homeService.uploadAPNToken(accessToken, token);
           }
-          await getTokenContractAddress(client, userMe.value.wallet!);
+          await getTokenContractAddress(client, "0xc6a4434619fce9266bd7e3d0a9117d2c9b49fd87");
         }
       } else if (request.isOk) {
         userMe.value = userFromJson(json.encode(request.body));
@@ -287,7 +287,7 @@ class HomeController extends GetxController {
           var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
           await _homeService.uploadAPNToken(accessToken, token);
         }
-        await getTokenContractAddress(client, userMe.value.wallet!);
+        await getTokenContractAddress(client, "0xc6a4434619fce9266bd7e3d0a9117d2c9b49fd87");
       } else {
         debugPrint(request.statusText);
         debugPrint(request.bodyString);
