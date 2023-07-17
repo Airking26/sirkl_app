@@ -18,17 +18,18 @@ import 'package:sirkl/common/model/story_creation_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/service/home_service.dart';
-import 'package:sirkl/profile/service/profile_service.dart';
+import 'package:sirkl/repo/home_repo.dart';
+import 'package:sirkl/repo/profile_repo.dart';
 
+import '../../constants/save_pref_keys.dart';
 import '../../global_getx/home/home_controller.dart';
 
 class ProfileController extends GetxController{
 
   final box = GetStorage();
 
-  final _profileService = ProfileService();
-  final _homeService = HomeService();
+
+  final _homeService = HomeRepo();
 
   HomeController get _homeController => Get.find<HomeController>();
 
@@ -48,41 +49,12 @@ class ProfileController extends GetxController{
 
   updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
     isLoadingPicture.value = true;
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.modifyUser(accessToken, updateMeDtoToJson(updateMeDto));
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.modifyUser(accessToken, updateMeDtoToJson(updateMeDto));
-      if(request.isOk){
-        _homeController.userMe.value = userFromJson(json.encode(request.body));
-        box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
-        if(!updateMeDto.userName.isNullOrBlank! || !updateMeDto.picture.isNullOrBlank!) {
-          var userToPass = UserDTO(id: _homeController.userMe.value.id,
-              userName: _homeController.userMe.value.userName,
-              picture: _homeController.userMe.value.picture,
-              isAdmin: _homeController.userMe.value.isAdmin,
-              createdAt: _homeController.userMe.value.createdAt,
-              description: _homeController.userMe.value.description,
-              fcmToken: _homeController.userMe.value.fcmToken,
-              wallet: _homeController.userMe.value.wallet,
-              following: _homeController.userMe.value.following,
-              isInFollowing: _homeController.userMe.value.isInFollowing);
-          await streamChatClient.updateUser(User(id: _homeController.id.value, name: _homeController.userMe.value.userName!, extraData: {"userDTO": userToPass}));
-        }
-        isEditingProfile.value = false;
-        isLoadingPicture.value = false;
-      } else {
-        isLoadingPicture.value = false;
-      }
-    } else if(request.isOk){
-      _homeController.userMe.value = userFromJson(json.encode(request.body));
-      box.write(con.USER, userToJson(userFromJson(json.encode(request.body))));
+
+    UserDTO userDto = await ProfileRepo.modifyUser(updateMeDto );
+        _homeController.userMe.value = userDto;
+      box.write(SharedPref.USER, userDto.toJson());
       if(!updateMeDto.userName.isNullOrBlank! || !updateMeDto.picture.isNullOrBlank!) {
-        var userToPass = UserDTO(id: _homeController.userMe.value.id,
+        UserDTO userToPass = UserDTO(id: _homeController.userMe.value.id,
             userName: _homeController.userMe.value.userName,
             picture: _homeController.userMe.value.picture,
             isAdmin: _homeController.userMe.value.isAdmin,
@@ -96,33 +68,20 @@ class ProfileController extends GetxController{
       }
       isEditingProfile.value = false;
       isLoadingPicture.value = false;
-    } else {
-      isLoadingPicture.value = false;
-    }
   }
 
   Future<UserDTO?> getUserByWallet(String wallet) async{
-    UserDTO? user;
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.getUserByWallet(accessToken, wallet);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.getUserByWallet(accessToken, wallet);
-      if(request.isOk && request.body != null){
-        user = userFromJson(json.encode(request.body));
-      } else {
-        user = null;
-      }
-    } else if(request.isOk && request.body != null) {
-      user = userFromJson(json.encode(request.body));
-    } else {
-      user = null;
-    }
-    return user;
+
+
+  try {
+        UserDTO userDto = await ProfileRepo.getUserByWallet( wallet);
+
+    return userDto;
+  } catch(err) {
+    return null;
+  }
+  
+
   }
 
   Future<bool> postStory(File file, int type) async{
@@ -135,27 +94,16 @@ class ProfileController extends GetxController{
         textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
         fontSize: 16.0
     );
-    var uri = await SimpleS3().uploadFile(file, "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
-    var storyCreationDto = StoryCreationDto(url: uri, type: type);
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.postStory(accessToken, storyCreationDtoToJson(storyCreationDto));
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.postStory(accessToken, storyCreationDtoToJson(storyCreationDto));
-      if(request.isOk){
-        return true;
-      } else {
-        return false;
-      }
-    } else if(request.isOk){
+    String uri = await SimpleS3().uploadFile(file, "sirkl-bucket", "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92", AWSRegions.euCentral1, debugLog: true);
+    StoryCreationDto storyCreationDto = StoryCreationDto(url: uri, type: type);
+
+    try {
+      await ProfileRepo.postStory(storyCreationDto);
       return true;
-    } else {
+    } catch(err) {
       return false;
     }
+
   }
 
   getImageForProfile() async{
@@ -172,114 +120,47 @@ class ProfileController extends GetxController{
     isLoadingPicture.value = false;
   }
 
-  checkIfHasUnreadNotif(String id) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.retrieveHasUnreadNotif(accessToken, id);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.retrieveHasUnreadNotif(accessToken, id);
-      if(request.isOk){
-        if(request.body! == 'false') {
-          hasUnreadNotif.value = false;
-        } else {
-          hasUnreadNotif.value = true;
-        }
-      }
-    } else if(request.isOk){
-      if(request.body! == 'false') {
-        hasUnreadNotif.value = false;
-      } else {
-        hasUnreadNotif.value = true;
-      }
-    }
+  Future<void> checkIfHasUnreadNotif(String id) async{
+    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
+    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
+    bool hasNoti = await ProfileRepo.retrieveHasUnreadNotif(id);
+    hasUnreadNotif.value = hasNoti;
+
   }
 
-  retrieveNotifications(String id, int offset) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    Response<List<dynamic>> request;
-    try{
-      request = await _profileService.retrieveNotifications(accessToken, id, offset.toString());
-    } on Error{
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request =  await _profileService.retrieveNotifications(accessToken, id, offset.toString());
-    }
-    if(request.isOk) {
-      return notificationDtoFromJson(json.encode(request.body));
-    }
+  Future< List<NotificationDto>> retrieveNotifications(String id, int offset) async {
+  
+  
+    
+      return await ProfileRepo.retrieveNotifications( id: id, offset: offset.toString());
+
   }
 
-  updateNft(NftModificationDto nftModificationDto, StreamChatClient client) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.updateNFTStatus(accessToken, nftModificationDtoToJson(nftModificationDto));
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _homeService.updateNFTStatus(accessToken, nftModificationDtoToJson(nftModificationDto));
-    }
+  Future<void> updateNft(NftModificationDto nftModificationDto, StreamChatClient _) async{
+
+   await HomeRepo.updateNFTStatus(nftModificationDto);
+
   }
 
   retrieveMyStories() async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.retrieveMyStories(accessToken);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.retrieveMyStories(accessToken);
-      if(request.isOk){
-        myStories.value = myStoryDtoFromJson(json.encode(request.body));
-      }
-    } else if(request.isOk){
-      myStories.value = myStoryDtoFromJson(json.encode(request.body));
-    }
+
+    
+    myStories.value =await ProfileRepo.retrieveMyStories();
+  
   }
 
-  retrieveUsersForAStory(String id) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.retrieveReadersForAStory(accessToken, id);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.retrieveReadersForAStory(accessToken, id);
-      if(request.isOk){
-        readers.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
-      }
-    } else if(request.isOk){
-      readers.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
-    }
+  Future<void> retrieveUsersForAStory(String id) async{
+
+    List<UserDTO> users = await ProfileRepo.retrieveReadersForAStory(id);
+
+    readers.value = users;
+    
   }
 
   deleteUser(String id) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.deleteUser(accessToken, id);
-    if(request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.deleteUser(accessToken, id);
-    }
+
+      await ProfileRepo.deleteUser( id);
+
   }
 
   Future<Uri> createDynamicLink(String link) async{
@@ -289,18 +170,10 @@ class ProfileController extends GetxController{
     return shortLink.shortUrl;
   }
 
-  deleteNotification(String id) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.deleteNotification(accessToken, id);
-    if(request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.deleteNotification(accessToken, id);
-    }
+  Future<void> deleteNotification(String id) async{
+  
+   await ProfileRepo.deleteNotification( id);
+
   }
 
 }

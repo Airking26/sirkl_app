@@ -12,7 +12,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:sirkl/chats/service/chats_service.dart';
+import 'package:sirkl/repo/chats_repo.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/contract_address_dto.dart';
@@ -28,9 +28,10 @@ import 'package:sirkl/common/model/token_metadata.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/service/home_service.dart';
+
+import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
-import 'package:sirkl/profile/service/profile_service.dart';
+import 'package:sirkl/repo/profile_repo.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
@@ -46,11 +47,13 @@ import 'package:web3dart/web3dart.dart';
 
 import '../../common/model/refresh_token_dto.dart';
 import '../../common/model/update_fcm_dto.dart';
+import '../../constants/save_pref_keys.dart';
+import '../../repo/auth_repo.dart';
 
 class HomeController extends GetxController {
-  final HomeService _homeService = HomeService();
-  final ProfileService _profileService = ProfileService();
-  final ChatsService _chatService = ChatsService();
+
+
+
 
   NavigationController get _navigationController => Get.find<NavigationController>();
   CommonController get _commonController => Get.find<CommonController>();
@@ -92,9 +95,9 @@ class HomeController extends GetxController {
   Web3App? connector;
 
   retrieveAccessToken() {
-    var accessTok = box.read(con.ACCESS_TOKEN);
+    var accessTok = box.read(SharedPref.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
-    streamChatToken.value = box.read(con.STREAM_CHAT_TOKEN) ?? "";
+    streamChatToken.value = box.read(SharedPref.STREAM_CHAT_TOKEN) ?? "";
     var checkBoxRead = box.read(con.contractAddresses);
     notificationActive.value = box.read(con.NOTIFICATION_ACTIVE) ?? true;
     if (checkBoxRead != null) {
@@ -103,11 +106,11 @@ class HomeController extends GetxController {
     } else {
       contractAddresses.value = [];
     }
-    var user = box.read(con.USER);
+    var user = box.read(SharedPref.USER);
     userMe.value =
-        user != null ? userFromJson(box.read(con.USER) ?? "") : UserDTO();
+        user != null ? userFromJson(box.read(SharedPref.USER) ?? "") : UserDTO();
     id.value =
-        user != null ? userFromJson(box.read(con.USER) ?? "").id ?? "" : "";
+        user != null ? userFromJson(box.read(SharedPref.USER) ?? "").id ?? "" : "";
     userBlocked.value = box.read(con.USER_BLOCKED) ?? [];
   }
 
@@ -215,89 +218,56 @@ class HomeController extends GetxController {
 
   loginWithWallet(BuildContext context, String wallet, String message,
       String signature) async {
-    var request = await _homeService.verifySignature(walletConnectDtoToJson(
-        WalletConnectDto(
+    SignInSuccessDto signSuccess = await AuthRepo.verifySignature( WalletConnectDto(
             wallet: wallet,
             message: message,
             signature: signature,
             platform: defaultTargetPlatform == TargetPlatform.android
                 ? "android"
-                : "iOS")));
-    if (request.isOk) {
-      _navigationController.hideNavBar.value = false;
-      var signSuccess = signInSuccessDtoFromJson(json.encode(request.body));
+                : "iOS"));
+  
+
       userMe.value = signSuccess.user!;
-      box.write(con.ACCESS_TOKEN, signSuccess.accessToken!);
-      accessToken.value = signSuccess.accessToken!;
-      box.write(con.REFRESH_TOKEN, signSuccess.refreshToken!);
-      box.write(con.USER, userToJson(signSuccess.user!));
+  
+      accessToken.value = signSuccess.accessToken;
+
+      box.write(SharedPref.USER, userToJson(signSuccess.user!));
       isConfiguring.value = true;
       isFirstConnexion.value = true;
       await connectUser(StreamChat.of(context).client);
       await putFCMToken(context, StreamChat.of(context).client, false);
       await getAllNftConfig();
       await retrieveInboxes();
-    }
+      _navigationController.hideNavBar.value = false;
   }
 
   putFCMToken(
       BuildContext context, StreamChatClient client, bool isLogged) async {
     if (accessToken.value.isNotEmpty) {
-      final firebaseMessaging = await FirebaseMessaging.instance.getToken();
-      var accessToken = box.read(con.ACCESS_TOKEN);
-      var refreshToken = box.read(con.REFRESH_TOKEN);
-      var fcm = defaultTargetPlatform == TargetPlatform.android
-          ? updateFcmdtoToJson(
-              UpdateFcmdto(token: firebaseMessaging, platform: 'android'))
-          : updateFcmdtoToJson(
-              UpdateFcmdto(token: firebaseMessaging, platform: 'iOS'));
-      var request = await _homeService.uploadFCMToken(accessToken!, fcm);
-      if (request.statusCode == 401) {
-        var requestToken = await _homeService.refreshToken(refreshToken!);
-        var refreshTokenDto =
-            refreshTokenDtoFromJson(json.encode(requestToken.body));
-        accessToken = refreshTokenDto.accessToken!;
-        box.write(con.ACCESS_TOKEN, accessToken);
-        request = await _homeService.uploadFCMToken(accessToken, fcm);
-        if (request.isOk) {
-          userMe.value = userFromJson(json.encode(request.body));
-          box.write(
-              con.USER, userToJson(userFromJson(json.encode(request.body))));
-          await retrieveNicknames();
-          await _commonController.showSirklUsers(id.value);
-          await client.addDevice(firebaseMessaging!, PushProvider.firebase,
-              pushProviderName: "Firebase_Config");
-          if (isLogged) updateAllNftConfig();
-          if (Platform.isIOS) {
-            var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
-            await _homeService.uploadAPNToken(accessToken, token);
-          }
-          await getTokenContractAddress(client, "0xc6a4434619fce9266bd7e3d0a9117d2c9b49fd87");
-        }
-      } else if (request.isOk) {
-        userMe.value = userFromJson(json.encode(request.body));
+      final String? fcmToken = await FirebaseMessaging.instance.getToken();
+
+      UserDTO userDTO = await HomeRepo.uploadFCMToken(UpdateFcmdto(token: fcmToken, platform: defaultTargetPlatform == TargetPlatform.android? 'android': 'iOS'));
+
+        userMe.value = userDTO;
         box.write(
-            con.USER, userToJson(userFromJson(json.encode(request.body))));
+            SharedPref.USER, userDTO.toJson());
         await retrieveNicknames();
         await _commonController.showSirklUsers(id.value);
-        await client.addDevice(firebaseMessaging!, PushProvider.firebase,
+        await client.addDevice(fcmToken!, PushProvider.firebase,
             pushProviderName: "Firebase_Config");
         if (isLogged) updateAllNftConfig();
         if (Platform.isIOS) {
           var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
-          await _homeService.uploadAPNToken(accessToken, token);
+          await HomeRepo.uploadAPNToken(token);
         }
         await getTokenContractAddress(client, "0xc6a4434619fce9266bd7e3d0a9117d2c9b49fd87");
-      } else {
-        debugPrint(request.statusText);
-        debugPrint(request.bodyString);
-      }
+    
     }
   }
 
   getTokenContractAddress(StreamChatClient? client, String wallet) async {
-    var request =
-        await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
+    var tokenContractAddress =
+        await HomeRepo.getTokenContractAddressesWithAlchemy(wallet: wallet);
     var ethClient = Web3Client(
         'https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2',
         htp.Client());
@@ -308,8 +278,7 @@ class HomeController extends GetxController {
             .contains("0x0000000000000000000000000000000000000000")) {
       contractAddresses.add("0x0000000000000000000000000000000000000000");
     }
-    if (request.isOk) {
-      var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
+     
       tokenContractAddress.result?.tokenBalances?.forEach((element) {
         if (element.tokenBalance !=
             "0x0000000000000000000000000000000000000000000000000000000000000000") {
@@ -321,7 +290,6 @@ class HomeController extends GetxController {
         }
       });
       await getNFTsContractAddresses(client, wallet);
-    }
   }
 
   getDropDownList(String wallet) async {
@@ -367,39 +335,23 @@ class HomeController extends GetxController {
   }
 
   Future<TokenMetadataDTO?> getTokenMetadata(String contractAddress) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request =
-        await _homeService.getTokenMetadataWithAlchemy(contractAddress);
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _homeService.getTokenMetadataWithAlchemy(contractAddress);
-      if (request.isOk) {
-        return tokenMetadataFromJson(json.encode(request.body));
-      }
-    } else if (request.isOk) {
-      return tokenMetadataFromJson(json.encode(request.body));
-    }
-    return null;
+
+    TokenMetadataDTO tokenMetaData =
+        await HomeRepo.getTokenMetadataWithAlchemy(contractAddress);
+
+    return tokenMetaData;
   }
 
   getNFTsContractAddresses(StreamChatClient? client, String wallet) async {
-    var req = await _homeService.getContractAddressesWithAlchemy(wallet, "");
-    if (req.body != null) {
-      var initialArray =
-          contractAddressDtoFromJson(json.encode(req.body)).contracts!;
-      if (contractAddressDtoFromJson(json.encode(req.body)).pageKey != null) {
-        var cursor = contractAddressDtoFromJson(json.encode(req.body)).pageKey;
+    ContractAddressDto contractAddress = await HomeRepo.getContractAddressesWithAlchemy(wallet: wallet, cursor: '');
+      var initialArray = contractAddress.contracts;
+      if (contractAddress.pageKey != null) {
+        String? cursor = contractAddress.pageKey;
         while (cursor != null) {
-          var newReq = await _homeService.getContractAddressesWithAlchemy(
-              wallet, "&pageKey=$cursor");
-          initialArray.addAll(
-              contractAddressDtoFromJson(json.encode(newReq.body)).contracts!);
-          cursor = contractAddressDtoFromJson(json.encode(newReq.body)).pageKey;
+          ContractAddressDto newContractAddress = await HomeRepo.getContractAddressesWithAlchemy(
+             wallet: wallet, cursor:"&pageKey=$cursor");
+          initialArray.addAll(newContractAddress.contracts);
+          cursor = newContractAddress.pageKey;
         }
       }
 
@@ -423,114 +375,59 @@ class HomeController extends GetxController {
       }
 
       box.write(con.contractAddresses, contractAddresses);
-    }
   }
 
   getAllNftConfig() async {
-    await _homeService.getAllNFTConfig(accessToken.value);
+    await HomeRepo.getAllNFTConfig();
   }
 
-  updateAllNftConfig() {
-    _homeService.updateAllNFTConfig(accessToken.value);
+  updateAllNftConfig() async {
+   await HomeRepo.updateAllNFTConfig();
   }
 
-  getNFT(String id, bool isFav, int offset) async {
+  Future<List<NftDto>> getNFT(String id, bool isFav, int offset) async {
     if (offset == 0) isInFav.clear();
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    Response<List<dynamic>> request;
-    try {
-      request = await _homeService.retrieveNFTs(
-          accessToken, id, isFav, offset.toString());
-    } on Error {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _homeService.retrieveNFTs(
-          accessToken, id, isFav, offset.toString());
-    }
+    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
+    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
+    List<NftDto> nfts = await HomeRepo.retrieveNFTs(
+        id: id,
+        isFav: isFav,
+        offset: offset.toString());
 
-    if (request.isOk) {
-      if (request.body != null && request.body!.isNotEmpty) {
         if (id == this.id.value) {
           iHaveNft.value = true;
         } else {
           heHasNft.value = true;
         }
-      }
-      var nft = nftDtoFromJson(json.encode(request.body));
-      isInFav.addAll(nft
+      
+  
+      isInFav.addAll(nfts
           .where((element) => element.isFav!)
           .map((e) => e.contractAddress!)
           .toList());
-      return nft;
-    }
+      return nfts;
   }
 
   updateMe(UpdateMeDto updateMeDto) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.modifyUser(
-        accessToken, updateMeDtoToJson(updateMeDto));
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.modifyUser(
-          accessToken, updateMeDtoToJson(updateMeDto));
-      if (request.isOk) {
-        userMe.value = userFromJson(json.encode(request.body));
-      }
-    } else if (request.isOk) {
-      userMe.value = userFromJson(json.encode(request.body));
-    }
+
+    UserDTO userDto = await ProfileRepo.modifyUser(updateMeDto);
+      userMe.value = userDto;
   }
 
   updateStory(StoryModificationDto storyModificationDto) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.updateStory(
-        accessToken, storyModificationDtoToJson(storyModificationDto));
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _homeService.updateStory(
-          accessToken, storyModificationDtoToJson(storyModificationDto));
-      if (request.isOk) {
-        stories.value?[actualStoryIndex.value]
-            ?.where((element) => element?.id == storyModificationDto.id)
-            .first
-            ?.readers = storyModificationDto.readers;
-        stories.refresh();
-      }
-    } else if (request.isOk) {
+
+    await HomeRepo.updateStory(storyModificationDto); 
       stories.value?[actualStoryIndex.value]
           ?.where((element) => element?.id == storyModificationDto.id)
           .first
           ?.readers = storyModificationDto.readers;
       stories.refresh();
-    }
+    
   }
 
-  deleteStory(String createdBy, String id) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.deleteStory(accessToken, createdBy, id);
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _homeService.deleteStory(accessToken, createdBy, id);
-    }
+  Future<void> deleteStory(String createdBy, String id) async {
+
+  await HomeRepo.deleteStory(createdBy: createdBy, id:id);
   }
 
   updateNickname(String wallet, String nickname) async {
@@ -538,47 +435,28 @@ class HomeController extends GetxController {
       nicknames[wallet] = nickname;
       nicknames.refresh();
       _commonController.users.refresh();
-      var accessToken = box.read(con.ACCESS_TOKEN);
-      var refreshToken = box.read(con.REFRESH_TOKEN);
-      var request = await _homeService.updateNicknames(accessToken, wallet,
-          nicknameCreationDtoToJson(NicknameCreationDto(nickname: nickname)));
-      if (request.statusCode == 401) {
-        var requestToken = await _homeService.refreshToken(refreshToken);
-        var refreshTokenDTO =
-            refreshTokenDtoFromJson(json.encode(requestToken.body));
-        accessToken = refreshTokenDTO.accessToken!;
-        box.write(con.ACCESS_TOKEN, accessToken);
-        await _homeService.updateNicknames(accessToken, wallet,
-            nicknameCreationDtoToJson(NicknameCreationDto(nickname: nickname)));
-      }
+
+      var request = await HomeRepo.updateNicknames(wallet: wallet,
+      nickNameDto: 
+        NicknameCreationDto(nickname: nickname));
+
     }
   }
 
-  getWelcomeMessage() async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.receiveWelcomeMessage(accessToken);
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _homeService.receiveWelcomeMessage(accessToken);
-    }
+  Future<void> getWelcomeMessage() async {
+    await HomeRepo.receiveWelcomeMessage();
+    
   }
 
   Future<void> connectUser(StreamChatClient client) async {
     retrieveAccessToken();
     if (accessToken.value.isNotEmpty) {
       if (client.wsConnectionStatus != ConnectionStatus.connected) {
-        var accessToken = box.read(con.ACCESS_TOKEN);
-        var refreshToken = box.read(con.REFRESH_TOKEN);
         if (streamChatToken.value.isNullOrBlank!) {
-          var request =
-              await _profileService.retrieveTokenStreamChat(accessToken);
-          streamChatToken.value = request.body!;
-          await box.write(con.STREAM_CHAT_TOKEN, request.body);
+          String token =
+              await ProfileRepo.retrieveTokenStreamChat();
+          streamChatToken.value = token;
+          await box.write(SharedPref.STREAM_CHAT_TOKEN, token);
           var userToPass = UserDTO(
               id: userMe.value.id,
               userName: userMe.value.userName,
@@ -590,48 +468,21 @@ class HomeController extends GetxController {
               wallet: userMe.value.wallet,
               following: userMe.value.following,
               isInFollowing: userMe.value.isInFollowing);
-          if (request.statusCode == 401) {
-            var requestToken = await _homeService.refreshToken(refreshToken);
-            var refreshTokenDTO =
-                refreshTokenDtoFromJson(json.encode(requestToken.body));
-            accessToken = refreshTokenDTO.accessToken!;
-            box.write(con.ACCESS_TOKEN, accessToken);
-            request =
-                await _profileService.retrieveTokenStreamChat(accessToken);
-            if (request.isOk) {
-              await client.connectUser(
-                  User(
-                      id: id.value,
-                      name: userMe.value.userName.isNullOrBlank!
-                          ? userMe.value.wallet
-                          : userMe.value.userName!,
-                      extraData: {"userDTO": userToPass}),
-                  request.body!);
-              if (DateTime.now().difference(userMe.value.createdAt!) <
-                  const Duration(minutes: 1)) {
-                await _commonController.addUserToSirkl(
-                    "63f78a6188f7d4001f68699a", client, id.value);
-                await getWelcomeMessage();
-                await checkIfHasMessage(client);
-              }
-            }
-          } else if (request.isOk) {
-            await client.connectUser(
-                User(
-                    id: id.value,
-                    name: userMe.value.userName.isNullOrBlank!
-                        ? userMe.value.wallet
-                        : userMe.value.userName!,
-                    extraData: {"userDTO": userToPass}),
-                request.body!);
-            if (DateTime.now().difference(userMe.value.createdAt!) <
-                const Duration(minutes: 1)) {
-              await _commonController.addUserToSirkl(
-                  "63f78a6188f7d4001f68699a", client, id.value);
-              await getWelcomeMessage();
-              await checkIfHasMessage(client);
-            }
-          }
+        await client.connectUser(
+                    User(
+                        id: id.value,
+                        name: userMe.value.userName.isNullOrBlank!
+                            ? userMe.value.wallet
+                            : userMe.value.userName!,
+                        extraData: {"userDTO": userToPass}),
+                    token);
+                if (DateTime.now().difference(userMe.value.createdAt!) <
+                    const Duration(minutes: 1)) {
+                  await _commonController.addUserToSirkl(
+                      "63f78a6188f7d4001f68699a", client, id.value);
+                  await getWelcomeMessage();
+                  await checkIfHasMessage(client);
+                }
         } else {
           await client.connectUser(User(id: id.value), streamChatToken.value);
           await checkIfHasMessage(client);
@@ -641,92 +492,43 @@ class HomeController extends GetxController {
   }
 
   retrieveNicknames() async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.retrieveNicknames(accessToken);
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      if (request.isOk) nicknames.value = request.body!;
-    } else if (request.isOk) {
-      nicknames.value = request.body!;
-    }
+
+    Map<dynamic, dynamic> names = await HomeRepo.retrieveNicknames();
+
+      nicknames.value = names;
+    
   }
 
-  retrieveStories(int offset) async {
+  Future<List<List<StoryDto>>> retrieveStories(int offset) async {
     if (offset == 0) stories.value?.clear();
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    Response<List> request;
-    try {
-      request =
-          await _homeService.retrieveStories(accessToken, offset.toString());
-    } on Error {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request =
-          await _homeService.retrieveStories(accessToken, offset.toString());
-    }
-    if (request.isOk) {
+
+ 
+
+      List<List<StoryDto>> retrivedStories =
+          await HomeRepo.retrieveStories(offset.toString());
+
       loadingStories.value = false;
       if (stories.value == null) {
-        stories.value = storyDtoFromJson(json.encode(request.body));
+        stories.value = retrivedStories;
       } else {
         stories.value =
-            stories.value! + storyDtoFromJson(json.encode(request.body));
+            stories.value! + retrivedStories;
       }
-      return storyDtoFromJson(json.encode(request.body));
-    } else {
-      loadingStories.value = false;
-    }
+      return retrivedStories;
   }
 
   retrieveInboxes() async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var req = await _chatService.walletsToMessages(accessToken);
-    if (req.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      req = await _chatService.walletsToMessages(accessToken);
-      if (req.isOk) {
-        isConfiguring.value = false;
-        isFirstConnexion.value = false;
-      } else {
-        isConfiguring.value = false;
-        isFirstConnexion.value = false;
-      }
-    } else if (req.isOk) {
+
+    var req = await ChatRepo.walletsToMessages();
+  
       isConfiguring.value = false;
       isFirstConnexion.value = false;
-    } else {
-      isConfiguring.value = false;
-      isFirstConnexion.value = false;
-    }
   }
 
   registerNotification(NotificationRegisterDto notificationRegisterDto) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _homeService.registerNotification(
-        accessToken, notificationRegisterDtoToJson(notificationRegisterDto));
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      request = await _homeService.registerNotification(
-          accessToken, notificationRegisterDtoToJson(notificationRegisterDto));
-    }
+
+    var request = await HomeRepo.registerNotification( notificationRegisterDto);
+
   }
 
   checkOfflineNotifAndRegister() async {

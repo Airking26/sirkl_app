@@ -10,10 +10,12 @@ import 'package:sirkl/global_getx/common/common_controller.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import '../../groups/ui/groups_screen.dart';
-import '../../home/ui/home_screen.dart';
+
 import '../../profile/ui/profile_screen.dart';
 import '../../global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
+
+import '../../views/home/home_screen.dart';
 
 class NavigationScreen extends StatefulWidget {
 

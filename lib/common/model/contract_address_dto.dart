@@ -12,12 +12,12 @@ String contractAddressDtoToJson(ContractAddressDto data) => json.encode(data.toJ
 
 class ContractAddressDto {
   ContractAddressDto({
-    this.contracts,
+    required this.contracts,
     this.totalCount,
     this.pageKey,
   });
 
-  List<Contract>? contracts;
+  List<Contract> contracts;
   int? totalCount;
   String? pageKey;
 

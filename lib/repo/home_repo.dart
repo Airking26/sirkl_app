@@ -1,0 +1,124 @@
+import 'dart:convert';
+
+
+import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/model/notification_register_dto.dart';
+import 'package:sirkl/common/model/story_dto.dart';
+import 'package:sirkl/config/s_config.dart';
+import 'package:sirkl/networks/request.dart';
+import 'package:sirkl/networks/urls.dart';
+
+import '../common/model/contract_address_dto.dart';
+import '../common/model/nft_dto.dart';
+import '../common/model/nft_modification_dto.dart';
+import '../common/model/nickname_creation_dto.dart';
+import '../common/model/sign_in_success_dto.dart';
+import '../common/model/story_modification_dto.dart';
+import '../common/model/token_dto.dart';
+import '../common/model/token_metadata.dart';
+import '../common/model/update_fcm_dto.dart';
+
+class HomeRepo {
+
+
+
+
+  static Future<UserDTO> uploadFCMToken(UpdateFcmdto fcmBody) async {
+  SRequests req = SRequests(SUrls.baseURL);
+  Response res = await req.put(url: SUrls.userMeFCM, body: fcmBody.toJson());
+  return UserDTO.fromJson(res.jsonBody());
+
+  }
+  static Future<void> uploadAPNToken(String apnToken) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.put(url: '${SUrls.userMeAPN}/$apnToken', body: null);
+    // server does return a response but we dont need it I guess
+  }
+
+  static Future<TokenDto> getTokenContractAddressesWithAlchemy({required String wallet}) async {
+    SRequests req = SRequests(SUrls.ethMainNetBaseUrl);
+    Response res = await req.post(url: "/v2/${SConfig.alchemyApiKey}", body: {
+    'jsonrpc': '2.0',
+    'id': 1,
+    'method': 'alchemy_getTokenBalances',
+    'params': [
+      wallet,
+    ],
+  });
+    return TokenDto.fromJson(res.jsonBody());
+  }
+  static Future<ContractAddressDto> getContractAddressesWithAlchemy({required wallet, String? cursor}) async {
+    SRequests req = SRequests(SUrls.ethMainNetBaseUrl);
+    Response res = await req.get("/nft/v2/${SConfig.alchemyApiKey}/getContractsForOwner?owner=$wallet&pageSize=100&withMetadata=true&filters[]=AIRDROPS&filters[]=SPAM$cursor");
+    return ContractAddressDto.fromJson(res.jsonBody());
+  }
+
+  static Future<TokenMetadataDTO> getTokenMetadataWithAlchemy(String contractAddress) async {
+    SRequests req = SRequests("https://eth-mainnet.g.alchemy.com/v2");
+    Response res = await req.post(url: 'v2${SConfig.alchemyApiKey}', body: {
+    'jsonrpc': '2.0',
+    'id': 1,
+    'method': 'alchemy_getTokenMetadata',
+    'params': [
+      contractAddress,
+    ],
+  });
+  return TokenMetadataDTO.fromJson(res.jsonBody());
+  }
+  static Future<void> getAllNFTConfig() async {
+    SRequests req = SRequests(SUrls.baseURL);
+    await req.get(SUrls.nftRetrieveAll);
+  }
+  static Future<void> updateAllNFTConfig() async {
+    SRequests req = SRequests(SUrls.baseURL);
+    await req.get(SUrls.nftUpdateAll);
+  }
+  static Future<List<NftDto>> retrieveNFTs({required String id, required bool isFav, required String offset }) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.get('SUrls.nftRetrieve/$id/$isFav/$offset');
+    List<Map<String, dynamic>> list = res.jsonBody();
+    return list.map((e) => NftDto.fromJson(e)).toList();
+  }
+  static Future<void> updateStory(StoryModificationDto modifiedStory) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.patch(url: SUrls.storyModify, body: modifiedStory.toJson());
+    // Server must be returning some response
+  }
+  static Future<void> deleteStory({required String createdBy, required String id}) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.delete(url: '${SUrls.storyMine}/$createdBy/$id');
+  }
+
+  static Future<void> updateNicknames({required String wallet, required NicknameCreationDto nickNameDto}) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.put(url: '${SUrls.nicknames}/$wallet', body: nickNameDto.toJson());
+  }
+  static Future<void> receiveWelcomeMessage() async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.get(SUrls.userMeWelcomeMessage);
+  }
+  static Future<Map<String, dynamic>> retrieveNicknames() async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.get(SUrls.nicknamesRetrieve);
+    return res.jsonBody();
+  }
+  static Future<List<List<StoryDto>>> retrieveStories(String offset) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.get('${SUrls.storyOthers}/$offset');
+    // TODO @sam, please check how to resolve this? I am confused why Stories are List of List of Stories?
+    //return (res.jsonBody() as List).map((e) => ).map((e) => StoryDto.fromJson(e)).toList();
+    return [];
+  }
+
+  static Future<void> registerNotification(NotificationRegisterDto notification) async {
+       SRequests req = SRequests(SUrls.baseURL);
+       Response res = await req.post(url: SUrls.notificationRegister, body: notification.toJson());
+  }
+
+  static Future<void> updateNFTStatus(NftModificationDto nftModi) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.patch(url: SUrls.nftUpdate, body: nftModi.toJson());
+  }
+
+
+}

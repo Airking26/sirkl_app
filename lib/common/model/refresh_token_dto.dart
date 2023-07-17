@@ -6,10 +6,10 @@ String refreshTokenDtoToJson(RefreshTokenDto data) => json.encode(data.toJson())
 
 class RefreshTokenDto {
   RefreshTokenDto({
-    this.accessToken,
+    required this.accessToken,
   });
 
-  String? accessToken;
+  String accessToken;
 
   factory RefreshTokenDto.fromJson(Map<String, dynamic> json) => RefreshTokenDto(
     accessToken: json["accessToken"],

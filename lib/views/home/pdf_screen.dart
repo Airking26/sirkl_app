@@ -1,25 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
+import '../../enums/pdf_type.dart';
+
 class PDFScreen extends StatefulWidget {
-  const PDFScreen({Key? key, required  this.isTermsAndConditions}) : super(key: key);
-  final int isTermsAndConditions;
+  const PDFScreen({Key? key, required  this.pdfType}) : super(key: key);
+  final PDFType pdfType;
 
   @override
   State<PDFScreen> createState() => _PDFScreenState();
 }
 
 class _PDFScreenState extends State<PDFScreen> {
+    String get toRead  {
+      switch(widget.pdfType) {
+ 
+    
+        case PDFType.tc:
+               return "assets/pdf/tc.pdf";
+          // TODO: Handle this case.
+
+        case PDFType.pp:
+        return "assets/pdf/pp.pdf";;
+       
+        case PDFType.all:
+        return "assets/pdf/all.pdf";
+      
+      }
+      }
   @override
   Widget build(BuildContext context) {
-    String toRead;
-    if(widget.isTermsAndConditions == 0) {
-      toRead = "assets/pdf/tc.pdf";
-    } else if(widget.isTermsAndConditions == 1) {
-      toRead = "assets/pdf/pp.pdf";
-    } else {
-      toRead = "assets/pdf/all.pdf";
-    }
+    // String toRead;
+    
+    // if(widget.isTermsAndConditions == 0) {
+    //   toRead = ;
+    // } else if(widget.isTermsAndConditions == 1) {
+    //   toRead = 
+    // } else {
+    //   toRead = 
+    // }
+  
     return Scaffold(
       body: Column(
         children: [

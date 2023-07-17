@@ -15,13 +15,13 @@ String userToJson(UserDTO user) => json.encode(user.toJson());
 class SignInSuccessDto {
   SignInSuccessDto({
     this.user,
-    this.accessToken,
-    this.refreshToken,
+    required this.accessToken,
+    required this.refreshToken,
   });
 
   UserDTO? user;
-  String? accessToken;
-  String? refreshToken;
+  String accessToken;
+  String refreshToken;
 
   factory SignInSuccessDto.fromJson(Map<String, dynamic> json) => SignInSuccessDto(
     user: json["user"] == null ? null : UserDTO.fromJson(json["user"]),
@@ -38,7 +38,7 @@ class SignInSuccessDto {
 
 class UserDTO extends ISuspensionBean{
   UserDTO({
-    this.id,
+     this.id,
     this.userName,
     this.picture,
     this.isAdmin,

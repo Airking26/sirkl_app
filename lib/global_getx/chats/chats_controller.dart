@@ -3,22 +3,23 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:sirkl/chats/service/chats_service.dart';
+import 'package:sirkl/repo/chats_repo.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/service/home_service.dart';
+import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
+import '../../constants/save_pref_keys.dart';
 import '../profile/profile_controller.dart';
 
 class ChatsController extends GetxController{
 
   final box = GetStorage();
-  final _chatService = ChatsService();
-  final _homeService = HomeService();
+
+  final _homeService = HomeRepo();
 
   ProfileController get _profileController => Get.find<ProfileController>();
 
@@ -53,18 +54,10 @@ class ChatsController extends GetxController{
   var groupPayingCollapsed = true.obs;
 
   Future<String> createInbox(InboxCreationDto inboxCreationDto) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
- 
-    var req = await _chatService.createInbox(accessToken, inboxCreationDtoToJson(inboxCreationDto));
-    if(req.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      req = await _chatService.createInbox(accessToken, inboxCreationDtoToJson(inboxCreationDto));
-    }
-    return req.body!;
+
+    String inboxResponse = await ChatRepo.createInbox(inboxCreationDto);
+
+    return inboxResponse;
   }
 
   checkOrCreateChannel(String himId, StreamChatClient client, String myId, bool nested) async{
@@ -120,104 +113,50 @@ class ChatsController extends GetxController{
   }
 
   Future<String?> getEthFromEns(String ens, String wallet) async{
-    String? eth = "";
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _chatService.ethFromEns(accessToken, ens);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _chatService.ethFromEns(accessToken, ens);
-      if(request.isOk){
-        eth = request.body;
-        if(request.body != '0' && request.body != "" && request.body!.toLowerCase() != wallet.toLowerCase()){
-          _profileController.isUserExists.value = await _profileController.getUserByWallet(request.body!);
-        }
-      }
-    } else if(request.isOk){
-      eth = request.body;
-      if(request.body != '0' && request.body != "" && request.body!.toLowerCase() != wallet.toLowerCase()){
-        _profileController.isUserExists.value = await _profileController.getUserByWallet(request.body!);
-      }
-    }
+   
+
+    String? eth = await ChatRepo.ethFromEns(ens);
+    
+          if(eth != '0' && eth != "" && eth?.toLowerCase() != wallet.toLowerCase()){
+            _profileController.isUserExists.value = await _profileController.getUserByWallet(eth!);
+          }
     return eth;
   }
 
-  deleteInbox(String id) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _chatService.deleteInbox(accessToken, id);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _chatService.deleteInbox(accessToken, id);
-    }
+  Future<void> deleteInbox(String id) async {
+
+     await ChatRepo.deleteInbox(id);
+ 
   }
 
   Future<bool> requestToJoinGroup(RequestToJoinDto requestToJoinDTO) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _chatService.requestToJoinGroup(accessToken, requestToJoinDtoToJson(requestToJoinDTO));
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _chatService.requestToJoinGroup(accessToken, requestToJoinDtoToJson(requestToJoinDTO));
-      if(request.isOk) {
-        return true;
-      } else {
-        return false;
-      }
-    } else if(request.isOk) {
+
+    try {
+      await ChatRepo.requestToJoinGroup(requestToJoinDTO);
       return true;
-    } else {
-      return false;
+    // ignore: empty_catches
+    } catch(err) {
+
     }
+    return false;
+ 
   }
 
   Future<bool> acceptDeclineRequest(RequestToJoinDto requestToJoinDto) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _chatService.acceptDeclineRequest(accessToken, requestToJoinDtoToJson(requestToJoinDto));
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _chatService.acceptDeclineRequest(accessToken, requestToJoinDtoToJson(requestToJoinDto));
-      if(request.isOk) {
+
+    try {
+         await ChatRepo.acceptDeclineRequest(requestToJoinDto);
         return true;
-      } else {
-        return false;
-      }
-    } else if(request.isOk) {
-      return true;
-    } else {
-      return false;
+    // ignore: empty_catches
+    } catch(err) {
+      
     }
+    return false;
+  
   }
 
   retrieveRequestsWaiting(String channelId) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _chatService.getRequestsWaiting(accessToken, channelId);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _chatService.getRequestsWaiting(accessToken, channelId);
-      if(request.isOk) {
-        requestsWaiting.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
-      }
-    } else if(request.isOk) {
-      requestsWaiting.value = request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
-    }
+    requestsWaiting.value = await ChatRepo.getRequestsWaiting(channelId);  
   }
 
 }

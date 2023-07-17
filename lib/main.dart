@@ -23,13 +23,14 @@ import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/service/home_service.dart';
+import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/home/utils/analyticService.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
-import 'package:sirkl/profile/service/profile_service.dart';
+import 'package:sirkl/repo/profile_repo.dart';
 import 'package:sirkl/profile/ui/profile_else_screen.dart';
 import 'package:stream_chat_persistence/stream_chat_persistence.dart';
 import 'chats/ui/settings_group_screen.dart';
+import 'constants/save_pref_keys.dart';
 import 'global_getx/dependency_manager.dart';
 import 'global_getx/home/home_controller.dart';
 import 'navigation/ui/navigation_screen.dart';
@@ -169,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage>{
                 title: message.data["title"],
                 body: message.data["body"],
                 flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-            await _homeController.registerNotification(
+            await HomeRepo.registerNotification(
                 NotificationRegisterDto(message: message.data["body"]));
           }
           else if (message.data['type'] == "message.new" &&
@@ -233,16 +234,13 @@ class _MyHomePageState extends State<MyHomePage>{
             debugPrint("OnDebugSirkl : CID not null");
             final client = StreamChatClient("mhgk84t9jfnt");
             final box = GetStorage();
-            var refreshToken = box.read(con.REFRESH_TOKEN);
-            var requestToken = await HomeService().refreshToken(refreshToken);
-            var refreshTokenDTO = refreshTokenDtoFromJson(
-                json.encode(requestToken.body));
-            var accessToken = refreshTokenDTO.accessToken!;
-            var request = await ProfileService().retrieveTokenStreamChat(
-                accessToken);
-            var id = userFromJson(box.read(con.USER)).id;
+
+          
+            String chatToken = await ProfileRepo.retrieveTokenStreamChat();
+            String? id = UserDTO.fromJson(box.read(SharedPref.USER)).id;
+     
             await client.connectUser(
-                User(id: id!,), request.body!, connectWebSocket: false);
+                User(id: id!,), chatToken, connectWebSocket: false);
             final response = await client.queryChannel("try",
                 channelId: (event.data["cid"] as String).replaceFirst(
                     'try:', ''));

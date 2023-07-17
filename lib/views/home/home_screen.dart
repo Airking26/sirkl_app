@@ -22,9 +22,10 @@ import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/web_wallet_connect_dto.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/home/ui/pdf_screen.dart';
-import 'package:sirkl/home/ui/story_viewer_screen.dart';
+
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/views/home/pdf_screen.dart';
+import 'package:sirkl/views/home/story_viewer_screen.dart';
 import 'package:slider_button/slider_button.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/story_view.dart';
@@ -32,6 +33,7 @@ import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:widget_circular_animator/widget_circular_animator.dart';
 
 import '../../common/utils.dart';
+import '../../enums/pdf_type.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../profile/ui/profile_else_screen.dart';
 
@@ -586,7 +588,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, HighlightedWord> words = {
     "terms and conditions": HighlightedWord(
       onTap: () {
-        Get.to(() => const PDFScreen(isTermsAndConditions : 0));
+        Get.to(() => const PDFScreen(pdfType:  PDFType.tc,));
       },
       textStyle: const TextStyle(
           color: Color(0xFF00CB7D),
@@ -596,7 +598,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     "privacy policy": HighlightedWord(
       onTap: () {
-        Get.to(() => const PDFScreen(isTermsAndConditions : 1));
+        Get.to(() => const PDFScreen(pdfType:  PDFType.pp));
       },
       textStyle: const TextStyle(
           color: Color(0xFF00CB7D),

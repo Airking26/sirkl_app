@@ -11,15 +11,17 @@ import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/ui/pdf_screen.dart';
+
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/profile/ui/my_communities_screen.dart';
 import 'package:sirkl/profile/ui/my_group_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../enums/pdf_type.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
+import '../../views/home/pdf_screen.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({Key? key}) : super(key: key);
@@ -327,7 +329,7 @@ class _SettingScreenState extends State<SettingScreen> {
         onTap: () {
           dialogMenu.dismiss();
           pushNewScreen(context,
-              screen: const PDFScreen(isTermsAndConditions: 2));
+              screen: const PDFScreen(pdfType: PDFType.all,));
         },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24.0, 16.0, 10.0, 8.0),

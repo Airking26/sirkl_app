@@ -20,12 +20,14 @@ import 'package:sirkl/common/model/token_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/groups/service/group_service.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/home/service/home_service.dart';
+import 'package:sirkl/repo/home_repo.dart';
+
+import '../../constants/save_pref_keys.dart';
 
 class GroupsController extends GetxController{
 
   final _groupService = GroupService();
-  final _homeService = HomeService();
+  final _homeService = HomeRepo();
   final box = GetStorage();
 
   ChatsController get _chatController => Get.find<ChatsController>();
@@ -57,11 +59,11 @@ class GroupsController extends GetxController{
     var cursor = "";
     var cursorInitialized = true;
     while(cursorInitialized || cursor.isNotEmpty){
-      var req = await _homeService.getContractAddressesWithAlchemy(wallet, cursor);
-      var res = contractAddressDtoFromJson(json.encode(req.body));
-      res.pageKey == null || res.pageKey!.isEmpty ? cursor = "" : cursor = "&pageKey=${res.pageKey}";
-      res.contracts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.opensea == null || element.opensea!.imageUrl == null || element.opensea!.imageUrl!.isEmpty  ||  element.opensea!.collectionName == null || element.opensea!.collectionName!.isEmpty || element.tokenType == TokenType.UNKNOWN || (element.tokenType == TokenType.ERC1155 && element.opensea?.safelistRequestStatus == SafelistRequestStatus.NOT_REQUESTED));
-      res.contracts?.forEach((element) {
+      ContractAddressDto contractAddress = await HomeRepo.getContractAddressesWithAlchemy(wallet: wallet, cursor: cursor );
+    
+      contractAddress.pageKey == null || contractAddress.pageKey!.isEmpty ? cursor = "" : cursor = "&pageKey=${contractAddress.pageKey}";
+      contractAddress.contracts?.removeWhere((element) => element.title == null || element.title!.isEmpty || element.opensea == null || element.opensea!.imageUrl == null || element.opensea!.imageUrl!.isEmpty  ||  element.opensea!.collectionName == null || element.opensea!.collectionName!.isEmpty || element.tokenType == TokenType.UNKNOWN || (element.tokenType == TokenType.ERC1155 && element.opensea?.safelistRequestStatus == SafelistRequestStatus.NOT_REQUESTED));
+      contractAddress.contracts?.forEach((element) {
         nfts.add(CollectionDbDto(collectionName: element.opensea!.collectionName!, contractAddress: element.address!, collectionImage: element.opensea!.imageUrl!, collectionImages: element.media?.first.thumbnail == null ? [element.media!.first.gateway!] : [element.media!.first.thumbnail!]));
       });
       cursorInitialized = false;
@@ -72,14 +74,14 @@ class GroupsController extends GetxController{
 
   retrieveGroups(String wallet) async{
     var nfts = await getNFTsToCreateGroup(wallet);
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
+    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
     var req = await _groupService.retrieveGroups(accessToken);
     if(req.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken!);
       var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
+      box.write(SharedPref.ACCESS_TOKEN, accessToken);
       req = await _groupService.retrieveGroups(accessToken);
       if(req.isOk){
         var groups = groupDtoFromJson(json.encode(req.body));
@@ -102,14 +104,14 @@ class GroupsController extends GetxController{
   }
 
   retrieveGroupsToCreate(StreamChatClient streamChatClient) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
+    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
     var req = await _groupService.retrieveGroups(accessToken);
     if(req.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken!);
       var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
+      box.write(SharedPref.ACCESS_TOKEN, accessToken);
       req = await _groupService.retrieveGroups(accessToken);
       if(req.isOk){
         var groups = groupDtoFromJson(json.encode(req.body)).sublist(2412);
@@ -150,14 +152,14 @@ class GroupsController extends GetxController{
   }
 
   createGroup(StreamChatClient streamChatClient, GroupCreationDto groupCreationDto)async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
+    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
     var request = await _groupService.createGroup(accessToken, groupCreationDtoToJson(groupCreationDto));
     if(request.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken!);
       var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
+      box.write(SharedPref.ACCESS_TOKEN, accessToken);
       request = await _groupService.createGroup(accessToken, groupCreationDtoToJson(groupCreationDto));
       if(request.isOk){
         await createChannel(streamChatClient, GroupDto(name: groupCreationDto.name, image: groupCreationDto.picture, contractAddress: groupCreationDto.contractAddress), groupCreationDto.picture);
@@ -168,14 +170,14 @@ class GroupsController extends GetxController{
   }
 
   changeAdminRole(AdminDto adminDTO) async{
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
+    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
+    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
     var request = await _groupService.changeAdminRole(accessToken, adminDtoToJson(adminDTO));
     if(request.statusCode == 401){
       var requestToken = await _homeService.refreshToken(refreshToken!);
       var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
       accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
+      box.write(SharedPref.ACCESS_TOKEN, accessToken);
       await _groupService.changeAdminRole(accessToken, adminDtoToJson(adminDTO));
     }
   }

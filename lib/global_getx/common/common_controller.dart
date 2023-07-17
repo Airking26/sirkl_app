@@ -9,21 +9,22 @@ import 'package:sirkl/common/model/inbox_dto.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
-import 'package:sirkl/common/service/common_service.dart';
+import 'package:sirkl/repo/common_repo.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/home/service/home_service.dart';
-import 'package:sirkl/profile/service/profile_service.dart';
+import 'package:sirkl/repo/home_repo.dart';
+import 'package:sirkl/repo/profile_repo.dart';
 import 'package:sirkl/util/multi_load.util.dart';
 
 import '../../common/model/refresh_token_dto.dart';
+import '../../constants/save_pref_keys.dart';
 
 class CommonController extends GetxController {
 
-  final HomeService _homeService = HomeService();
-  final CommonService _commonService = CommonService();
-  final ProfileService _profileService = ProfileService();
+  final HomeRepo _homeService = HomeRepo();
+
+
   final box = GetStorage();
 
   Rx<UserDTO?> userClicked = (null as UserDTO?).obs;
@@ -65,44 +66,22 @@ class CommonController extends GetxController {
     }
     await streamChatClient.updateChannelPartial(channel.channel!.id, "try",
         set: {"${myId}_follow_channel": meFollow});
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.addUserToSirkl(accessToken, id);
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _commonService.addUserToSirkl(accessToken, id);
-      if (request.isOk) {
-        contactAddLoading.value = false;
-        refreshAllInbox();
+
+   try {
+     UserDTO newUser = await CommonRepo.addUserToSirkl(id);
+     contactAddLoading.value = false;
+            refreshAllInbox();
         if (!users
             .map((element) => element.id)
-            .contains(userFromJson(json.encode(request.body)).id)) {
-          users.add(userFromJson(json.encode(request.body)));
+            .contains(newUser.id)) {
+          users.add(newUser);
         }
         userClickedFollowStatus.value = true;
-        return true;
-      } else {
-        contactAddLoading.value = false;
-        return false;
-      }
-    } else if (request.isOk) {
-      contactAddLoading.value = false;
-      refreshAllInbox();
-      if (!users
-          .map((element) => element.id)
-          .contains(userFromJson(json.encode(request.body)).id)) {
-        users.add(userFromJson(json.encode(request.body)));
-      }
-      userClickedFollowStatus.value = true;
-      return true;
-    } else {
-      contactAddLoading.value = false;
-      return false;
-    }
+     return true;
+   } catch(err) {
+    return false;
+   }
+
   }
 
   Future<bool> removeUserToSirkl(
@@ -117,180 +96,81 @@ class CommonController extends GetxController {
     }
     await streamChatClient.updateChannelPartial(channel.channel!.id, "try",
         set: {"${value}_follow_channel": meFollow});
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.removeUserToSirkl(accessToken, id);
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _commonService.removeUserToSirkl(accessToken, id);
-      if (request.isOk) {
-        refreshAllInbox();
-        if (users
-            .map((element) => element.id)
-            .contains(userFromJson(json.encode(request.body)).id)) {
-          users.removeWhere(
-              (e) => e.id == userFromJson(json.encode(request.body)).id);
-        }
-        userClickedFollowStatus.value = false;
-        return true;
-      } else {
-        return false;
-      }
-    } else if (request.isOk) {
+    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
+    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
+    try {
+      UserDTO removedUser = await CommonRepo.removeUserToSirkl(id);
+     
       refreshAllInbox();
       if (users
           .map((element) => element.id)
-          .contains(userFromJson(json.encode(request.body)).id)) {
+          .contains(removedUser.id)) {
         users.removeWhere(
-            (e) => e.id == userFromJson(json.encode(request.body)).id);
+            (e) => e.id == removedUser.id);
       }
       userClickedFollowStatus.value = false;
+  
       return true;
-    } else {
-      return false;
+    } catch(err) {
+
     }
+    return false;
+   
   }
 
   showSirklUsers(String id) async {
     gettingStoryAndContacts.value = true;
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    Response<List<dynamic>> request;
+
+
     try {
-      request = await _commonService.getSirklUsers(accessToken, id);
-      if (request.isOk) {
+      List<UserDTO> following = await CommonRepo.getSirklUsers(id);
+      
         users.clear();
-        users.value = request.body!
-            .map<UserDTO>((user) => userFromJson(json.encode(user)))
-            .toList();
+        users.value = following;
         users.sort((a, b) {
           return a.userName!.toLowerCase().compareTo(b.userName!.toLowerCase());
         });
         users.refresh();
-      } else {
-        gettingStoryAndContacts.value = false;
-      }
-    } on Error {
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      try {
-        request = await _commonService.getSirklUsers(accessToken, id);
-        if (request.isOk) {
-          users.clear();
-          users.value = request.body!
-              .map<UserDTO>((user) => userFromJson(json.encode(user)))
-              .toList();
-          users.sort((a, b) {
-            return a.userName!
-                .toLowerCase()
-                .compareTo(b.userName!.toLowerCase());
-          });
-          users.refresh();
-        } else {
-          gettingStoryAndContacts.value = false;
-        }
-      } on Error {
-        gettingStoryAndContacts.value = false;
-      }
+    } catch(err) {
+
     }
 
     gettingStoryAndContacts.value = false;
   }
 
   checkUserIsInFollowing() async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.checkUserIsInFollowing(
-        accessToken, userClicked.value!.id!);
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _commonService.checkUserIsInFollowing(
-          accessToken, userClicked.value!.id!);
-      userClickedFollowStatus.value = request.body == "false" ? false : true;
-    } else if (request.isOk) {
-      userClickedFollowStatus.value = request.body == "false" ? false : true;
-    }
+
+     userClickedFollowStatus.value = await CommonRepo.checkUserIsInFollowing(userClicked.value!.id!);
+
   }
 
   getUserById(String id) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _profileService.getUserByID(accessToken, id);
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(con.ACCESS_TOKEN, accessToken);
-      request = await _profileService.getUserByID(accessToken, id);
-      if (request.isOk)
-        userClicked.value = userFromJson(json.encode(request.body));
-    } else if (request.isOk) {
-      userClicked.value = userFromJson(json.encode(request.body));
-    }
+
+    UserDTO userDto = await ProfileRepo.getUserByID( id);
+
+      userClicked.value = userDto;
+    
   }
 
-  notifyAddedInGroup(
+  Future<void> notifyAddedInGroup(
       NotificationAddedAdminDto notificationAddedAdminDto) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.notifyAddedInGroup(accessToken,
-        notificationAddedAdminDtoToJson(notificationAddedAdminDto));
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      request = await _commonService.notifyAddedInGroup(accessToken,
-          notificationAddedAdminDtoToJson(notificationAddedAdminDto));
-    }
+
+   await CommonRepo.notifyAddedInGroup(notificationAddedAdminDto);
+
   }
 
   notifyUserAsAdmin(NotificationAddedAdminDto notificationAddedAdminDto) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request = await _commonService.notifyUserAsAdmin(accessToken,
-        notificationAddedAdminDtoToJson(notificationAddedAdminDto));
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      request = await _commonService.notifyUserAsAdmin(accessToken,
-          notificationAddedAdminDtoToJson(notificationAddedAdminDto));
-    }
+
+    await CommonRepo.notifyUserAsAdmin(notificationAddedAdminDto);
+
   }
 
   report(BuildContext context, ReportDto reportDTO, Utils utils) async {
-    var accessToken = box.read(con.ACCESS_TOKEN);
-    var refreshToken = box.read(con.REFRESH_TOKEN);
-    var request =
-        await _commonService.report(accessToken, reportDtoToJson(reportDTO));
-    if (request.statusCode == 401) {
-      var requestToken = await _homeService.refreshToken(refreshToken);
-      var refreshTokenDTO =
-          refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDTO.accessToken!;
-      request =
-          await _commonService.report(accessToken, reportDtoToJson(reportDTO));
-      if (request.isOk) {
+    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
+    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
+
+        await CommonRepo.report(reportDTO);
         utils.showToast(
             context, "Thank you! Your report has been correctly sent.");
-      }
-    } else if (request.isOk) {
-      utils.showToast(
-          context, "Thank you! Your report has been correctly sent.");
-    }
   }
 }

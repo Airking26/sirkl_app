@@ -1,9 +1,9 @@
 /// Common ///
 const String URL_SERVER = "http://sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com/";
-const String ACCESS_TOKEN = "access_token";
-const String STREAM_CHAT_TOKEN = "stream_chat_token";
-const String REFRESH_TOKEN = "refresh_token";
-const String USER = "user";
+
+//const String STREAM_CHAT_TOKEN = "stream_chat_token";
+
+// const String USER = "user";
 const String NOTIFICATION_ACTIVE = "notification_active";
 const String USER_BLOCKED = "user_blocked";
 const String errorRes = "error";
@@ -11,7 +11,7 @@ const String nicknames = "nicknames";
 const String contractAddresses = "contract_addresses";
 const String errorWalletAlreadyUsedRes = "error_wallet_already_used";
 const String moralisApiKey = "i9AyfrkBTZQg3gUEXqANDoGAY4h3W7zjUhpoPNtO69sCAFvSVO7ICpZSEdCsYxIj";
-const String alchemyApiKey =  "ELrNU9K6I9RNfXbIkJqq6H6NeoXNbF10";
+//const String alchemyApiKey =  "ELrNU9K6I9RNfXbIkJqq6H6NeoXNbF10";
 const String urlPrefix = "https://sirkl.page.link";
 const String notificationSaved = "notification_saved";
 
