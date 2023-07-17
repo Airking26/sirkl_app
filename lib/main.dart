@@ -92,10 +92,13 @@ class MyApp extends StatelessWidget {
     return DynamicTheme(
           defaultBrightness: Brightness.light,
           data: (Brightness brightness) {
-            SColors.loadColors(AppThemeEnum.light);
+
+        
             if (brightness == Brightness.light) {
+                  SColors.loadColors(AppThemeEnum.light);
               return ThemeData.light();
             } else {
+                  SColors.loadColors(AppThemeEnum.dark);
               return ThemeData.light();
             }
           },

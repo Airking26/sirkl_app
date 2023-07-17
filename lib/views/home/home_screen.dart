@@ -655,9 +655,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(
           height: 50,
         ),
-        TextButton(onPressed: (){
-          _homeController.signMessageWithMetamask(context);
-        }, child: const Text('Slide')),
+
         SliderButton(
           backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
               ? const Color(0xff9BA0A5)

@@ -204,8 +204,9 @@ class HomeController extends GetxController {
 
   signMessageWithMetamask(BuildContext context) async {
        try {
-        await loginWithWallet(context, address.value, 'message', 'sign');
-        return;
+        // the next line is for bypassing the wallet signature only for dev purpose
+       // await loginWithWallet(context, address.value, 'message', 'sign');
+       // return;
          var message = generateSessionMessage(address.value);
          launchUrl(_uri, mode: LaunchMode.externalApplication);
          var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:1", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex, message]));
