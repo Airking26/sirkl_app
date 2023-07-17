@@ -20,13 +20,14 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
-import 'package:sirkl/profile/ui/my_story_viewer_screen.dart';
-import 'package:sirkl/profile/ui/notifications_screen.dart';
-import 'package:sirkl/profile/ui/settings_screen.dart';
+import 'package:sirkl/views/profile/settings_screen.dart';
+
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
+import 'my_story_viewer_screen.dart';
+import 'notifications_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);

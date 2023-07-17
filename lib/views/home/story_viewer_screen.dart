@@ -6,12 +6,13 @@ import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
+
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../global_getx/home/home_controller.dart';
+import '../profile/profile_else_screen.dart';
 
 class StoryViewerScreen extends StatefulWidget {
   const StoryViewerScreen({Key? key}) : super(key: key);

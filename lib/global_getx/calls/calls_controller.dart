@@ -12,8 +12,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/calls/service/calls_service.dart';
-import 'package:sirkl/calls/ui/call_invite_sending_screen.dart';
+import 'package:sirkl/repo/calls_repo.dart';
+
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/call_creation_dto.dart';
 import 'package:sirkl/common/model/call_dto.dart';
@@ -26,12 +26,13 @@ import 'package:sirkl/repo/profile_repo.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../../constants/save_pref_keys.dart';
+import '../../views/calls/call_invite_sending_screen.dart';
 
 
 class CallsController extends GetxController{
 
-  final _callService = CallService();
-  //final _homeService = HomeRepo();
+
+
 
   final box = GetStorage();
 
@@ -185,134 +186,66 @@ class CallsController extends GetxController{
     });
   }
 
-  createCall(CallCreationDto callCreationDto) async {
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var request = await _callService.createCall(accessToken, callCreationDtoToJson(callCreationDto));
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      request = await _callService.createCall(accessToken, callCreationDtoToJson(callCreationDto));
-    }
+  Future<void> createCall(CallCreationDto callCreationDto) async {
+
+     await CallRepo.createCall(callCreationDto);
+
   }
 
   updateCall(CallModificationDto callModificationDto) async {
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var request = await _callService.updateCall(accessToken, callModificationDtoToJson(callModificationDto));
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      request = await _callService.updateCall(accessToken, callModificationDtoToJson(callModificationDto));
-    }
+  
+    await CallRepo.updateCall(callModificationDto);
+
   }
 
-  retrieveCalls(String offset) async{
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var request;
-    try{
-      request = await _callService.retrieveCalls(accessToken, offset);
-    } on Error{
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      request = await _callService.retrieveCalls(accessToken, offset);
-    }
-    if(request.isOk) {
-      callList.value == null ? callList.value = callDtoFromJson(json.encode(request.body)) : callList.value?.addAll(callDtoFromJson(json.encode(request.body)));
-      return callDtoFromJson(json.encode(request.body));
-    }
+  Future<List<CallDto>> retrieveCalls(String offset) async{
+
+  
+       List<CallDto> calls = await CallRepo.retrieveCalls(offset);
+      callList.value ??= [];
+      callList.value!.addAll(calls);
+      return calls;
+
   }
 
   Future<List<UserDTO>> retrieveUsers(String substring, int offset) async{
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var request;
+
     try{
-      request = await _callService.searchUser(accessToken, substring, offset.toString());
+      return await CallRepo.searchUser(substring, offset.toString());
+     
     } on Error{
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      request = await _callService.searchUser(accessToken, substring, offset.toString());
+
     }
-    if(request.isOk) {
-      return request.body!.map<UserDTO>((user) => userFromJson(json.encode(user))).toList();
-    } else {
-      return [];
-    }
+ 
+       return [];
   }
 
-  endCall(String id, String channel) async{
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var request = await _callService.endCall(accessToken, id, channel);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      request = await _callService.endCall(accessToken, id, channel);
-    }
+  Future<void> endCall(String id, String channel) async{
+
+   await CallRepo.endCall( id, channel);
+
   }
 
   missedCallNotification(String id) async{
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var request = await _callService.missedCallNotification(accessToken, id);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      request = await _callService.missedCallNotification(accessToken, id);
-    }
+   
+    var request = await CallRepo.missedCallNotification(id);
+
   }
 
   getUserById(String id) async {
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var request = await _profileService.getUserByID(accessToken, id);
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(
-          json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      request = await _profileService.getUserByID(accessToken, id);
-      if(request.isOk) userCalled.value = userFromJson(json.encode(request.body));
-    } else if(request.isOk) {
-      userCalled.value = userFromJson(json.encode(request.body));
-    }
+ 
+    userCalled.value = await ProfileRepo.getUserByID(id);
+
   }
 
   Future<List<CallDto>> searchInCalls(String search) async{
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var req = await _callService.searchCalls(accessToken, search);
-    if(req.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      req = await _callService.searchCalls(accessToken, search);
-      if(req.isOk) {
-        return callDtoFromJson(json.encode(req.body));
-      } else {
-        return [];
-      }
-    } else if(req.isOk){
-      return callDtoFromJson(json.encode(req.body));
-    } else {
+
+    try {
+       return await CallRepo.searchCalls(search);
+    } catch(err) {
       return [];
     }
+
   }
 
 }

@@ -42,7 +42,7 @@ class ChatRepo {
   static Future<List<UserDTO>> getRequestsWaiting(String channelId) async {
       SRequests req = SRequests(SUrls.baseURL);
       Response res = await req.get(SUrls.joinRequestsByChannelId(channelId));
-      return (res as List<Map<String, dynamic>>).map((e) => UserDTO.fromJson(e)).toList();
+      return (res as List<dynamic>).map((e) => UserDTO.fromJson(e)).toList();
   }
 
 }

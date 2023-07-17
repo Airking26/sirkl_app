@@ -7,7 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/chats/ui/settings_group_screen.dart';
+
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
@@ -16,13 +16,16 @@ import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
-import 'package:sirkl/groups/ui/community_settings_screen.dart';
+
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
-import 'package:sirkl/profile/ui/settings_profile_else_screen.dart';
+
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../../../../global_getx/home/home_controller.dart';
 import '../../../../../global_getx/profile/profile_controller.dart';
+import '../../../../../views/chats/settings_group_screen.dart';
+import '../../../../../views/group/community_settings_screen.dart';
+import '../../../../../views/profile/settings_profile_else_screen.dart';
 
 /// {@template streamChannelHeader}
 /// ![screenshot](https://raw.githubusercontent.com/GetStream/stream-chat-flutter/master/packages/stream_chat_flutter/screenshots/channel_header.png)

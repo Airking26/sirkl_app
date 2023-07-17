@@ -6,7 +6,7 @@ import '../config/enviroment.dart';
 class SUrls {
 
   static String get ethMainNetBaseUrl => "https://eth-mainnet.g.alchemy.com/";
-
+  static String get etherscanBaseUrl => "https://api.etherscan.io/";
   static String baseURL = Environment.baseURL;
 
   static const String verifySignature = 'auth/verifySignature';
@@ -20,7 +20,7 @@ class SUrls {
   static const String nicknames = 'nicknames';
   static const String nicknamesRetrieve = 'nicknames/retrieve';
   static const String storyOthers = 'story/others';
-  static const String nftRetrieve = 'nft/retrieve/';
+  static const String nftRetrieve = 'nft/retrieve';
   static const String nftRetrieveAll = 'nft/retrieveAll';
   static const String nftUpdateAll = 'nft/updateAll';
   static const String notificationRegister = 'notification/register';
@@ -56,13 +56,13 @@ class SUrls {
   static const String joinRequestToJoin = 'join/request_to_join';
   static const String joinAcceptDeclineRequest = 'join/accept_decline_request';
   static  String joinRequestsByChannelId(String channelId) => 'join/requests/$channelId';
-  static const String callEndByIdChannel = 'call/end/\$id/\$channel';
-  static const String callMissedCallById = 'call/missed_call/\$id';
+  static  String callEndByIdChannel(String id, String channel) => 'call/end/$id/$channel';
+  static  String callMissedCallById(String id) => 'call/missed_call/$id';
   static const String callCreate = 'call/create';
   static const String callUpdate = 'call/update';
-  static const String callRetrieveByOffset = 'call/retrieve/\$offset';
-  static const String callSearchBySubstring = 'call/search/\$substring';
-  static const String searchUsersBySubstringOffset = 'search/users/\$substring/\$offset';
+  static  String callRetrieveByOffset(String offset) => 'call/retrieve/$offset';
+  static  String callSearchBySubstring(String substring) => 'call/search/$substring';
+  static  String searchUsersBySubstringOffset(String substring, String offset ) => 'search/users/$substring/$offset';
    
 }
 

@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -22,6 +22,7 @@ import 'package:sirkl/common/constants.dart' as con;
 
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
+import 'detailed_chat_screen.dart';
 
 class CreateGroupSecondScreen extends StatefulWidget {
   const CreateGroupSecondScreen({Key? key}) : super(key: key);

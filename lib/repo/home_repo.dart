@@ -37,7 +37,7 @@ class HomeRepo {
 
   static Future<TokenDto> getTokenContractAddressesWithAlchemy({required String wallet}) async {
     SRequests req = SRequests(SUrls.ethMainNetBaseUrl);
-    Response res = await req.post(url: "/v2/${SConfig.alchemyApiKey}", body: {
+    Response res = await req.post(url: "v2/${SConfig.alchemyApiKey}", body: {
     'jsonrpc': '2.0',
     'id': 1,
     'method': 'alchemy_getTokenBalances',
@@ -49,13 +49,13 @@ class HomeRepo {
   }
   static Future<ContractAddressDto> getContractAddressesWithAlchemy({required wallet, String? cursor}) async {
     SRequests req = SRequests(SUrls.ethMainNetBaseUrl);
-    Response res = await req.get("/nft/v2/${SConfig.alchemyApiKey}/getContractsForOwner?owner=$wallet&pageSize=100&withMetadata=true&filters[]=AIRDROPS&filters[]=SPAM$cursor");
+    Response res = await req.get("nft/v2/${SConfig.alchemyApiKey}/getContractsForOwner?owner=$wallet&pageSize=100&withMetadata=true&filters[]=AIRDROPS&filters[]=SPAM$cursor");
     return ContractAddressDto.fromJson(res.jsonBody());
   }
 
   static Future<TokenMetadataDTO> getTokenMetadataWithAlchemy(String contractAddress) async {
-    SRequests req = SRequests("https://eth-mainnet.g.alchemy.com/v2");
-    Response res = await req.post(url: 'v2${SConfig.alchemyApiKey}', body: {
+    SRequests req = SRequests("https://eth-mainnet.g.alchemy.com");
+    Response res = await req.post(url: 'v2/${SConfig.alchemyApiKey}', body: {
     'jsonrpc': '2.0',
     'id': 1,
     'method': 'alchemy_getTokenMetadata',
@@ -75,8 +75,8 @@ class HomeRepo {
   }
   static Future<List<NftDto>> retrieveNFTs({required String id, required bool isFav, required String offset }) async {
     SRequests req = SRequests(SUrls.baseURL);
-    Response res = await req.get('SUrls.nftRetrieve/$id/$isFav/$offset');
-    List<Map<String, dynamic>> list = res.jsonBody();
+    Response res = await req.get('${SUrls.nftRetrieve}/$id/$isFav/$offset');
+    List<dynamic> list = res.jsonBody();
     return list.map((e) => NftDto.fromJson(e)).toList();
   }
   static Future<void> updateStory(StoryModificationDto modifiedStory) async {

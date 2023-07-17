@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:defer_pointer/defer_pointer.dart';
@@ -5,28 +7,31 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
+import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+
 import 'package:tiny_avatar/tiny_avatar.dart';
 
-import '../../global_getx/home/home_controller.dart';
+import '../../views/profile/profile_else_screen.dart';
 
-class NewCallScreen extends StatefulWidget {
-  const NewCallScreen({Key? key}) : super(key: key);
+class AddUserToGroupScreen extends StatefulWidget {
+  const AddUserToGroupScreen({Key? key}) : super(key: key);
 
   @override
-  State<NewCallScreen> createState() => _NewCallScreenState();
+  State<AddUserToGroupScreen> createState() => _AddUserToGroupScreenState();
 }
 
-class _NewCallScreenState extends State<NewCallScreen> {
+class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
 
   CallsController get _callController => Get.find<CallsController>();
-  HomeController get _homeController => Get.find<HomeController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
   CommonController get _commonController => Get.find<CommonController>();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
@@ -36,7 +41,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
   @override
   void initState() {
     pagingController.addPageRequestListener((pageKey) {
-       if(_callController.callQuery.value.isEmpty){
+       if(_chatController.addUserQuery.value.isEmpty){
         pagingController.refresh();
         pagingController.appendLastPage(_commonController.users);
       }
@@ -48,7 +53,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
     try {
       List<UserDTO> newItems;
       if(pageKey == 0) newItems = [];
-        newItems = await _callController.retrieveUsers(_callController.callQuery.value, pageKey);
+        newItems = await _callController.retrieveUsers(_chatController.addUserQuery.value, pageKey);
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
         pagingController.appendLastPage(newItems);
@@ -91,9 +96,23 @@ class _NewCallScreenState extends State<NewCallScreen> {
           Expanded(
             child: Padding(
                 padding: const EdgeInsets.only(top: 45),
-                child: Column(
+                child: Obx(() => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _chatController.chipsListAddUsers.isEmpty  ? Container() : Column(
+                      children: [
+                        Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 0),
+                            height: 50,
+                            child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _chatController.chipsListAddUsers.length,
+                            itemBuilder: buildToSendChip),
+                            ),
+                        const SizedBox(height: 24,)
+                      ],
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
@@ -129,7 +148,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
                       ),
                     )
                   ],
-                )),
+                ))),
           ),
         ]));
   }
@@ -171,7 +190,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 0.0),
                 child: Text(
-                  con.newCallRes.tr,
+                  "Add User",
                   style: TextStyle(
                       color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                       fontWeight: FontWeight.w600,
@@ -179,15 +198,16 @@ class _NewCallScreenState extends State<NewCallScreen> {
                       fontSize: 20),
                 ),
               ),
-              IconButton(
-                  onPressed: () {
-                  },
-                  icon: Image.asset(
-                    "assets/images/plus.png",
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? Colors.transparent
-                        : Colors.transparent,
-                  )),
+              TextButton(
+                  onPressed: () async{
+                    for (var element in _chatController.chipsListAddUsers) {
+                      await _chatController.channel.value?.addMembers([element.id!]);
+                      await _commonController.notifyAddedInGroup(NotificationAddedAdminDto(idUser: element.id!, idChannel: _chatController.channel.value!.id!, channelName: _chatController.channel.value!.extraData["nameOfGroup"] as String));
+                      _chatController.channel.refresh();
+                    }
+                    Navigator.pop(context);
+                  }, child: const Text("DONE", style: TextStyle(fontWeight: FontWeight.w700, fontFamily: "Gilroy", color: Color(0xFF00CB7D)),),
+                  ),
             ],
           ),
         ),
@@ -202,7 +222,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
       controller: _searchController,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      hint: 'Paste a wallet address or a username',
+      hint: 'Search for a user',
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 0),
@@ -234,7 +254,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
       onQueryChanged: (query) async{
         if(query.isNotEmpty) {
           pagingController.itemList = [];
-          _callController.callQuery.value = query;
+          _chatController.addUserQuery.value = query;
           fetchPageUsers();
         } else {
           pagingController.refresh();
@@ -265,28 +285,60 @@ class _NewCallScreenState extends State<NewCallScreen> {
     );
   }
 
+  Widget buildToSendChip(BuildContext context, int index) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: InputChip(
+          deleteIconColor: Colors.white,
+          deleteIcon: Image.asset(
+            'assets/images/close.png',
+            color: Colors.white,
+          ),
+          padding: const EdgeInsets.all(12),
+          onDeleted: () {
+            _chatController.chipsListAddUsers.removeAt(index);
+            _chatController.chipsListAddUsers.refresh();
+          },
+          backgroundColor: const Color(0xFF00CB7D),
+          label: Text(
+            _chatController.chipsListAddUsers[index].userName.isNullOrBlank! ? "${_chatController.chipsListAddUsers[index].wallet!.substring(0, 10)}..." : _chatController.chipsListAddUsers[index].userName!,
+            style: const TextStyle(
+                fontFamily: "Gilroy",
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.white),
+          )),
+    );
+  }
+
   Widget buildNewMessageTile(BuildContext context, int index, UserDTO item) {
     return ListTile(
         leading: InkWell(
             onTap: (){
                 _commonController.userClicked.value = item;
-                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false, fromNested: true,));
+                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false));
             },
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(90.0), child:
             item.picture == null ?
             SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
-            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         trailing: InkWell(
           onTap: () async {
-            _callController.userCalled.value = item;
-            await _callController.inviteCall(item, DateTime.now().toString(), _homeController.id.value);
+            var isPresent = await _chatController.channel.value?.queryMembers(filter: Filter.equal("id", item.id!));
+            if(isPresent!.members.isEmpty) {
+              if(!_chatController.chipsListAddUsers.map((element) => element.id).contains(item.id)) {
+                _chatController.chipsListAddUsers.add(item);
+              }
+            } else {
+              utils.showToast(context, "This user is already present in this group");
+            }
           },
           child: Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: Image.asset(
-              "assets/images/call_tab.png",
+              "assets/images/add_user.png",
               color: const Color(0xFF00CB7D),
               width: 20,
               height: 20,
@@ -322,8 +374,9 @@ class _NewCallScreenState extends State<NewCallScreen> {
 
   @override
   void dispose() {
+    _chatController.chipsListAddUsers.clear();
     pagingController.dispose();
-    _callController.callQuery.value = "";
+    _chatController.addUserQuery.value = "";
     super.dispose();
   }
 

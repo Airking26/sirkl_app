@@ -6,19 +6,21 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
+
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
-import 'package:sirkl/groups/ui/group_participants_screen.dart';
-import 'package:sirkl/groups/ui/pinned_messages_screen.dart';
+import 'package:sirkl/views/group/group_participants_screen.dart';
+import 'package:sirkl/views/group/pinned_messages_screen.dart';
+
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
+import '../chats/nested_detailed_chat_screen.dart';
 
 class CommunitySettingScreen extends StatefulWidget {
   const CommunitySettingScreen({Key? key}) : super(key: key);

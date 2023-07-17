@@ -9,17 +9,20 @@ import 'package:intl/intl.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
-import 'package:sirkl/calls/ui/new_call_screen.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+
+
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/call_dto.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
+
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../global_getx/home/home_controller.dart';
+import '../../views/profile/profile_else_screen.dart';
+import '../chats/detailed_chat_screen.dart';
+import 'new_call_screen.dart';
 
 class CallsScreen extends StatefulWidget {
   const CallsScreen({Key? key}) : super(key: key);

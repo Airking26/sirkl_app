@@ -16,7 +16,9 @@ import 'package:sirkl/common/view/stream_chat/src/message_widget/reactions/react
 import 'package:sirkl/common/view/stream_chat/src/message_widget/user_avatar_transform.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
+
+import '../../../../../views/profile/profile_else_screen.dart';
+
 
 /// {@template messageWidgetContent}
 /// The main content of a [StreamMessageWidget].

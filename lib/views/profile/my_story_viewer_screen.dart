@@ -6,16 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/global_getx/profile/profile_controller.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:sirkl/views/profile/profile_else_screen.dart';
+
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../global_getx/home/home_controller.dart';
+import '../chats/detailed_chat_screen.dart';
 
 class MyStoryViewerScreen extends StatefulWidget {
   const MyStoryViewerScreen({Key? key}) : super(key: key);

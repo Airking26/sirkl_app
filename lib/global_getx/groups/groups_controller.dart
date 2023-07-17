@@ -18,7 +18,7 @@ import 'package:sirkl/common/model/nft_alchemy_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/token_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/groups/service/group_service.dart';
+import 'package:sirkl/repo/group_repo.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/repo/home_repo.dart';
 
@@ -26,7 +26,7 @@ import '../../constants/save_pref_keys.dart';
 
 class GroupsController extends GetxController{
 
-  final _groupService = GroupService();
+
   final _homeService = HomeRepo();
   final box = GetStorage();
 
@@ -74,65 +74,27 @@ class GroupsController extends GetxController{
 
   retrieveGroups(String wallet) async{
     var nfts = await getNFTsToCreateGroup(wallet);
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var req = await _groupService.retrieveGroups(accessToken);
-    if(req.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      req = await _groupService.retrieveGroups(accessToken);
-      if(req.isOk){
-        var groups = groupDtoFromJson(json.encode(req.body));
-        nftAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress.toLowerCase()).contains(element.contractAddress.toLowerCase())).toList().cast<CollectionDbDto>();
-        isLoadingAvailableNFT.value = false;
-      }
-    } else if(req.isOk){
-      var groups = groupDtoFromJson(json.encode(req.body));
+
+    List<GroupDto> groups = await GroupRepo.retrieveGroups();
+ 
+  
       nftAvailable.value = nfts.where((element) => !groups.map((e) => e.contractAddress.toLowerCase()).contains(element.contractAddress.toLowerCase())).toList().cast<CollectionDbDto>() ;
       isLoadingAvailableNFT.value = false;
-    }
+  
   }
 
   Future<String?> retrieveCreatorGroup(String contract) async {
-    var request = await _groupService.retrieveCreatorGroup(contract);
-    if(request.isOk) {
-      return contractCreatorDtoFromJson(json.encode(request.body))?.result?.first?.contractCreator;
-    }
-    return "";
+    ContractCreatorDto? contractCreator = await GroupRepo.retrieveCreatorGroup(contract);
+    return contractCreator?.result?.first?.contractCreator;
+ 
+
   }
 
   retrieveGroupsToCreate(StreamChatClient streamChatClient) async{
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var req = await _groupService.retrieveGroups(accessToken);
-    if(req.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      req = await _groupService.retrieveGroups(accessToken);
-      if(req.isOk){
-        var groups = groupDtoFromJson(json.encode(req.body)).sublist(2412);
-        for (var element in groups) {
-          if(!element.image.contains("token-image-placeholder.svg") && !element.image.contains("data:image")) {
-            await Future.delayed(const Duration(seconds: 1));
-            var resp = await Dio().get(element.image,
-                options: Options(responseType: ResponseType.bytes));
-            final result = await ImageGallerySaver.saveImage(
-                Uint8List.fromList(resp.data), quality: 100);
-            var pic = await SimpleS3().uploadFile(
-                File(result["filePath"].replaceAll("file://", "")),
-                "sirkl-bucket",
-                "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92",
-                AWSRegions.euCentral1, debugLog: true);
-            await createChannel(streamChatClient, element, pic);
-          }
-        }
-      }
-    } else if(req.isOk){
-      var groups = groupDtoFromJson(json.encode(req.body)).sublist(2412);
+
+    List<GroupDto> groups = await GroupRepo.retrieveGroups();
+    groups = groups.sublist(2412);
+  
       for (var element in groups) {
         if(!element.image.contains("token-image-placeholder.svg") && !element.image.contains("data:image")) {
           await Future.delayed(const Duration(seconds: 1));
@@ -148,38 +110,18 @@ class GroupsController extends GetxController{
           await createChannel(streamChatClient, element, pic);
         }
       }
-    }
   }
 
   createGroup(StreamChatClient streamChatClient, GroupCreationDto groupCreationDto)async{
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var request = await _groupService.createGroup(accessToken, groupCreationDtoToJson(groupCreationDto));
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      request = await _groupService.createGroup(accessToken, groupCreationDtoToJson(groupCreationDto));
-      if(request.isOk){
-        await createChannel(streamChatClient, GroupDto(name: groupCreationDto.name, image: groupCreationDto.picture, contractAddress: groupCreationDto.contractAddress), groupCreationDto.picture);
-      }
-    } else if(request.isOk){
-      await createChannel(streamChatClient, GroupDto(name: groupCreationDto.name, image: groupCreationDto.picture, contractAddress: groupCreationDto.contractAddress), groupCreationDto.picture);
-    }
+
+    await GroupRepo.createGroup(groupCreationDto);
+    await createChannel(streamChatClient, GroupDto(name: groupCreationDto.name, image: groupCreationDto.picture, contractAddress: groupCreationDto.contractAddress), groupCreationDto.picture);
   }
 
-  changeAdminRole(AdminDto adminDTO) async{
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
-    var request = await _groupService.changeAdminRole(accessToken, adminDtoToJson(adminDTO));
-    if(request.statusCode == 401){
-      var requestToken = await _homeService.refreshToken(refreshToken!);
-      var refreshTokenDto = refreshTokenDtoFromJson(json.encode(requestToken.body));
-      accessToken = refreshTokenDto.accessToken!;
-      box.write(SharedPref.ACCESS_TOKEN, accessToken);
-      await _groupService.changeAdminRole(accessToken, adminDtoToJson(adminDTO));
-    }
+  Future<void> changeAdminRole(AdminDto adminDTO) async{
+
+    await GroupRepo.changeAdminRole(adminDTO);
+
   }
 
 

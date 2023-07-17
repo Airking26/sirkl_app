@@ -38,12 +38,13 @@ class ProfileRepo {
   static Future<List<NotificationDto>> retrieveNotifications({required String id, required String offset}) async {
     SRequests req = SRequests(SUrls.baseURL);
     Response res = await req.get(SUrls.notificationByOffset(id, offset));
-    return (res.jsonBody() as List<Map<String, dynamic>>).map((e) => NotificationDto.fromJson(e)).toList();
+    return (res.jsonBody() as List<dynamic>).map((e) => NotificationDto.fromJson(e)).toList();
   }
   static Future<List<StoryDto>> retrieveMyStories() async {
     SRequests req = SRequests(SUrls.baseURL);
     Response res = await req.get(SUrls.storyMine);
-    return (res.jsonBody() as List< Map<String, dynamic>>).map((e) => StoryDto.fromJson(e)).toList();
+    
+    return (res.jsonBody() as List<dynamic>).map((e) => StoryDto.fromJson(e)).toList();
   }
   static Future<void> deleteUser(String id) async {
     SRequests req = SRequests(SUrls.baseURL);
@@ -58,7 +59,7 @@ class ProfileRepo {
   static Future<List<UserDTO>> retrieveReadersForAStory(String id) async {
     SRequests req = SRequests(SUrls.baseURL);
     Response res = await req.get(SUrls.storyReadersById(id));
-    return (res.jsonBody() as List<Map<String, dynamic>>).map((e) => UserDTO.fromJson(e)).toList();
+    return (res.jsonBody() as List<dynamic>).map((e) => UserDTO.fromJson(e)).toList();
   }
   static Future<UserDTO> getUserByID(String id) async {
         SRequests req = SRequests(SUrls.baseURL);

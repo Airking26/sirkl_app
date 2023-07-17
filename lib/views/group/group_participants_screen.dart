@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/chats/ui/add_user_to_group_screen.dart';
+
 import 'package:sirkl/common/model/admin_dto.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
@@ -11,10 +11,12 @@ import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/member_scroll_view/stream_member_list_view.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
+
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 import '../../global_getx/home/home_controller.dart';
+import '../chats/add_user_to_group_screen.dart';
+import '../profile/profile_else_screen.dart';
 
 
 class GroupParticipantScreen extends StatefulWidget {

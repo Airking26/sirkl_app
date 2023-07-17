@@ -1,5 +1,5 @@
 /// Common ///
-const String URL_SERVER = "http://sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com/";
+//const String URL_SERVER = "http://sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com/";
 
 //const String STREAM_CHAT_TOKEN = "stream_chat_token";
 

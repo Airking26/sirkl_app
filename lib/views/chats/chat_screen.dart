@@ -5,17 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
-import 'package:sirkl/chats/ui/settings_group_screen.dart';
+
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/chats/ui/new_message_screen.dart';
+
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/views/chats/settings_group_screen.dart';
 
 import '../../global_getx/home/home_controller.dart';
+import 'new_message_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);

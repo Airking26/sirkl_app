@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
@@ -14,14 +14,16 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/profile/ui/my_communities_screen.dart';
-import 'package:sirkl/profile/ui/my_group_screen.dart';
+
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../enums/pdf_type.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import '../../views/home/pdf_screen.dart';
+import '../chats/detailed_chat_screen.dart';
+import 'my_communities_screen.dart';
+import 'my_group_screen.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({Key? key}) : super(key: key);

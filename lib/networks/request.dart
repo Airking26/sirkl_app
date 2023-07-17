@@ -25,6 +25,7 @@ class SRequests {
 
   Future<Response> post(
       {required String url, required Map<dynamic, dynamic> body}) async {
+      debugPrint('Posting ${baseUrl + url}');
     final Response response = await http.post(_uriBuilder(url),
         body: jsonEncode(body), headers: await _headers);
   

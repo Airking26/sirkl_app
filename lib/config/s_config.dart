@@ -21,5 +21,6 @@ class SConfig {
   static const String wIcon = 'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png';
 
   static const String alchemyApiKey =  "ELrNU9K6I9RNfXbIkJqq6H6NeoXNbF10";
+  static const String ethScanApiKey = "V3EVCZS2JV1WG9SSB14171DEFDQYQ63QFU";
 
 }

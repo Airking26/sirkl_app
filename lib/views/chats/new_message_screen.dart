@@ -8,10 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
-import 'package:sirkl/chats/ui/add_contact_screen.dart';
-import 'package:sirkl/chats/ui/create_group_first_screen.dart';
+
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
@@ -25,6 +24,9 @@ import '../../common/view/dialog/custom_dial.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import '../../global_getx/chats/chats_controller.dart';
+import 'add_contact_screen.dart';
+import 'create_group_first_screen.dart';
+import 'detailed_chat_screen.dart';
 
 class NewMessageScreen extends StatefulWidget {
   const NewMessageScreen({Key? key}) : super(key: key);

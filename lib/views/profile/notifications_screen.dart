@@ -10,7 +10,8 @@ import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/notification_dto.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:sirkl/views/profile/profile_else_screen.dart';
+
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../global_getx/home/home_controller.dart';

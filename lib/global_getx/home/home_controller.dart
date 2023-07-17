@@ -106,11 +106,10 @@ class HomeController extends GetxController {
     } else {
       contractAddresses.value = [];
     }
-    var user = box.read(SharedPref.USER);
-    userMe.value =
-        user != null ? userFromJson(box.read(SharedPref.USER) ?? "") : UserDTO();
-    id.value =
-        user != null ? userFromJson(box.read(SharedPref.USER) ?? "").id ?? "" : "";
+    UserDTO user = box.read(SharedPref.USER) != null? UserDTO.fromJson(box.read(SharedPref.USER)) : UserDTO();
+    
+    userMe.value = user;
+    id.value = user.id ?? '';
     userBlocked.value = box.read(con.USER_BLOCKED) ?? [];
   }
 
@@ -205,6 +204,8 @@ class HomeController extends GetxController {
 
   signMessageWithMetamask(BuildContext context) async {
        try {
+        await loginWithWallet(context, address.value, 'message', 'sign');
+        return;
          var message = generateSessionMessage(address.value);
          launchUrl(_uri, mode: LaunchMode.externalApplication);
          var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:1", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex, message]));
@@ -582,7 +583,8 @@ class HomeController extends GetxController {
                 "${id.value}_follow_channel", false)
           ])
         ]), channelStateSort: const [SortOption('last_message_at')], paginationParams: const PaginationParams(limit: 1)).listen((event) {
-          if(event.first.state != null && event.first.state!.unreadCount > 0) {
+
+          if(event.isNotEmpty && event.first.state != null && event.first.state!.unreadCount > 0) {
             _chatController.index.value = 1;
             _navigationController.controller.value.index = 3;
           }

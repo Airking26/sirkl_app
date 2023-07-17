@@ -13,12 +13,12 @@ import 'package:highlight_text/highlight_text.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:nice_buttons/nice_buttons.dart';
-import 'package:sirkl/chats/ui/add_contact_screen.dart';
+
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/web_wallet_connect_dto.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -35,7 +35,10 @@ import 'package:widget_circular_animator/widget_circular_animator.dart';
 import '../../common/utils.dart';
 import '../../enums/pdf_type.dart';
 import '../../global_getx/home/home_controller.dart';
-import '../../profile/ui/profile_else_screen.dart';
+import '../chats/add_contact_screen.dart';
+import '../chats/detailed_chat_screen.dart';
+import '../profile/profile_else_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -153,7 +156,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                   onPressed: () {
-                    if(_homeController.accessToken.value.isNotEmpty) pushNewScreen(context, screen: const AddContactScreen()).then((value) => _commonController.users.refresh());
+                   
+                    if(_homeController.accessToken.value.isNotEmpty) pushNewScreen(context, screen: const AddContactScreen(), withNavBar: false).then((value) => _commonController.users.refresh());
                   },
                   icon: Image.asset(
                     "assets/images/add_user.png",

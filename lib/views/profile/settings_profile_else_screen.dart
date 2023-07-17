@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
-import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
+
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
@@ -15,12 +15,14 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:sirkl/views/profile/profile_else_screen.dart';
+
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
+import '../chats/nested_detailed_chat_screen.dart';
 
 
 class SettingsProfileElseScreen extends StatefulWidget {

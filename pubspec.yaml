@@ -89,6 +89,8 @@ dependencies:
   stream_chat_persistence: ^6.1.0
   web_socket_channel: ^2.4.0
   dart_jsonwebtoken: ^2.3.1
+  dynamic_theme: 
+    path: packages/dynamic_theme
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -33,7 +33,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   final nicknameController = TextEditingController();
   final userController = TextEditingController();
   final _utils = Utils();
-
+  bool autofocus  = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(

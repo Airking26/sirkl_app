@@ -10,7 +10,7 @@ import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/group_creation_dto.dart';
 import 'package:sirkl/common/model/nft_modification_dto.dart';
@@ -21,6 +21,7 @@ import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import '../../common/view/dialog/custom_dial.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
+import '../chats/detailed_chat_screen.dart';
 
 class GroupsScreen extends StatefulWidget {
   const GroupsScreen({Key? key}) : super(key: key);

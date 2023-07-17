@@ -7,8 +7,7 @@ import 'package:get/get.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
-import 'package:sirkl/chats/ui/nested_detailed_chat_screen.dart';
+
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/model/request_to_join_dto.dart';
@@ -17,13 +16,16 @@ import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:http/http.dart' as htp;
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/common/web3/web3_controller.dart';
-import 'package:sirkl/groups/ui/group_participants_screen.dart';
+
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
+import '../../views/group/group_participants_screen.dart';
+import 'detailed_chat_screen.dart';
+import 'nested_detailed_chat_screen.dart';
 import 'requests_waiting_for_approval_screen.dart';
 
 

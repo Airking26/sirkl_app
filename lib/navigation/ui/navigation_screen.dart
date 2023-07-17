@@ -4,18 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
-import 'package:sirkl/calls/ui/calls_screen.dart';
-import 'package:sirkl/chats/ui/chat_screen.dart';
+
+
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
-import '../../groups/ui/groups_screen.dart';
 
-import '../../profile/ui/profile_screen.dart';
+
 import '../../global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
+import '../../views/calls/calls_screen.dart';
+import '../../views/chats/chat_screen.dart';
+import '../../views/group/groups_screen.dart';
 import '../../views/home/home_screen.dart';
+import '../../views/profile/profile_screen.dart';
 
 class NavigationScreen extends StatefulWidget {
 

@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -13,9 +14,10 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/common/model/notification_register_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/enums/app_theme.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/chats/ui/detailed_chat_screen.dart';
+
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/language.dart';
 import 'package:sirkl/common/local_notification_initialize.dart';
@@ -24,12 +26,16 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/repo/home_repo.dart';
-import 'package:sirkl/home/utils/analyticService.dart';
+import 'package:sirkl/util/analyticService.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/repo/profile_repo.dart';
-import 'package:sirkl/profile/ui/profile_else_screen.dart';
+import 'package:sirkl/views/chats/detailed_chat_screen.dart';
+import 'package:sirkl/views/chats/settings_group_screen.dart';
+import 'package:sirkl/views/profile/profile_else_screen.dart';
+
 import 'package:stream_chat_persistence/stream_chat_persistence.dart';
-import 'chats/ui/settings_group_screen.dart';
+
+import 'config/s_colors.dart';
 import 'constants/save_pref_keys.dart';
 import 'global_getx/dependency_manager.dart';
 import 'global_getx/home/home_controller.dart';
@@ -83,7 +89,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return DynamicTheme(
+          defaultBrightness: Brightness.light,
+          data: (Brightness brightness) {
+            SColors.loadColors(AppThemeEnum.light);
+            if (brightness == Brightness.light) {
+              return ThemeData.light();
+            } else {
+              return ThemeData.light();
+            }
+          },
+          themedWidgetBuilder: (BuildContext context, ThemeData theme) {
+          
+              return GetMaterialApp(
+      
       translations: Language(),
       locale: const Locale('en'),
       builder: (context, child){
@@ -97,6 +116,8 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(),
       initialBinding: GlobalDependencyManager(),
     );
+          });
+   
   }
 }
 
