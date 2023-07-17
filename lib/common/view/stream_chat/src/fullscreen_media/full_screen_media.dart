@@ -14,6 +14,8 @@ import 'package:sirkl/common/view/stream_chat/src/fullscreen_media/full_screen_m
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// A full screen image widget
 class StreamFullScreenMedia extends FullScreenMediaWidget {
   /// Instantiate a new FullScreenImage
@@ -327,8 +329,8 @@ class _FullScreenMediaState extends State<StreamFullScreenMedia> {
                 } else if (attachment.type == 'video') {
                   final controller = videoPackages[attachment.id]!;
                   if (!controller.initialized) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: Color(0xff00CB7D)),
+                    return  Center(
+                      child: CircularProgressIndicator(color: SColors.activeColor),
                     );
                   }
                   return InkWell(

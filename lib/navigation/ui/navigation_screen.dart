@@ -7,6 +7,7 @@ import 'package:sirkl/global_getx/calls/calls_controller.dart';
 
 
 import 'package:sirkl/global_getx/common/common_controller.dart';
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 
@@ -51,7 +52,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       PersistentBottomNavBarItem(
         icon: const ImageIcon(AssetImage("assets/images/home_tab.png"), size: 18,),
         title: (con.homeTabRes.tr),
-        activeColorPrimary: const Color(0xFF00CB7D),
+        activeColorPrimary: SColors.activeColor,
         inactiveColorPrimary: const Color(0xFF9BA0A5),
           textStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 10)
 
@@ -59,7 +60,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       PersistentBottomNavBarItem(
         icon: const ImageIcon(AssetImage("assets/images/call_tab.png"), size: 18,),
         title: (con.callsTabRes.tr),
-        activeColorPrimary: const Color(0xFF00CB7D),
+        activeColorPrimary: SColors.activeColor,
         inactiveColorPrimary: const Color(0xFF9BA0A5),
           textStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 10)
 
@@ -67,7 +68,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       PersistentBottomNavBarItem(
         icon: const ImageIcon(AssetImage("assets/images/group-tab.png"), size: 18,),
         title: (con.groupsTabRes.tr),
-        activeColorPrimary: const Color(0xFF00CB7D),
+        activeColorPrimary: SColors.activeColor,
         inactiveColorPrimary: const Color(0xFF9BA0A5),
           textStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 10)
 
@@ -75,14 +76,14 @@ class _NavigationScreenState extends State<NavigationScreen> {
       PersistentBottomNavBarItem(
         icon: const ImageIcon(AssetImage("assets/images/chat_tab.png"), size: 18,),
         title: (con.chatsTabRes.tr),
-        activeColorPrimary: const Color(0xFF00CB7D),
+        activeColorPrimary: SColors.activeColor,
         inactiveColorPrimary: const Color(0xFF9BA0A5),
           textStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 10)
       ),
       PersistentBottomNavBarItem(
         icon: const ImageIcon(AssetImage("assets/images/profile_tab.png"), size: 18,),
         title: (con.profileTabRes.tr),
-        activeColorPrimary: const Color(0xFF00CB7D),
+        activeColorPrimary: SColors.activeColor,
         inactiveColorPrimary: const Color(0xFF9BA0A5),
         textStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 10)
       ),

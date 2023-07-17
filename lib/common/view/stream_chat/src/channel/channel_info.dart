@@ -2,6 +2,8 @@ import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// {@template streamChannelInfo}
 /// Displays information about the current [Channel].
 /// {@endtemplate}
@@ -139,11 +141,11 @@ class _ConnectingTitleState extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const SizedBox(
+         SizedBox(
           height: 16,
           width: 16,
           child: Center(
-            child: CircularProgressIndicator(color: Color(0xff00CB7D)),
+            child: CircularProgressIndicator(color: SColors.activeColor),
           ),
         ),
         const SizedBox(width: 10),

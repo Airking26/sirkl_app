@@ -20,6 +20,7 @@ import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import 'detailed_chat_screen.dart';
@@ -176,7 +177,7 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
             _chatController.chipsList.removeAt(index);
             _chatController.chipsList.refresh();
           },
-          backgroundColor: const Color(0xFF00CB7D),
+          backgroundColor: SColors.activeColor,
           label: Text(
             _chatController.chipsList[index].userName.isNullOrBlank! ? "${_chatController.chipsList[index].wallet!.substring(0, 10)}..." : _chatController.chipsList[index].userName!,
             style: const TextStyle(
@@ -195,7 +196,7 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
             borderRadius: BorderRadius.circular(90.0), child:
         item.picture == null ?
         SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
-        CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+        CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
             errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))),
         trailing: Checkbox(
           onChanged: (selected) {
@@ -212,10 +213,10 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
             }
           },
           value: _chatController.chipsList.map((element) => element.wallet).contains(item.wallet),
-          checkColor: const Color(0xFF00CB7D),
+          checkColor: SColors.activeColor,
           fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
           side: MaterialStateBorderSide.resolveWith(
-                (states) => const BorderSide(width: 1.0, color: Color(0xFF00CB7D)),
+                (states) =>  BorderSide(width: 1.0, color: SColors.activeColor),
           ),
         ),
         title: Transform.translate(
@@ -330,7 +331,7 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
                 } else {
                   await sendMessageAsGroup();
                 }
-              }, child: Text("Done", style: TextStyle(color: _chatController.chipsList.isNotEmpty && _chatController.chipsList.length >= 2 ? Color(0xff00CB7D) : Colors.grey, fontFamily: "Gilroy"),),),
+              }, child: Text("Done", style: TextStyle(color: _chatController.chipsList.isNotEmpty && _chatController.chipsList.length >= 2 ? SColors.activeColor : Colors.grey, fontFamily: "Gilroy"),),),
             ],
           ),
         ),

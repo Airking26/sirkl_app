@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
+import '../../../config/s_colors.dart';
+
 class YYDialog {
   //================================弹窗属性======================================
   List<Widget> widgetList = []; //弹窗内部所有组件
@@ -244,7 +246,7 @@ class YYDialog {
     return this.widget(Padding(
       padding: padding,
       child: CircularProgressIndicator(
-        color: Color(0xff00CB7D),
+        color: SColors.activeColor,
         strokeWidth: strokeWidth ?? 4.0,
         backgroundColor: backgroundColor,
         //valueColor: AlwaysStoppedAnimation<Color>(valueColor),

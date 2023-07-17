@@ -14,6 +14,7 @@ import 'package:sirkl/views/profile/profile_else_screen.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 
@@ -141,7 +142,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 await _profileController.deleteNotification(item.id);
                 pagingController.refresh();
               }
-            }, icon: const Icon(Icons.add, color: Color(0xff00CB7D),)),
+            }, icon:  Icon(Icons.add, color: SColors.activeColor,)),
             IconButton(onPressed: () async {
               if(await _chatController.acceptDeclineRequest(RequestToJoinDto(receiver: _homeController.id.value, requester: item.requester, channelName: item.channelName, channelId: item.channelId, accept: false, paying: item.paying))) {
                 await _profileController.deleteNotification(item.id);
@@ -153,16 +154,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
               item.type != 0 && item.type != 1 && item.type != 5 && item.type != 6 && item.type != 7?
                   Container(
                     width: 50, height: 50,
-                      decoration: const BoxDecoration(
+                      decoration:  BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Color(0xff00CB7D),
+                        color: SColors.activeColor,
                       ),
                   child: Align(alignment: Alignment.center, child: Image.asset('assets/images/stories.png', width: 24, height: 24,),),) :
           item.picture.isNullOrBlank! ?
           SizedBox(height: 50, width: 50, child: TinyAvatar(baseString: item.wallet?? "", dimension: 50, circular: true, colourScheme:TinyAvatarColourScheme.seascape )) :
           ClipRRect(
             borderRadius: BorderRadius.circular(90),
-            child: CachedNetworkImage(imageUrl: item.picture!, width: 50, height: 50, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+            child: CachedNetworkImage(imageUrl: item.picture!, width: 50, height: 50, fit: BoxFit.cover,placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", width: 50, height: 50, fit: BoxFit.cover)),
           ),
           title: Transform.translate(
@@ -185,7 +186,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         text: TextSpan(
             style: const TextStyle(),
             children: [
-              TextSpan(text: item.username ?? item.wallet , style: const TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Color(0xff00CB7D))),
+              TextSpan(text: item.username ?? item.wallet , style:  TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: SColors.activeColor)),
               TextSpan(text: " added you in his SIRKL - ${timeago.format(timeSince)}", style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.6))),
             ]
         ),
@@ -196,7 +197,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             style: const TextStyle(),
             children: [
               TextSpan(text: "You have added ", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color:MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.6))),
-              TextSpan(text: item.username ?? item.wallet , style: const TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: Color(0xff00CB7D))),
+              TextSpan(text: item.username ?? item.wallet , style:  TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: SColors.activeColor)),
               TextSpan(text: " in your SIRKL - ${timeago.format(timeSince)}", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.6))),
             ]
         ),

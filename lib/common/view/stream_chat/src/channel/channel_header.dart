@@ -21,6 +21,7 @@ import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../../../../config/s_colors.dart';
 import '../../../../../global_getx/home/home_controller.dart';
 import '../../../../../global_getx/profile/profile_controller.dart';
 import '../../../../../views/chats/settings_group_screen.dart';
@@ -278,7 +279,7 @@ class StreamChannelHeader extends StatelessWidget
                                       width: 40,
                                       height: 40,
                                       fit: BoxFit.cover,
-                                      placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                                      placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                                   ) :
                                   channel.extraData['isConv'] !=null && channel.extraData['isConv'] as bool ?
@@ -290,7 +291,7 @@ class StreamChannelHeader extends StatelessWidget
                                     width: 40,
                                     height: 40,
                                     fit: BoxFit.cover,
-                                      placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                                      placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                                   ) :
                                       channel.image == null ?
@@ -301,7 +302,7 @@ class StreamChannelHeader extends StatelessWidget
                                     width: 40,
                                     height: 40,
                                     fit: BoxFit.cover,
-                                      placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                                      placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
                                   )
                               )
@@ -471,9 +472,9 @@ class StreamChannelHeader extends StatelessWidget
                           );
                         }
                       },
-                      child: const Padding(
+                      child:  Padding(
                         padding: EdgeInsets.only(top: 16.0, right: 16),
-                        child: Text("DONE", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF00CB7D))),
+                        child: Text("DONE", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w700, color: SColors.activeColor)),
                       ),
                     ) :
                         InkWell(

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../config/s_colors.dart';
 import '../../../../../global_getx/home/home_controller.dart';
 
 /// It shows the current [Channel] name using a [Text] widget.
@@ -91,8 +92,8 @@ class StreamChannelName extends StatelessWidget {
                 style: textStyle!.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
                 overflow: textOverflow,
               ),
-              channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true ? Transform.translate(offset: const Offset(-2, 0), child: IconButton(padding : EdgeInsets.zero,constraints: BoxConstraints(), icon: Image.asset("assets/images/ethereum.png", color: const Color(0xff00CB7D), width: 16,), onPressed: (){},)) : const SizedBox(),
-              channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == true ? Transform.translate(offset: Offset(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true ? -4 : 4, 0), child: Icon(Icons.lock_outline_rounded, size: 14, color: const Color(0xff00CB7D).withOpacity(0.7),)) : const SizedBox(),
+              channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true ? Transform.translate(offset: const Offset(-2, 0), child: IconButton(padding : EdgeInsets.zero,constraints: BoxConstraints(), icon: Image.asset("assets/images/ethereum.png", color: SColors.activeColor, width: 16,), onPressed: (){},)) : const SizedBox(),
+              channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == true ? Transform.translate(offset: Offset(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true ? -4 : 4, 0), child: Icon(Icons.lock_outline_rounded, size: 14, color: SColors.activeColor.withOpacity(0.7),)) : const SizedBox(),
             ],
           );
         },

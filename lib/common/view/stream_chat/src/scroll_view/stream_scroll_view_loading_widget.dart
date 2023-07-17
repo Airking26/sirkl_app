@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// A widget that is displayed while the [StreamScrollView] is loading.
 class StreamScrollViewLoadingWidget extends StatelessWidget {
   /// Creates a new instance of [StreamScrollViewLoadingWidget].
@@ -19,6 +21,6 @@ class StreamScrollViewLoadingWidget extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(
         height: height,
         width: width,
-        child: const CircularProgressIndicator.adaptive(valueColor: AlwaysStoppedAnimation(Color(0xff00CB7D)),),
+        child:  CircularProgressIndicator.adaptive(valueColor: AlwaysStoppedAnimation(SColors.activeColor),),
       );
 }

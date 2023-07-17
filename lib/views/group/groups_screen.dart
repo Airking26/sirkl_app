@@ -19,6 +19,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import '../../common/view/dialog/custom_dial.dart';
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import '../chats/detailed_chat_screen.dart';
@@ -407,7 +408,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
            padding: const EdgeInsets.only(top: 24.0, left: 24, right: 24),
            child: Column(
              children: [
-               const CircularProgressIndicator(color: Color(0xff00CB7D)),
+                CircularProgressIndicator(color: SColors.activeColor),
                const SizedBox(height: 8,),
                Text("Please wait while we are loading your NFTs...",textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black),)
              ],
@@ -443,7 +444,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         await _groupController.createGroup(StreamChat.of(context).client, GroupCreationDto(name: _groupController.nftAvailable[index].collectionName, picture: _groupController.nftAvailable[index].collectionImage, contractAddress: _groupController.nftAvailable[index].contractAddress));
                         pushNewScreen(context, screen: const DetailedChatScreen(create: false), withNavBar: false).then((value) => _navigationController.hideNavBar.value = false);
                       },
-                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftAvailable[index].collectionImage, width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
+                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftAvailable[index].collectionImage, width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
 
                       title: Text(_groupController.nftAvailable[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
                     ),

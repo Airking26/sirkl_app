@@ -17,6 +17,7 @@ import 'package:sirkl/common/constants.dart' as con;
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../config/s_colors.dart';
 import '../../enums/pdf_type.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
@@ -74,9 +75,9 @@ class _SettingScreenState extends State<SettingScreen> {
                       colorBlendMode:
                       BlendMode.difference,
                       placeholder: (context, url) =>
-                      const Center(
+                       Center(
                           child: CircularProgressIndicator(
-                              color: Color(0xff00CB7D))),
+                              color: SColors.activeColor)),
                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))),
                 ),
             ),
@@ -180,7 +181,7 @@ class _SettingScreenState extends State<SettingScreen> {
                               await StreamChat.of(context).client.addDevice(_homeController.userMe.value.fcmToken!, PushProvider.firebase, pushProviderName: "Firebase_Config");
                             }
                             _homeController.switchActiveNotification(active);
-                          }, activeColor: const Color(0xFF00CB7D), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,),
+                          }, activeColor: SColors.activeColor, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,),
                         )
                       ],
                     ),

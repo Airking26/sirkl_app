@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../config/s_colors.dart';
+
 class AudioLoadingMessage extends StatelessWidget {
   const AudioLoadingMessage({
     Key? key,
@@ -12,12 +14,12 @@ class AudioLoadingMessage extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
+        children:  [
           SizedBox(
             height: 20,
             width: 20,
             child: CircularProgressIndicator(
-              color: Color(0xff00CB7D),
+              color: SColors.activeColor,
               strokeWidth: 3,
             ),
           ),

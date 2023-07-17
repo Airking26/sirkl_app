@@ -7,6 +7,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../../../../config/s_colors.dart';
 import '../../../../../global_getx/home/home_controller.dart';
 
 /// {@template streamUserAvatar}
@@ -112,7 +113,7 @@ class StreamUserAvatar extends StatelessWidget {
                 filterQuality: FilterQuality.high,
                 imageUrl: picOfGroup != null ? picOfGroup as String :userDTO.picture!,
                 errorWidget: (context, __, ___) => backupGradientAvatar,
-                placeholder:(context, _) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                placeholder:(context, _) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                 imageBuilder: (context, imageProvider) => DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(90),

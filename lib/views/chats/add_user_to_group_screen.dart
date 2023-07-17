@@ -19,6 +19,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../config/s_colors.dart';
 import '../../views/profile/profile_else_screen.dart';
 
 class AddUserToGroupScreen extends StatefulWidget {
@@ -206,7 +207,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                       _chatController.channel.refresh();
                     }
                     Navigator.pop(context);
-                  }, child: const Text("DONE", style: TextStyle(fontWeight: FontWeight.w700, fontFamily: "Gilroy", color: Color(0xFF00CB7D)),),
+                  }, child:  Text("DONE", style: TextStyle(fontWeight: FontWeight.w700, fontFamily: "Gilroy", color: SColors.activeColor),),
                   ),
             ],
           ),
@@ -299,7 +300,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
             _chatController.chipsListAddUsers.removeAt(index);
             _chatController.chipsListAddUsers.refresh();
           },
-          backgroundColor: const Color(0xFF00CB7D),
+          backgroundColor: SColors.activeColor,
           label: Text(
             _chatController.chipsListAddUsers[index].userName.isNullOrBlank! ? "${_chatController.chipsListAddUsers[index].wallet!.substring(0, 10)}..." : _chatController.chipsListAddUsers[index].userName!,
             style: const TextStyle(
@@ -322,7 +323,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                 borderRadius: BorderRadius.circular(90.0), child:
             item.picture == null ?
             SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
-            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         trailing: InkWell(
           onTap: () async {
@@ -339,7 +340,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
             padding: const EdgeInsets.only(right: 8.0),
             child: Image.asset(
               "assets/images/add_user.png",
-              color: const Color(0xFF00CB7D),
+              color: SColors.activeColor,
               width: 20,
               height: 20,
             ),

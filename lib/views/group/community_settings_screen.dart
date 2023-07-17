@@ -18,6 +18,7 @@ import 'package:sirkl/views/group/pinned_messages_screen.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import '../chats/nested_detailed_chat_screen.dart';
@@ -67,9 +68,9 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                     colorBlendMode:
                     BlendMode.difference,
                     placeholder: (context, url) =>
-                    const Center(
+                     Center(
                         child: CircularProgressIndicator(
-                            color: Color(0xff00CB7D))),
+                            color: SColors.activeColor)),
                     errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),
               ),
             ),
@@ -194,7 +195,7 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                                   _chatController.channel.value!.cid!);
                               _chatController.channel.refresh();
                             }
-                          } , activeColor: const Color(0xFF00CB7D), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,),
+                          } , activeColor: SColors.activeColor, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,),
                       )
                     ],
                   ),

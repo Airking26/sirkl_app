@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// {@template loadingIndicatorMLV}
 /// A loading indicator for [MessageListView]. Not intended for use outside of
 /// [MessageListView].
@@ -50,10 +52,10 @@ class LoadingIndicator extends StatelessWidget {
       builder: (context, data) {
         if (!data) return const Offstage();
         return indicatorBuilder?.call(context) ??
-            const Center(
+             Center(
               child: Padding(
                 padding: EdgeInsets.all(8),
-                child: CircularProgressIndicator(color: Color(0xff00CB7D)),
+                child: CircularProgressIndicator(color: SColors.activeColor),
               ),
             );
       },

@@ -13,6 +13,8 @@ import 'package:sirkl/common/view/stream_chat/src/utils/utils.dart';
 import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// {@template streamFileAttachment}
 /// Displays file attachments that have been sent in a chat.
 ///
@@ -198,21 +200,21 @@ class _FileTypeImage extends StatelessWidget {
         child: source.when(
           local: () => StreamVideoThumbnailImage(
             video: attachment.file!.path!,
-            placeholderBuilder: (_) => const Center(
+            placeholderBuilder: (_) =>  Center(
               child: SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(color: Color(0xff00CB7D)),
+                child: CircularProgressIndicator(color: SColors.activeColor),
               ),
             ),
           ),
           network: () => StreamVideoThumbnailImage(
             video: attachment.assetUrl!,
-            placeholderBuilder: (_) => const Center(
+            placeholderBuilder: (_) =>  Center(
               child: SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(color: Color(0xff00CB7D)),
+                child: CircularProgressIndicator(color: SColors.activeColor),
               ),
             ),
           ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// {@template color_theme}
 /// Theme that holds colors
 /// {@endtemplate}
@@ -14,7 +16,7 @@ class StreamColorTheme {
     this.appBg = const Color(0xfffcfcfc),
     this.barsBg = const Color(0xffffffff),
     this.linkBg = const Color(0xffe9f2ff),
-    this.accentPrimary = const Color(0xff00CB7D),
+    required this.accentPrimary ,
     this.accentError = const Color(0xffFF3842),
     this.accentInfo = const Color(0xff20E070),
     this.highlight = const Color(0xfffbf4dd),
@@ -66,7 +68,7 @@ class StreamColorTheme {
     this.appBg = const Color(0xff070A0D),
     this.barsBg = const Color(0xff101418),
     this.linkBg = const Color(0xff00193D),
-    this.accentPrimary = const Color(0xff00CB7D),
+    required this.accentPrimary,
     this.accentError = const Color(0xffFF3742),
     this.accentInfo = const Color(0xff20E070),
     this.borderTop = const Effect(

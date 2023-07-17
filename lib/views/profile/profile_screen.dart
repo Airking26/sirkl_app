@@ -24,6 +24,7 @@ import 'package:sirkl/views/profile/settings_screen.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import 'my_story_viewer_screen.dart';
@@ -159,9 +160,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   : 0,
                                               hideZeroCount: true,
                                               badgeColor:
-                                                  const Color(0xff00CB7D),
+                                                  SColors.activeColor,
                                               badgeTextColor:
-                                                  const Color(0xff00CB7D),
+                                                  SColors.activeColor,
                                               contentPadding:
                                                   const EdgeInsets.only(
                                                       top: 0.1,
@@ -224,8 +225,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     padding: const EdgeInsets.all(8),
                                     width: 48,
                                     height: 48,
-                                    child: const CircularProgressIndicator(
-                                      color: Color(0xFF00CB7D),
+                                    child:  CircularProgressIndicator(
+                                      color: SColors.activeColor,
                                     )) :
                                 _profileController.isEditingProfile.value
                                     ? InkWell(
@@ -256,8 +257,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     usernameTextEditingController.clear();
                                     descriptionTextEditingController.clear();
                                   },
-                                  child: const Padding(
-                                    padding: EdgeInsets.only(
+                                  child:  Padding(
+                                    padding: const  EdgeInsets.only(
                                         top: 16.0, left: 16),
                                     child: Text("DONE",
                                         textAlign: TextAlign.center,
@@ -267,7 +268,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             fontWeight:
                                             FontWeight.w700,
                                             color:
-                                            Color(0xFF00CB7D))),
+                                            SColors.activeColor)),
                                   ),
                                 ) :IconButton(
                                     onPressed: () async {
@@ -289,7 +290,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             Brightness.dark
                                         ? const Color(0xFF122034)
                                         : Colors.white :
-                                    const Color(0xff00CB7D),
+                                    SColors.activeColor,
                                     width: 5),
                                 borderRadius: BorderRadius.circular(90)),
                             child: DeferPointer(
@@ -329,9 +330,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               colorBlendMode:
                                                   BlendMode.difference,
                                               placeholder: (context, url) =>
-                                                  const Center(
+                                                   Center(
                                                       child: CircularProgressIndicator(
-                                                          color: Color(0xff00CB7D))),
+                                                          color: SColors.activeColor)),
                                               errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))),
                                 ),
                               ),
@@ -406,10 +407,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style:  TextStyle(
                               fontFamily: "Gilroy",
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF00CB7D),
+                              color: SColors.activeColor,
                               fontSize: 16),
                         ),
                         const SizedBox(
@@ -419,7 +420,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           "assets/images/copy.png",
                           height: 18,
                           width: 18,
-                          color: const Color(0xFF00CB7D),
+                          color: SColors.activeColor,
                         )
                       ],
                     ),
@@ -498,7 +499,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ? Icons.favorite_rounded
                                     : Icons.favorite_border_rounded,
                                 color: _homeController.isFavNftSelected.value
-                                    ? const Color(0xFF00CB7D)
+                                    ? SColors.activeColor
                                     : MediaQuery.of(context)
                                                 .platformBrightness ==
                                             Brightness.dark
@@ -527,17 +528,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           pagingController: pagingController,
                           builderDelegate: PagedChildBuilderDelegate<NftDto>(
                               firstPageProgressIndicatorBuilder: (context) =>
-                                  const Center(
+                                   Center(
                                     child: CircularProgressIndicator(
-                                      color: Color(0xFF00CB7D),
+                                      color: SColors.activeColor,
                                     ),
                                   ),
                               newPageProgressIndicatorBuilder: (context) =>
-                                  const Padding(
+                                   Padding(
                                     padding: EdgeInsets.all(8.0),
                                     child: Center(
                                       child: CircularProgressIndicator(
-                                        color: Color(0xFF00CB7D),
+                                        color: SColors.activeColor,
                                       ),
                                     ),
                                   ),
@@ -606,8 +607,8 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                 width: 56,
                 height: 56,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                placeholder: (context, url) =>  Center(
+                    child: CircularProgressIndicator(color: SColors.activeColor)),
                 errorWidget: (context, url, error) =>
                     Image.asset("assets/images/app_icon_rounded.png")),
           ),
@@ -625,7 +626,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                       size: 18,
                       color: homeController.isInFav
                               .contains(widget.nftDto.contractAddress)
-                          ? const Color(0xff00CB7D)
+                          ? SColors.activeColor
                           : MediaQuery.of(context).platformBrightness ==
                                   Brightness.dark
                               ? Colors.white.withOpacity(0.5)
@@ -699,9 +700,9 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                                       width: 80,
                                       height: 70,
                                       placeholder: (context, url) =>
-                                          const Center(
+                                           Center(
                                               child: CircularProgressIndicator(
-                                                  color: Color(0xff00CB7D))),
+                                                  color: SColors.activeColor)),
                                       errorWidget: (context, url, error) =>
                                           Image.asset(
                                               "assets/images/app_icon_rounded.png")))),

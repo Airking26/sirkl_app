@@ -3,6 +3,8 @@ import 'package:record/record.dart';
 import 'package:sirkl/common/view/stream_chat/src/misc/stream_svg_icon.dart';
 import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
 
+import '../../../../../config/s_colors.dart';
+
 typedef RecordCallback = void Function(String);
 
 class RecordButton extends StatefulWidget {
@@ -49,7 +51,7 @@ class _RecordButtonState extends State<RecordButton> {
 
     return IconButton(
       icon: Icon( _isRecording ? Icons.stop : Icons.mic),
-      color: _isRecording ? const Color(0xff00CB7D) : StreamChatTheme.of(context).primaryIconTheme.color,
+      color: _isRecording ? SColors.activeColor : StreamChatTheme.of(context).primaryIconTheme.color,
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints.tightFor(
         height: 24,

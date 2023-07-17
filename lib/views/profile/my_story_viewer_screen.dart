@@ -16,6 +16,7 @@ import 'package:sirkl/views/profile/profile_else_screen.dart';
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../chats/detailed_chat_screen.dart';
 
@@ -250,9 +251,9 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
                                 width: 56,
                                 height: 56,
                                 fit: BoxFit.cover,
-                                placeholder: (context, url) => const Center(
+                                placeholder: (context, url) =>  Center(
                                     child: CircularProgressIndicator(
-                                        color: Color(0xff00CB7D))),
+                                        color: SColors.activeColor)),
                                 errorWidget: (context, url, error) => Image.asset(
                                     "assets/images/app_icon_rounded.png"))),
                       ),
@@ -276,7 +277,7 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
                                   },
                                   child: Image.asset(
                                     "assets/images/call_tab.png",
-                                    color: const Color(0xFF00CB7D),
+                                    color: SColors.activeColor,
                                     width: 20,
                                     height: 20,
                                   ),

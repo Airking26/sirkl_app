@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_trimmer/video_trimmer.dart';
 
+import '../../../config/s_colors.dart';
+
 class TrimmerView extends StatefulWidget {
   final File file;
 
@@ -82,8 +84,8 @@ class TrimmerViewState extends State<TrimmerView> {
               children: <Widget>[
                 Visibility(
                   visible: _progressVisibility,
-                  child: const LinearProgressIndicator(
-                    backgroundColor: Color(0xFF00CB7D),
+                  child:  LinearProgressIndicator(
+                    backgroundColor: SColors.activeColor,
                   ),
                 ),
                 const SizedBox(height: 24,),
@@ -157,7 +159,7 @@ class TrimmerViewState extends State<TrimmerView> {
                             shape: BoxShape.circle,
                             color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color.fromARGB(255, 247, 253, 255) : const Color(0xFF102437) ,
                           ),
-                          child: const Icon(Icons.send_rounded, color: Color(0xFF00CB7D),),
+                          child:  Icon(Icons.send_rounded, color: SColors.activeColor,),
                         ),
                       ),
                     ],

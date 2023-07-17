@@ -17,6 +17,8 @@ import 'package:sirkl/common/view/stream_chat/src/misc/swipeable.dart';
 import 'package:sirkl/common/view/stream_chat/src/utils/typedefs.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// Spacing Types (These are properties of a message to help inform the decision
 /// of how much space / which widget to build after it)
 enum SpacingType {
@@ -419,8 +421,8 @@ class _StreamMessageListViewState extends State<StreamMessageListView> {
         paginationLimit: widget.paginationLimit,
         messageFilter: widget.messageFilter,
         loadingBuilder: widget.loadingBuilder ??
-            (context) => const Center(
-                  child: CircularProgressIndicator(color: Color(0xff00CB7D)),
+            (context) =>  Center(
+                  child: CircularProgressIndicator(color: SColors.activeColor),
                 ),
         emptyBuilder: widget.emptyBuilder ??
             (context) => Center(

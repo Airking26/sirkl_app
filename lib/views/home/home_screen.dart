@@ -33,6 +33,7 @@ import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:widget_circular_animator/widget_circular_animator.dart';
 
 import '../../common/utils.dart';
+import '../../config/s_colors.dart';
 import '../../enums/pdf_type.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../chats/add_contact_screen.dart';
@@ -90,8 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             _homeController.loadingStories.value && !_homeController.isFirstConnexion.value
                         ? Container(
                             margin: const EdgeInsets.only(top: 150),
-                            child: const CircularProgressIndicator(
-                                color: Color(0xFF00CB7D)))
+                            child:  CircularProgressIndicator(
+                                color: SColors.activeColor))
                         : _commonController.users.isNotEmpty
                             ? buildRepertoireList(context)
                             : buildEmptyFriends()
@@ -165,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 24,
                     color: _homeController.accessToken.value.isEmpty
                         ? Colors.transparent
-                        : const Color(0xFF00CB7D),
+                        : SColors.activeColor,
                   )),
             ],
           ),
@@ -189,9 +190,9 @@ class _HomeScreenState extends State<HomeScreen> {
         pagingController: _homeController.pagingController.value,
         builderDelegate: PagedChildBuilderDelegate<List<StoryDto?>?>(
             itemBuilder: (context, item, index) => buildStory(item, index),
-            firstPageProgressIndicatorBuilder: (context) => const Center(
+            firstPageProgressIndicatorBuilder: (context) =>  Center(
                   child: CircularProgressIndicator(
-                    color: Color(0xff00CB7D),
+                    color: SColors.activeColor,
                   ),
                 ),
             noItemsFoundIndicatorBuilder: (context) => Container()),
@@ -226,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color(0xff00CB7D),
+                  color: SColors.activeColor,
                   width: hasUnread ? 3.0 : 0.0,
                 ),
               ),
@@ -237,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       circular: true,
                       colourScheme: TinyAvatarColourScheme.seascape)
                   : CircleAvatar(
-                      backgroundColor: const Color(0xff00CB7D),
+                      backgroundColor: SColors.activeColor,
                       radius: 36,
                       backgroundImage: CachedNetworkImageProvider(
                           listOfStories.first!.createdBy.picture!),
@@ -291,8 +292,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 return Container(
                   width: 60,
                   height: 60,
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle, color: Color(0xff00CB7D)),
+                  decoration:  BoxDecoration(
+                      shape: BoxShape.circle, color: SColors.activeColor),
                   alignment: Alignment.center,
                   child: Text(hint,
                       style: const TextStyle(
@@ -321,8 +322,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         : const Color(0xFF828282).withOpacity(0.8),
                     borderRadius: BorderRadius.circular(20.0),
                   ),
-                  selectTextStyle: const TextStyle(
-                      color: Color(0xff00CB7D),
+                  selectTextStyle:  TextStyle(
+                      color: SColors.activeColor,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       fontFamily: "Gilroy"),
@@ -472,9 +473,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 56,
                           height: 56,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
+                          placeholder: (context, url) =>  Center(
                               child: CircularProgressIndicator(
-                                  color: Color(0xff00CB7D))),
+                                  color: SColors.activeColor)),
                           errorWidget: (context, url, error) => Image.asset(
                               "assets/images/app_icon_rounded.png"))),
             ),
@@ -495,7 +496,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                         child: Image.asset(
                           "assets/images/call_tab.png",
-                          color: const Color(0xFF00CB7D),
+                          color: SColors.activeColor,
                           width: 20,
                           height: 20,
                         ),
@@ -594,8 +595,8 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         Get.to(() => const PDFScreen(pdfType:  PDFType.tc,));
       },
-      textStyle: const TextStyle(
-          color: Color(0xFF00CB7D),
+      textStyle:  TextStyle(
+          color: SColors.activeColor,
           fontSize: 16,
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
@@ -604,8 +605,8 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         Get.to(() => const PDFScreen(pdfType:  PDFType.pp));
       },
-      textStyle: const TextStyle(
-          color: Color(0xFF00CB7D),
+      textStyle:  TextStyle(
+          color: SColors.activeColor,
           fontSize: 16,
           fontFamily: "Gilroy",
           fontWeight: FontWeight.w500),
@@ -811,7 +812,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Column(children: [
-                      const Icon(Icons.lock_outline_rounded, color: Color(0xFF00CB7D), size: 36,),
+                       Icon(Icons.lock_outline_rounded, color: SColors.activeColor, size: 36,),
                       const SizedBox(height: 4,),
                       Text("PRIVATE AND SECURE LOGIN", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w400),)
                     ],),
@@ -862,7 +863,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 12,),
                     TextButton(onPressed: (){
                       Navigator.pop(context);
-                    }, child: const Text("I UNDERSTAND", style: TextStyle(color: Color(0xFF00CB7D), fontFamily: "Gilroy", fontWeight: FontWeight.w600),))
+                    }, child:  Text("I UNDERSTAND", style: TextStyle(color: SColors.activeColor, fontFamily: "Gilroy", fontWeight: FontWeight.w600),))
                   ],
                 ),
               );

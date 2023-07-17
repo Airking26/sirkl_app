@@ -21,6 +21,7 @@ import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:web3dart/web3dart.dart';
 
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import '../../views/group/group_participants_screen.dart';
@@ -95,9 +96,9 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                   colorBlendMode:
                   BlendMode.difference,
                   placeholder: (context, url) =>
-                  const Center(
+                   Center(
                       child: CircularProgressIndicator(
-                          color: Color(0xff00CB7D))),
+                          color: SColors.activeColor)),
                   errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),
             ),
           ),
@@ -129,10 +130,10 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                     AlertDialog alert = AlertDialog(
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
+                        children:  [
                           Padding(
-                            padding: EdgeInsets.only(bottom: 24.0, top: 12),
-                            child: CircularProgressIndicator(color: Color(0xFF00CB7D),),
+                            padding: const EdgeInsets.only(bottom: 24.0, top: 12),
+                            child: CircularProgressIndicator(color: SColors.activeColor,),
                           ),
                           Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
                         ],),
@@ -268,7 +269,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                               _chatController.channel.value!.cid!);
                           _chatController.channel.refresh();
                         }
-                      } : null, activeColor: const Color(0xFF00CB7D), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,),
+                      } : null, activeColor: SColors.activeColor, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,),
                   )
                 ],
               ),
@@ -548,8 +549,8 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                   }
                   _chatController.isEditingGroup.value = false;
                 },
-                child: const Padding(
-                  padding: EdgeInsets.only(
+                child:  Padding(
+                  padding: const EdgeInsets.only(
                       top: 16.0, left: 16),
                   child: Text("DONE",
                       textAlign: TextAlign.center,
@@ -559,7 +560,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                           fontWeight:
                           FontWeight.w700,
                           color:
-                          Color(0xFF00CB7D))),
+                          SColors.activeColor)),
                 ),
               ): IconButton(
                   onPressed: () async {

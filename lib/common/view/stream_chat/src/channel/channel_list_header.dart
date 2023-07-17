@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// {@template streamChannelListHeader}
 /// Shows the current [StreamChatClient] status.
 ///
@@ -237,11 +239,11 @@ class _ConnectingTitleState extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const SizedBox(
+         SizedBox(
           height: 16,
           width: 16,
           child: Center(
-            child: CircularProgressIndicator(color: Color(0xff00CB7D)),
+            child: CircularProgressIndicator(color: SColors.activeColor),
           ),
         ),
         const SizedBox(width: 10),

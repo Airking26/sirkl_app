@@ -10,6 +10,7 @@ import 'package:sirkl/common/view/stream_chat/src/message_widget/parse_attachmen
 import 'package:sirkl/common/view/stream_chat/src/message_widget/quoted_message.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../config/s_colors.dart';
 import '../../../../../global_getx/home/home_controller.dart';
 
 /// {@template messageCard}
@@ -204,7 +205,7 @@ class _MessageCardState extends State<MessageCard> {
       color: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(width: widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? 0 : 1 : MediaQuery.of(context).platformBrightness == Brightness.dark ? 2 : 0.1, color: widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Color(0xFF00CB7D).withOpacity(0.2) : Colors.grey.withOpacity(0.35)),
+          border: Border.all(width: widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? 0 : 1 : MediaQuery.of(context).platformBrightness == Brightness.dark ? 2 : 0.1, color: widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : SColors.activeColor.withOpacity(0.2) : Colors.grey.withOpacity(0.35)),
           borderRadius: BorderRadius.only(
               bottomLeft: const Radius.circular(10),
               bottomRight: widget.reverse && widget.showTimeStamp ? const Radius.circular(0) : const Radius.circular(10),
@@ -214,8 +215,8 @@ class _MessageCardState extends State<MessageCard> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ?  Colors.white.withOpacity(0.1) : const Color(0xFF00CB7D).withOpacity(0.05) : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.white,
-                widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.05) : const Color(0xFF00CB7D).withOpacity(0.05)  : MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.transparent : Colors.white
+                widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ?  Colors.white.withOpacity(0.1) : SColors.activeColor.withOpacity(0.05) : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.white,
+                widget.reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.05) : SColors.activeColor.withOpacity(0.05)  : MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.transparent : Colors.white
               ]),
 
         ),
@@ -241,7 +242,7 @@ class _MessageCardState extends State<MessageCard> {
                     padding: const EdgeInsets.only(left: 15.0, right: 12, top: 12),
                     child: Text(_homeController.nicknames[userDTO.wallet] != null ?
                     _homeController.nicknames[userDTO.wallet] + (userDTO.userName!.isEmpty ? "" : " (${userDTO.userName!})") : (userDTO.userName!.isEmpty ? "${userDTO.wallet!.substring(0, 6)}...${userDTO.wallet!.substring(userDTO.wallet!.length - 4)}" : userDTO.userName!), maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Color(0xFF00CB7D): Colors.blueGrey),),
+                      style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? SColors.activeColor: Colors.blueGrey),),
                   ),
                   if (widget.hasQuotedMessage) QuotedMessage(
                       reverse: widget.reverse,
@@ -303,7 +304,7 @@ class _MessageCardState extends State<MessageCard> {
                                 showThreadReplyIndicator: widget.showThreadReplyIndicator,
                                 showTimeStamp: widget.showTimeStamp,
                                 showUsername: false,
-                                streamChatTheme: StreamChatThemeData(colorTheme: StreamColorTheme.dark(appBg: Colors.red)),
+                                streamChatTheme: StreamChatThemeData(colorTheme: StreamColorTheme.dark(appBg: Colors.red,accentPrimary: SColors.activeColor)),
                                 onThreadTap: widget.onThreadTap,
                                 deletedBottomRowBuilder: widget.deletedBottomRowBuilder,
                                 streamChat: widget.streamChat,

@@ -19,6 +19,7 @@ import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../views/profile/profile_else_screen.dart';
 import '../chats/detailed_chat_screen.dart';
@@ -285,7 +286,7 @@ class _CallsScreenState extends State<CallsScreen> {
           },
           child: ClipRRect(
             borderRadius: BorderRadius.circular(90),
-            child: CachedNetworkImage(imageUrl: callDto.called.picture!, width: 50, height: 50, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+            child: CachedNetworkImage(imageUrl: callDto.called.picture!, width: 50, height: 50, fit: BoxFit.cover,placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", width: 50, height: 50, fit: BoxFit.cover)),
           ),
         ),
@@ -304,7 +305,7 @@ class _CallsScreenState extends State<CallsScreen> {
                 children: [
                 InkWell(onTap:()async{
                   await _callController.inviteCall(callDto.called, DateTime.now().toString(), _homeController.id.value);
-                  } ,child: Image.asset("assets/images/call_tab.png", color: const Color(0xFF00CB7D), width: 20, height: 20,)),
+                  } ,child: Image.asset("assets/images/call_tab.png", color: SColors.activeColor, width: 20, height: 20,)),
                 const SizedBox(width: 10,),
                 InkWell(
                   onTap: () {

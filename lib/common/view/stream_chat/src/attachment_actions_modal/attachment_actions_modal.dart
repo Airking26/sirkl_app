@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../config/s_colors.dart';
 import '../../stream_chat_flutter.dart';
 
 /// Widget that shows the options in the gallery view
@@ -346,7 +347,7 @@ class AttachmentActionsModal extends StatelessWidget {
                                   children: [
                                     CircularProgressIndicator(
                                       strokeWidth: 8,
-                                        color: Color(0xff00CB7D)
+                                        color: SColors.activeColor
                                     ),
                                     Center(
                                       child: Text(

@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// ![screenshot](https://raw.githubusercontent.com/GetStream/stream-chat-flutter/master/packages/stream_chat_flutter/screenshots/channel_image.png)
 /// ![screenshot](https://raw.githubusercontent.com/GetStream/stream-chat-flutter/master/packages/stream_chat_flutter/screenshots/channel_image_paint.png)
 ///
@@ -101,7 +103,7 @@ class StreamChannelAvatar extends StatelessWidget {
               onTap: onTap,
               child: CachedNetworkImage(
                 imageUrl: channelImage,
-                placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+                placeholder: (context, url) => Center(child:  CircularProgressIndicator(color: SColors.activeColor)),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"),
                 fit: BoxFit.cover,
               ),

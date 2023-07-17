@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// {@template streamUploadProgressIndicator}
 /// Shows the upload progress of an attachment.
 /// {@endtemplate}
@@ -52,7 +54,7 @@ class StreamUploadProgressIndicator extends StatelessWidget {
             height: 16,
             width: 16,
             child: CircularProgressIndicator(
-              color: Color(0xff00CB7D),
+              color: SColors.activeColor,
               strokeWidth: 3,
               //valueColor: AlwaysStoppedAnimation(progressIndicatorColor),
             ),

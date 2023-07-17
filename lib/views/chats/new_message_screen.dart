@@ -21,6 +21,7 @@ import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../common/view/dialog/custom_dial.dart';
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import '../../global_getx/chats/chats_controller.dart';
@@ -366,7 +367,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             _chatController.chipsList.removeAt(index);
             _chatController.chipsList.refresh();
           },
-          backgroundColor: const Color(0xFF00CB7D),
+          backgroundColor: SColors.activeColor,
           label: Text(
             _chatController.chipsList[index].userName.isNullOrBlank! ? "${_chatController.chipsList[index].wallet!.substring(0, 10)}..." : _chatController.chipsList[index].userName!,
             style: const TextStyle(
@@ -416,7 +417,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             borderRadius: BorderRadius.circular(90.0), child:
         item.picture == null ?
         SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
-        CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+        CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
             errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))),
         trailing: _chatController.sendingMessageMode.value == 2 ? Checkbox(
           onChanged: (selected) {
@@ -432,15 +433,15 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               _chatController.chipsList.refresh();
           },
           value: _chatController.chipsList.map((element) => element.wallet).contains(item.wallet),
-          checkColor: const Color(0xFF00CB7D),
+          checkColor: SColors.activeColor,
           fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
           side: MaterialStateBorderSide.resolveWith(
-            (states) => const BorderSide(width: 1.0, color: Color(0xFF00CB7D)),
+            (states) =>  BorderSide(width: 1.0, color: SColors.activeColor),
           ),
         ) :
         /*_chatController.sendingMessageMode.value == 3 ? Padding(
           padding: const EdgeInsets.only(right: 8.0),
-          child: IconButton(icon : item.id.isNullOrBlank! ? Image.asset("assets/images/chat_tab.png", color:  const Color(0xFF00CB7D),) :
+          child: IconButton(icon : item.id.isNullOrBlank! ? Image.asset("assets/images/chat_tab.png", color:  SColors.activeColor,) :
           const Icon(Icons.person_add_alt_1_rounded, size: 28,), onPressed: () async {
             if(item.id.isNullOrBlank!){
               var idChannel = DateTime
@@ -472,7 +473,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                 utils.showToast(context, "This user is already in your SIRKL");
               }
             }
-          }, color: const Color(0xFF00CB7D),),
+          }, color: SColors.activeColor,),
         ) :*/
         const SizedBox(height: 0, width: 0,),
         title: Transform.translate(
@@ -554,7 +555,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               },
               child:
                   _chatController.messageSending.value ?
-                      const SizedBox(width: 55, height: 55, child: Center(child: CircularProgressIndicator(color: Color(0xff00CB7D),),)) :
+                       SizedBox(width: 55, height: 55, child: Center(child: CircularProgressIndicator(color: SColors.activeColor,),)) :
               Container(
                 width: 55,
                 height: 55,

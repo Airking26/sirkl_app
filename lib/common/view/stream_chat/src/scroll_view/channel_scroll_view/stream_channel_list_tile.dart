@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../../../../../config/s_colors.dart';
 import '../../../../../../global_getx/home/home_controller.dart';
 
 /// A widget that displays a channel preview.
@@ -213,7 +214,7 @@ class StreamChannelListTile extends StatelessWidget {
               padding: EdgeInsets.zero,
               onPressed: onFavPressed,
               backgroundColor: Colors.white,
-              foregroundColor: isFav! ? const Color(0xff00CB7D) : Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
+              foregroundColor: isFav! ? SColors.activeColor : Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
               icon: isFav! ? Icons.favorite_rounded : Icons.favorite_border_rounded,
             )] : isFriends! ?
             [SlidableAction(
@@ -235,7 +236,7 @@ class StreamChannelListTile extends StatelessWidget {
                 onPressed: onAddPressed,
                 backgroundColor: Colors.white,
                 foregroundColor: Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282),
-                child: Image.asset("assets/images/add_user.png", color: const Color(0xff00CB7D), width: 20, height: 20,),
+                child: Image.asset("assets/images/add_user.png", color: SColors.activeColor, width: 20, height: 20,),
               )],
           ),
           child: ListTile(

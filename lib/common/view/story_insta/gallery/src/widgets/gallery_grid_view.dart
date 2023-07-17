@@ -9,6 +9,8 @@ import 'package:sirkl/common/view/story_insta/gallery/src/widgets/lazy_load_scro
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../../config/s_colors.dart';
+
 ///
 class GalleryGridView extends StatelessWidget {
   ///
@@ -109,9 +111,9 @@ class GalleryGridView extends StatelessWidget {
                             }
                           });
                         },
-                        child: const Icon(
+                        child:  Icon(
                           CupertinoIcons.camera,
-                          color: Color(0xFF00CB7D),
+                          color: SColors.activeColor,
                           size: 26,
                         ),
                       );

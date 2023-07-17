@@ -4,6 +4,8 @@ import 'package:sirkl/common/view/story_insta/camera/src/widgets/ui_handler.dart
 import 'package:sirkl/common/view/story_insta/editor/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../../config/s_colors.dart';
+
 ///
 class EditorShutterButton extends StatelessWidget {
   ///
@@ -66,9 +68,9 @@ class EditorShutterButton extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),
-                child: const Icon(
+                child:  Icon(
                   Icons.send_rounded,
-                  color: Color(0xFF00CB7D),
+                  color: SColors.activeColor,
                 ),
               ),
             ),

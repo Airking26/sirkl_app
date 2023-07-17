@@ -14,6 +14,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 
@@ -82,7 +83,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         textFieldConfiguration: TextFieldConfiguration(
                             controller: userController,
                             //enabled: _chatController.contactAddIsEmpty.value,
-                            cursorColor: const Color(0xFF00CB7D),
+                            cursorColor: SColors.activeColor,
                             autofocus: true,
                             decoration: InputDecoration(
                                 hintText:
@@ -172,9 +173,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                   width: 56,
                                   height: 56,
                                   fit: BoxFit.cover,
-                                  placeholder: (context, url) => const Center(
+                                  placeholder: (context, url) =>  Center(
                                       child: CircularProgressIndicator(
-                                          color: Color(0xff00CB7D))),
+                                          color: SColors.activeColor)),
                                   errorWidget: (context, url, error) =>
                                       Image.asset(
                                           "assets/images/app_icon_rounded.png"))),
@@ -349,12 +350,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
                     }
                   }
                 },
-                child: _commonController.contactAddLoading.value ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Color(0xff00CB7D),)) : Text(
+                child: _commonController.contactAddLoading.value ?  SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: SColors.activeColor,)) : Text(
                   "Add",
                   style: TextStyle(
                     color: _chatController.contactAddIsEmpty.value
                         ? Colors.grey
-                        : const Color(0xff00CB7D),
+                        : SColors.activeColor,
                     fontFamily: "Gilroy",
                     fontWeight: FontWeight.w600,
                   ),

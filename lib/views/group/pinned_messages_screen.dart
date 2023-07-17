@@ -7,6 +7,7 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
 
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 
@@ -41,7 +42,7 @@ class _PinnedMessageScreenState extends State<PinnedMessageScreen> {
                   margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 8),
                     decoration: BoxDecoration(color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? Colors.white.withOpacity(0.1) : const Color(0xFF00CB7D).withOpacity(0.2), borderRadius: BorderRadius.circular(5)),
+                        ? Colors.white.withOpacity(0.1) : SColors.activeColor.withOpacity(0.2), borderRadius: BorderRadius.circular(5)),
                     child: Column(
                       children: [
                         Padding(

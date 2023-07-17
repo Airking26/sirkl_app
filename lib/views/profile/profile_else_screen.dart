@@ -19,6 +19,7 @@ import 'package:sirkl/views/profile/settings_profile_else_screen.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../chats/nested_detailed_chat_screen.dart';
 
@@ -135,7 +136,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                               widget.fromConversation ? Navigator.of(context).pop():
                               pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true, fromProfile: true), withNavBar: false).then((value) => _navigationController.hideNavBar.value = !widget.fromNested);
                             }
-                          }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :const Color(0xff00CB7D), height: 28, width: 28,)),
+                          }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :SColors.activeColor, height: 28, width: 28,)),
                         ],),
                     ),
                   ),
@@ -151,7 +152,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                           child: GestureDetector(onTap: (){},
                               child:_commonController.userClicked.value!.picture == null ?
                               TinyAvatar(baseString: _commonController.userClicked.value!.wallet!, dimension: 140, circular: true, colourScheme: TinyAvatarColourScheme.seascape) :
-                            CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture! , color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                            CachedNetworkImage(imageUrl: _commonController.userClicked.value!.picture! , color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))
                           ,),)
                   ),
@@ -171,9 +172,9 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${_commonController.userClicked.value!.wallet!.substring(0,6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}",overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF00CB7D), fontSize: 16),),
+                    Text("${_commonController.userClicked.value!.wallet!.substring(0,6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}",overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center, style:  TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: SColors.activeColor, fontSize: 16),),
                     const SizedBox(width: 4,),
-                    Image.asset("assets/images/copy.png", height: 18, width: 18, color: const Color(0xFF00CB7D),)
+                    Image.asset("assets/images/copy.png", height: 18, width: 18, color: SColors.activeColor,)
                   ],
                 ),
               ),
@@ -203,8 +204,8 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                     child: PagedListView(
                       pagingController: pagingController,
                       builderDelegate: PagedChildBuilderDelegate<NftDto>(
-                          firstPageProgressIndicatorBuilder: (context) => const Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
-                          newPageProgressIndicatorBuilder: (context) => const Center(child: CircularProgressIndicator(color: Color(0xFF00CB7D),),),
+                          firstPageProgressIndicatorBuilder: (context) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor,),),
+                          newPageProgressIndicatorBuilder: (context) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor,),),
                           itemBuilder:  (context, item, index) => CardNFT(item, _commonController, index)),
                     ),
                   ),
@@ -251,7 +252,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
             ],
           ),
           child: ExpansionTile(
-              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.nftDto.collectionImage!, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.nftDto.collectionImage!, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                   errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
             title: Text(widget.nftDto.title!, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black)),
             subtitle: Text("${widget.nftDto.images!.length} available", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
@@ -275,7 +276,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
                       child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: SizedBox.fromSize(
-                              child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: widget.nftDto.images![i], width: 80, height: 70,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                              child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: widget.nftDto.images![i], width: 80, height: 70,placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                                   errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
                     );
                   }, scrollDirection: Axis.horizontal,)),

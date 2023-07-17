@@ -6,6 +6,8 @@ import 'package:sirkl/common/view/stream_chat/src/attachment/attachment_widget.d
 import 'package:sirkl/common/view/stream_chat/src/utils/typedefs.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// {@template streamGiphyAttachment}
 /// Shows a GIF attachment in a [StreamMessageWidget].
 /// {@endtemplate}
@@ -112,8 +114,8 @@ class StreamGiphyAttachment extends StreamAttachmentWidget {
                       placeholder: (_, __) => SizedBox(
                         width: constraints?.maxHeight,
                         height: constraints?.maxWidth,
-                        child: const Center(
-                          child: CircularProgressIndicator(color: Color(0xff00CB7D)),
+                        child:  Center(
+                          child: CircularProgressIndicator(color: SColors.activeColor),
                         ),
                       ),
                       imageUrl: imageUrl,

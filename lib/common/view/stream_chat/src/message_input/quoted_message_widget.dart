@@ -7,6 +7,8 @@ import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.da
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// {@template streamQuotedMessage}
 /// Widget for the quoted message.
 /// {@endtemplate}
@@ -302,8 +304,8 @@ class _ParseAttachments extends StatelessWidget {
             return SizedBox(
               width: size.width,
               height: size.height,
-              child: const Center(
-                child: CircularProgressIndicator(color: Color(0xff00CB7D)),
+              child:  Center(
+                child: CircularProgressIndicator(color: SColors.activeColor),
               ),
             );
           },
@@ -394,7 +396,7 @@ class _VideoAttachmentThumbnailState extends State<_VideoAttachmentThumbnail> {
       width: 32,
       child: _controller.value.isInitialized
           ? VideoPlayer(_controller)
-          : const CircularProgressIndicator(color: Color(0xff00CB7D)),
+          :  CircularProgressIndicator(color: SColors.activeColor),
     );
   }
 }

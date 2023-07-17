@@ -8,6 +8,7 @@ import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../../config/s_colors.dart';
 import '../../../../../../global_getx/home/home_controller.dart';
 
 /// A widget that displays a user.
@@ -167,7 +168,7 @@ class StreamUserListTile extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, fontFamily: "Gilroy",color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
             ),
         SizedBox(width: channelRole == "channel_moderator" || _chatController.channel.value!.createdBy!.id == user.id  ? 4 : 0,),
-        channelRole == "channel_moderator" || _chatController.channel.value!.createdBy!.id == user.id  ? const Icon(Icons.diamond_outlined, color: Color(0xFF00CB7D), size: 16,) : const SizedBox(height: 0, width: 0,)
+        channelRole == "channel_moderator" || _chatController.channel.value!.createdBy!.id == user.id  ?  Icon(Icons.diamond_outlined, color: SColors.activeColor, size: 16,) : const SizedBox(height: 0, width: 0,)
       ],
     );
 
@@ -199,7 +200,7 @@ class StreamUserListTile extends StatelessWidget {
           padding: EdgeInsets.zero,
           onPressed: onAdminPressed,
           backgroundColor: Colors.white,
-          foregroundColor: channelRole == "channel_moderator" ?  Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282) : const Color(0xFF00CB7D),
+          foregroundColor: channelRole == "channel_moderator" ?  Get.isDarkMode ? const Color(0xff9BA0A5) : const Color(0xFF828282) : SColors.activeColor,
           icon: Icons.diamond_outlined,
         )
       ],),

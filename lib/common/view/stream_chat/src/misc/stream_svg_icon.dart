@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// {@template streamSvgIcon}
 /// Icon set of stream chat
 /// {@endtemplate}
@@ -73,7 +75,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_love_reaction.svg',
-      color: Color(0xFF00CB7D),
+      color: SColors.activeColor,
       width: size,
       height: size,
     );
@@ -86,7 +88,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_thumbs_up_reaction.svg',
-      color: Color(0xFF00CB7D),
+      color: SColors.activeColor,
       width: size,
       height: size,
     );
@@ -99,7 +101,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_thumbs_down_reaction.svg',
-      color: Color(0xFF00CB7D),
+      color: SColors.activeColor,
       width: size,
       height: size,
     );
@@ -112,7 +114,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_LOL_reaction.svg',
-      color: Color(0xFF00CB7D),
+      color: SColors.activeColor,
       width: size,
       height: size,
     );
@@ -125,7 +127,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_wut_reaction.svg',
-      color: Color(0xFF00CB7D),
+      color: SColors.activeColor,
       width: size,
       height: size,
     );
@@ -255,7 +257,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_check.svg',
-      color: Color(0xFF00CB7D),
+      color: SColors.activeColor,
       width: size,
       height: size,
     );
@@ -268,7 +270,7 @@ class StreamSvgIcon extends StatelessWidget {
   }) {
     return StreamSvgIcon(
       assetName: 'Icon_check_all.svg',
-      color: Color(0xFF00CB7D),
+      color: SColors.activeColor,
       width: size,
       height: size,
     );

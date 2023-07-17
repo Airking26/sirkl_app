@@ -6,6 +6,8 @@ import 'package:sirkl/common/view/story_insta/camera/src/widgets/ui_handler.dart
 import 'package:sirkl/common/view/story_insta/editor/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../../config/s_colors.dart';
+
 ///
 class EditorCloseButton extends StatelessWidget {
   ///
@@ -83,7 +85,7 @@ class _AppDialog extends StatelessWidget {
       child: Text(
         'NO',
         style: Theme.of(context).textTheme.button!.copyWith(
-              color: const Color(0xFF00CB7D),
+              color: SColors.activeColor,
             ),
       ),
     );
@@ -94,7 +96,7 @@ class _AppDialog extends StatelessWidget {
       child: Text(
         'DISCARD',
         style: Theme.of(context).textTheme.button!.copyWith(
-              color: const Color(0xFF00CB7D),
+              color: SColors.activeColor,
             ),
       ),
     );

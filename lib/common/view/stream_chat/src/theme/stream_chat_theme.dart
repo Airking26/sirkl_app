@@ -8,6 +8,8 @@ import 'package:sirkl/common/view/stream_chat/src/theme/message_theme.dart';
 import 'package:sirkl/common/view/stream_chat/src/theme/text_theme.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
+import '../../../../../config/s_colors.dart';
+
 /// {@template streamChatTheme}
 /// Inherited widget providing the [StreamChatThemeData] to the widget tree
 /// {@endtemplate}
@@ -65,7 +67,7 @@ class StreamChatThemeData {
     brightness ??= colorTheme?.brightness ?? Brightness.light;
     final isDark = brightness == Brightness.dark;
     textTheme ??= isDark ? StreamTextTheme.dark() : StreamTextTheme.light();
-    colorTheme ??= isDark ? StreamColorTheme.dark() : StreamColorTheme.light();
+    colorTheme ??= isDark ? StreamColorTheme.dark(accentPrimary: SColors.activeColor) : StreamColorTheme.light(accentPrimary: SColors.activeColor);
 
     final defaultData = StreamChatThemeData.fromColorAndTextTheme(
       colorTheme,

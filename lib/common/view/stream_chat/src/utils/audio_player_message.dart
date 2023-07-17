@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:sirkl/common/view/stream_chat/src/utils/audio_loading_message.dart';
 
+import '../../../../../config/s_colors.dart';
+
 class AudioPlayerMessage extends StatefulWidget {
   const AudioPlayerMessage({
     Key? key,
@@ -72,7 +74,7 @@ class AudioPlayerMessageState extends State<AudioPlayerMessage> {
       stream: _audioPlayer.playingStream,
       builder: (context, _) {
         final color =
-        _audioPlayer.playerState.playing ? const Color(0xff00CB7D) : const Color(0xff00CB7D);
+        _audioPlayer.playerState.playing ? SColors.activeColor : SColors.activeColor;
         final icon =
         _audioPlayer.playerState.playing ? Icons.pause : Icons.play_arrow;
         return Padding(
@@ -102,7 +104,7 @@ class AudioPlayerMessageState extends State<AudioPlayerMessage> {
       builder: (context, snapshot) {
         if (snapshot.hasData && duration != null) {
           return Slider(
-            activeColor: const Color(0xff00CB7D),
+            activeColor: SColors.activeColor,
             thumbColor: Colors.grey,
             inactiveColor: Colors.grey,
             value: snapshot.data!.inMicroseconds / duration.inMicroseconds,

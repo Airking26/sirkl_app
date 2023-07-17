@@ -16,6 +16,7 @@ import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
 
+import '../../config/s_colors.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import '../../global_getx/navigation/navigation_controller.dart';
 import 'create_group_second_screen.dart';
@@ -72,7 +73,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                             await _profileController.getImageForGroup();
                           },
                               child:
-                              Obx(() => CachedNetworkImage(imageUrl: _profileController.urlPictureGroup.value, color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+                              Obx(() => CachedNetworkImage(imageUrl: _profileController.urlPictureGroup.value, color: Colors.white.withOpacity(0.0),fit: BoxFit.cover, colorBlendMode: BlendMode.difference,placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                                   errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))))
                           ,),)
                     ),
@@ -88,15 +89,15 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                           }
                         },
                         style: const TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.w500),
-                        cursorColor: const Color(0xff00CB7D),
+                        cursorColor: SColors.activeColor,
                         maxLines: 1,
                         maxLength: 10,
-                        decoration: const InputDecoration(hintText: "Name of the group", hintStyle: TextStyle(fontFamily: "Gilroy"),
+                        decoration:  InputDecoration(hintText: "Name of the group", hintStyle: TextStyle(fontFamily: "Gilroy"),
                           enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xff00CB7D)),
+                            borderSide: BorderSide(color: SColors.activeColor),
                           ),
                           focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xff00CB7D)),
+                            borderSide: BorderSide(color: SColors.activeColor),
                           ), ),
                       ),
                     )
@@ -134,7 +135,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                             Checkbox(value: _chatController.groupType.value == 0, onChanged: (checked){
                               if(checked!) _chatController.groupType.value = 0;
                             },
-                              checkColor: const Color(0xFF00CB7D),
+                              checkColor: SColors.activeColor,
                               fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
                               side: MaterialStateBorderSide.resolveWith(
                                     (states) => const BorderSide(width: 0.0, color: Colors.transparent),
@@ -153,7 +154,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                             Checkbox(value: _chatController.groupType.value == 1, onChanged: (checked){
                               if(checked!) _chatController.groupType.value = 1;
                             },
-                              checkColor: const Color(0xFF00CB7D),
+                              checkColor: SColors.activeColor,
                               fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
                               side: MaterialStateBorderSide.resolveWith(
                                     (states) => const BorderSide(width: 0.0, color: Colors.transparent),
@@ -203,7 +204,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                             Checkbox(value: _chatController.groupVisibility.value == 0, onChanged: (checked){
                               if(checked!) _chatController.groupVisibility.value = 0;
                             },
-                              checkColor: const Color(0xFF00CB7D),
+                              checkColor: SColors.activeColor,
                               fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
                               side: MaterialStateBorderSide.resolveWith(
                                     (states) => const BorderSide(width: 0.0, color: Colors.transparent),
@@ -222,7 +223,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                             Checkbox(value: _chatController.groupVisibility.value == 1, onChanged: (checked){
                               if(checked!) _chatController.groupVisibility.value = 1;
                             },
-                              checkColor: const Color(0xFF00CB7D),
+                              checkColor: SColors.activeColor,
                               fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
                               side: MaterialStateBorderSide.resolveWith(
                                     (states) => const BorderSide(width: 0.0, color: Colors.transparent),
@@ -268,7 +269,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                             Checkbox(value: _chatController.groupPaying.value == 0, onChanged: (checked){
                               if(checked!) _chatController.groupPaying.value = 0;
                             },
-                              checkColor: const Color(0xFF00CB7D),
+                              checkColor: SColors.activeColor,
                               fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
                               side: MaterialStateBorderSide.resolveWith(
                                     (states) => const BorderSide(width: 0.0, color: Colors.transparent),
@@ -292,7 +293,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                                 _utils.showToast(context, "You don't have any token link with this wallet.");
                                 */
                             },
-                              checkColor: const Color(0xFF00CB7D),
+                              checkColor: SColors.activeColor,
                               fillColor: MaterialStateProperty.all<Color>(Colors.transparent),
                               side: MaterialStateBorderSide.resolveWith(
                                     (states) => const BorderSide(width: 0.0, color: Colors.transparent),
@@ -324,7 +325,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                                   child: TextField(
                                     controller: _priceController,
                                     keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.center,cursorColor: const Color(0xff00CB7D), decoration: const InputDecoration(
+                                    textAlign: TextAlign.center,cursorColor: SColors.activeColor, decoration: const InputDecoration(
                                       hintText: "0.0", hintStyle: TextStyle(fontWeight: FontWeight.w500, fontFamily: "Gilroy", fontSize: 18),contentPadding: EdgeInsets.only(bottom: 4), isDense: true, enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(color: Colors.grey, width: 0.5),
                                   ), focusedBorder: UnderlineInputBorder(
@@ -409,7 +410,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                     });
                   }
                 }
-              }, child: Text("Create", style: TextStyle(color: _chatController.groupNameIsEmpty.value ? Colors.grey : const Color(0xff00CB7D), fontFamily: "Gilroy", fontWeight: FontWeight.w600,),),),
+              }, child: Text("Create", style: TextStyle(color: _chatController.groupNameIsEmpty.value ? Colors.grey : SColors.activeColor, fontFamily: "Gilroy", fontWeight: FontWeight.w600,),),),
             ],
           ),
         ),
@@ -425,7 +426,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
     //     children: const [
     //       Padding(
     //         padding: EdgeInsets.only(bottom: 24.0, top: 12),
-    //         child: CircularProgressIndicator(color: Color(0xFF00CB7D),),
+    //         child: CircularProgressIndicator(color: SColors.activeColor,),
     //       ),
     //       Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
     //     ],),

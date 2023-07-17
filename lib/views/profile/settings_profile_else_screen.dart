@@ -20,6 +20,7 @@ import 'package:sirkl/views/profile/profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import '../chats/nested_detailed_chat_screen.dart';
@@ -82,9 +83,9 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                       colorBlendMode:
                       BlendMode.difference,
                       placeholder: (context, url) =>
-                      const Center(
+                       Center(
                           child: CircularProgressIndicator(
-                              color: Color(0xff00CB7D))),
+                              color: SColors.activeColor)),
                       errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),
                 ),
               ),
@@ -109,9 +110,9 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset('assets/images/add_user.png', color: const Color(0xFF00CB7D), width: 24, height: 24,),
+                          Image.asset('assets/images/add_user.png', color: SColors.activeColor, width: 24, height: 24,),
                           const SizedBox(height: 4),
-                          const Text("Add", style: TextStyle(fontFamily: "Gilroy", color: Color(0xFF00CB7D)),)
+                           Text("Add", style: TextStyle(fontFamily: "Gilroy", color: SColors.activeColor),)
                         ],),
                     ),
                   ),
@@ -261,7 +262,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                                     .unmuteUser(
                                     _commonController.userClicked.value!.id!);
                               }
-                          } : null, activeColor: const Color(0xFF00CB7D), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,),
+                          } : null, activeColor: SColors.activeColor, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,),
                         )
                       ],
                     ),
@@ -451,9 +452,9 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                   _profileController.usernameElseTextEditingController.value.clear();
                   _commonController.showSirklUsers(_homeController.id.value);
                 },
-                child: const Padding(
+                child:  Padding(
                   padding: EdgeInsets.only(top: 16.0, left: 16),
-                  child: Text("DONE", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF00CB7D))),
+                  child: Text("DONE", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w700, color: SColors.activeColor)),
                 ),
               ) :
               IconButton(

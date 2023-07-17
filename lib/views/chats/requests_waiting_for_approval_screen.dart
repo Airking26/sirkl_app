@@ -8,6 +8,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 
 class RequestWaitingForApprovalScreen extends StatefulWidget {
@@ -68,7 +69,7 @@ class _RequestWaitingForApprovalScreenState extends State<RequestWaitingForAppro
                   _chatController.requestsWaiting.refresh();
                   if(_chatController.requestsWaiting.isEmpty) Navigator.pop(context);
                 }
-              }, icon: const Icon(Icons.add, color: Color(0xff00CB7D),)),
+              }, icon:  Icon(Icons.add, color: SColors.activeColor,)),
               IconButton(onPressed: () async {
                 if(await _chatController.acceptDeclineRequest(RequestToJoinDto(receiver: _homeController.id.value, requester: item.id, channelName: _chatController.channel.value!.extraData["nameOfGroup"] as String, channelId: _chatController.channel.value!.id!, accept: false))){
                   _chatController.requestsWaiting.removeWhere((element) => element.id == item.id);
@@ -82,7 +83,7 @@ class _RequestWaitingForApprovalScreenState extends State<RequestWaitingForAppro
           SizedBox(height: 50, width: 50, child: TinyAvatar(baseString: item.wallet?? "", dimension: 50, circular: true, colourScheme:TinyAvatarColourScheme.seascape )) :
           ClipRRect(
             borderRadius: BorderRadius.circular(90),
-            child: CachedNetworkImage(imageUrl: item.picture!, width: 50, height: 50, fit: BoxFit.cover,placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Color(0xff00CB7D))),
+            child: CachedNetworkImage(imageUrl: item.picture!, width: 50, height: 50, fit: BoxFit.cover,placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", width: 50, height: 50, fit: BoxFit.cover)),
           ),
           title: Transform.translate(

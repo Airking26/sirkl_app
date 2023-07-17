@@ -14,6 +14,7 @@ import 'package:sirkl/common/utils.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
+import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../views/profile/profile_else_screen.dart';
 
@@ -277,7 +278,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
                 borderRadius: BorderRadius.circular(90.0), child:
             item.picture == null ?
             SizedBox(width: 56, height: 56, child: TinyAvatar(baseString: item.wallet!, dimension: 56, circular: true, colourScheme: TinyAvatarColourScheme.seascape,)) :
-            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => Center(child: const CircularProgressIndicator(color: Color(0xff00CB7D))),
+            CachedNetworkImage(imageUrl: item.picture!, width: 56, height: 56, fit: BoxFit.cover,placeholder: (context, url) => Center(child:  CircularProgressIndicator(color: SColors.activeColor)),
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         trailing: InkWell(
           onTap: () async {
@@ -288,7 +289,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
             padding: const EdgeInsets.only(right: 8.0),
             child: Image.asset(
               "assets/images/call_tab.png",
-              color: const Color(0xFF00CB7D),
+              color: SColors.activeColor,
               width: 20,
               height: 20,
             ),

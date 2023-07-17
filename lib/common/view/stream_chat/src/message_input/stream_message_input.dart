@@ -29,6 +29,8 @@ import 'package:sirkl/global_getx/home/home_controller.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
 
+import '../../../../../config/s_colors.dart';
+
 
 const _kCommandTrigger = '/';
 const _kMentionTrigger = '@';
@@ -500,12 +502,12 @@ class StreamMessageInputState extends State<StreamMessageInput>
                         AlertDialog alert = AlertDialog(
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            children:  [
                               Padding(
-                                padding: EdgeInsets.only(bottom: 24.0, top: 12),
-                                child: CircularProgressIndicator(color: Color(0xFF00CB7D),),
+                                padding: const EdgeInsets.only(bottom: 24.0, top: 12),
+                                child: CircularProgressIndicator(color: SColors.activeColor,),
                               ),
-                              Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+                            const  Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
                             ],),
                         );
                         await _homeController.connectWallet(context);
