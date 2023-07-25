@@ -158,9 +158,7 @@ class ProfileController extends GetxController{
   }
 
   deleteUser(String id) async{
-
-      await ProfileRepo.deleteUser( id);
-
+      await ProfileRepo.deleteUser(id);
   }
 
   Future<Uri> createDynamicLink(String link) async{

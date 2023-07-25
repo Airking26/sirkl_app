@@ -15,11 +15,11 @@ class SColors {
   }
 
   static void _loadlight() {
-    activeColor = SColors.activeColor;
+    activeColor = const Color(0xFF00CB7D);
   }
 
   static void _loadDark() {
-     activeColor = SColors.activeColor;
+     activeColor = const Color(0xFF00CB7D);
 
   }
 

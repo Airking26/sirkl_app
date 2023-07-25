@@ -247,9 +247,7 @@ class HomeController extends GetxController {
       BuildContext context, StreamChatClient client, bool isLogged) async {
     if (accessToken.value.isNotEmpty) {
       final String? fcmToken = await FirebaseMessaging.instance.getToken();
-
       UserDTO userDTO = await HomeRepo.uploadFCMToken(UpdateFcmdto(token: fcmToken, platform: defaultTargetPlatform == TargetPlatform.android? 'android': 'iOS'));
-
         userMe.value = userDTO;
         box.write(
             SharedPref.USER, userDTO.toJson());
@@ -262,7 +260,7 @@ class HomeController extends GetxController {
           var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
           await HomeRepo.uploadAPNToken(token);
         }
-        await getTokenContractAddress(client, "0xc6a4434619fce9266bd7e3d0a9117d2c9b49fd87");
+        await getTokenContractAddress(client, userMe.value.wallet!);
     
     }
   }
