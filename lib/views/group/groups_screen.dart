@@ -100,9 +100,6 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-
-
-
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark

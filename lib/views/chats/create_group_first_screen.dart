@@ -34,8 +34,6 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
   ChatsController get _chatController => Get.find<ChatsController>();
   HomeController get _homeController => Get.find<HomeController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
-  CommonController get _commonController => Get.find<CommonController>();
-  final web3Controller = Get.put(Web3Controller());
   final _priceController = TextEditingController();
   final _utils = Utils();
 

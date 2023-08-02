@@ -10,11 +10,13 @@ import '../config/s_config.dart';
 import '../networks/urls.dart';
 
 class GroupRepo {
+
   static Future<List<GroupDto>> retrieveGroups() async {
     SRequests req = SRequests(SUrls.baseURL);
     Response res = await req.get(SUrls.groupRetrieve);
-    return (res as List<dynamic>).map((e) => GroupDto.fromJson(e)).toList();
+    return (res.jsonBody() as List<dynamic>).map((e) => GroupDto.fromJson(e)).toList();
   }
+
   static Future<ContractCreatorDto?> retrieveCreatorGroup(String contract) async {
     SRequests req = SRequests(SUrls.etherscanBaseUrl);
     Response res = await req.get("api?module=contract&action=getcontractcreation&contractaddresses=$contract&apikey=${SConfig.ethScanApiKey}");
@@ -24,10 +26,10 @@ class GroupRepo {
       return null;
     }
   }
+
   static Future<void> createGroup(GroupCreationDto groupCreationDto) async {
     SRequests req = SRequests(SUrls.baseURL);
     Response res = await req.post(url: SUrls.groupCreate, body: groupCreationDto.toJson());
-
   }
   
   static Future<void> changeAdminRole(AdminDto adminDto) async {

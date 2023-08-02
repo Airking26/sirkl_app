@@ -13,9 +13,10 @@ import 'package:highlight_text/highlight_text.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:nice_buttons/nice_buttons.dart';
-
+import 'package:http/http.dart' as htp;
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 
@@ -30,6 +31,8 @@ import 'package:slider_button/slider_button.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
+import 'package:web3dart/credentials.dart';
+import 'package:web3dart/web3dart.dart';
 import 'package:widget_circular_animator/widget_circular_animator.dart';
 
 import '../../common/utils.dart';
@@ -53,6 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
   CommonController get _commonController => Get.find<CommonController>();
   CallsController get _callController => Get.find<CallsController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
+
   final utils = Utils();
   final storyController = StoryController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -156,9 +161,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               IconButton(
-                  onPressed: () {
-                   
+                  onPressed: () async {
                     if(_homeController.accessToken.value.isNotEmpty) pushNewScreen(context, screen: const AddContactScreen(), withNavBar: false).then((value) => _commonController.users.refresh());
+                    //await _web3Controller.createGroupV2(["example", "new", BigInt.one, EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")], _homeController.userMe.value.wallet!);
                   },
                   icon: Image.asset(
                     "assets/images/add_user.png",

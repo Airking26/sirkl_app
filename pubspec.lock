@@ -250,7 +250,7 @@ packages:
     source: hosted
     version: "3.0.0"
   convert:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: convert
       sha256: "0f08b14755d163f6e2134cb58222dd25ea2a2ee8a195e53983d57c075324d592"
@@ -2056,10 +2056,10 @@ packages:
     dependency: "direct main"
     description:
       name: walletconnect_flutter_v2
-      sha256: "388cabf877b30a6f8daa69345ed34c4a2b70a8c18f303de77270a08d8d9d7ecb"
+      sha256: "47baee579dca5976ac9516fd860f81d951d591e4772df05cd0ae365b57d61f80"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.12"
+    version: "2.0.15"
   web3dart:
     dependency: "direct main"
     description:

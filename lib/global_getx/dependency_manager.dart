@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
@@ -26,5 +27,6 @@ class GlobalDependencyManager extends Bindings {
     Get.put(GroupsController(), permanent: _permanent);
     Get.put(CallsController(), permanent: _permanent);
     Get.put(CommonController(), permanent: _permanent);
+    Get.put(Web3Controller(), permanent: _permanent);
   }
 }

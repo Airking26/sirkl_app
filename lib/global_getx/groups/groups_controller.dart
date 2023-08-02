@@ -26,8 +26,6 @@ import '../../constants/save_pref_keys.dart';
 
 class GroupsController extends GetxController{
 
-
-  final _homeService = HomeRepo();
   final box = GetStorage();
 
   ChatsController get _chatController => Get.find<ChatsController>();
@@ -93,7 +91,7 @@ class GroupsController extends GetxController{
   retrieveGroupsToCreate(StreamChatClient streamChatClient) async{
 
     List<GroupDto> groups = await GroupRepo.retrieveGroups();
-    groups = groups.sublist(2412);
+    groups = groups.sublist(2172);
   
       for (var element in groups) {
         if(!element.image.contains("token-image-placeholder.svg") && !element.image.contains("data:image")) {

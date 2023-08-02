@@ -71,6 +71,7 @@ dependencies:
   stop_watch_timer: ^2.0.0
   syncfusion_flutter_pdfviewer: ^20.4.43
   highlight_text: ^1.6.0
+  convert: ^3.1.1
   camera: ^0.10.1
   video_trimmer: ^2.0.0
   ndialog: ^4.2.3
@@ -85,7 +86,7 @@ dependencies:
   firebase_dynamic_links: ^5.1.1
   flutter_typeahead: ^4.3.7
   flutter_beep: ^1.0.0
-  walletconnect_flutter_v2: ^2.0.12
+  walletconnect_flutter_v2: ^2.0.15
   stream_chat_persistence: ^6.1.0
   web_socket_channel: ^2.4.0
   dart_jsonwebtoken: ^2.3.1

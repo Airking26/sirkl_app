@@ -12,6 +12,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/repo/chats_repo.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
@@ -91,6 +92,7 @@ class HomeController extends GetxController {
   var qrActive = false.obs;
   var notificationActive = true.obs;
   var streamChatToken = "".obs;
+  late String chainToConnect;
 
   Web3App? connector;
 
@@ -120,7 +122,7 @@ class HomeController extends GetxController {
 
   connectWallet(BuildContext context) async {
     connector ??= await Web3App.createInstance(
-      projectId: 'c718fbc5856d92e4a54160117ef81345',
+      projectId: 'bdfe4b74c44308ffb46fa4e6198605af',
       metadata: const PairingMetadata(
         name: 'SIRKL',
         description: 'SIRKL Login',
@@ -129,11 +131,11 @@ class HomeController extends GetxController {
       ),
     );
 
-    ConnectResponse res = await connector!.connect(requiredNamespaces: {
+    ConnectResponse res = await connector!.connect(
+        requiredNamespaces: {
       'eip155': const RequiredNamespace(
-        events: ['session_request','chainChanged',
-          'accountsChanged',],
-        chains: ['eip155:1'], // Ethereum chain
+        events: ['session_request','chainChanged', 'accountsChanged',],
+        chains: [],
         methods: [
           'personal_sign',
           'eth_sign',
@@ -143,6 +145,7 @@ class HomeController extends GetxController {
         ], // Requestable Methods
       ),
     });
+
     try {
       _uri = res.uri!;
       var hasLaunched = await launchUrl(res.uri!, mode: LaunchMode.externalApplication);
@@ -186,11 +189,10 @@ class HomeController extends GetxController {
     }
 
     connector!.onSessionConnect.subscribe((args) {
-      address.value = args!.session.namespaces['eip155']!.accounts.first.split("eip155:1:")[1].toLowerCase();
+      chainToConnect = args!.session.namespaces['eip155']!.accounts.first.split("eip155:")[1].split(':')[0];
+      address.value = args.session.namespaces['eip155']!.accounts.first.split("eip155:$chainToConnect:")[1].toLowerCase();
       debugPrint('Session $address.value');
     });
-
-
   }
 
   String generateSessionMessage(String accountAddress) {
@@ -209,7 +211,7 @@ class HomeController extends GetxController {
        // return;
          var message = generateSessionMessage(address.value);
          launchUrl(_uri, mode: LaunchMode.externalApplication);
-         var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:1", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex, message]));
+         var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:${chainToConnect.toLowerCase()}", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex, message]));
          await loginWithWallet(context, address.value, message, signature);
        } catch (exp) {
          if (kDebugMode) {
@@ -218,21 +220,14 @@ class HomeController extends GetxController {
      }
   }
 
-  loginWithWallet(BuildContext context, String wallet, String message,
-      String signature) async {
+  loginWithWallet(BuildContext context, String wallet, String message, String signature) async {
     SignInSuccessDto signSuccess = await AuthRepo.verifySignature( WalletConnectDto(
             wallet: wallet,
             message: message,
             signature: signature,
-            platform: defaultTargetPlatform == TargetPlatform.android
-                ? "android"
-                : "iOS"));
-  
-
+            platform: defaultTargetPlatform == TargetPlatform.android ? "android" : "iOS"));
       userMe.value = signSuccess.user!;
-  
       accessToken.value = signSuccess.accessToken;
-
       box.write(SharedPref.USER, userToJson(signSuccess.user!));
       isConfiguring.value = true;
       isFirstConnexion.value = true;

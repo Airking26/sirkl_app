@@ -43,7 +43,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get _homeController => Get.find<HomeController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
-  final web3Controller = Get.put(Web3Controller());
   final TextEditingController usernameTextEditingController = TextEditingController();
   final TextEditingController descriptionTextEditingController = TextEditingController();
 
