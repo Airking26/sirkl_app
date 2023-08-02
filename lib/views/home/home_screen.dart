@@ -690,6 +690,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Column buildConnectWalletUI() {
+    if (_navigationController.hideNavBar.isFalse) {
+      Future.delayed(Duration.zero, () {
+       _navigationController.hideNavBar.value = true;
+      });
+    }
     return Column(
       children: [
          SizedBox(
@@ -744,7 +749,9 @@ class _HomeScreenState extends State<HomeScreen> {
             endColor: const Color(0xff0063FB),
             gradientOrientation: GradientOrientation.Horizontal,
             onTap: (finish) async {
-         
+              //_navigationController.hideNavBar.value = !_navigationController.hideNavBar.value;
+              debugPrint('Nav bar  value is ${_navigationController.hideNavBar.value}');
+              
               await _homeController.connectWallet(context);
             },
             child: const Text(

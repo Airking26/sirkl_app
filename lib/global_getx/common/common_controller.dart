@@ -45,9 +45,14 @@ class CommonController extends GetxController {
     ];
     MultiLoadUtil multiLoad = MultiLoadUtil();
 
-    for (var element in chatStreamControllers) {
-      multiLoad.startLoading();
+    for (StreamChannelListController element in chatStreamControllers) {
+      try {
+             multiLoad.startLoading();
       element.refresh().then((value) => multiLoad.stopLoading());
+      }      catch(err) {
+        multiLoad.stopLoading();
+      }
+ 
     }
     await multiLoad.isDone();
   }
@@ -123,6 +128,7 @@ class CommonController extends GetxController {
 
 
     try {
+   
       List<UserDTO> following = await CommonRepo.getSirklUsers(id);
       
         users.clear();

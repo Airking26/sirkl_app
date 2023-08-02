@@ -54,6 +54,7 @@ class SRequests {
   }
       Future<Response> delete(
       {required String url}) async {
+           debugPrint('Calling ${_uriBuilder(url).toString()}');
     final Response response = await http.delete(_uriBuilder(url), headers: await _headers);
 
     handleError(response);

@@ -55,7 +55,6 @@ class HomeController extends GetxController {
 
 
 
-
   NavigationController get _navigationController => Get.find<NavigationController>();
   CommonController get _commonController => Get.find<CommonController>();
   ChatsController get _chatController => Get.find<ChatsController>();
@@ -74,7 +73,7 @@ class HomeController extends GetxController {
 
   var id = "".obs;
   var isConfiguring = false.obs;
-  var accessToken = "".obs;
+  Rx<String> accessToken = "".obs;
   var userMe = UserDTO().obs;
   var userAdded = UserDTO().obs;
   var address = "".obs;
@@ -96,6 +95,7 @@ class HomeController extends GetxController {
 
   Web3App? connector;
 
+
   retrieveAccessToken() {
     var accessTok = box.read(SharedPref.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
@@ -108,6 +108,8 @@ class HomeController extends GetxController {
     } else {
       contractAddresses.value = [];
     }
+    var us = box.read(SharedPref.USER);
+
     UserDTO user = box.read(SharedPref.USER) != null? UserDTO.fromJson(box.read(SharedPref.USER)) : UserDTO();
     
     userMe.value = user;
@@ -121,6 +123,7 @@ class HomeController extends GetxController {
   }
 
   connectWallet(BuildContext context) async {
+
     connector ??= await Web3App.createInstance(
       projectId: 'bdfe4b74c44308ffb46fa4e6198605af',
       metadata: const PairingMetadata(
@@ -226,9 +229,13 @@ class HomeController extends GetxController {
             message: message,
             signature: signature,
             platform: defaultTargetPlatform == TargetPlatform.android ? "android" : "iOS"));
+
+      box.write(SharedPref.USER, signSuccess.user!.toJson());
       userMe.value = signSuccess.user!;
+      
       accessToken.value = signSuccess.accessToken;
-      box.write(SharedPref.USER, userToJson(signSuccess.user!));
+      debugPrint('Login with wallet ${signSuccess.user}');
+      
       isConfiguring.value = true;
       isFirstConnexion.value = true;
       await connectUser(StreamChat.of(context).client);
