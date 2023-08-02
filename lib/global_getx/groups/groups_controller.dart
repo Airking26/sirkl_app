@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -15,14 +14,9 @@ import 'package:sirkl/common/model/contract_creator_dto.dart';
 import 'package:sirkl/common/model/group_creation_dto.dart';
 import 'package:sirkl/common/model/group_dto.dart';
 import 'package:sirkl/common/model/nft_alchemy_dto.dart';
-import 'package:sirkl/common/model/refresh_token_dto.dart';
-import 'package:sirkl/common/model/token_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/repo/group_repo.dart';
-import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/repo/home_repo.dart';
-
-import '../../constants/save_pref_keys.dart';
 
 class GroupsController extends GetxController{
 

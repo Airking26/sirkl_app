@@ -95,7 +95,6 @@ class HomeController extends GetxController {
 
   Web3App? connector;
 
-
   retrieveAccessToken() {
     var accessTok = box.read(SharedPref.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
@@ -108,7 +107,6 @@ class HomeController extends GetxController {
     } else {
       contractAddresses.value = [];
     }
-    var us = box.read(SharedPref.USER);
 
     UserDTO user = box.read(SharedPref.USER) != null? UserDTO.fromJson(box.read(SharedPref.USER)) : UserDTO();
     
@@ -209,9 +207,6 @@ class HomeController extends GetxController {
 
   signMessageWithMetamask(BuildContext context) async {
        try {
-        // the next line is for bypassing the wallet signature only for dev purpose
-       // await loginWithWallet(context, address.value, 'message', 'sign');
-       // return;
          var message = generateSessionMessage(address.value);
          launchUrl(_uri, mode: LaunchMode.externalApplication);
          var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:${chainToConnect.toLowerCase()}", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex, message]));
@@ -240,13 +235,12 @@ class HomeController extends GetxController {
       isFirstConnexion.value = true;
       await connectUser(StreamChat.of(context).client);
       await putFCMToken(context, StreamChat.of(context).client, false);
-      await getAllNftConfig();
       await retrieveInboxes();
+      await getAllNftConfig();
       _navigationController.hideNavBar.value = false;
   }
 
-  putFCMToken(
-      BuildContext context, StreamChatClient client, bool isLogged) async {
+  putFCMToken(BuildContext context, StreamChatClient client, bool isLogged) async {
     if (accessToken.value.isNotEmpty) {
       final String? fcmToken = await FirebaseMessaging.instance.getToken();
       UserDTO userDTO = await HomeRepo.uploadFCMToken(UpdateFcmdto(token: fcmToken, platform: defaultTargetPlatform == TargetPlatform.android? 'android': 'iOS'));
@@ -389,8 +383,6 @@ class HomeController extends GetxController {
 
   Future<List<NftDto>> getNFT(String id, bool isFav, int offset) async {
     if (offset == 0) isInFav.clear();
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
     List<NftDto> nfts = await HomeRepo.retrieveNFTs(
         id: id,
         isFav: isFav,
@@ -525,6 +517,7 @@ class HomeController extends GetxController {
   
       isConfiguring.value = false;
       isFirstConnexion.value = false;
+      _navigationController.hideNavBar.value = false;
   }
 
   registerNotification(NotificationRegisterDto notificationRegisterDto) async {

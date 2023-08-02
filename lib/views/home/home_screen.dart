@@ -180,8 +180,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
-
   Widget buildListOfStories() {
     return Container(
       padding: const EdgeInsets.only(right: 8, left: 8, top: 24),
@@ -970,8 +968,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
-
-
 
   Future<void> fetchPageStories() async {
     try {
