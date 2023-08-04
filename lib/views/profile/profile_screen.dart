@@ -632,14 +632,11 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                               : Colors.black.withOpacity(0.5)),
                   onPressed: () async {
                     bool fav;
-                    if (homeController.isInFav
-                        .contains(widget.nftDto.contractAddress)) {
-                      homeController.isInFav
-                          .remove(widget.nftDto.contractAddress);
+                    if (homeController.isInFav.contains(widget.nftDto.contractAddress)) {
+                      homeController.isInFav.remove(widget.nftDto.contractAddress);
                       fav = false;
                     } else {
-                      homeController.isInFav
-                          .add(widget.nftDto.contractAddress!);
+                      homeController.isInFav.add(widget.nftDto.contractAddress!);
                       fav = true;
                     }
                     // ignore: invalid_use_of_protected_member
@@ -648,8 +645,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                         NftModificationDto(
                             contractAddress: widget.nftDto.contractAddress!,
                             id: homeController.id.value,
-                            isFav: fav),
-                        StreamChat.of(context).client);
+                            isFav: fav));
                     if(fav) {
                       await StreamChat.of(context).client.updateChannelPartial(widget.nftDto.contractAddress!, 'try', set: {"${homeController.id.value}_favorite" : true});
                     } else {

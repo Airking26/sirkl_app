@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use, prefer_typing_uninitialized_variables
 
-import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as htp;
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -12,7 +11,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/repo/chats_repo.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
@@ -24,7 +22,6 @@ import 'package:sirkl/common/model/notification_register_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
-import 'package:sirkl/common/model/token_dto.dart';
 import 'package:sirkl/common/model/token_metadata.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
@@ -34,19 +31,11 @@ import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/repo/profile_repo.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:walletconnect_flutter_v2/apis/core/pairing/utils/pairing_models.dart';
-import 'package:walletconnect_flutter_v2/apis/sign_api/models/proposal_models.dart';
-import 'package:walletconnect_flutter_v2/apis/sign_api/models/session_models.dart';
-import 'package:walletconnect_flutter_v2/apis/sign_api/models/sign_client_models.dart';
-import 'package:walletconnect_flutter_v2/apis/web3app/web3app.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 
-import '../../common/model/refresh_token_dto.dart';
 import '../../common/model/update_fcm_dto.dart';
 import '../../constants/save_pref_keys.dart';
 import '../../repo/auth_repo.dart';
@@ -330,14 +319,6 @@ class HomeController extends GetxController {
     }*/
   }
 
-  Future<TokenMetadataDTO?> getTokenMetadata(String contractAddress) async {
-
-    TokenMetadataDTO tokenMetaData =
-        await HomeRepo.getTokenMetadataWithAlchemy(contractAddress);
-
-    return tokenMetaData;
-  }
-
   getNFTsContractAddresses(StreamChatClient? client, String wallet) async {
     ContractAddressDto contractAddress = await HomeRepo.getContractAddressesWithAlchemy(wallet: wallet, cursor: '');
       var initialArray = contractAddress.contracts;
@@ -486,17 +467,12 @@ class HomeController extends GetxController {
   }
 
   retrieveNicknames() async {
-
     Map<dynamic, dynamic> names = await HomeRepo.retrieveNicknames();
-
       nicknames.value = names;
-    
   }
 
   Future<List<List<StoryDto>>> retrieveStories(int offset) async {
     if (offset == 0) stories.value?.clear();
-
- 
 
       List<List<StoryDto>> retrivedStories =
           await HomeRepo.retrieveStories(offset.toString());
@@ -512,18 +488,14 @@ class HomeController extends GetxController {
   }
 
   retrieveInboxes() async {
-
     var req = await ChatRepo.walletsToMessages();
-  
       isConfiguring.value = false;
       isFirstConnexion.value = false;
       _navigationController.hideNavBar.value = false;
   }
 
   registerNotification(NotificationRegisterDto notificationRegisterDto) async {
-
     var request = await HomeRepo.registerNotification( notificationRegisterDto);
-
   }
 
   checkOfflineNotifAndRegister() async {

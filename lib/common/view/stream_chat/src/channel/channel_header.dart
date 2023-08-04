@@ -216,7 +216,7 @@ class StreamChannelHeader extends StatelessWidget
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
-                      width: channel.isGroup ? 300 : 280,
+                      width: channel.extraData["isConv"] == null ? 300 : 280,
                       height: 50,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -248,7 +248,7 @@ class StreamChannelHeader extends StatelessWidget
                                           fromConversation: true,
                                           fromProfile: false));
                                 }
-                                else if (channel.isGroup || (channel.extraData['isGroupPaying'] != null &&
+                                else if (channel.extraData["isConv"] == null || (channel.extraData['isGroupPaying'] != null &&
                                     channel.extraData['isGroupPaying'] as bool)) {
                                   _chatController.channel.value = channel;
                                   if (channel.extraData['isConv'] != null &&
@@ -330,7 +330,7 @@ class StreamChannelHeader extends StatelessWidget
                                       screen: const SettingsProfileElseScreen(
                                           fromConversation: true,
                                           fromProfile: false));
-                                } else if (channel.isGroup|| (channel.extraData['isGroupPaying'] != null &&
+                                } else if (channel.extraData["isConv"] == null || (channel.extraData['isGroupPaying'] != null &&
                                     channel.extraData['isGroupPaying'] as bool)) {
                                   _chatController.channel.value = channel;
                                   if (channel.extraData['isConv'] != null &&
@@ -374,7 +374,7 @@ class StreamChannelHeader extends StatelessWidget
                                         channel.extraData["nameOfGroup"] :
                                     "${(channel.extraData["wallet"] as String).substring(0, 6)}...${(channel.extraData["wallet"] as String).substring((channel.extraData["wallet"] as String).length - 4)}":
                                         channel.extraData['ens']:
-                                      channel.memberCount != null && channel.memberCount! > 2 ?
+                                      channel.extraData["isConv"] == null ?
                                           channel.extraData['nameOfGroup'] == null ?
                                           channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
                                           channel.extraData["nameOfGroup"]
@@ -397,8 +397,8 @@ class StreamChannelHeader extends StatelessWidget
                                               : Colors.black),
                                     ),
                                   ),
-                                  (channel.memberCount != null && channel.memberCount! > 2) || (channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true)  ? Text(
-                                    "${channel.extraData['isConv'] == null ? _chatController.channel.value!.memberCount! - 2 : _chatController.channel.value!.memberCount!} participants",
+                                  (channel.extraData['isConv'] == null) || (channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true)  ? Text(
+                                    "${_chatController.channel.value!.memberCount!} ${_chatController.channel.value!.memberCount! == 1 || _chatController.channel.value!.memberCount! - 3 == 1 ? "participant" : "participants"}",
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -416,7 +416,7 @@ class StreamChannelHeader extends StatelessWidget
                         ],
                       ),
                     ),
-                    channel.isGroup || (channel.extraData['isGroupPaying'] != null &&
+                    channel.extraData["isConv"] == null || (channel.extraData['isGroupPaying'] != null &&
                         channel.extraData['isGroupPaying'] as bool) ? Container() :  _chatController.isEditingProfile.value ? Container() : Transform.translate(
                       offset: const Offset(16, 1),
                       child: IconButton(onPressed: () async {

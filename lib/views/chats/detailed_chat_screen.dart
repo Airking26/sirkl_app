@@ -32,13 +32,15 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
 
   @override
   void initState() {
-    _navigationController.hideNavBar.value = true;
-    if(_commonController.userClicked.value != null) _commonController.checkUserIsInFollowing();
-    if(widget.create) {
-      _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value, false);
-    } else if(widget.channelId != null) {
-      _chatController.checkOrCreateChannelWithId(StreamChat.of(context).client, widget.channelId!, false);
-    }
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _navigationController.hideNavBar.value = true;
+      if(_commonController.userClicked.value != null) _commonController.checkUserIsInFollowing();
+      if(widget.create) {
+        _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value, false);
+      } else if(widget.channelId != null) {
+        _chatController.checkOrCreateChannelWithId(StreamChat.of(context).client, widget.channelId!, false);
+      }
+    });
     super.initState();
   }
 

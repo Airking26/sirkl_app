@@ -136,7 +136,7 @@ class ProfileController extends GetxController{
 
   }
 
-  Future<void> updateNft(NftModificationDto nftModificationDto, StreamChatClient _) async{
+  Future<void> updateNft(NftModificationDto nftModificationDto) async{
 
    await HomeRepo.updateNFTStatus(nftModificationDto);
 

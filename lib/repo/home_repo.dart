@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/notification_register_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
+import 'package:sirkl/common/model/token_metadata_details_dto.dart';
 import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/networks/request.dart';
 import 'package:sirkl/networks/urls.dart';
@@ -47,24 +48,27 @@ class HomeRepo {
   });
     return TokenDto.fromJson(res.jsonBody());
   }
+
+  static Future<TokenMetadataDetailsDto> getTokenMetadataWithAlchemy({required String token}) async {
+    SRequests req = SRequests(SUrls.ethMainNetBaseUrl);
+    Response res = await req.post(url: "v2/${SConfig.alchemyApiKey}", body: {
+      'jsonrpc': '2.0',
+      'id': 1,
+      'method': 'alchemy_getTokenMetadata',
+      'params': [
+        token,
+      ],
+    });
+    return TokenMetadataDetailsDto.fromJson(res.jsonBody());
+  }
+
   static Future<ContractAddressDto> getContractAddressesWithAlchemy({required wallet, String? cursor}) async {
     SRequests req = SRequests(SUrls.ethMainNetBaseUrl);
     Response res = await req.get("nft/v2/${SConfig.alchemyApiKey}/getContractsForOwner?owner=$wallet&pageSize=100&withMetadata=true&filters[]=AIRDROPS&filters[]=SPAM$cursor");
     return ContractAddressDto.fromJson(res.jsonBody());
   }
 
-  static Future<TokenMetadataDTO> getTokenMetadataWithAlchemy(String contractAddress) async {
-    SRequests req = SRequests("https://eth-mainnet.g.alchemy.com");
-    Response res = await req.post(url: 'v2/${SConfig.alchemyApiKey}', body: {
-    'jsonrpc': '2.0',
-    'id': 1,
-    'method': 'alchemy_getTokenMetadata',
-    'params': [
-      contractAddress,
-    ],
-  });
-  return TokenMetadataDTO.fromJson(res.jsonBody());
-  }
+
   static Future<void> getAllNFTConfig() async {
     SRequests req = SRequests(SUrls.baseURL);
     await req.get(SUrls.nftRetrieveAll);
