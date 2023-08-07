@@ -426,7 +426,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
     //         padding: EdgeInsets.only(bottom: 24.0, top: 12),
     //         child: CircularProgressIndicator(color: SColors.activeColor,),
     //       ),
-    //       Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+    //       Text("Please, wait while group is created on the Blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
     //     ],),
     // );
     // await _homeController.connectWallet(context);

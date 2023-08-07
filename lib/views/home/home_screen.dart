@@ -163,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                   onPressed: () async {
                     if(_homeController.accessToken.value.isNotEmpty) pushNewScreen(context, screen: const AddContactScreen(), withNavBar: false).then((value) => _commonController.users.refresh());
-                    //await _web3Controller.createGroupV2(["example", "new", BigInt.one, EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")], _homeController.userMe.value.wallet!);
+                    //await _web3Controller.createGroup(["example", "new", BigInt.one, EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")], _homeController.userMe.value.wallet!);
                   },
                   icon: Image.asset(
                     "assets/images/add_user.png",
