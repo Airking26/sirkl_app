@@ -222,11 +222,11 @@ class HomeController extends GetxController {
       
       isConfiguring.value = true;
       isFirstConnexion.value = true;
+      _navigationController.hideNavBar.value = false;
       await connectUser(StreamChat.of(context).client);
       await putFCMToken(context, StreamChat.of(context).client, false);
       await retrieveInboxes();
       await getAllNftConfig();
-      _navigationController.hideNavBar.value = false;
   }
 
   putFCMToken(BuildContext context, StreamChatClient client, bool isLogged) async {
@@ -491,7 +491,6 @@ class HomeController extends GetxController {
     var req = await ChatRepo.walletsToMessages();
       isConfiguring.value = false;
       isFirstConnexion.value = false;
-      _navigationController.hideNavBar.value = false;
   }
 
   registerNotification(NotificationRegisterDto notificationRegisterDto) async {

@@ -219,13 +219,13 @@ class _SettingScreenState extends State<SettingScreen> {
                                 onPressed: () async {
                                   
                                   
-                                  //await StreamChat.of(context).client.disconnectUser();
+                                  await StreamChat.of(context).client.disconnectUser();
                                   await StreamChat.of(context).client.dispose();
                                   _homeController.accessToken.value = "";
                                   _homeController.address.value = "";
                                   _navigationController.controller.value.jumpToTab(0);
                                 
-                                  await _profileController.deleteUser(_homeController.id.value);
+                                  //await _profileController.deleteUser(_homeController.id.value);
                                   await GetStorage().erase();
                                   _navigationController.hideNavBar.value = true;
                                   Get.back();
@@ -416,13 +416,13 @@ class _SettingScreenState extends State<SettingScreen> {
                                 : Colors.black)),
                     onPressed: () async {
                       await StreamChat.of(context).client.disconnectUser();
-                      await _profileController
-                          .deleteUser(_homeController.id.value);
+                      await _profileController.deleteUser(_homeController.id.value);
                       await GetStorage().erase();
                       _homeController.accessToken.value = "";
                       _homeController.address.value = "";
                       _navigationController.controller.value.jumpToTab(0);
                       Get.back();
+                      Navigator.pop(context);
                     },
                   )
                 ],

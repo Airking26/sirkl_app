@@ -127,7 +127,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
           popAllScreensOnTapOfSelectedTab: true,
           navBarStyle: NavBarStyle.simple,
           onItemSelected: (index) async{
-            
             Navigator.popUntil(context, (route) => route.isFirst);
             if(index == 0) {
               _profileController.isEditingProfile.value = false;

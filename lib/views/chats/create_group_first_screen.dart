@@ -12,6 +12,7 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/web3/web3_controller.dart';
 import 'package:sirkl/global_getx/home/home_controller.dart';
+import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
@@ -33,6 +34,9 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
   ProfileController get _profileController => Get.find<ProfileController>();
   ChatsController get _chatController => Get.find<ChatsController>();
   HomeController get _homeController => Get.find<HomeController>();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
+  CommonController get _commonController => Get.find<CommonController>();
+
   NavigationController get _navigationController => Get.find<NavigationController>();
   final _priceController = TextEditingController();
   final _utils = Utils();
@@ -90,7 +94,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                         cursorColor: SColors.activeColor,
                         maxLines: 1,
                         maxLength: 10,
-                        decoration:  InputDecoration(hintText: "Name of the group", hintStyle: TextStyle(fontFamily: "Gilroy"),
+                        decoration:  InputDecoration(hintText: "Name of the group", hintStyle: const TextStyle(fontFamily: "Gilroy"),
                           enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: SColors.activeColor),
                           ),
@@ -417,74 +421,78 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
   }
 
   Future<void> createPaidGroup() async{
-  
-    // AlertDialog alert = AlertDialog(
-    //   content: Column(
-    //     mainAxisSize: MainAxisSize.min,
-    //     children: const [
-    //       Padding(
-    //         padding: EdgeInsets.only(bottom: 24.0, top: 12),
-    //         child: CircularProgressIndicator(color: SColors.activeColor,),
-    //       ),
-    //       Text("Please, wait while group is created on the Blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
-    //     ],),
-    // );
-    // await _homeController.connectWallet(context);
-    // var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
-    // var price = double.parse(_priceController.text) * 1e18;
-    // var address = await web3Controller.createGroup(
-    //     client,
-    //     [_chatController.groupTextController.value.text, "", BigInt.from(price), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
-    //     _homeController.connector.value);
-    // final contract = await web3Controller.getContract();
-    // final filter = FilterOptions.events(
-    //   contract: contract,
-    //   event: contract.event('GroupCreated'),
-    // );
 
-    // Stream<FilterEvent> eventStream = client.events(filter);
-    // if(address != null) alert.show(context, barrierDismissible: false);
-    // eventStream.listen((event) async {
-    //   final decoded = contract.event("GroupCreated").decodeResults(event.topics!, event.data!);
-    //   if(address == event.transactionHash) {
-    //     _chatController.messageSending.value = true;
-    //     var idChannel = DateTime
-    //         .now()
-    //         .millisecondsSinceEpoch
-    //         .toString();
-    //     var idChannelCreated = await _chatController.createInbox(
-    //         InboxCreationDto(
-    //             price: double.parse(_priceController.text),
-    //             tokenAccepted: "0x0000000000000000000000000000000000000000",
-    //             idGroupBlockchain: decoded[0].toString(),
-    //             isConv: false,
-    //             createdBy: _homeController.id.value,
-    //             isGroupPrivate: _chatController.groupType.value == 0
-    //                 ? false
-    //                 : true,
-    //             isGroupVisible: _chatController.groupVisibility.value == 0
-    //                 ? true
-    //                 : false,
-    //             isGroupPaying: true,
-    //             wallets: [_homeController.userMe.value.wallet!],
-    //             nameOfGroup: _chatController.groupTextController.value.text,
-    //             picOfGroup: _profileController.urlPictureGroup.value,
-    //             idChannel: idChannel));
-    //     Get.back();
-    //     FocusManager.instance.primaryFocus?.unfocus();
-    //     _chatController.messageSending.value = false;
-    //     _profileController.urlPictureGroup.value = "";
-    //     _chatController.groupTextController.value.text = "";
-    //     _chatController.fromGroupCreation.value = true;
-    //     _commonController.refreshAllInbox();
-    //     Navigator.popUntil(context, (route) => route.isFirst);
-    //     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-    //       pushNewScreen(context, screen: DetailedChatScreen(
-    //         create: false, channelId: idChannelCreated,)).then((value) =>
-    //       _navigationController.hideNavBar.value = false);
-    //     });
-    //   }
-    // });
+     AlertDialog alert = AlertDialog(
+       content: Column(
+         mainAxisSize: MainAxisSize.min,
+         children: [
+           Padding(
+             padding: const EdgeInsets.only(bottom: 24.0, top: 12),
+             child: CircularProgressIndicator(color: SColors.activeColor,),
+           ),
+           const Text("Please, wait while group is created on the Blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+         ],),
+     );
+    // await _homeController.connectWallet(context);
+     var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
+     var price = double.parse(_priceController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '.')) * 1e18;
+     var connector = await _web3Controller.connect();
+     connector.onSessionConnect.subscribe((args) async {
+       var address = await _web3Controller.createGroup(
+         connector, args,
+           [_chatController.groupTextController.value.text, "", BigInt.from(price), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
+           _homeController.userMe.value.wallet!);
+       final contract = await _web3Controller.getContract();
+       final filter = FilterOptions.events(
+         contract: contract,
+         event: contract.event('GroupCreated'),
+       );
+
+       Stream<FilterEvent> eventStream = client.events(filter);
+       if(address != null) alert.show(context, barrierDismissible: false);
+       eventStream.listen((event) async {
+         final decoded = contract.event("GroupCreated").decodeResults(event.topics!, event.data!);
+         if(address == event.transactionHash) {
+           _chatController.messageSending.value = true;
+           var idChannel = DateTime
+               .now()
+               .millisecondsSinceEpoch
+               .toString();
+           var idChannelCreated = await _chatController.createInbox(
+               InboxCreationDto(
+                   price: double.parse(_priceController.text),
+                   tokenAccepted: "0x0000000000000000000000000000000000000000",
+                   idGroupBlockchain: decoded[0].toString(),
+                   isConv: false,
+                   createdBy: _homeController.id.value,
+                   isGroupPrivate: _chatController.groupType.value == 0
+                       ? false
+                       : true,
+                   isGroupVisible: _chatController.groupVisibility.value == 0
+                       ? true
+                       : false,
+                   isGroupPaying: true,
+                   wallets: [_homeController.userMe.value.wallet!],
+                   nameOfGroup: _chatController.groupTextController.value.text,
+                   picOfGroup: _profileController.urlPictureGroup.value,
+                   idChannel: idChannel));
+           Get.back();
+           FocusManager.instance.primaryFocus?.unfocus();
+           _chatController.messageSending.value = false;
+           _profileController.urlPictureGroup.value = "";
+           _chatController.groupTextController.value.text = "";
+           _chatController.fromGroupCreation.value = true;
+           _commonController.refreshAllInbox();
+           Navigator.popUntil(context, (route) => route.isFirst);
+           WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+             pushNewScreen(context, screen: DetailedChatScreen(
+               create: false, channelId: idChannelCreated,)).then((value) =>
+             _navigationController.hideNavBar.value = false);
+           });
+         }
+       });
+     });
+
 
   }
 

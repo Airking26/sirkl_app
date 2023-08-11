@@ -294,7 +294,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
   StreamRestorableMessageInputController? _controller;
 
   HomeController get _homeController => Get.find<HomeController>();
-  final web3Controller = Get.put(Web3Controller());
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
 
   void _createLocalController([Message? message]) {
     assert(_controller == null, '');
@@ -507,22 +507,25 @@ class StreamMessageInputState extends State<StreamMessageInput>
                                 padding: const EdgeInsets.only(bottom: 24.0, top: 12),
                                 child: CircularProgressIndicator(color: SColors.activeColor,),
                               ),
-                            const  Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+                            const  Text("Please, wait while the transaction is processed. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
                             ],),
                         );
-                        await _homeController.connectWallet(context);
                         var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
-                       // var address = await web3Controller.joinGroup(client, [BigInt.parse(channel.extraData["idGroupBlockChain"] as String)], _homeController.connector.value, channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble());
-                        final contract = await web3Controller.getContract();
-                        final filter = FilterOptions.events(contract: contract, event: contract.event('GroupJoined'));
-                        Stream<FilterEvent> eventStream = client.events(filter);
-                       // if(address != null) alert.show(context, barrierDismissible: false);
-                        eventStream.listen((event) async {
-                        //  if(address == event.transactionHash) {
-                         //   await channel.addMembers([_homeController.id.value]);
+                        var connector = await _web3Controller.connect();
+                        connector.onSessionConnect.subscribe((args) async {
+                          var address = await _web3Controller.joinGroup(connector, args, [BigInt.parse(channel.extraData["idGroupBlockChain"] as String)], channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble(), _homeController.userMe.value.wallet!);
+                          final contract = await _web3Controller.getContract();
+                          final filter = FilterOptions.events(contract: contract, event: contract.event('GroupJoined'));
+                          Stream<FilterEvent> eventStream = client.events(filter);
+                          if(address != null) alert.show(context, barrierDismissible: false);
+                          eventStream.listen((event) async {
+                              if(address == event.transactionHash) {
+                               await channel.addMembers([_homeController.id.value]);
                             Get.back();
-                         // }
+                             }
+                          });
                         });
+
                       }
                       else {
                         showDialog(context: context,
@@ -566,7 +569,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
                             ]),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                      child: Center(child: Text(channel.extraData["isGroupPrivate"] == false ? "Join (cost : ${channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble()}ETH)" : "Request to join", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),)),
+                      child: Center(child: Text(channel.extraData["isGroupPrivate"] == false ? "Join (cost : ${channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble()}ETH)" : "Request to join", style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),)),
                     ),
                   ) :
                   Container(

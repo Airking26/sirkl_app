@@ -1,9 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:convert/convert.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/model/eth_transaction_dto.dart';
+import 'package:sirkl/common/web3/wallet_connect_ethereum_credentials_v2.dart';
+import 'package:sirkl/networks/request.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
@@ -24,11 +28,7 @@ class Web3Controller extends GetxController{
     return contract;
   }
 
-  Future<dynamic> query(String functionName, List<dynamic> arg, bool hasFee, dynamic fee, String? wallet) async {
-    DeployedContract contract = await getContract();
-    ContractFunction function = contract.function(functionName);
-    //var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
-
+  Future<Web3App> connect() async {
     var connector = await Web3App.createInstance(
       projectId: 'bdfe4b74c44308ffb46fa4e6198605af',
       metadata: const PairingMetadata(
@@ -53,55 +53,48 @@ class Web3Controller extends GetxController{
       ),
     });
     launchUrl(res.uri!, mode: LaunchMode.externalApplication);
+    return connector;
+  }
 
-    connector.onSessionConnect.subscribe((args) async {
-      Transaction transaction = Transaction.callContract(
-          //from: EthereumAddress.fromHex(wallet!),
+  Future<dynamic> query(Web3App connector, SessionConnect? sessionConnect, String functionName, List<dynamic> arg, bool hasFee, double? fee, String? wallet) async {
+    DeployedContract contract = await getContract();
+    ContractFunction function = contract.function(functionName);
+    //var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
+
+    Transaction transaction = Transaction.callContract(
+          from: EthereumAddress.fromHex(wallet!),
           contract: contract,
           function: function,
           parameters: arg);
 
-      //var estimatedGasFee = await x.estimateGas(data: Uint8List.fromList(List<int>.from(transaction.data!)));
+    launchUrl(Uri.parse("metamask://"), mode: LaunchMode.externalApplication);
 
-      bool canOpen = await canLaunchUrl(Uri.parse("metamask://"));
-      if (!canOpen) {await Future.delayed(const Duration(seconds: 3));}
-      launchUrl(Uri.parse("metamask://"), mode: LaunchMode.externalApplication);
-
-      EthereumTransaction ethereumTransaction = EthereumTransaction(
+    EthereumTransaction ethereumTransaction = EthereumTransaction(
         from: wallet,
         to: "0x9B2044615349Ffe31Cf979F16945D0c785eED7da",
-        value: '0x0',
+        value: "0x${hasFee ? BigInt.from(fee! * 1e18).toRadixString(16) : "0"}",
         data: hex.encode(List<int>.from(transaction.data!)),
-        //gas: '0x${estimatedGasFee.toRadixString(16)}'
       );
 
-      var transactionId = await connector.request(
-        topic: args!.session.topic,
-        chainId: "eip155:5",
-        request: SessionRequestParams(
+
+    var transactionId = await connector.request(
+      topic: sessionConnect!.session.topic,
+      chainId: "eip155:5",
+      request: SessionRequestParams(
           method: 'eth_sendTransaction',
           params: [ethereumTransaction.toJson()],
         ),
-      );
+    );
 
-      return transactionId;
-
-      /*client.events(FilterOptions.events(
-           contract: contract,
-           event: contract.event('GroupCreated'),
-         )).listen((event) async{
-        final decoded = contract.event("GroupCreated").decodeResults(event.topics!, event.data!);
-        if(transactionId == event.transactionHash){
-          var t = "";
-        }
-      });*/
-
-    });
-
+    return transactionId;
   }
 
-  Future<String?> createGroup(List<dynamic> args, String? wallet) async {
-    return await query("createGroup", args, false, null, wallet);
+  Future<String?> createGroup(Web3App connector, SessionConnect? sessionConnect, List<dynamic> args, String? wallet) async {
+    return await query(connector, sessionConnect, "createGroup", args, false, null, wallet);
+  }
+
+  Future<String?> joinGroup(Web3App connector, SessionConnect? sessionConnect, List<dynamic> args, double fee, String? wallet) async {
+    return await query(connector, sessionConnect, "joinGroup", args, true, fee, wallet);
   }
 
 
