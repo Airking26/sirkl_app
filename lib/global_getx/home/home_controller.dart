@@ -125,7 +125,7 @@ class HomeController extends GetxController {
         requiredNamespaces: {
       'eip155': const RequiredNamespace(
         events: ['session_request','chainChanged', 'accountsChanged',],
-        chains: [],
+        chains: ["eip155:5"],
         methods: [
           'personal_sign',
           'eth_sign',

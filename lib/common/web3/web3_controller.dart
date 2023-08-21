@@ -9,11 +9,13 @@ import 'package:sirkl/common/model/eth_transaction_dto.dart';
 import 'package:sirkl/common/web3/wallet_connect_ethereum_credentials_v2.dart';
 import 'package:sirkl/networks/request.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 import 'package:web3dart/web3dart.dart';
 
 class Web3Controller extends GetxController{
+
+  var loadingToJoinGroup = false.obs;
+  var loadingToCreateGroup = false.obs;
 
   Future<DeployedContract> getContract() async {
     String abi = await rootBundle.loadString("assets/abi.json");
@@ -42,7 +44,7 @@ class Web3Controller extends GetxController{
     ConnectResponse res = await connector.connect(requiredNamespaces: {
       'eip155': const RequiredNamespace(
         events: ['session_request','chainChanged', 'accountsChanged',],
-        chains: [],
+        chains: ['eip155:5'],
         methods: [
           'personal_sign',
           'eth_sign',
@@ -59,13 +61,16 @@ class Web3Controller extends GetxController{
   Future<dynamic> query(Web3App connector, SessionConnect? sessionConnect, String functionName, List<dynamic> arg, bool hasFee, double? fee, String? wallet) async {
     DeployedContract contract = await getContract();
     ContractFunction function = contract.function(functionName);
-    //var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
+    var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
 
     Transaction transaction = Transaction.callContract(
           from: EthereumAddress.fromHex(wallet!),
           contract: contract,
           function: function,
           parameters: arg);
+
+    var gasPrice = await client.getGasPrice();
+    var estimatedGasFee = await client.estimateGas(sender: EthereumAddress.fromHex(wallet), gasPrice: gasPrice, value: hasFee ? EtherAmount.inWei(BigInt.from(fee! * 10e18)) : EtherAmount.zero());
 
     launchUrl(Uri.parse("metamask://"), mode: LaunchMode.externalApplication);
 
@@ -74,6 +79,7 @@ class Web3Controller extends GetxController{
         to: "0x9B2044615349Ffe31Cf979F16945D0c785eED7da",
         value: "0x${hasFee ? BigInt.from(fee! * 1e18).toRadixString(16) : "0"}",
         data: hex.encode(List<int>.from(transaction.data!)),
+        gas: "0x${(BigInt.parse("${estimatedGasFee}0")).toRadixString(16)}"
       );
 
 

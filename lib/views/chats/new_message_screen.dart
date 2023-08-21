@@ -89,7 +89,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           ),
           Expanded(
             child: Padding(
-                padding: const EdgeInsets.only(top: 32),
+                padding: const EdgeInsets.only(top: 38),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

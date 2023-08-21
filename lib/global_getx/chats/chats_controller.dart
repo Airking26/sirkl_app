@@ -19,8 +19,6 @@ class ChatsController extends GetxController{
 
   final box = GetStorage();
 
-  final _homeService = HomeRepo();
-
   ProfileController get _profileController => Get.find<ProfileController>();
 
   var index = 0.obs;

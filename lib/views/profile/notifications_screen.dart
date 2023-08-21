@@ -10,6 +10,7 @@ import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/notification_dto.dart';
+import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/profile/profile_else_screen.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -131,8 +132,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
         padding: const EdgeInsets.only(right: 8.0, top: 8, bottom: 8),
         child: ListTile(
           onTap: () async{
-            await _commonController.getUserById(item.idData);
-            pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: false, fromNested: true,));
+            if(item.type == 5 && !item.channelId.isNullOrBlank!){
+              pushNewScreen(context, screen: DetailedChatScreen(create: false, fromProfile: false, channelId: item.channelId,), withNavBar: false);
+            } else {
+              await _commonController.getUserById(item.idData);
+              pushNewScreen(context, screen: const ProfileElseScreen(
+                fromConversation: false, fromNested: true,));
+            }
           },
           trailing: item.type == 7 ? Row(
             mainAxisSize: MainAxisSize.min,

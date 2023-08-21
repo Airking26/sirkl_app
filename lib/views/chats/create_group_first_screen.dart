@@ -240,7 +240,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                   ),
                 ),
               ),
-              /*SizedBox(height: _chatController.groupVisibilityCollapsed.value || _chatController.groupTypeCollapsed.value ? 8 : 24,),
+              SizedBox(height: _chatController.groupVisibilityCollapsed.value || _chatController.groupTypeCollapsed.value ? 8 : 24,),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark ?  const Color(0xFF113751) : Colors.white,
@@ -342,7 +342,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                     ],
                   ),
                 ),
-              ),*/
+              ),
               const SizedBox(height: 24,),
             ],),
           ),
@@ -412,7 +412,10 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                     });
                   }
                 }
-              }, child: Text("Create", style: TextStyle(color: _chatController.groupNameIsEmpty.value ? Colors.grey : SColors.activeColor, fontFamily: "Gilroy", fontWeight: FontWeight.w600,),),),
+              }, child:
+              _web3Controller.loadingToCreateGroup.value ?
+              SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: SColors.activeColor, strokeWidth: 2,)) :
+              Text("Create", style: TextStyle(color: _chatController.groupNameIsEmpty.value ? Colors.grey : SColors.activeColor, fontFamily: "Gilroy", fontWeight: FontWeight.w600,),)),
             ],
           ),
         ),
@@ -421,7 +424,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
   }
 
   Future<void> createPaidGroup() async{
-
+    _web3Controller.loadingToCreateGroup.value = true;
      AlertDialog alert = AlertDialog(
        content: Column(
          mainAxisSize: MainAxisSize.min,
@@ -440,7 +443,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
      connector.onSessionConnect.subscribe((args) async {
        var address = await _web3Controller.createGroup(
          connector, args,
-           [_chatController.groupTextController.value.text, "", BigInt.from(price), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
+           [_chatController.groupTextController.value.text, "A small example", BigInt.from(price), EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")],
            _homeController.userMe.value.wallet!);
        final contract = await _web3Controller.getContract();
        final filter = FilterOptions.events(
@@ -476,6 +479,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                    nameOfGroup: _chatController.groupTextController.value.text,
                    picOfGroup: _profileController.urlPictureGroup.value,
                    idChannel: idChannel));
+           _web3Controller.loadingToCreateGroup.value = false;
            Get.back();
            FocusManager.instance.primaryFocus?.unfocus();
            _chatController.messageSending.value = false;

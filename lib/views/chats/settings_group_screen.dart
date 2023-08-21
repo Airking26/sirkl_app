@@ -44,6 +44,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   ChatsController get _chatController => Get.find<ChatsController>();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
   NavigationController get _navigationController => Get.find<NavigationController>();
 
   final _nameGroupController = TextEditingController();
@@ -58,10 +59,6 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var k = _chatController.channel.value!.membership != null;
-    var fk = _chatController.channel.value!.membership?.channelRole == "channel_member";
-    var f  = _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value);
-    var kf = _chatController.channel.value?.createdBy?.id != _homeController.id.value;
     return Scaffold(
       backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
           ? const Color(0xFF102437)
@@ -116,40 +113,232 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                 _chatController.isEditingGroup.value = true;
               } else {
                 if (_chatController.channel.value!
-                    .extraData["isGroupPrivate"] as bool) {
-                 if(await _chatController.requestToJoinGroup(RequestToJoinDto(
-                      receiver: _chatController.channel.value!.createdBy?.id,
-                      requester: _homeController.id.value, channelId: _chatController.channel.value!.id,
-                  channelName: _chatController.channel.value!.extraData["nameOfGroup"] as String, paying: _chatController.channel.value!.extraData["isGroupPaying"] != null && _chatController.channel.value!.extraData["isGroupPaying"] == true ? true : false))) {
-                   utils.showToast(context, "Your request has been sent, you will be notify if it is accepted");
-                 } else {
-                   utils.showToast(context, "Request already sent");
-                 }
+                    .extraData["isGroupPrivate"] as bool && (_chatController.channel.value!.extraData["users_awaiting"] == null || (_chatController.channel.value!.extraData["users_awaiting"] != null && !((_chatController.channel.value!.extraData["users_awaiting"]) as List<dynamic>).contains(_homeController.id.value)))) {
+
+                  showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (_) => CupertinoAlertDialog(
+                        title: Text(
+                          "Join",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: "Gilroy",
+                              color: MediaQuery.of(context)
+                                  .platformBrightness ==
+                                  Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black),
+                        ),
+                        content: Text(
+                            "Once approved by the admin, you can join the group by paying a ${_chatController.channel.value!.extraData["price"] is double ? _chatController.channel.value!.extraData["price"] as double : (_chatController.channel.value!.extraData["price"] as int).toDouble()}ETH subscription fee.",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: "Gilroy",
+                                color: MediaQuery.of(context)
+                                    .platformBrightness ==
+                                    Brightness.dark
+                                    ? Colors.white
+                                    .withOpacity(0.5)
+                                    : Colors.black
+                                    .withOpacity(0.5))),
+                        actions: [
+                          CupertinoDialogAction(
+                            child: Text("Cancel",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: "Gilroy",
+                                    color: MediaQuery.of(
+                                        context)
+                                        .platformBrightness ==
+                                        Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black)),
+                            onPressed: () {
+                              Get.back();
+                            },
+                          ),
+                          CupertinoDialogAction(
+                            child: Text("Continue",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: "Gilroy",
+                                    color: MediaQuery.of(
+                                        context)
+                                        .platformBrightness ==
+                                        Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black)),
+                            onPressed: () async {
+                              if (await _chatController
+                                  .requestToJoinGroup(RequestToJoinDto(
+                                  receiver:
+                                  _chatController.channel.value!.createdBy?.id,
+                                  requester: _homeController
+                                      .id.value,
+                                  channelId: _chatController.channel.value!.id,
+                                  channelName: _chatController.channel.value!
+                                      .extraData[
+                                  "nameOfGroup"]
+                                  as String,
+                                  paying: _chatController.channel.value!.extraData[
+                                  "isGroupPaying"] !=
+                                      null &&
+                                      _chatController.channel.value!.extraData[
+                                      "isGroupPaying"] ==
+                                          true
+                                      ? true
+                                      : false))) {
+                                Get.back();
+                                showDialog(
+                                    context: context,
+                                    barrierDismissible: true,
+                                    builder: (_) =>
+                                        CupertinoAlertDialog(
+                                          title: Text(
+                                            "Join",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight:
+                                                FontWeight
+                                                    .w600,
+                                                fontFamily:
+                                                "Gilroy",
+                                                color: MediaQuery.of(context)
+                                                    .platformBrightness ==
+                                                    Brightness
+                                                        .dark
+                                                    ? Colors
+                                                    .white
+                                                    : Colors
+                                                    .black),
+                                          ),
+                                          content: Text(
+                                              "You will receive a notification upon approval of your request. See you soon!",
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight:
+                                                  FontWeight
+                                                      .w600,
+                                                  fontFamily:
+                                                  "Gilroy",
+                                                  color: MediaQuery.of(context)
+                                                      .platformBrightness ==
+                                                      Brightness
+                                                          .dark
+                                                      ? Colors
+                                                      .white
+                                                      .withOpacity(
+                                                      0.5)
+                                                      : Colors
+                                                      .black
+                                                      .withOpacity(
+                                                      0.5))),
+                                          actions: [
+                                            CupertinoDialogAction(
+                                              child: Text("OK",
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                      16,
+                                                      fontWeight:
+                                                      FontWeight
+                                                          .w600,
+                                                      fontFamily:
+                                                      "Gilroy",
+                                                      color: MediaQuery.of(context).platformBrightness ==
+                                                          Brightness
+                                                              .dark
+                                                          ? Colors
+                                                          .white
+                                                          : Colors
+                                                          .black)),
+                                              onPressed:
+                                                  () async {
+                                                Get.back();
+                                              },
+                                            )
+                                          ],
+                                        ));
+                              } else {
+                                Get.back();
+                                utils.showToast(context, "Request already sent");
+                              }
+                            },
+                          )
+                        ],
+                      ));
                 } else {
                   if (_chatController.channel.value?.extraData["price"] != null) {
                     AlertDialog alert = AlertDialog(
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
-                        children:  [
+                        children: [
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 24.0, top: 12),
-                            child: CircularProgressIndicator(color: SColors.activeColor,),
+                            padding: const EdgeInsets.only(
+                                bottom: 24.0, top: 12),
+                            child: CircularProgressIndicator(
+                              color: SColors.activeColor,
+                            ),
                           ),
-                          Text("Please, wait while group is created on the blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
-                        ],),
+                          const Text(
+                            "Please, wait while the transaction is processed. This may take some time.",
+                            style: TextStyle(
+                                fontFamily: "Gilroy",
+                                fontWeight: FontWeight.w500),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     );
-                    await _homeController.connectWallet(context);
-                    var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
-                  //  var address = await web3Controller.joinGroup(client, [BigInt.parse(_chatController.channel.value?.extraData["idGroupBlockChain"] as String)], _homeController.connector.value, _chatController.channel.value?.extraData["price"] is double ? _chatController.channel.value?.extraData["price"] as double : (_chatController.channel.value?.extraData["price"] as int).toDouble());
-                    final contract = await web3Controller.getContract();
-                    final filter = FilterOptions.events(contract: contract, event: contract.event('GroupJoined'));
-                    Stream<FilterEvent> eventStream = client.events(filter);
-                  //  if(address != null) alert.show(context, barrierDismissible: false);
-                    eventStream.listen((event) async {
-                   //   if(address == event.transactionHash) {
-                     //   await _chatController.channel.value?.addMembers([_homeController.id.value]);
-                        Get.back();
-                     // }
+                    var client = Web3Client(
+                        "https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2",
+                        htp.Client());
+                    var connector = await _web3Controller.connect();
+                    connector.onSessionConnect
+                        .subscribe((args) async {
+                      var address = await _web3Controller.joinGroup(
+                          connector,
+                          args,
+                          [
+                            BigInt.parse(
+                                _chatController.channel.value!.extraData["idGroupBlockChain"]
+                                as String)
+                          ],
+                          _chatController.channel.value!.extraData["price"] is double
+                              ? _chatController.channel.value!.extraData["price"] as double
+                              : (_chatController.channel.value!.extraData["price"] as int)
+                              .toDouble(),
+                          _homeController.userMe.value.wallet!);
+                      final contract =
+                      await _web3Controller.getContract();
+                      final filter = FilterOptions.events(
+                          contract: contract,
+                          event: contract.event('GroupJoined'));
+                      Stream<FilterEvent> eventStream =
+                      client.events(filter);
+                      if (address != null) {
+                        alert.show(context,
+                            barrierDismissible: false);
+                      }
+                      eventStream.listen((event) async {
+                        if (address == event.transactionHash) {
+                          _web3Controller.loadingToJoinGroup.value =
+                          false;
+                          var ua = _chatController.channel.value!.extraData["users_awaiting"];
+                          if(ua != null){
+                            (ua as List<dynamic>).remove(_homeController.id.value);
+                            await _chatController.channel.value!.updatePartial(set: {"users_awaiting": ua});
+                          }
+                          await _chatController.channel.value!
+                              .addMembers([_homeController.id.value]);
+                          _chatController.channel.refresh();
+                          Get.back();
+                        }
+                      });
                     });
                   } else {
                     await _chatController.channel.value!.addMembers(
@@ -177,8 +366,17 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                   children: [
                     Icon( (_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value) ? Icons.mode_edit_rounded : Icons.add_rounded, color : MediaQuery.of(context).platformBrightness == Brightness.dark ?  Colors.white : Colors.black),
                     const SizedBox(height: 4),
-                    Text((_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) && (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value)? "Edit" : "Join", style: const TextStyle(fontFamily: "Gilroy"),),
-                    (_chatController.channel.value?.extraData["price"] != null) ?
+                    Text(
+                      (_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value))
+                          && (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value)?
+                      "Edit" :
+                      _chatController.channel.value!.extraData["isGroupPrivate"]  ==
+                          false || (_chatController.channel.value!.extraData["users_awaiting"] != null && (_chatController.channel.value!.extraData["users_awaiting"] as List<dynamic>).contains(_homeController.id.value)) ?
+                      "Join" : "Request To Join", style: const TextStyle(fontFamily: "Gilroy"), textAlign: TextAlign.center,),
+                    _chatController.channel.value?.extraData["price"] != null && _chatController.channel.value!.extraData["isGroupPrivate"]  == false && !(_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value))
+                    || _chatController.channel.value?.extraData["price"] != null && (_chatController.channel.value!.extraData["isGroupPrivate"]  == true && (_chatController.channel.value!.extraData["users_awaiting"] != null && (_chatController.channel.value!.extraData["users_awaiting"] as List<dynamic>).contains(_homeController.id.value)))
+                        //&& (_chatController.channel.value!.membership?.channelRole == "channel_moderator" || _chatController.channel.value?.createdBy?.id == _homeController.id.value))
+                        ?
                     Text('${_chatController.channel.value?.extraData["price"] is double ? _chatController.channel.value?.extraData["price"] as double : (_chatController.channel.value?.extraData["price"] as int).toDouble()}ETH', style: const TextStyle(fontFamily: "Gilroy", fontSize: 10),) : const SizedBox(),
                   ],),
               ),

@@ -9,11 +9,11 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart'
-    hide debounce;
+import 'package:get/get.dart' hide debounce;
 import 'package:ndialog/ndialog.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/view/stream_chat/platform_widget_builder/src/platform_widget_builder.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/attachment_button.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/command_button.dart';
@@ -25,12 +25,12 @@ import 'package:sirkl/common/view/stream_chat/src/message_input/tld.dart';
 import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/common/web3/web3_controller.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/home/home_controller.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
 
 import '../../../../../config/s_colors.dart';
-
 
 const _kCommandTrigger = '/';
 const _kMentionTrigger = '@';
@@ -294,6 +294,9 @@ class StreamMessageInputState extends State<StreamMessageInput>
   StreamRestorableMessageInputController? _controller;
 
   HomeController get _homeController => Get.find<HomeController>();
+
+  ChatsController get _chatController => Get.find<ChatsController>();
+
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
 
   void _createLocalController([Message? message]) {
@@ -431,18 +434,18 @@ class StreamMessageInputState extends State<StreamMessageInput>
     final channel = StreamChannel.of(context).channel;
     if (channel.state != null &&
         !channel.ownCapabilities.contains(PermissionType.sendMessage)) {
-      return SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 15,
-          ),
-          child: Text(
-            context.translations.sendMessagePermissionError,
-            style: _messageInputTheme.inputTextStyle,
-          ),
-        ),
-      );
+      return Obx(() => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 15,
+              ),
+              child: Text(
+                context.translations.sendMessagePermissionError,
+                style: _messageInputTheme.inputTextStyle,
+              ),
+            ),
+          ));
     }
 
     return StreamMessageValueListenableBuilder(
@@ -489,103 +492,313 @@ class StreamMessageInputState extends State<StreamMessageInput>
                       },
                     ),
                   ((channel.membership == null &&
-                      !channel.state!.members
-                          .map((e) => e.userId!)
-                          .contains(_homeController.id.value)) &&
-                      channel.extraData["isConv"] != null &&
-                      channel.extraData["isConv"] == false &&
-                      channel.extraData["isGroupPaying"] != null &&
-                      channel.extraData["isGroupPaying"] == true) ?
-                  InkWell(
-                    onTap: () async {
-                      if(channel.extraData["isGroupPrivate"] == false ){
-                        AlertDialog alert = AlertDialog(
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children:  [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 24.0, top: 12),
-                                child: CircularProgressIndicator(color: SColors.activeColor,),
-                              ),
-                            const  Text("Please, wait while the transaction is processed. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
-                            ],),
-                        );
-                        var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
-                        var connector = await _web3Controller.connect();
-                        connector.onSessionConnect.subscribe((args) async {
-                          var address = await _web3Controller.joinGroup(connector, args, [BigInt.parse(channel.extraData["idGroupBlockChain"] as String)], channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble(), _homeController.userMe.value.wallet!);
-                          final contract = await _web3Controller.getContract();
-                          final filter = FilterOptions.events(contract: contract, event: contract.event('GroupJoined'));
-                          Stream<FilterEvent> eventStream = client.events(filter);
-                          if(address != null) alert.show(context, barrierDismissible: false);
-                          eventStream.listen((event) async {
-                              if(address == event.transactionHash) {
-                               await channel.addMembers([_homeController.id.value]);
-                            Get.back();
-                             }
-                          });
-                        });
-
-                      }
-                      else {
-                        showDialog(context: context,
-                            barrierDismissible: true,
-                            builder: (_) => CupertinoAlertDialog(
-                              title: Text("Join", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
-                              content: Text("Once approved by the admin, you can join the group by paying a ${channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble()}ETH subscription fee.", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
-                              actions: [
-                                CupertinoDialogAction(child: Text("Cancel", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){ Get.back();},),
-                                CupertinoDialogAction(child: Text("Continue", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
-                                  onPressed: () async {
+                              !channel.state!.members
+                                  .map((e) => e.userId!)
+                                  .contains(_homeController.id.value)) &&
+                          channel.extraData["isConv"] != null &&
+                          channel.extraData["isConv"] == false &&
+                          channel.extraData["isGroupPaying"] != null &&
+                          channel.extraData["isGroupPaying"] == true)
+                      ? InkWell(
+                          onTap: () async {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            if (channel.extraData["isGroupPrivate"] == false || (channel.extraData["users_awaiting"] != null && (channel.extraData["users_awaiting"] as List<dynamic>).contains(_homeController.id.value))) {
+                              _web3Controller.loadingToJoinGroup.value = true;
+                              AlertDialog alert = AlertDialog(
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          bottom: 24.0, top: 12),
+                                      child: CircularProgressIndicator(
+                                        color: SColors.activeColor,
+                                      ),
+                                    ),
+                                    const Text(
+                                      "Please, wait while the transaction is processed. This may take some time.",
+                                      style: TextStyle(
+                                          fontFamily: "Gilroy",
+                                          fontWeight: FontWeight.w500),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              );
+                              var client = Web3Client(
+                                  "https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2",
+                                  htp.Client());
+                              var connector = await _web3Controller.connect();
+                              connector.onSessionConnect
+                                  .subscribe((args) async {
+                                var address = await _web3Controller.joinGroup(
+                                    connector,
+                                    args,
+                                    [
+                                      BigInt.parse(
+                                          channel.extraData["idGroupBlockChain"]
+                                              as String)
+                                    ],
+                                    channel.extraData["price"] is double
+                                        ? channel.extraData["price"] as double
+                                        : (channel.extraData["price"] as int)
+                                            .toDouble(),
+                                    _homeController.userMe.value.wallet!);
+                                final contract =
+                                    await _web3Controller.getContract();
+                                final filter = FilterOptions.events(
+                                    contract: contract,
+                                    event: contract.event('GroupJoined'));
+                                Stream<FilterEvent> eventStream =
+                                    client.events(filter);
+                                if (address != null) {
+                                  alert.show(context,
+                                      barrierDismissible: false);
+                                }
+                                eventStream.listen((event) async {
+                                  if (address == event.transactionHash) {
+                                    _web3Controller.loadingToJoinGroup.value =
+                                        false;
+                                    var ua = channel.extraData["users_awaiting"];
+                                    if(ua != null){
+                                      (ua as List<dynamic>).remove(_homeController.id.value);
+                                      await channel.updatePartial(set: {"users_awaiting": ua});
+                                    }
+                                    await channel
+                                        .addMembers([_homeController.id.value]);
                                     Get.back();
-                                    showDialog(context: context,
-                                        barrierDismissible: true,
-                                        builder: (_) => CupertinoAlertDialog(
-                                          title: Text("Join", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
-                                          content: Text("You will receive a notification upon approval of your request. See you soon!", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
-                                          actions: [
-                                            CupertinoDialogAction(child: Text("OK", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
-                                              onPressed: () async {
-                                                Get.back();
-                                              },)
-                                          ],
-                                        ));
-                                  },)
-                              ],
-                            ));
-                      }
+                                  }
+                                });
+                              });
+                            } else {
 
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration:  BoxDecoration(
-                        border: const Border(top: BorderSide(color: Colors.grey, width: 0.01)),
-                        gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF111D28) : Colors.white,
-                              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
-                            ]),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                      child: Center(child: Text(channel.extraData["isGroupPrivate"] == false ? "Join (cost : ${channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble()}ETH)" : "Request to join", style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, fontSize: 18),)),
-                    ),
-                  ) :
-                  Container(
-                    decoration:  BoxDecoration(
-                      border: const Border(top: BorderSide(color: Colors.grey, width: 0.01)),
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF111D28) : Colors.white,
-                            MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
-                          ]),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                    child: _buildTextField(context),
-                  ) ,
+                              showDialog(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  builder: (_) => CupertinoAlertDialog(
+                                        title: Text(
+                                          "Join",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              fontFamily: "Gilroy",
+                                              color: MediaQuery.of(context)
+                                                          .platformBrightness ==
+                                                      Brightness.dark
+                                                  ? Colors.white
+                                                  : Colors.black),
+                                        ),
+                                        content: Text(
+                                            "Once approved by the admin, you can join the group by paying a ${channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble()}ETH subscription fee.",
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                fontFamily: "Gilroy",
+                                                color: MediaQuery.of(context)
+                                                            .platformBrightness ==
+                                                        Brightness.dark
+                                                    ? Colors.white
+                                                        .withOpacity(0.5)
+                                                    : Colors.black
+                                                        .withOpacity(0.5))),
+                                        actions: [
+                                          CupertinoDialogAction(
+                                            child: Text("Cancel",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontFamily: "Gilroy",
+                                                    color: MediaQuery.of(
+                                                                    context)
+                                                                .platformBrightness ==
+                                                            Brightness.dark
+                                                        ? Colors.white
+                                                        : Colors.black)),
+                                            onPressed: () {
+                                              Get.back();
+                                            },
+                                          ),
+                                          CupertinoDialogAction(
+                                            child: Text("Continue",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontFamily: "Gilroy",
+                                                    color: MediaQuery.of(
+                                                                    context)
+                                                                .platformBrightness ==
+                                                            Brightness.dark
+                                                        ? Colors.white
+                                                        : Colors.black)),
+                                            onPressed: () async {
+                                              if (await _chatController
+                                                  .requestToJoinGroup(RequestToJoinDto(
+                                                      receiver:
+                                                          channel.createdBy?.id,
+                                                      requester: _homeController
+                                                          .id.value,
+                                                      channelId: channel.id,
+                                                      channelName: channel
+                                                                  .extraData[
+                                                              "nameOfGroup"]
+                                                          as String,
+                                                      paying: channel.extraData[
+                                                                      "isGroupPaying"] !=
+                                                                  null &&
+                                                              channel.extraData[
+                                                                      "isGroupPaying"] ==
+                                                                  true
+                                                          ? true
+                                                          : false))) {
+                                                Get.back();
+                                                showDialog(
+                                                    context: context,
+                                                    barrierDismissible: true,
+                                                    builder: (_) =>
+                                                        CupertinoAlertDialog(
+                                                          title: Text(
+                                                            "Join",
+                                                            style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontFamily:
+                                                                    "Gilroy",
+                                                                color: MediaQuery.of(context)
+                                                                            .platformBrightness ==
+                                                                        Brightness
+                                                                            .dark
+                                                                    ? Colors
+                                                                        .white
+                                                                    : Colors
+                                                                        .black),
+                                                          ),
+                                                          content: Text(
+                                                              "You will receive a notification upon approval of your request. See you soon!",
+                                                              style: TextStyle(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontFamily:
+                                                                      "Gilroy",
+                                                                  color: MediaQuery.of(context)
+                                                                              .platformBrightness ==
+                                                                          Brightness
+                                                                              .dark
+                                                                      ? Colors
+                                                                          .white
+                                                                          .withOpacity(
+                                                                              0.5)
+                                                                      : Colors
+                                                                          .black
+                                                                          .withOpacity(
+                                                                              0.5))),
+                                                          actions: [
+                                                            CupertinoDialogAction(
+                                                              child: Text("OK",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          16,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      fontFamily:
+                                                                          "Gilroy",
+                                                                      color: MediaQuery.of(context).platformBrightness ==
+                                                                              Brightness
+                                                                                  .dark
+                                                                          ? Colors
+                                                                              .white
+                                                                          : Colors
+                                                                              .black)),
+                                                              onPressed:
+                                                                  () async {
+                                                                Get.back();
+                                                              },
+                                                            )
+                                                          ],
+                                                        ));
+                                              }
+                                            },
+                                          )
+                                        ],
+                                      ));
+                            }
+                          },
+                          child: Obx(
+                            () => Container(
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                border: const Border(
+                                    top: BorderSide(
+                                        color: Colors.grey, width: 0.01)),
+                                gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      MediaQuery.of(context)
+                                                  .platformBrightness ==
+                                              Brightness.dark
+                                          ? const Color(0xFF111D28)
+                                          : Colors.white,
+                                      MediaQuery.of(context)
+                                                  .platformBrightness ==
+                                              Brightness.dark
+                                          ? const Color(0xFF1E2032)
+                                          : Colors.white
+                                    ]),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 8),
+                              child: _web3Controller.loadingToJoinGroup.value
+                                  ? Center(
+                                      child: SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: SColors.activeColor,
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Text(
+                                      channel.extraData["isGroupPrivate"]  ==
+                                              false || (channel.extraData["users_awaiting"] != null && (channel.extraData["users_awaiting"] as List<dynamic>).contains(_homeController.id.value))
+                                          ? "Join (cost : ${channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble()}ETH)"
+                                          : "Request to join",
+                                      style: const TextStyle(
+                                          fontFamily: "Gilroy",
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 18),
+                                    )),
+                            ),
+                          ))
+                      : Container(
+                          decoration: BoxDecoration(
+                            border: const Border(
+                                top: BorderSide(
+                                    color: Colors.grey, width: 0.01)),
+                            gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  MediaQuery.of(context).platformBrightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF111D28)
+                                      : Colors.white,
+                                  MediaQuery.of(context).platformBrightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF1E2032)
+                                      : Colors.white
+                                ]),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 8),
+                          child: _buildTextField(context),
+                        ),
                   if (_effectiveController.message.parentId != null &&
                       !widget.hideSendAsDm)
                     Padding(
@@ -770,7 +983,9 @@ class StreamMessageInputState extends State<StreamMessageInput>
                       channel.state != null &&
                       channel.config?.commands.isNotEmpty == true)
                     _buildCommandButton(context),
-                  ..._effectiveController.attachments.isEmpty ? widget.actions : [],
+                  ..._effectiveController.attachments.isEmpty
+                      ? widget.actions
+                      : [],
                 ].insertBetween(const SizedBox(width: 0)),
               ),
         duration: const Duration(milliseconds: 300),
@@ -807,8 +1022,12 @@ class StreamMessageInputState extends State<StreamMessageInput>
   }
 
   Expanded _buildTextInput(BuildContext context) {
-    final margin = (widget.sendButtonLocation == SendButtonLocation.inside ? const EdgeInsets.only(right: 8) : EdgeInsets.zero) +
-        (widget.actionsLocation != ActionsLocation.left || _commandEnabled ? const EdgeInsets.only(left: 8) : EdgeInsets.zero);
+    final margin = (widget.sendButtonLocation == SendButtonLocation.inside
+            ? const EdgeInsets.only(right: 8)
+            : EdgeInsets.zero) +
+        (widget.actionsLocation != ActionsLocation.left || _commandEnabled
+            ? const EdgeInsets.only(left: 8)
+            : EdgeInsets.zero);
 
     return Expanded(
       child: DropTarget(
@@ -839,9 +1058,10 @@ class StreamMessageInputState extends State<StreamMessageInput>
             clipBehavior: Clip.hardEdge,
             margin: margin,
             decoration: BoxDecoration(
-              color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                  ? const Color(0xFF2D465E)
-                  : const Color(0xFFF2F2F2),
+              color:
+                  MediaQuery.of(context).platformBrightness == Brightness.dark
+                      ? const Color(0xFF2D465E)
+                      : const Color(0xFFF2F2F2),
               borderRadius: BorderRadius.circular(20),
               //gradient: _effectiveFocusNode.hasFocus ? _messageInputTheme.activeBorderGradient : _messageInputTheme.idleBorderGradient,
               border: _draggingBorder,
@@ -924,19 +1144,15 @@ class StreamMessageInputState extends State<StreamMessageInput>
       ),
       focusedBorder: const OutlineInputBorder(
         borderSide: BorderSide.none,
-
       ),
       enabledBorder: const OutlineInputBorder(
         borderSide: BorderSide.none,
-
       ),
       errorBorder: const OutlineInputBorder(
         borderSide: BorderSide.none,
-
       ),
       disabledBorder: const OutlineInputBorder(
         borderSide: BorderSide.none,
-
       ),
       contentPadding: const EdgeInsets.fromLTRB(16, 12, 13, 11),
       prefixIcon: _commandEnabled
@@ -981,8 +1197,8 @@ class StreamMessageInputState extends State<StreamMessageInput>
       suffixIconConstraints: const BoxConstraints.tightFor(height: 40),
       prefixIconConstraints: const BoxConstraints.tightFor(height: 40),
       suffixIcon:
-      //_effectiveController.attachments.isEmpty ?
-      Row(
+          //_effectiveController.attachments.isEmpty ?
+          Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (_commandEnabled)

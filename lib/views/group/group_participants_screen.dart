@@ -39,7 +39,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
     limit: 25,
     filter: Filter.and(
       [
-        Filter.notIn("id", ['bot_one', 'bot_two', 'bot_three']),
+        Filter.notIn("id", const ['bot_one', 'bot_two', 'bot_three']),
       ],
     ),
     sort: [
