@@ -40,7 +40,6 @@ class ChatsController extends GetxController{
   var isEditingGroup = false.obs;
   var needToRefresh = false.obs;
   Rx<Channel?> channel = (null as Channel?).obs;
-  Rx<Channel?> nestedChannel = (null as Channel?).obs;
   var retryProgress = false.obs;
 
   var sendingMessageMode = 0.obs;
@@ -58,20 +57,7 @@ class ChatsController extends GetxController{
     return inboxResponse;
   }
 
-  checkOrCreateChannel(String himId, StreamChatClient client, String myId, bool nested) async{
-    if(nested){
-      nestedChannel.value = client.channel(
-        'try',
-        extraData: {
-          'members': [
-            myId,
-            himId,
-          ],
-          "isConv" : true
-        },
-      );
-      await nestedChannel.value!.watch();
-    } else {
+  checkOrCreateChannel(String himId, StreamChatClient client, String myId) async{
       channel.value = client.channel(
         'try',
         extraData: {
@@ -83,21 +69,10 @@ class ChatsController extends GetxController{
         },
       );
        await channel.value!.watch();
-    }
 
   }
 
-  checkOrCreateChannelWithId(StreamChatClient client, String channelId, bool nested) async{
-    if(nested){
-      nestedChannel.value = client.channel(
-          'try',
-          id: channelId,
-          extraData: {
-            "isConv" : true
-          }
-      );
-      await nestedChannel.value!.watch();
-    } else {
+  checkOrCreateChannelWithId(StreamChatClient client, String channelId) async{
       channel.value = client.channel(
           'try',
           id: channelId,
@@ -106,8 +81,6 @@ class ChatsController extends GetxController{
           }
       );
       await channel.value!.watch();
-    }
-
   }
 
   Future<String?> getEthFromEns(String ens, String wallet) async{

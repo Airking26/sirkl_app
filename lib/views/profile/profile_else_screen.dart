@@ -15,13 +15,13 @@ import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/profile/settings_profile_else_screen.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
-import '../chats/nested_detailed_chat_screen.dart';
 
 class ProfileElseScreen extends StatefulWidget {
   const ProfileElseScreen({Key? key, required this.fromConversation, this.fromNested = false}) : super(key: key);
@@ -134,7 +134,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                               }
                             } else {
                               widget.fromConversation ? Navigator.of(context).pop():
-                              pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true, fromProfile: true), withNavBar: false).then((value) => _navigationController.hideNavBar.value = !widget.fromNested);
+                              pushNewScreen(context, screen: const DetailedChatScreen(create: true, fromProfile: true), withNavBar: false).then((value) => _navigationController.hideNavBar.value = !widget.fromNested);
                             }
                           }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :SColors.activeColor, height: 28, width: 28,)),
                         ],),

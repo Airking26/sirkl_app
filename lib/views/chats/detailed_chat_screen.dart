@@ -36,9 +36,9 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
       _navigationController.hideNavBar.value = true;
       if(_commonController.userClicked.value != null) _commonController.checkUserIsInFollowing();
       if(widget.create) {
-        _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value, false);
+        _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value);
       } else if(widget.channelId != null) {
-        _chatController.checkOrCreateChannelWithId(StreamChat.of(context).client, widget.channelId!, false);
+        _chatController.checkOrCreateChannelWithId(StreamChat.of(context).client, widget.channelId!);
       }
     });
     super.initState();

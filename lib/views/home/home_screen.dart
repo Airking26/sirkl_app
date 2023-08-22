@@ -16,7 +16,7 @@ import 'package:nice_buttons/nice_buttons.dart';
 import 'package:http/http.dart' as htp;
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:sirkl/common/web3/web3_controller.dart';
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 

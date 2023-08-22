@@ -13,6 +13,7 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
+import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/group/group_participants_screen.dart';
 import 'package:sirkl/views/group/pinned_messages_screen.dart';
 
@@ -21,7 +22,6 @@ import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
-import '../chats/nested_detailed_chat_screen.dart';
 
 class CommunitySettingScreen extends StatefulWidget {
   const CommunitySettingScreen({Key? key}) : super(key: key);
@@ -156,7 +156,7 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                         if (_commonController.userClicked.value!.wallet !=
                             _homeController.userMe.value.wallet!) {
                           pushNewScreen(
-                            context, screen: const NestedDetailedChatScreen(
+                            context, screen: const DetailedChatScreen(
                             create: true));
                         }
                       }

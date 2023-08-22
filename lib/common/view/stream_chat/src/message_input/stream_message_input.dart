@@ -24,7 +24,7 @@ import 'package:sirkl/common/view/stream_chat/src/message_input/simple_safe_area
 import 'package:sirkl/common/view/stream_chat/src/message_input/tld.dart';
 import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/common/web3/web3_controller.dart';
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/home/home_controller.dart';
 import 'package:web3dart/web3dart.dart';
@@ -503,79 +503,17 @@ class StreamMessageInputState extends State<StreamMessageInput>
                           onTap: () async {
                             FocusManager.instance.primaryFocus?.unfocus();
                             if (channel.extraData["isGroupPrivate"] == false || (channel.extraData["users_awaiting"] != null && (channel.extraData["users_awaiting"] as List<dynamic>).contains(_homeController.id.value))) {
-                              _web3Controller.loadingToJoinGroup.value = true;
-                              AlertDialog alert = AlertDialog(
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          bottom: 24.0, top: 12),
-                                      child: CircularProgressIndicator(
-                                        color: SColors.activeColor,
-                                      ),
-                                    ),
-                                    const Text(
-                                      "Please, wait while the transaction is processed. This may take some time.",
-                                      style: TextStyle(
-                                          fontFamily: "Gilroy",
-                                          fontWeight: FontWeight.w500),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              );
-                              var client = Web3Client(
-                                  "https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2",
-                                  htp.Client());
+                              AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while the transaction is processed. This may take some time.");
                               var connector = await _web3Controller.connect();
-                              connector.onSessionConnect
-                                  .subscribe((args) async {
-                                var address = await _web3Controller.joinGroup(
-                                    connector,
-                                    args,
-                                    [
-                                      BigInt.parse(
-                                          channel.extraData["idGroupBlockChain"]
-                                              as String)
-                                    ],
-                                    channel.extraData["price"] is double
-                                        ? channel.extraData["price"] as double
-                                        : (channel.extraData["price"] as int)
-                                            .toDouble(),
-                                    _homeController.userMe.value.wallet!);
-                                final contract =
-                                    await _web3Controller.getContract();
-                                final filter = FilterOptions.events(
-                                    contract: contract,
-                                    event: contract.event('GroupJoined'));
-                                Stream<FilterEvent> eventStream =
-                                    client.events(filter);
-                                if (address != null) {
-                                  alert.show(context,
-                                      barrierDismissible: false);
-                                }
-                                eventStream.listen((event) async {
-                                  if (address == event.transactionHash) {
-                                    _web3Controller.loadingToJoinGroup.value =
-                                        false;
-                                    var ua = channel.extraData["users_awaiting"];
-                                    if(ua != null){
-                                      (ua as List<dynamic>).remove(_homeController.id.value);
-                                      await channel.updatePartial(set: {"users_awaiting": ua});
-                                    }
-                                    await channel
-                                        .addMembers([_homeController.id.value]);
-                                    Get.back();
-                                  }
-                                });
+                              connector.onSessionConnect.subscribe((args) async {
+                                _web3Controller.joinGroupMethod(connector, args, context, channel, _homeController.userMe.value.wallet!, alert, _homeController.id.value);
                               });
                             } else {
-
                               showDialog(
                                   context: context,
                                   barrierDismissible: true,
-                                  builder: (_) => CupertinoAlertDialog(
+                                  builder: (_) =>
+                                      CupertinoAlertDialog(
                                         title: Text(
                                           "Join",
                                           style: TextStyle(

@@ -15,7 +15,7 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:http/http.dart' as htp;
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/common/web3/web3_controller.dart';
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -26,7 +26,6 @@ import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
 import '../../views/group/group_participants_screen.dart';
 import 'detailed_chat_screen.dart';
-import 'nested_detailed_chat_screen.dart';
 import 'requests_waiting_for_approval_screen.dart';
 
 
@@ -273,73 +272,12 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                       ));
                 } else {
                   if (_chatController.channel.value?.extraData["price"] != null) {
-                    AlertDialog alert = AlertDialog(
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 24.0, top: 12),
-                            child: CircularProgressIndicator(
-                              color: SColors.activeColor,
-                            ),
-                          ),
-                          const Text(
-                            "Please, wait while the transaction is processed. This may take some time.",
-                            style: TextStyle(
-                                fontFamily: "Gilroy",
-                                fontWeight: FontWeight.w500),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    );
-                    var client = Web3Client(
-                        "https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2",
-                        htp.Client());
+                    AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while the transaction is processed. This may take some time.");
                     var connector = await _web3Controller.connect();
-                    connector.onSessionConnect
-                        .subscribe((args) async {
-                      var address = await _web3Controller.joinGroup(
-                          connector,
-                          args,
-                          [
-                            BigInt.parse(
-                                _chatController.channel.value!.extraData["idGroupBlockChain"]
-                                as String)
-                          ],
-                          _chatController.channel.value!.extraData["price"] is double
-                              ? _chatController.channel.value!.extraData["price"] as double
-                              : (_chatController.channel.value!.extraData["price"] as int)
-                              .toDouble(),
-                          _homeController.userMe.value.wallet!);
-                      final contract =
-                      await _web3Controller.getContract();
-                      final filter = FilterOptions.events(
-                          contract: contract,
-                          event: contract.event('GroupJoined'));
-                      Stream<FilterEvent> eventStream =
-                      client.events(filter);
-                      if (address != null) {
-                        alert.show(context,
-                            barrierDismissible: false);
-                      }
-                      eventStream.listen((event) async {
-                        if (address == event.transactionHash) {
-                          _web3Controller.loadingToJoinGroup.value =
-                          false;
-                          var ua = _chatController.channel.value!.extraData["users_awaiting"];
-                          if(ua != null){
-                            (ua as List<dynamic>).remove(_homeController.id.value);
-                            await _chatController.channel.value!.updatePartial(set: {"users_awaiting": ua});
-                          }
-                          await _chatController.channel.value!
-                              .addMembers([_homeController.id.value]);
-                          _chatController.channel.refresh();
-                          Get.back();
-                        }
-                      });
+                    connector.onSessionConnect.subscribe((args) async {
+                      await _web3Controller.joinGroupMethod(connector, args, context, _chatController.channel.value!, _homeController.userMe.value.wallet!, alert, _homeController.id.value);
                     });
+                    _chatController.channel.refresh();
                   } else {
                     await _chatController.channel.value!.addMembers(
                         [_homeController.id.value]);
@@ -477,7 +415,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
             _chatController.channel.value?.createdBy?.id != _homeController.id.value ? InkWell(
               onTap: () async {
                 await _commonController.getUserById(_chatController.channel.value!.createdBy!.id);
-                pushNewScreen(context, screen: const NestedDetailedChatScreen(create: true), withNavBar: false).then((value) => _navigationController.hideNavBar.value = true);
+                pushNewScreen(context, screen: const DetailedChatScreen(create: true), withNavBar: false).then((value) => _navigationController.hideNavBar.value = true);
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -574,10 +512,20 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                                     ? Colors.white
                                     : Colors.black)),
                           onPressed: () async {
-                            await _chatController.channel.value!.removeMembers([_homeController.id.value]);
-                            Get.back();
-                            Navigator.pop(context);
-                            Navigator.pop(context);
+                            if(_chatController.channel.value!.extraData["isGroupPaying"] != null && _chatController.channel.value!.extraData["isGroupPaying"] == true){
+                              AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while the transaction is processed. This may take some time.");
+                              var connector = await _web3Controller.connect();
+                              connector.onSessionConnect.subscribe((args) async {
+                                await _web3Controller.leaveGroupMethod(connector, args, context, _chatController.channel.value!, _homeController.userMe.value.wallet!, alert, _homeController.id.value);
+                              });
+                            } else {
+                              await _chatController.channel.value!
+                                  .removeMembers([_homeController.id.value]);
+                              Get.back();
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            }
+
                           },)
                       ],
                     )

@@ -15,6 +15,7 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/profile/profile_else_screen.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -23,7 +24,6 @@ import 'package:sirkl/common/constants.dart' as con;
 import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
-import '../chats/nested_detailed_chat_screen.dart';
 
 
 class SettingsProfileElseScreen extends StatefulWidget {
@@ -151,7 +151,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                     _commonController.userClicked.value!;
                     widget.fromConversation ? Navigator.pop(context) : pushNewScreen(context,
                         screen:
-                        const NestedDetailedChatScreen(
+                        const DetailedChatScreen(
                             create: true, fromProfile: true,), withNavBar: false)
                         .then((value) => _navigationController.hideNavBar.value = true);
                   },

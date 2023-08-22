@@ -17,7 +17,7 @@ import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/common/web3/web3_controller.dart';
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/views/profile/settings_screen.dart';

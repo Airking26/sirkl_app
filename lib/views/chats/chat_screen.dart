@@ -7,6 +7,7 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 
 import 'package:sirkl/common/constants.dart' as con;
@@ -32,6 +33,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
 
   final _floatingSearchBarController = FloatingSearchBarController();
   late TabController tabController;
@@ -230,9 +232,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                               _commonController.refreshAllInbox();
                                               Get.back();
                                             } else {
-                                              await channel.removeMembers(
-                                                  [_homeController.id.value]);
-                                                _commonController.refreshAllInbox();
+                                              if(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true){
+                                                AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while the transaction is processed. This may take some time.");
+                                                var connector = await _web3Controller.connect();
+                                                connector.onSessionConnect.subscribe((args) async {
+                                                  await _web3Controller.leaveGroupMethod(connector, args, context, _chatController.channel.value!, _homeController.userMe.value.wallet!, alert, _homeController.id.value);
+                                                });
+                                              } else {
+                                                await channel.removeMembers([_homeController.id.value]);
+                                              }
+                                              _commonController.refreshAllInbox();
                                               Get.back();
                                             }
                                           },
@@ -371,7 +380,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                               await _chatController
                                                   .deleteInbox(channel.id!);
                                             }
-                                                   _commonController.refreshAllInbox();
+                                            _commonController.refreshAllInbox();
                                             Get.back();
                                           },
                                         )

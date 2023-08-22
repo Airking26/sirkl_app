@@ -10,7 +10,7 @@ import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/common/web3/web3_controller.dart';
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 import 'package:sirkl/global_getx/home/home_controller.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:web3dart/credentials.dart';
@@ -425,19 +425,8 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
 
   Future<void> createPaidGroup() async{
     _web3Controller.loadingToCreateGroup.value = true;
-     AlertDialog alert = AlertDialog(
-       content: Column(
-         mainAxisSize: MainAxisSize.min,
-         children: [
-           Padding(
-             padding: const EdgeInsets.only(bottom: 24.0, top: 12),
-             child: CircularProgressIndicator(color: SColors.activeColor,),
-           ),
-           const Text("Please, wait while group is created on the Blockchain. This may take some time.", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
-         ],),
-     );
-    // await _homeController.connectWallet(context);
-     var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", htp.Client());
+     AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while group is created on the Blockchain. This may take some time.");
+     var client = _web3Controller.client;
      var price = double.parse(_priceController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '.')) * 1e18;
      var connector = await _web3Controller.connect();
      connector.onSessionConnect.subscribe((args) async {
@@ -452,7 +441,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
        );
 
        Stream<FilterEvent> eventStream = client.events(filter);
-       if(address != null) alert.show(context, barrierDismissible: false);
+       if(address != null) showDialog(context: context, builder: (_) => WillPopScope(onWillPop : () async => false, child: alert), barrierDismissible: false);
        eventStream.listen((event) async {
          final decoded = contract.event("GroupCreated").decodeResults(event.topics!, event.data!);
          if(address == event.transactionHash) {

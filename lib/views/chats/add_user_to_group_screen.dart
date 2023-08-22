@@ -3,10 +3,12 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:defer_pointer/defer_pointer.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
@@ -16,8 +18,10 @@ import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/global_getx/home/home_controller.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
+import 'package:web3dart/web3dart.dart';
 
 import '../../config/s_colors.dart';
 import '../../views/profile/profile_else_screen.dart';
@@ -34,6 +38,8 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
   CallsController get _callController => Get.find<CallsController>();
   ChatsController get _chatController => Get.find<ChatsController>();
   CommonController get _commonController => Get.find<CommonController>();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
+  HomeController get _homeController => Get.find<HomeController>();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
   final _searchController = FloatingSearchBarController();
@@ -188,18 +194,15 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                 child: Icon(Icons.keyboard_arrow_left_rounded,size: 42,color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 0.0),
-                child: Text(
-                  "Add User",
-                  style: TextStyle(
-                      color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: "Gilroy",
-                      fontSize: 20),
-                ),
+              Text(
+                _chatController.channel.value!.extraData["isGroupPaying"] != null ? "Send Invite" : "Add User",
+                style: TextStyle(
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: "Gilroy",
+                    fontSize: 20),
               ),
-              TextButton(
+              _chatController.channel.value!.extraData["isGroupPaying"] != null ? const SizedBox(width: 42, height: 42,) : TextButton(
                   onPressed: () async{
                     for (var element in _chatController.chipsListAddUsers) {
                       await _chatController.channel.value?.addMembers([element.id!]);
@@ -327,13 +330,160 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                 errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
         trailing: InkWell(
           onTap: () async {
-            var isPresent = await _chatController.channel.value?.queryMembers(filter: Filter.equal("id", item.id!));
-            if(isPresent!.members.isEmpty) {
-              if(!_chatController.chipsListAddUsers.map((element) => element.id).contains(item.id)) {
-                _chatController.chipsListAddUsers.add(item);
-              }
+            if(_chatController.channel.value!.extraData["isGroupPaying"] != null){
+              showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (_) =>
+                      CupertinoAlertDialog(
+                        title: Text(
+                          "Invite",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: "Gilroy",
+                              color: MediaQuery.of(context)
+                                  .platformBrightness ==
+                                  Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black),
+                        ),
+                        content: Text(
+                            "By clicking 'Custom Fee' you'll be able to set a special fee for this user to pay to join the group, else the default fee will apply.",
+                            //"Once approved by the admin, you can join the group by paying a ${channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble()}ETH subscription fee.",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: "Gilroy",
+                                color: MediaQuery.of(context)
+                                    .platformBrightness ==
+                                    Brightness.dark
+                                    ? Colors.white
+                                    .withOpacity(0.5)
+                                    : Colors.black
+                                    .withOpacity(0.5))),
+                        actions: [
+                          CupertinoDialogAction(
+                            child: Text("Custom Fee",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: "Gilroy",
+                                    color: MediaQuery.of(
+                                        context)
+                                        .platformBrightness ==
+                                        Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black)),
+                            onPressed: () {
+                              Get.back();
+                              showDialog(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  builder: (_) =>
+                                      CupertinoAlertDialog(
+                                        title: Text(
+                                          "Join",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight:
+                                              FontWeight
+                                                  .w600,
+                                              fontFamily:
+                                              "Gilroy",
+                                              color: MediaQuery.of(context)
+                                                  .platformBrightness ==
+                                                  Brightness
+                                                      .dark
+                                                  ? Colors
+                                                  .white
+                                                  : Colors
+                                                  .black),
+                                        ),
+                                        content: Text(
+                                            "You will receive a notification upon approval of your request. See you soon!",
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight:
+                                                FontWeight
+                                                    .w600,
+                                                fontFamily:
+                                                "Gilroy",
+                                                color: MediaQuery.of(context)
+                                                    .platformBrightness ==
+                                                    Brightness
+                                                        .dark
+                                                    ? Colors
+                                                    .white
+                                                    .withOpacity(
+                                                    0.5)
+                                                    : Colors
+                                                    .black
+                                                    .withOpacity(
+                                                    0.5))),
+                                        actions: [
+                                          CupertinoDialogAction(
+                                            child: Text("OK",
+                                                style: TextStyle(
+                                                    fontSize:
+                                                    16,
+                                                    fontWeight:
+                                                    FontWeight
+                                                        .w600,
+                                                    fontFamily:
+                                                    "Gilroy",
+                                                    color: MediaQuery.of(context).platformBrightness ==
+                                                        Brightness
+                                                            .dark
+                                                        ? Colors
+                                                        .white
+                                                        : Colors
+                                                        .black)),
+                                            onPressed:
+                                                () async {
+                                              Get.back();
+                                            },
+                                          )
+                                        ],
+                                      ));
+                              },
+                          ),
+                          CupertinoDialogAction(
+                            child: Text("Default Fee",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: "Gilroy",
+                                    color: MediaQuery.of(
+                                        context)
+                                        .platformBrightness ==
+                                        Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black)),
+                            onPressed: () async {
+                              Get.back();
+                              AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while the transaction is processed. This may take some time.");
+                              var connector = await _web3Controller.connect();
+                              connector.onSessionConnect.subscribe((args) async {
+                                await _web3Controller.sendInviteMethod(connector, args, context, _chatController.channel.value!, _homeController.userMe.value.wallet!, alert, item.wallet!, _chatController.channel.value!.extraData["price"] as double);
+                                var t  = "";
+                              });
+                            },
+                          )
+                        ],
+                      ));
             } else {
-              utils.showToast(context, "This user is already present in this group");
+              var isPresent = await _chatController.channel.value?.queryMembers(
+                  filter: Filter.equal("id", item.id!));
+              if (isPresent!.members.isEmpty) {
+                if (!_chatController.chipsListAddUsers.map((element) =>
+                element.id).contains(item.id)) {
+                  _chatController.chipsListAddUsers.add(item);
+                }
+              } else {
+                utils.showToast(
+                    context, "This user is already present in this group");
+              }
             }
           },
           child: Padding(
