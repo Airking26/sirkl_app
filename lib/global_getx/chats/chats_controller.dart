@@ -56,8 +56,11 @@ class ChatsController extends GetxController{
 
     return inboxResponse;
   }
-
+  resetChannel() {
+    channel.value = null;
+  }
   checkOrCreateChannel(String himId, StreamChatClient client, String myId) async{
+      
       channel.value = client.channel(
         'try',
         extraData: {
