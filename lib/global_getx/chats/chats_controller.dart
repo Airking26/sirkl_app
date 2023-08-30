@@ -57,7 +57,8 @@ class ChatsController extends GetxController{
     return inboxResponse;
   }
   resetChannel() {
-    channel.value = null;
+    channel = (null as Channel?).obs;
+   ;
   }
   checkOrCreateChannel(String himId, StreamChatClient client, String myId) async{
       
@@ -71,6 +72,7 @@ class ChatsController extends GetxController{
           "isConv" : true
         },
       );
+      
        await channel.value!.watch();
 
   }
