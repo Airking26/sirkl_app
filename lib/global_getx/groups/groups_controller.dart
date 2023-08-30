@@ -51,14 +51,14 @@ class GroupsController extends GetxController{
     await _chatController.channel.value!.addMembers([streamChatClient.state.currentUser!.id]);
   }
 
-  getNFTsToCreateGroup(String wallet, List<dynamic> nfts) async {
+  getNFTsToCreateGroup(String wallet, List<dynamic> nfts, List<GroupDto> groups) async {
     var cursor = "";
     var cursorInitialized = true;
     while(cursorInitialized || cursor.isNotEmpty){
       ContractAddressDto contractAddress = await HomeRepo.getContractAddressesWithAlchemy(wallet: wallet, cursor: cursor );
     
       contractAddress.pageKey == null || contractAddress.pageKey!.isEmpty ? cursor = "" : cursor = "&pageKey=${contractAddress.pageKey}";
-      contractAddress.contracts.removeWhere((element) => element.title == null || element.title!.isEmpty || element.opensea == null || element.opensea!.imageUrl == null || element.opensea!.imageUrl!.isEmpty  ||  element.opensea!.collectionName == null || element.opensea!.collectionName!.isEmpty || element.tokenType == TokenType.UNKNOWN || (element.tokenType == TokenType.ERC1155 && element.opensea?.safelistRequestStatus == SafelistRequestStatus.NOT_REQUESTED));
+      contractAddress.contracts.removeWhere((element) => groups.map((e) => e.contractAddress).contains(element.address) || element.title == null || element.title!.isEmpty || element.opensea == null || element.opensea!.imageUrl == null || element.opensea!.imageUrl!.isEmpty  ||  element.opensea!.collectionName == null || element.opensea!.collectionName!.isEmpty || element.tokenType == TokenType.UNKNOWN || (element.tokenType == TokenType.ERC1155 && element.opensea?.safelistRequestStatus == SafelistRequestStatus.NOT_REQUESTED));
       for (var element in contractAddress.contracts) {
         nfts.add(CollectionDbDto(collectionName: element.opensea!.collectionName!, contractAddress: element.address!, collectionImage: element.opensea!.imageUrl!, collectionImages: element.media?.first.thumbnail == null ? [element.media!.first.gateway!] : [element.media!.first.thumbnail!]));
       }
@@ -68,25 +68,30 @@ class GroupsController extends GetxController{
     return nfts;
   }
 
-  getTokenToCreateGroup(String wallet) async {
+  getTokenToCreateGroup(String wallet, List<GroupDto> groups) async {
     var tokens = [];
     var tokenContractAddress =
     await HomeRepo.getTokenContractAddressesWithAlchemy(wallet: wallet);
 
     for(TokenBalance element in tokenContractAddress.result!.tokenBalances!) {
-      if (element.tokenBalance != "0x0000000000000000000000000000000000000000000000000000000000000000") {
+      if (element.tokenBalance != "0x0000000000000000000000000000000000000000000000000000000000000000" && !groups.map((e) => e.contractAddress).contains(element.contractAddress)) {
         var tokenDetails = await HomeRepo.getTokenMetadataWithAlchemy(token: element.contractAddress!);
-        tokens.add(CollectionDbDto(collectionName: tokenDetails.result!.name!, contractAddress: element.contractAddress!, collectionImage: tokenDetails.result!.logo!, collectionImages: [tokenDetails.result!.logo!]));
+        if(tokenDetails.result != null && tokenDetails.result!.logo != null) {
+          tokens.add(CollectionDbDto(collectionName: tokenDetails.result!.name!,
+              contractAddress: element.contractAddress!,
+              collectionImage: tokenDetails.result!.logo!,
+              collectionImages: [tokenDetails.result!.logo!]));
+        }
       }
     }
 
-    await getNFTsToCreateGroup(wallet, tokens);
+    return await getNFTsToCreateGroup(wallet, tokens, groups);
   }
 
   retrieveNFTAvailableForCreation(String wallet) async{
-    var tokens = await getTokenToCreateGroup(wallet);
     List<GroupDto> groups = await GroupRepo.retrieveGroups();
-    nftAvailable.value = tokens == null ? <CollectionDbDto>[] : tokens.where((element) => !groups.map((e) => e.contractAddress.toLowerCase()).contains(element.contractAddress.toLowerCase())).toList().cast<CollectionDbDto>() ;
+    var tokens = await getTokenToCreateGroup(wallet, groups);
+    nftAvailable.value = tokens.toList().cast<CollectionDbDto>();
     isLoadingAvailableNFT.value = false;
   }
 

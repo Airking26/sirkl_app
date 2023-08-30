@@ -402,7 +402,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                 if(_chatController.groupTextController.value.text.isEmpty) {
                   _utils.showToast(context, "Please, enter a name for you group.");
                 } else {
-                  if(_chatController.groupPaying.value == 1){
+                  if(_chatController.groupPaying.value == 1 && _priceController.text.isNotEmpty && isNumeric(_priceController.text)){
                     await createPaidGroup();
                   } else {
                     pushNewScreen(

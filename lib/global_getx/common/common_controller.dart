@@ -101,8 +101,6 @@ class CommonController extends GetxController {
     }
     await streamChatClient.updateChannelPartial(channel.channel!.id, "try",
         set: {"${value}_follow_channel": meFollow});
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
     try {
       UserDTO removedUser = await CommonRepo.removeUserToSirkl(id);
      
@@ -171,9 +169,11 @@ class CommonController extends GetxController {
 
   }
 
+  notifyUserInvitedToJoinPayingGroup(NotificationAddedAdminDto notificationAddedAdminDto) async {
+    await CommonRepo.notifyUserInvitedToJoinPayingGroup(notificationAddedAdminDto);
+  }
+
   report(BuildContext context, ReportDto reportDTO, Utils utils) async {
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
 
         await CommonRepo.report(reportDTO);
         utils.showToast(

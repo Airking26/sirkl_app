@@ -7,9 +7,11 @@ class MyCircularLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        height: 20,
-        width: 20,
-        child: CircularProgressIndicator(color: color ?? Theme.of(context).primaryColor));
+    return Center(
+      child: SizedBox(
+          height: 20,
+          width: 20,
+          child: CircularProgressIndicator(color: color ?? Theme.of(context).primaryColor)),
+    );
   }
 }

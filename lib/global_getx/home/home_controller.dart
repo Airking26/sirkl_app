@@ -223,10 +223,10 @@ class HomeController extends GetxController {
       isConfiguring.value = true;
       isFirstConnexion.value = true;
       _navigationController.hideNavBar.value = false;
+      await getAllNftConfig();
       await connectUser(StreamChat.of(context).client);
       await putFCMToken(context, StreamChat.of(context).client, false);
       await retrieveInboxes();
-      await getAllNftConfig();
   }
 
   putFCMToken(BuildContext context, StreamChatClient client, bool isLogged) async {
@@ -558,3 +558,5 @@ class HomeController extends GetxController {
     });
   }
 }
+
+isNumeric(string) => num.tryParse(string) != null;

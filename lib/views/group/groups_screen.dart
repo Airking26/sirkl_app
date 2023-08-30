@@ -408,7 +408,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
              children: [
                 CircularProgressIndicator(color: SColors.activeColor),
                const SizedBox(height: 8,),
-               Text("Please wait while we are loading your NFTs...",textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black),)
+               Text("Please wait while we are loading your NFTs and Tokens available. This may take some time.",textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black),)
              ],
            ),
          ) : _groupController.nftAvailable.isEmpty ? noNFTFound() :

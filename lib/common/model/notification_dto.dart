@@ -21,7 +21,9 @@ class NotificationDto {
     this.channelId,
     this.channelName,
     this.requester,
-    this.paying
+    this.paying,
+    this.inviteId,
+    this.channelPrice
   });
 
   String id;
@@ -40,6 +42,8 @@ class NotificationDto {
   String? channelName;
   String? requester;
   bool? paying;
+  String? inviteId;
+  String? channelPrice;
 
   factory NotificationDto.fromJson(Map<String, dynamic> json) => NotificationDto(
     id: json["id"],
@@ -57,7 +61,9 @@ class NotificationDto {
     channelId: json["channelId"],
     channelName: json["channelName"],
     requester: json["requester"],
-    paying: json['paying']
+    paying: json['paying'],
+    inviteId: json['inviteId'],
+    channelPrice: json["channelPrice"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -76,6 +82,8 @@ class NotificationDto {
     "channelId": channelId,
     "channelName": channelName,
     "requester": requester,
-    "paying": paying
+    "paying": paying,
+    "inviteId": inviteId,
+    "channelPrice": channelPrice
   };
 }

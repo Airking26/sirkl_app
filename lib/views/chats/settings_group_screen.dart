@@ -354,7 +354,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
             InkWell(
               onTap: (){
                 if(_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) {
-                  pushNewScreen(context, screen: GroupParticipantScreen(fromChat: true));
+                  pushNewScreen(context, screen: const GroupParticipantScreen());
                 } else {
                   utils.showToast(context, "You have to be a member to access this data");
                 }

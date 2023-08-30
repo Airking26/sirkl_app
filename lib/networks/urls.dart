@@ -42,6 +42,7 @@ class SUrls {
   static  String followMeById(String id) => 'follow/me/$id';
   static const String notificationAddedInGroup = 'notification/added_in_group';
   static const String notificationUpgradedAsAdmin = 'notification/upgraded_as_admin';
+  static const String notificationInvitedToJoinPayingGroup = 'notification/invited_to_join_paying_group';
   static const String signalmentReport = 'signalment/report';
   static  String followIsInFollowing(String id) => 'follow/isInFollowing/$id';
   static  String followByIdFollowing(String id) => 'follow/$id/following'; 

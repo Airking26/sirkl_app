@@ -300,7 +300,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               withNavBar: false,
                                       screen: StreamChannel(
                                           channel: channel,
-                                          
                                           child: const ChannelPage()))
                                   .then((value) async{
                                 _navigationController.hideNavBar.value = false;

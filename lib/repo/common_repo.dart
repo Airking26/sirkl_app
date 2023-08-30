@@ -40,10 +40,17 @@ class CommonRepo {
     Response res = await req.post(url: SUrls.notificationUpgradedAsAdmin, body: notificationAddedAdminDto.toJson() );
   }
 
+  static Future<void> notifyUserInvitedToJoinPayingGroup(NotificationAddedAdminDto notificationAddedAdminDto) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.post(url: SUrls.notificationInvitedToJoinPayingGroup, body: notificationAddedAdminDto.toJson() );
+  }
+
       static Future<void> report(ReportDto reportDto) async { 
          SRequests req = SRequests(SUrls.baseURL);
     Response res = await req.post(url: SUrls.signalmentReport, body: reportDto.toJson() );
   }
+
+
   
 
   //Future<Response<List<dynamic>>> searchSirklUsers(String accessToken, String name, String offset) => get('${con.URL_SERVER}follow/search/following/$name/$offset', headers: {'Authorization':'Bearer $accessToken'});

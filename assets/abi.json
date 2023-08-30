@@ -74,6 +74,7 @@
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
+
   {
     "anonymous": false,
     "inputs": [
@@ -305,6 +306,7 @@
     "name": "InvitationCreated",
     "type": "event"
   },
+
   {
     "inputs": [
       {

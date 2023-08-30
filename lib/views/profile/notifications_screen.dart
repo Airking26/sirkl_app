@@ -4,12 +4,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/notification_dto.dart';
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/profile/profile_else_screen.dart';
 
@@ -32,6 +35,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   ChatsController get _chatController => Get.find<ChatsController>();
   CommonController get _commonController => Get.find<CommonController>();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
   final PagingController<int, NotificationDto> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
 
@@ -132,8 +136,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
         padding: const EdgeInsets.only(right: 8.0, top: 8, bottom: 8),
         child: ListTile(
           onTap: () async{
-            if(item.type == 5 && !item.channelId.isNullOrBlank!){
-              pushNewScreen(context, screen: DetailedChatScreen(create: false, fromProfile: false, channelId: item.channelId,), withNavBar: false);
+            if((item.type == 5 || item.type == 8) && !item.channelId.isNullOrBlank!){
+              AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while the transaction is processed. This may take some time.");
+              var connector = await _web3Controller.connect();
+              connector.onSessionConnect.subscribe((args) async {
+                StreamChat.of(context).client.queryChannels(filter: Filter.equal("id", item.channelId!), paginationParams: const PaginationParams(limit: 1)).listen((event) async {
+                  await _web3Controller.acceptInvitationMethod(connector, args, context, event[0],_homeController.userMe.value.wallet!, alert, item.belongTo, double.parse(item.channelPrice!), item.inviteId!);
+                });
+              });
             } else {
               await _commonController.getUserById(item.idData);
               pushNewScreen(context, screen: const ProfileElseScreen(
@@ -157,7 +167,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             }, icon: const Icon(Icons.close_rounded, color: Colors.grey,))
           ],) : const SizedBox(),
           leading:
-              item.type != 0 && item.type != 1 && item.type != 5 && item.type != 6 && item.type != 7?
+              item.type != 0 && item.type != 1 && item.type != 5 && item.type != 6 && item.type != 7 && item.type != 8?
                   Container(
                     width: 50, height: 50,
                       decoration:  BoxDecoration(
@@ -208,7 +218,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ]
         ),
       );
-    } else if(item.type == 4 || item.type == 5 || item.type == 6 || item.type == 7){
+    } else if(item.type == 4 || item.type == 5 || item.type == 6 || item.type == 7 || item.type == 8){
       return Text(item.message!, style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color:MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.6)));
     } else {
       return Container();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/widgets/my_circular_indicator.dart';
+import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/utils.dart';
@@ -29,14 +30,11 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
   CommonController get _commonController => Get.find<CommonController>();
   ChatsController get _chatController => Get.find<ChatsController>();
   HomeController get _homeController => Get.find<HomeController>();
-  NavigationController get _navigationController => Get.find<NavigationController>();
 
   @override
   void initState() {
     _chatController.resetChannel();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      //_navigationController.hideNavBar.value = true;
-
       if(_commonController.userClicked.value != null) _commonController.checkUserIsInFollowing();
       if(widget.create) {
         _chatController.checkOrCreateChannel(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value);
@@ -57,7 +55,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
         body: Obx(() {
 
           
-          return _chatController.channel.value == null? const MyCircularLoader():
+          return _chatController.channel.value == null? MyCircularLoader(color: SColors.activeColor,):
        
         StreamChat(
           client: StreamChat.of(context).client,

@@ -40,6 +40,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
   CommonController get _commonController => Get.find<CommonController>();
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
   HomeController get _homeController => Get.find<HomeController>();
+  final _priceController = TextEditingController();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
   final _searchController = FloatingSearchBarController();
@@ -383,7 +384,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                                   builder: (_) =>
                                       CupertinoAlertDialog(
                                         title: Text(
-                                          "Join",
+                                          "Admission Price",
                                           style: TextStyle(
                                               fontSize: 16,
                                               fontWeight:
@@ -400,30 +401,51 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                                                   : Colors
                                                   .black),
                                         ),
-                                        content: Text(
-                                            "You will receive a notification upon approval of your request. See you soon!",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight:
-                                                FontWeight
-                                                    .w600,
-                                                fontFamily:
-                                                "Gilroy",
-                                                color: MediaQuery.of(context)
-                                                    .platformBrightness ==
-                                                    Brightness
-                                                        .dark
-                                                    ? Colors
-                                                    .white
-                                                    .withOpacity(
-                                                    0.5)
-                                                    : Colors
-                                                    .black
-                                                    .withOpacity(
-                                                    0.5))),
+                                        content: Material(
+                                          color: Colors.transparent,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top: 8.0),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Transform.translate(offset: const Offset(0, 3.75),
+                                                    child:  SizedBox(width: 50,
+                                                      child: TextField(
+                                                        controller: _priceController,
+                                                        keyboardType: TextInputType.number,
+                                                        textAlign: TextAlign.center,cursorColor: SColors.activeColor, decoration: const InputDecoration(
+                                                        hintText: "0.0", hintStyle: TextStyle(fontWeight: FontWeight.w500, fontFamily: "Gilroy", fontSize: 18),contentPadding: EdgeInsets.only(bottom: 4), isDense: true, enabledBorder: UnderlineInputBorder(
+                                                        borderSide: BorderSide(color: Colors.grey, width: 0.5),
+                                                      ), focusedBorder: UnderlineInputBorder(
+                                                        borderSide: BorderSide(color: Colors.grey, width: 0.5),
+                                                      ),  ),),)),
+                                                const SizedBox(width: 4,),
+                                                DropdownButton<dynamic>(
+                                                    items: [DropdownMenuItem(
+                                                        child: Row(
+                                                          children: [
+                                                            Image.network(
+                                                              "https://raw.githubusercontent.com/dappradar/tokens/main/ethereum/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee/logo.png",
+                                                              width: 22,
+                                                              height: 22,
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 4,
+                                                            ),
+                                                            const Text(
+                                                              "ETH",
+                                                              style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),
+                                                            )
+                                                          ],
+                                                        ))],
+                                                    onChanged: (any){})
+                                              ],),
+                                          ),
+                                        ),
                                         actions: [
                                           CupertinoDialogAction(
-                                            child: Text("OK",
+                                            child: Text("Invite",
                                                 style: TextStyle(
                                                     fontSize:
                                                     16,
@@ -441,7 +463,31 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                                                         .black)),
                                             onPressed:
                                                 () async {
-                                              Get.back();
+                                                  if(_priceController.text.isNotEmpty && isNumeric(_priceController.text)) {
+                                                    Get.back();
+                                                    AlertDialog alert = _web3Controller
+                                                        .blockchainInfo(
+                                                        "Please, wait while the transaction is processed. This may take some time.");
+                                                    var connector = await _web3Controller
+                                                        .connect();
+                                                    connector.onSessionConnect
+                                                        .subscribe((
+                                                        args) async {
+                                                      await _web3Controller
+                                                          .sendInviteMethod(
+                                                          connector,
+                                                          args,
+                                                          context,
+                                                          _chatController
+                                                              .channel.value!,
+                                                          _homeController.userMe
+                                                              .value.wallet!,
+                                                          alert,
+                                                          item,
+                                                          double.parse(_priceController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '.')));
+                                                    });
+                                                  }
+
                                             },
                                           )
                                         ],
@@ -465,8 +511,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                               AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while the transaction is processed. This may take some time.");
                               var connector = await _web3Controller.connect();
                               connector.onSessionConnect.subscribe((args) async {
-                                await _web3Controller.sendInviteMethod(connector, args, context, _chatController.channel.value!, _homeController.userMe.value.wallet!, alert, item.wallet!, _chatController.channel.value!.extraData["price"] as double);
-                                var t  = "";
+                                await _web3Controller.sendInviteMethod(connector, args, context, _chatController.channel.value!, _homeController.userMe.value.wallet!, alert, item, _chatController.channel.value!.extraData["price"] as double);
                               });
                             },
                           )

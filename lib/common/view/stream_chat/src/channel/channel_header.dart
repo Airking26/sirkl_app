@@ -247,9 +247,7 @@ class StreamChannelHeader extends StatelessWidget
                                       screen: const SettingsProfileElseScreen(
                                           fromConversation: true,
                                           fromProfile: false));
-                                }
-                                else if (channel.extraData["isConv"] == null || (channel.extraData['isGroupPaying'] != null &&
-                                    channel.extraData['isGroupPaying'] as bool)) {
+                                } else if (channel.extraData["isConv"] == null || (channel.extraData["isConv"] != null && channel.extraData["isConv"] == false)) {
                                   _chatController.channel.value = channel;
                                   if (channel.extraData['isConv'] != null &&
                                       !(channel.extraData['isConv'] as bool)) {
@@ -266,45 +264,7 @@ class StreamChannelHeader extends StatelessWidget
                               padding: const EdgeInsets.only(left: 8.0),
                               child: ClipRRect(
                                   borderRadius: BorderRadius.circular(90),
-                                  child:
-                                  (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ?
-                                      Image.asset("assets/images/app_icon_rounded.png") :
-                                  channel.extraData['isConv'] !=null && !(channel.extraData['isConv'] as bool) ?
-                                      _chatController.channel.value!.extraData["picOfGroup"] == null ?
-                                  TinyAvatar(baseString: (channel.extraData["isGroupPaying"] != null && (channel.extraData["isGroupPaying"]) as bool) ?
-                                  channel.extraData["nameOfGroup"] as String : userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!, dimension: 40, circular: true,
-                                      colourScheme: TinyAvatarColourScheme.seascape) :
-                                  CachedNetworkImage(
-                                      imageUrl: _chatController.channel.value!.extraData["picOfGroup"] as String,
-                                      width: 40,
-                                      height: 40,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
-                                      errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
-                                  ) :
-                                  channel.extraData['isConv'] !=null && channel.extraData['isConv'] as bool ?
-                                  userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).picture == null ?
-                                  TinyAvatar(baseString: userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!, dimension: 40, circular: true,
-                                      colourScheme: TinyAvatarColourScheme.seascape) :
-                                  CachedNetworkImage(
-                                    imageUrl: userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).picture!,
-                                    width: 40,
-                                    height: 40,
-                                    fit: BoxFit.cover,
-                                      placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
-                                      errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
-                                  ) :
-                                      channel.image == null ?
-                                      TinyAvatar(baseString: channel.name!, dimension: 40, circular: true,
-                                          colourScheme: TinyAvatarColourScheme.seascape) :
-                                  CachedNetworkImage(
-                                    imageUrl: channel.image!,
-                                    width: 40,
-                                    height: 40,
-                                    fit: BoxFit.cover,
-                                      placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
-                                      errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")
-                                  )
+                                  child: getImageForChannel(channel, context)
                               )
                               ,
                             ),
@@ -330,8 +290,7 @@ class StreamChannelHeader extends StatelessWidget
                                       screen: const SettingsProfileElseScreen(
                                           fromConversation: true,
                                           fromProfile: false));
-                                } else if (channel.extraData["isConv"] == null || (channel.extraData['isGroupPaying'] != null &&
-                                    channel.extraData['isGroupPaying'] as bool)) {
+                                } else if (channel.extraData["isConv"] == null || (channel.extraData["isConv"] != null && channel.extraData["isConv"] == false)) {
                                   _chatController.channel.value = channel;
                                   if (channel.extraData['isConv'] != null &&
                                       !(channel.extraData['isConv'] as bool)) {
@@ -368,24 +327,7 @@ class StreamChannelHeader extends StatelessWidget
                                   ):SizedBox(
                                     width: MediaQuery.of(context).size.width / 2.5,
                                     child: Text(
-                                    (channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members') ?
-                                        (channel.extraData['ens'] == null || channel.extraData['ens'] == "0") ?
-                                        (channel.extraData['isGroupPaying'] != null && channel.extraData["isGroupPaying"] == true) ?
-                                        channel.extraData["nameOfGroup"] :
-                                    "${(channel.extraData["wallet"] as String).substring(0, 6)}...${(channel.extraData["wallet"] as String).substring((channel.extraData["wallet"] as String).length - 4)}":
-                                        channel.extraData['ens']:
-                                      channel.extraData["isConv"] == null ?
-                                          channel.extraData['nameOfGroup'] == null ?
-                                          channel.name!.substring(0, channel.name!.length < 25 ? channel.name!.length : 25) :
-                                          channel.extraData["nameOfGroup"]
-                                              :
-                                      (channel.extraData['isGroupPaying'] != null && channel.extraData["isGroupPaying"] == true) ?
-                                      channel.extraData["nameOfGroup"] :
-                                      _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] != null ?
-                                      _homeController.nicknames[userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!] + " (" + (!userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
-                                            userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName! : "${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(0,6)}...${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.length - 4)}") + ")"
-                                              : (!userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName.isNullOrBlank! ?
-                                          userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).userName! : "${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(0,6)}...${userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!.length - 4)}"),
+                                      getDisplayName(channel, context),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
@@ -397,8 +339,8 @@ class StreamChannelHeader extends StatelessWidget
                                               : Colors.black),
                                     ),
                                   ),
-                                  (channel.extraData['isConv'] == null) || (channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true)  ? Text(
-                                    "${_chatController.channel.value!.memberCount!} ${_chatController.channel.value!.memberCount! == 1 || _chatController.channel.value!.memberCount! - 3 == 1 ? "participant" : "participants"}",
+                                  (channel.extraData['isConv'] == null) || (channel.extraData["isConv"] != null && channel.extraData["isConv"] == false)|| (channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true)  ? Text(
+                                    "${_chatController.channel.value!.memberCount!} ${_chatController.channel.value!.memberCount! == 1 ? "participant" : "participants"}",
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -416,8 +358,8 @@ class StreamChannelHeader extends StatelessWidget
                         ],
                       ),
                     ),
-                    channel.extraData["isConv"] == null || (channel.extraData['isGroupPaying'] != null &&
-                        channel.extraData['isGroupPaying'] as bool) ? Container() :  _chatController.isEditingProfile.value ? Container() : Transform.translate(
+                    channel.extraData["isConv"] == null || (channel.extraData["isConv"] != null && channel.extraData["isConv"] == false) || (channel.extraData['isGroupPaying'] != null &&
+                        channel.extraData['isGroupPaying'] as bool || (channel.memberCount == null || channel.memberCount == 0 && !channel.id!.contains('members'))) ? Container() :  _chatController.isEditingProfile.value ? Container() : Transform.translate(
                       offset: const Offset(16, 1),
                       child: IconButton(onPressed: () async {
                         _callController.userCalled.value = userFromJson(
@@ -431,7 +373,6 @@ class StreamChannelHeader extends StatelessWidget
                                 .user!
                                 .extraData["userDTO"]));
                         _callController.isFromConv.value = true;
-                        //var t = await StreamChat.of(context).client.createCall(callId: DateTime.now().toString(), callType: 'video', channelType: channel.type, channelId: channel.id!, );
                         await _callController.inviteCall(_callController.userCalled.value, DateTime.now().toString(), _homeController.id.value);
                       }, icon: Image.asset(
                         "assets/images/call_tab.png",
@@ -473,7 +414,7 @@ class StreamChannelHeader extends StatelessWidget
                         }
                       },
                       child:  Padding(
-                        padding: EdgeInsets.only(top: 16.0, right: 16),
+                        padding: const EdgeInsets.only(top: 16.0, right: 16),
                         child: Text("DONE", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w700, color: SColors.activeColor)),
                       ),
                     ) :
@@ -495,5 +436,121 @@ class StreamChannelHeader extends StatelessWidget
       },
     );
   }
+
+  String getDisplayName(Channel channel, BuildContext context) {
+    // Condition 1: memberCount is null or zero, and channel id does not contain 'members'
+    if ((channel.memberCount == null || channel.memberCount == 0) && !channel.id!.contains('members')) {
+      return handleMemberCountNull(channel);
+    }
+
+    // Condition 2: isConv is null
+    if (channel.extraData["isConv"] == null) {
+      return handleIsConvNull(channel);
+    }
+
+    // Condition 3: Other cases (this is just a placeholder, you can customize)
+    return handleOtherCases(channel, context);
+  }
+
+// Helper function for handling null memberCount
+  String handleMemberCountNull(Channel channel) {
+    if (channel.extraData['ens'] == null || channel.extraData['ens'] == "0") {
+      return handleWalletOrGroupPaying(channel);
+    } else {
+      return channel.extraData['ens'] as String;
+    }
+  }
+
+// Helper function for handling null isConv
+  String handleIsConvNull(Channel channel) {
+    return channel.extraData['nameOfGroup'] as String? ?? truncateName(channel.name!);
+  }
+
+// Helper function for handling wallet or group paying condition
+  String handleWalletOrGroupPaying(Channel channel) {
+    if (channel.extraData['isGroupPaying'] != null && channel.extraData["isGroupPaying"] == true) {
+      return channel.extraData["nameOfGroup"] as String;
+    } else {
+      return "${(channel.extraData["wallet"] as String).substring(0, 6)}...${(channel.extraData["wallet"] as String).substring((channel.extraData["wallet"] as String).length - 4)}";
+    }
+  }
+
+// Helper function to truncate name
+  String truncateName(String name) {
+    return name.substring(0, name.length < 25 ? name.length : 25);
+  }
+
+// Helper function for other cases (this is just a placeholder, you can customize)
+  String handleOtherCases(Channel channel, dynamic context) {
+    if (channel.extraData['isConv'] != null && channel.extraData["isConv"] == false) {
+      return channel.extraData["nameOfGroup"] as String;
+    } else {
+      var memberData = channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"];
+      var user = userFromJson(json.encode(memberData));
+
+      if (_homeController.nicknames[user.wallet!] != null) {
+        var userNickname = _homeController.nicknames[user.wallet!];
+        var userNameOrWallet = !user.userName.isNullOrBlank! ? user.userName! : "${user.wallet!.substring(0, 6)}...${user.wallet!.substring(user.wallet!.length - 4)}";
+        return "$userNickname ($userNameOrWallet)";
+      } else {
+        return !user.userName.isNullOrBlank! ? user.userName! : "${user.wallet!.substring(0, 6)}...${user.wallet!.substring(user.wallet!.length - 4)}";
+      }
+    }
+  }
+
+  Widget getImageForChannel(Channel channel, BuildContext context) {
+    if (channel.memberCount == null || channel.memberCount == 0 && !channel.id!.contains('members')) {
+      return Image.asset("assets/images/app_icon_rounded.png");
+    }
+
+    if (channel.extraData['isConv'] != null) {
+      if (!(channel.extraData['isConv'] as bool)) {
+        return handleGroupChatCase(channel, context);
+      } else {
+        return handlePersonalChatCase(channel, context);
+      }
+    }
+
+    return handleDefaultCase(channel);
+  }
+
+  Widget handleGroupChatCase(Channel channel, BuildContext context) {
+    String? picOfGroup = _chatController.channel.value!.extraData["picOfGroup"] as String?;
+
+    if (picOfGroup == null) {
+      return TinyAvatar(baseString: channel.extraData["nameOfGroup"] as String, dimension: 40, circular: true, colourScheme: TinyAvatarColourScheme.seascape);
+    } else {
+      return buildCachedNetworkImage(picOfGroup);
+    }
+  }
+
+  Widget handlePersonalChatCase(Channel channel, BuildContext context) {
+    String? userPicture = userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).picture;
+
+    if (userPicture == null) {
+      String userWallet = userFromJson(json.encode(channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"])).wallet!;
+      return TinyAvatar(baseString: userWallet, dimension: 40, circular: true, colourScheme: TinyAvatarColourScheme.seascape);
+    } else {
+      return buildCachedNetworkImage(userPicture);
+    }
+  }
+
+  Widget handleDefaultCase(Channel channel) {
+    return channel.image == null
+        ? TinyAvatar(baseString: channel.name!, dimension: 40, circular: true, colourScheme: TinyAvatarColourScheme.seascape)
+        : buildCachedNetworkImage(channel.image!);
+  }
+
+  Widget buildCachedNetworkImage(String imageUrl) {
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      width: 40,
+      height: 40,
+      fit: BoxFit.cover,
+      placeholder: (context, url) => Center(child: CircularProgressIndicator(color: SColors.activeColor)),
+      errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"),
+    );
+  }
+
 
 }

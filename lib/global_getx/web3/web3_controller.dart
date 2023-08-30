@@ -7,9 +7,14 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:sirkl/common/model/eth_transaction_dto.dart';
+import 'package:sirkl/common/model/notification_added_admin_dto.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_colors.dart';
+import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/networks/request.dart';
+import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 import 'package:web3dart/web3dart.dart';
@@ -20,6 +25,7 @@ class Web3Controller extends GetxController{
   var loadingToJoinGroup = false.obs;
   var loadingToCreateGroup = false.obs;
   var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
+  CommonController get _commonController => Get.find<CommonController>();
   var _uri;
 
   Future<DeployedContract> getContract() async {
@@ -77,7 +83,7 @@ class Web3Controller extends GetxController{
           parameters: arg);
 
     var gasPrice = await client.getGasPrice();
-    var estimatedGasFee = await client.estimateGas(sender: EthereumAddress.fromHex(wallet), gasPrice: gasPrice, value: hasFee ? EtherAmount.inWei(BigInt.from(fee! * 10e18)) : EtherAmount.zero());
+    var estimatedGasFee = await client.estimateGas(sender: EthereumAddress.fromHex(wallet), gasPrice: gasPrice, value: hasFee ? EtherAmount.inWei(BigInt.from(fee! * 1e18)) : EtherAmount.zero());
 
     launchUrl(_uri, mode: LaunchMode.externalApplication);
 
@@ -116,6 +122,14 @@ class Web3Controller extends GetxController{
 
   Future<String?> sendInvite(Web3App connector, SessionConnect? sessionConnect, List<dynamic> args, String? wallet) async {
     return await query(connector, sessionConnect, "inviteToGroup", args, false, null, wallet);
+  }
+
+  Future<String?> acceptInvitation(Web3App connector, SessionConnect? sessionConnect, List<dynamic> args, double fee, String? wallet) async {
+    return await query(connector, sessionConnect, "acceptInvitation", args, true, fee, wallet);
+  }
+
+  Future<String?> kickMember(Web3App connector, SessionConnect? sessionConnect, List<dynamic> args, String? wallet) async{
+    return await query(connector, sessionConnect, "kickMember", args, false, null, wallet);
   }
 
   joinGroupMethod(Web3App connector, SessionConnect? args, BuildContext context, Channel channel, String wallet, AlertDialog alert, String id) async {
@@ -176,17 +190,50 @@ class Web3Controller extends GetxController{
       });
   }
 
-  sendInviteMethod(Web3App connector, SessionConnect? args, BuildContext context, Channel channel, String wallet, AlertDialog alert, String walletInvited, double fee) async {
-    var address = await sendInvite(connector, args, [BigInt.parse(channel.extraData['idGroupBlockChain'] as String), EthereumAddress.fromHex(walletInvited), BigInt.from(fee * 10e18)], wallet);
+  sendInviteMethod(Web3App connector, SessionConnect? args, BuildContext context, Channel channel, String wallet, AlertDialog alert, UserDTO item, double fee) async {
+    var address = await sendInvite(connector, args, [BigInt.parse(channel.extraData['idGroupBlockChain'] as String), EthereumAddress.fromHex(item.wallet!), BigInt.from(fee * 1e18)], wallet);
       final contract = await getContract();
       final filter = FilterOptions.events(contract: contract, event: contract.event('InvitationCreated'));
       Stream<FilterEvent> eventStream = client.events(filter);
       if(address != null) showDialog(context: context, builder: (_) => WillPopScope(onWillPop : () async => false, child: alert), barrierDismissible: false);
       eventStream.listen((event) async {
         if(event.transactionHash == address){
+          var kj = contract.event("InvitationCreated").decodeResults(event.topics!, event.data!);
+          final inviteId = contract.event("InvitationCreated").decodeResults(event.topics!, event.data!)[4];
+          await _commonController.notifyUserInvitedToJoinPayingGroup(NotificationAddedAdminDto(idUser: item.id!, idChannel: channel.id! , channelName: channel.extraData['nameOfGroup'] as String, channelPrice: fee.toString(), channelPrivate: channel.extraData["isGroupPrivate"] as bool, inviteId: inviteId.toString()));
           Get.back();
         }
       });
+  }
+
+  acceptInvitationMethod(Web3App connector, SessionConnect? args, BuildContext context, Channel channel, String wallet, AlertDialog alert, String id, double fee, String inviteId) async {
+    var address = await acceptInvitation(connector, args, [BigInt.parse(inviteId)], fee, wallet);
+    final contract = await getContract();
+    final filter = FilterOptions.events(contract: contract, event: contract.event("GroupJoined"));
+    Stream<FilterEvent> eventStream = client.events(filter);
+    if(address != null) showDialog(context: context, builder: (_) => WillPopScope(onWillPop : () async => false, child: alert), barrierDismissible: false);
+    eventStream.listen((event) async {
+      if(event.transactionHash == address){
+        await channel.addMembers([id]);
+        Get.back();
+        pushNewScreen(context, screen: DetailedChatScreen(create: false, fromProfile: false, channelId: channel.id!,), withNavBar: false);
+      }
+    });
+  }
+  
+  kickMemberMethod(Web3App connector, SessionConnect? args, Channel channel, String wallet, AlertDialog alert, String id, StreamMemberListController memberListController, String walletToKick) async {
+    var address = await kickMember(connector, args, [BigInt.parse(channel.extraData["idGroupBlockChain"] as String), EthereumAddress.fromHex(walletToKick)], wallet);
+    final contract = await getContract();
+    final filter = FilterOptions.events(contract: contract, event: contract.event("GroupLeft"));
+    Stream<FilterEvent> eventStream = client.events(filter);
+    //if (address != null) showDialog(context: context, builder: (_) => WillPopScope(onWillPop : () async => false, child: alert), barrierDismissible: false);
+    eventStream.listen((event) async {
+      if(event.transactionHash == address) {
+        await channel.removeMembers([id]);
+        await memberListController.refresh();
+        //Get.back();
+      }
+    });
   }
 
   AlertDialog blockchainInfo(String info){

@@ -122,6 +122,7 @@ class HomeRepo {
   static Future<void> updateNFTStatus(NftModificationDto nftModi) async {
     SRequests req = SRequests(SUrls.baseURL);
     Response res = await req.patch(url: SUrls.nftUpdate, body: nftModi.toJson());
+    var yu = "";
   }
 
 

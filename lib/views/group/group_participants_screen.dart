@@ -11,6 +11,7 @@ import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/member_scroll_view/stream_member_list_view.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
@@ -20,8 +21,8 @@ import '../profile/profile_else_screen.dart';
 
 
 class GroupParticipantScreen extends StatefulWidget {
-  bool fromChat;
-  GroupParticipantScreen({Key? key, required this.fromChat}) : super(key: key);
+
+  const GroupParticipantScreen({Key? key}) : super(key: key);
 
   @override
   State<GroupParticipantScreen> createState() => _GroupParticipantScreenState();
@@ -33,6 +34,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
   GroupsController get _groupController => Get.find<GroupsController>();
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
 
   late final StreamMemberListController _memberListController =
   StreamMemberListController(
@@ -67,10 +69,20 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
               padding: const EdgeInsets.only(top: 8.0),
               child: StreamMemberListView(
                 memberPage: true,
-                userSlidableEnabled: widget.fromChat,
-                onUserDeletePressed: (context, memberId) async {
-                  await _chatController.channel.value?.removeMembers([memberId]);
-                  await _memberListController.refresh();
+                userSlidableEnabled: _chatController.channel.value?.createdBy?.id == _homeController.id.value ||
+                    _chatController.channel.value?.membership?.channelRole == "channel_moderator",
+                onUserDeletePressed: (context, memberId, wallet) async {
+                  if(_chatController.channel.value!.extraData["isGroupPaying"] != null && _chatController.channel.value!.extraData["isGroupPaying"] as bool ){
+                    AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while the transaction is processed. This may take some time.");
+                    var connector = await _web3Controller.connect();
+                    connector.onSessionConnect.subscribe((args) async {
+                      await _web3Controller.kickMemberMethod(connector, args, _chatController.channel.value!, _homeController.userMe.value.wallet!, alert, memberId, _memberListController, wallet!);
+                    });
+                  } else {
+                    await _chatController.channel.value?.removeMembers(
+                        [memberId]);
+                    await _memberListController.refresh();
+                  }
                 },
                 onAdminPressed: (context, memberId, isAdmin) async {
                   await _groupController.changeAdminRole(AdminDto(idChannel: _chatController.channel.value!.id!, userToUpdate: memberId, makeAdmin: !isAdmin));
@@ -140,7 +152,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                       fontSize: 20),
                 ),
               ),
-              _chatController.channel.value?.createdBy?.id == _homeController.id.value && widget.fromChat ||
+              _chatController.channel.value?.createdBy?.id == _homeController.id.value ||
                   _chatController.channel.value?.membership?.channelRole == "channel_moderator" ? IconButton(
                   onPressed: () {
                     pushNewScreen(context, screen: const AddUserToGroupScreen()).then((value) => _memberListController.refresh());

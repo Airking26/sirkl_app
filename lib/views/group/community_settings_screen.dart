@@ -111,7 +111,7 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
               children: [
                 InkWell(
                   onTap: (){
-                    pushNewScreen(context, screen: GroupParticipantScreen(fromChat: true));
+                    pushNewScreen(context, screen: const GroupParticipantScreen());
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),

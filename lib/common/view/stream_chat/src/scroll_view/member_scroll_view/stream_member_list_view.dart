@@ -4,6 +4,7 @@ import 'package:dart_vlc/channel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_error_widget.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/stream_scroll_view_load_more_error.dart';
@@ -83,7 +84,7 @@ class StreamMemberListView extends StatelessWidget {
 
   final bool memberPage;
   final bool? userSlidableEnabled;
-  final void Function(BuildContext, String)? onUserDeletePressed;
+  final void Function(BuildContext, String, String?)? onUserDeletePressed;
   final void Function(BuildContext, String, bool)? onAdminPressed;
 
   /// The [StreamMemberListController] used to control the list of members.
@@ -322,7 +323,7 @@ class StreamMemberListView extends StatelessWidget {
           final streamUserListTile = StreamMemberListTile(
             memberPage: memberPage,
             slidableEnabled: userSlidableEnabledBool,
-            onDeletePressed: onUserDeletedPressed == null ? null : (context) => onUserDeletedPressed(context, member.userId!),
+            onDeletePressed: onUserDeletedPressed == null ? null : (context) => onUserDeletedPressed(context, member.userId!, UserDTO.fromJson(member.user!.extraData["userDTO"] as Map<String, dynamic>).wallet!),
             onAdminPressed:  onAdminPressed == null ? null : (context) => onAdminPressed(context, member.userId!, member.channelRole == "channel_moderator"),
             user: member.user!,
             channelRole : member.channelRole,
