@@ -43,7 +43,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
 
   @override
   void initState() {
-    _homeController.getDropDownList(_homeController.userMe.value.wallet!);
+    //_homeController.getDropDownList(_homeController.userMe.value.wallet!);
     super.initState();
   }
 
@@ -335,7 +335,23 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                                   ),  ),),)),
                         const SizedBox(width: 4,),
                         DropdownButton<dynamic>(
-                        items: _homeController.dropDownMenuItems,
+                        items: [DropdownMenuItem(
+                            child: Row(
+                              children: [
+                                Image.network(
+                                  "https://raw.githubusercontent.com/dappradar/tokens/main/ethereum/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee/logo.png",
+                                  width: 22,
+                                  height: 22,
+                                ),
+                                const SizedBox(
+                                  width: 4,
+                                ),
+                                const Text(
+                                  "ETH",
+                                  style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),
+                                )
+                              ],
+                            ))],
                             onChanged: (any){})
                           ],),
                       )

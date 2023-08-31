@@ -14,10 +14,11 @@ import '../../global_getx/home/home_controller.dart';
 
 class DetailedChatScreen extends StatefulWidget {
 
-  const DetailedChatScreen({Key? key, required this.create, this.fromProfile = false, this.channelId}) : super(key: key);
+  const DetailedChatScreen({Key? key, required this.create, this.fromProfile = false, this.channelId, this.resetChannel = true}) : super(key: key);
   final bool create;
   final String? channelId;
   final bool fromProfile;
+  final bool resetChannel;
 
   @override
   State<DetailedChatScreen> createState() =>
@@ -33,7 +34,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
 
   @override
   void initState() {
-    _chatController.resetChannel();
+    if(widget.resetChannel) _chatController.resetChannel();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if(_commonController.userClicked.value != null) _commonController.checkUserIsInFollowing();
       if(widget.create) {

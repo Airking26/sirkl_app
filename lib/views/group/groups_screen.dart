@@ -440,66 +440,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     child: ListTile(
                       onTap: () async{
                         await _groupController.createGroup(StreamChat.of(context).client, GroupCreationDto(name: _groupController.nftAvailable[index].collectionName, picture: _groupController.nftAvailable[index].collectionImage, contractAddress: _groupController.nftAvailable[index].contractAddress));
-                        pushNewScreen(context, screen: const DetailedChatScreen(create: false), withNavBar: false).then((value) {
-                          _navigationController.hideNavBar.value = false;
-                          _groupController.addAGroup.value = false;
-                        });
-                      },
-                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftAvailable[index].collectionImage, width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
-
-                      title: Text(_groupController.nftAvailable[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildSelectToken(){
-    return _groupController.isLoadingAvailableNFT.value ?
-    Padding(
-      padding: const EdgeInsets.only(top: 24.0, left: 24, right: 24),
-      child: Column(
-        children: [
-          CircularProgressIndicator(color: SColors.activeColor),
-          const SizedBox(height: 8,),
-          Text("Please wait while we are loading your Tokens...",textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black),)
-        ],
-      ),
-    ) : _groupController.nftAvailable.isEmpty ? noNFTFound() :
-    MediaQuery.removePadding(
-      context: context,
-      removeTop: true,
-      child: Expanded(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: SafeArea(
-            child: ListView.builder(
-              itemCount: _groupController.nftAvailable.length,
-              itemBuilder: (context, index){
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 6),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xFF1A2E40) : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.grey,
-                          offset: Offset(0.0, 0.01),
-                          blurRadius: 0.01,
-                        ),
-                      ],
-                    ),
-                    child: ListTile(
-                      onTap: () async{
-                        await _groupController.createGroup(StreamChat.of(context).client, GroupCreationDto(name: _groupController.nftAvailable[index].collectionName, picture: _groupController.nftAvailable[index].collectionImage, contractAddress: _groupController.nftAvailable[index].contractAddress));
-                        pushNewScreen(context, screen: const DetailedChatScreen(create: false), withNavBar: false).then((value) {
+                        pushNewScreen(context, screen: const DetailedChatScreen(create: false, resetChannel: false,), withNavBar: false).then((value) {
                           _navigationController.hideNavBar.value = false;
                           _groupController.addAGroup.value = false;
                         });
@@ -589,7 +530,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     IconButton(
                         onPressed: () {
                           if(_groupController.addAGroup.value == false) _groupController.searchIsActive.value = false;
-                            if(!_groupController.addAGroup.value && _groupController.nftAvailable.isEmpty) _groupController.retrieveNFTAvailableForCreation(_homeController.userMe.value.wallet!);
+                            if(!_groupController.addAGroup.value && _groupController.nftAvailable.isEmpty) _groupController.retrieveNFTAvailableForCreation("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87");
                           _groupController.addAGroup.value = !_groupController.addAGroup.value;
                         },
                         icon: Image.asset(

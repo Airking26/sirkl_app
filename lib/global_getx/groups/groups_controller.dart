@@ -58,7 +58,7 @@ class GroupsController extends GetxController{
       ContractAddressDto contractAddress = await HomeRepo.getContractAddressesWithAlchemy(wallet: wallet, cursor: cursor );
     
       contractAddress.pageKey == null || contractAddress.pageKey!.isEmpty ? cursor = "" : cursor = "&pageKey=${contractAddress.pageKey}";
-      contractAddress.contracts.removeWhere((element) => groups.map((e) => e.contractAddress).contains(element.address) || element.title == null || element.title!.isEmpty || element.opensea == null || element.opensea!.imageUrl == null || element.opensea!.imageUrl!.isEmpty  ||  element.opensea!.collectionName == null || element.opensea!.collectionName!.isEmpty || element.tokenType == TokenType.UNKNOWN || (element.tokenType == TokenType.ERC1155 && element.opensea?.safelistRequestStatus == SafelistRequestStatus.NOT_REQUESTED));
+      contractAddress.contracts.removeWhere((element) => groups.map((e) => e.contractAddress.toLowerCase()).contains(element.address?.toLowerCase()) || element.title == null || element.title!.isEmpty || element.opensea == null || element.opensea!.imageUrl == null || element.opensea!.imageUrl!.isEmpty  ||  element.opensea!.collectionName == null || element.opensea!.collectionName!.isEmpty);
       for (var element in contractAddress.contracts) {
         nfts.add(CollectionDbDto(collectionName: element.opensea!.collectionName!, contractAddress: element.address!, collectionImage: element.opensea!.imageUrl!, collectionImages: element.media?.first.thumbnail == null ? [element.media!.first.gateway!] : [element.media!.first.thumbnail!]));
       }
@@ -74,14 +74,14 @@ class GroupsController extends GetxController{
     await HomeRepo.getTokenContractAddressesWithAlchemy(wallet: wallet);
 
     for(TokenBalance element in tokenContractAddress.result!.tokenBalances!) {
-      if (element.tokenBalance != "0x0000000000000000000000000000000000000000000000000000000000000000" && !groups.map((e) => e.contractAddress).contains(element.contractAddress)) {
+      if (element.tokenBalance != "0x0000000000000000000000000000000000000000000000000000000000000000" && !groups.map((e) => e.contractAddress.toLowerCase()).contains(element.contractAddress?.toLowerCase())) {
         var tokenDetails = await HomeRepo.getTokenMetadataWithAlchemy(token: element.contractAddress!);
-        if(tokenDetails.result != null && tokenDetails.result!.logo != null) {
+        //if(tokenDetails.result != null && tokenDetails.result!.logo != null) {
           tokens.add(CollectionDbDto(collectionName: tokenDetails.result!.name!,
               contractAddress: element.contractAddress!,
-              collectionImage: tokenDetails.result!.logo!,
-              collectionImages: [tokenDetails.result!.logo!]));
-        }
+              collectionImage: tokenDetails.result?.logo ?? "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png",
+              collectionImages: [tokenDetails.result?.logo ?? "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"]));
+        //}
       }
     }
 

@@ -42,6 +42,7 @@ class ChatsController extends GetxController{
   Rx<Channel?> channel = (null as Channel?).obs;
   var retryProgress = false.obs;
 
+  var sliderShare = 1.0.obs;
   var sendingMessageMode = 0.obs;
   var groupType = 0.obs;
   var groupVisibility = 0.obs;

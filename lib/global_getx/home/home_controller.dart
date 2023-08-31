@@ -56,7 +56,7 @@ class HomeController extends GetxController {
 
   Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
   RxList<String> contractAddresses = <String>[].obs;
-  RxList<DropdownMenuItem> dropDownMenuItems = <DropdownMenuItem>[].obs;
+  //RxList<DropdownMenuItem> dropDownMenuItems = <DropdownMenuItem>[].obs;
   Rx<PagingController<int, List<StoryDto?>?>> pagingController =
       PagingController<int, List<StoryDto?>?>(firstPageKey: 0).obs;
 
@@ -125,13 +125,9 @@ class HomeController extends GetxController {
         requiredNamespaces: {
       'eip155': const RequiredNamespace(
         events: ['session_request','chainChanged', 'accountsChanged',],
-        chains: ["eip155:5"],
+        chains: ["eip155:1"],
         methods: [
           'personal_sign',
-          'eth_sign',
-          'eth_signTransaction',
-          'eth_signTypedData',
-          'eth_sendTransaction',
         ], // Requestable Methods
       ),
     });
@@ -278,7 +274,7 @@ class HomeController extends GetxController {
   }
 
   getDropDownList(String wallet) async {
-    //var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
+    /*var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
     //var ethClient = Web3Client('https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2', htp.Client());
     //var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet));
     //if(balance.getInWei > BigInt.zero) {
@@ -300,7 +296,7 @@ class HomeController extends GetxController {
       ],
     )));
     //}
-    /*if(request.isOk){
+    if(request.isOk){
       var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
       tokenContractAddress.result?.tokenBalances?.forEach((element) async {
         if(element.tokenBalance != "0x0000000000000000000000000000000000000000000000000000000000000000"){

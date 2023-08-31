@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ndialog/ndialog.dart';
+import 'package:sirkl/common/model/admin_dto.dart';
 import 'package:sirkl/common/model/eth_transaction_dto.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -13,6 +14,7 @@ import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/global_getx/groups/groups_controller.dart';
 import 'package:sirkl/networks/request.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,6 +28,7 @@ class Web3Controller extends GetxController{
   var loadingToCreateGroup = false.obs;
   var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
   CommonController get _commonController => Get.find<CommonController>();
+  GroupsController get _groupController => Get.find<GroupsController>();
   var _uri;
 
   Future<DeployedContract> getContract() async {
@@ -132,6 +135,14 @@ class Web3Controller extends GetxController{
     return await query(connector, sessionConnect, "kickMember", args, false, null, wallet);
   }
 
+  Future<String?> addCreator(Web3App connector, SessionConnect? sessionConnect, List<dynamic> args, String? wallet) async {
+    return await query(connector, sessionConnect, "addCreator", args, false, null, wallet);
+  }
+
+  Future<String?> removeCreator(Web3App connector, SessionConnect? sessionConnect, List<dynamic> args, String? wallet) async {
+    return await query(connector, sessionConnect, "removeCreator", args, false, null, wallet);
+  }
+
   joinGroupMethod(Web3App connector, SessionConnect? args, BuildContext context, Channel channel, String wallet, AlertDialog alert, String id) async {
     loadingToJoinGroup.value = true;
       var address = await joinGroup(
@@ -232,6 +243,34 @@ class Web3Controller extends GetxController{
         await channel.removeMembers([id]);
         await memberListController.refresh();
         //Get.back();
+      }
+    });
+  }
+
+  addCreatorMethod(Web3App connector, SessionConnect? args, Channel channel, String wallet, AlertDialog alert, String id, StreamMemberListController memberListController, String walletToAddAsCreator) async {
+    var address = await addCreator(connector, args, [BigInt.parse(channel.extraData['idGroupBlockChain'] as String), EthereumAddress.fromHex(walletToAddAsCreator), BigInt.parse("source")], wallet);
+    final contract = await getContract();
+    final filter = FilterOptions.events(contract: contract, event: contract.event('CreatorAdded'));
+    Stream<FilterEvent> eventStream = client.events(filter);
+    eventStream.listen((event) async {
+      if(event.transactionHash == address){
+        await _groupController.changeAdminRole(AdminDto(idChannel: channel.id!, userToUpdate: id, makeAdmin: true));
+        await _commonController.notifyUserAsAdmin(NotificationAddedAdminDto(idUser: id, idChannel: channel.id!, channelName: channel.extraData["nameOfGroup"] as String));
+        await memberListController.refresh();
+      }
+    });
+  }
+
+
+  removeCreatorMethod(Web3App connector, SessionConnect? args, Channel channel, String wallet, AlertDialog alert, String id, StreamMemberListController memberListController, String walletToAddAsCreator) async {
+    var address = await addCreator(connector, args, [BigInt.parse(channel.extraData['idGroupBlockChain'] as String), EthereumAddress.fromHex(walletToAddAsCreator)], wallet);
+    final contract = await getContract();
+    final filter = FilterOptions.events(contract: contract, event: contract.event('CreatorRemoved'));
+    Stream<FilterEvent> eventStream = client.events(filter);
+    eventStream.listen((event) async {
+      if(event.transactionHash == address){
+        await _groupController.changeAdminRole(AdminDto(idChannel: channel.id!, userToUpdate: id, makeAdmin: false));
+        await memberListController.refresh();
       }
     });
   }

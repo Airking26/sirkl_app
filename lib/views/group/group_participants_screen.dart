@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:sirkl/common/model/admin_dto.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -54,7 +56,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
   
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Obx(() => Scaffold(
       backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
           ? const Color(0xFF102437)
           : const Color.fromARGB(255, 247, 253, 255),
@@ -85,9 +87,127 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                   }
                 },
                 onAdminPressed: (context, memberId, isAdmin) async {
-                  await _groupController.changeAdminRole(AdminDto(idChannel: _chatController.channel.value!.id!, userToUpdate: memberId, makeAdmin: !isAdmin));
-                  await _memberListController.refresh();
-                  if(!isAdmin) await _commonController.notifyUserAsAdmin(NotificationAddedAdminDto(idUser: memberId, idChannel: _chatController.channel.value!.id!, channelName: _chatController.channel.value!.extraData["nameOfGroup"] as String));
+                  if(_chatController.channel.value!.extraData["isGroupPaying"] != null && _chatController.channel.value!.extraData["isGroupPaying"] as bool ){
+                    showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (_) =>
+                            CupertinoAlertDialog(
+                              title: Text(
+                                "Shares To Give",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight:
+                                    FontWeight
+                                        .w600,
+                                    fontFamily:
+                                    "Gilroy",
+                                    color: MediaQuery.of(context)
+                                        .platformBrightness ==
+                                        Brightness
+                                            .dark
+                                        ? Colors
+                                        .white
+                                        : Colors
+                                        .black),
+                              ),
+                              content: Material(
+                                color: Colors.transparent,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                          "By making another user co-creator ",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              fontFamily: "Gilroy",
+                                              color: MediaQuery.of(context)
+                                                  .platformBrightness ==
+                                                  Brightness.dark
+                                                  ? Colors.white
+                                                  .withOpacity(0.5)
+                                                  : Colors.black
+                                                  .withOpacity(0.5))),
+                                      const SizedBox(height: 16,),
+                                      Obx(() => Slider(
+                                          activeColor: SColors.activeColor,
+                                          inactiveColor: Colors.grey,
+                                          value: _chatController.sliderShare.value,
+                                          max: 79,
+                                          min: 1,
+                                          label: _chatController.sliderShare.round().toString(),
+                                          divisions: 77,
+                                          onChanged: (e){
+                                        _chatController.sliderShare.value = e;
+                                      })),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              actions: [
+                                CupertinoDialogAction(
+                                  child: Text("Cancel",
+                                      style: TextStyle(
+                                          fontSize:
+                                          16,
+                                          fontWeight:
+                                          FontWeight
+                                              .w600,
+                                          fontFamily:
+                                          "Gilroy",
+                                          color: MediaQuery.of(context).platformBrightness ==
+                                              Brightness
+                                                  .dark
+                                              ? Colors
+                                              .white
+                                              : Colors
+                                              .black)),
+                                  onPressed:
+                                      () async {
+                                    Get.back();
+                                  },
+                                ),
+                                CupertinoDialogAction(
+                                  child: Text("Confirm",
+                                      style: TextStyle(
+                                          fontSize:
+                                          16,
+                                          fontWeight:
+                                          FontWeight
+                                              .w600,
+                                          fontFamily:
+                                          "Gilroy",
+                                          color: MediaQuery.of(context).platformBrightness ==
+                                              Brightness
+                                                  .dark
+                                              ? Colors
+                                              .white
+                                              : Colors
+                                              .black)),
+                                  onPressed:
+                                      () async {
+
+                                  },
+                                ),
+                              ],
+                            ));
+                  } else {
+                    await _groupController.changeAdminRole(
+                        AdminDto(idChannel: _chatController.channel.value!.id!,
+                            userToUpdate: memberId,
+                            makeAdmin: !isAdmin));
+                    await _memberListController.refresh();
+                    if (!isAdmin) {
+                      await _commonController.notifyUserAsAdmin(
+                        NotificationAddedAdminDto(
+                            idUser: memberId, idChannel: _chatController.channel
+                            .value!.id!, channelName: _chatController.channel
+                            .value!.extraData["nameOfGroup"] as String));
+                    }
+                  }
                 },
                 controller: _memberListController, onMemberTap: (member){
                   if(_homeController.id.value != member.user!.id) {
@@ -102,7 +222,7 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
           ),
         ),
       ],
-    ));
+    )));
   }
 
   Container buildAppbar(BuildContext context) {
