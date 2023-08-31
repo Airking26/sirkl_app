@@ -44,6 +44,8 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
     });
     super.initState();
   }
+  
+
 
   @override
   Widget build(BuildContext context) {
