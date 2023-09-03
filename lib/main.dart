@@ -66,6 +66,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   final chatPersistentClient = StreamChatPersistenceClient(
@@ -79,7 +81,7 @@ void main() async{
   FirebaseMessaging.instance.subscribeToTopic("all");
   await GetStorage.init();
   AnalyticService().getAnalyticObserver();
-  runApp(MyApp(client: client,));
+  runApp(MyApp(client: client));
 }
 
 class MyApp extends StatelessWidget {
@@ -105,7 +107,7 @@ class MyApp extends StatelessWidget {
           themedWidgetBuilder: (BuildContext context, ThemeData theme) {
           
               return GetMaterialApp(
-      
+      navigatorKey: navigatorKey,
       translations: Language(),
       locale: const Locale('en'),
       builder: (context, child){

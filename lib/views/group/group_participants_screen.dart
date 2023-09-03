@@ -86,114 +86,157 @@ class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
                     await _memberListController.refresh();
                   }
                 },
-                onAdminPressed: (context, memberId, isAdmin) async {
+                onAdminPressed: (context, memberId, isAdmin, wallet) async {
                   if(_chatController.channel.value!.extraData["isGroupPaying"] != null && _chatController.channel.value!.extraData["isGroupPaying"] as bool ){
-                    showDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        builder: (_) =>
-                            CupertinoAlertDialog(
-                              title: Text(
-                                "Shares To Give",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight:
-                                    FontWeight
-                                        .w600,
-                                    fontFamily:
-                                    "Gilroy",
-                                    color: MediaQuery.of(context)
-                                        .platformBrightness ==
-                                        Brightness
-                                            .dark
-                                        ? Colors
-                                        .white
-                                        : Colors
-                                        .black),
-                              ),
-                              content: Material(
-                                color: Colors.transparent,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                          "By making another user co-creator ",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              fontFamily: "Gilroy",
-                                              color: MediaQuery.of(context)
-                                                  .platformBrightness ==
-                                                  Brightness.dark
-                                                  ? Colors.white
-                                                  .withOpacity(0.5)
-                                                  : Colors.black
-                                                  .withOpacity(0.5))),
-                                      const SizedBox(height: 16,),
-                                      Obx(() => Slider(
-                                          activeColor: SColors.activeColor,
-                                          inactiveColor: Colors.grey,
-                                          value: _chatController.sliderShare.value,
-                                          max: 79,
-                                          min: 1,
-                                          label: _chatController.sliderShare.round().toString(),
-                                          divisions: 77,
-                                          onChanged: (e){
-                                        _chatController.sliderShare.value = e;
-                                      })),
-                                    ],
+                    if(isAdmin){
+                      AlertDialog alert = _web3Controller
+                          .blockchainInfo(
+                          "Please, wait while the transaction is processed. This may take some time.");
+                      var connector = await _web3Controller
+                          .connect();
+                      connector.onSessionConnect.subscribe((args) async {
+                        await _web3Controller.removeCreatorMethod(context, connector, args, _chatController.channel.value!, _homeController.userMe.value.wallet!, alert, memberId, _memberListController, wallet!);
+                      });
+                  } else {
+                      showDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (_) =>
+                              CupertinoAlertDialog(
+                                title: Text(
+                                  "Shares To Give",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight:
+                                      FontWeight
+                                          .w600,
+                                      fontFamily:
+                                      "Gilroy",
+                                      color: MediaQuery
+                                          .of(context)
+                                          .platformBrightness ==
+                                          Brightness
+                                              .dark
+                                          ? Colors
+                                          .white
+                                          : Colors
+                                          .black),
+                                ),
+                                content: Material(
+                                  color: Colors.transparent,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                            "By making another user co-creator, you can share percentages of your shares with him.",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                fontFamily: "Gilroy",
+                                                color: MediaQuery
+                                                    .of(context)
+                                                    .platformBrightness ==
+                                                    Brightness.dark
+                                                    ? Colors.white
+                                                    .withOpacity(0.5)
+                                                    : Colors.black
+                                                    .withOpacity(0.5))),
+                                        const SizedBox(height: 16,),
+                                        Obx(() =>
+                                            Slider(
+                                                activeColor: SColors
+                                                    .activeColor,
+                                                inactiveColor: Colors.grey,
+                                                value: _chatController
+                                                    .sliderShare.value,
+                                                max: 79,
+                                                min: 0,
+                                                label: _chatController
+                                                    .sliderShare.round()
+                                                    .toString(),
+                                                divisions: 78,
+                                                onChanged: (e) {
+                                                  _chatController.sliderShare
+                                                      .value = e;
+                                                })),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              actions: [
-                                CupertinoDialogAction(
-                                  child: Text("Cancel",
-                                      style: TextStyle(
-                                          fontSize:
-                                          16,
-                                          fontWeight:
-                                          FontWeight
-                                              .w600,
-                                          fontFamily:
-                                          "Gilroy",
-                                          color: MediaQuery.of(context).platformBrightness ==
-                                              Brightness
-                                                  .dark
-                                              ? Colors
-                                              .white
-                                              : Colors
-                                              .black)),
-                                  onPressed:
-                                      () async {
-                                    Get.back();
-                                  },
-                                ),
-                                CupertinoDialogAction(
-                                  child: Text("Confirm",
-                                      style: TextStyle(
-                                          fontSize:
-                                          16,
-                                          fontWeight:
-                                          FontWeight
-                                              .w600,
-                                          fontFamily:
-                                          "Gilroy",
-                                          color: MediaQuery.of(context).platformBrightness ==
-                                              Brightness
-                                                  .dark
-                                              ? Colors
-                                              .white
-                                              : Colors
-                                              .black)),
-                                  onPressed:
-                                      () async {
-
-                                  },
-                                ),
-                              ],
-                            ));
+                                actions: [
+                                  CupertinoDialogAction(
+                                    child: Text("Cancel",
+                                        style: TextStyle(
+                                            fontSize:
+                                            16,
+                                            fontWeight:
+                                            FontWeight
+                                                .w600,
+                                            fontFamily:
+                                            "Gilroy",
+                                            color: MediaQuery
+                                                .of(context)
+                                                .platformBrightness ==
+                                                Brightness
+                                                    .dark
+                                                ? Colors
+                                                .white
+                                                : Colors
+                                                .black)),
+                                    onPressed:
+                                        () async {
+                                      Get.back();
+                                    },
+                                  ),
+                                  CupertinoDialogAction(
+                                    child: Text("Confirm",
+                                        style: TextStyle(
+                                            fontSize:
+                                            16,
+                                            fontWeight:
+                                            FontWeight
+                                                .w600,
+                                            fontFamily:
+                                            "Gilroy",
+                                            color: MediaQuery
+                                                .of(context)
+                                                .platformBrightness ==
+                                                Brightness
+                                                    .dark
+                                                ? Colors
+                                                .white
+                                                : Colors
+                                                .black)),
+                                    onPressed:
+                                        () async {
+                                      Get.back();
+                                      AlertDialog alert = _web3Controller
+                                          .blockchainInfo(
+                                          "Please, wait while the transaction is processed. This may take some time.");
+                                      var connector = await _web3Controller
+                                          .connect();
+                                      connector.onSessionConnect.subscribe((
+                                          args) async {
+                                        await _web3Controller.addCreatorMethod(
+                                          context,
+                                            connector,
+                                            args,
+                                            _chatController.channel.value!,
+                                            _homeController.userMe.value
+                                                .wallet!,
+                                            alert,
+                                            memberId,
+                                            _memberListController,
+                                            wallet!,
+                                            _chatController.sliderShare.value);
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ));
+                    }
                   } else {
                     await _groupController.changeAdminRole(
                         AdminDto(idChannel: _chatController.channel.value!.id!,

@@ -85,7 +85,7 @@ class StreamMemberListView extends StatelessWidget {
   final bool memberPage;
   final bool? userSlidableEnabled;
   final void Function(BuildContext, String, String?)? onUserDeletePressed;
-  final void Function(BuildContext, String, bool)? onAdminPressed;
+  final void Function(BuildContext, String, bool, String?)? onAdminPressed;
 
   /// The [StreamMemberListController] used to control the list of members.
   final StreamMemberListController controller;
@@ -324,7 +324,7 @@ class StreamMemberListView extends StatelessWidget {
             memberPage: memberPage,
             slidableEnabled: userSlidableEnabledBool,
             onDeletePressed: onUserDeletedPressed == null ? null : (context) => onUserDeletedPressed(context, member.userId!, UserDTO.fromJson(member.user!.extraData["userDTO"] as Map<String, dynamic>).wallet!),
-            onAdminPressed:  onAdminPressed == null ? null : (context) => onAdminPressed(context, member.userId!, member.channelRole == "channel_moderator"),
+            onAdminPressed:  onAdminPressed == null ? null : (context) => onAdminPressed(context, member.userId!, member.channelRole == "channel_moderator", UserDTO.fromJson(member.user!.extraData["userDTO"] as Map<String, dynamic>).wallet!),
             user: member.user!,
             channelRole : member.channelRole,
             onTap: onTap == null ? null : () => onTap(member),

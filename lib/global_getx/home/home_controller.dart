@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use, prefer_typing_uninitialized_variables
 
 import 'dart:io';
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:http/http.dart' as htp;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -26,13 +27,13 @@ import 'package:sirkl/common/model/token_metadata.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-
 import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/repo/profile_repo.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
+import 'package:logger/logger.dart' as l;
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -53,6 +54,7 @@ class HomeController extends GetxController {
 
   var sessionStatus;
   var _uri;
+  var pairingTopic;
 
   Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
   RxList<String> contractAddresses = <String>[].obs;
@@ -112,19 +114,20 @@ class HomeController extends GetxController {
   connectWallet(BuildContext context) async {
 
     connector ??= await Web3App.createInstance(
+      logLevel: l.Level.verbose,
       projectId: 'bdfe4b74c44308ffb46fa4e6198605af',
       metadata: const PairingMetadata(
         name: 'SIRKL',
         description: 'SIRKL Login',
-        url: 'https://walletconnect.com',
-        icons: ['https://avatars.githubusercontent.com/u/37784886'],
+        url: 'https://sirkl.io/',
+        icons: ["https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"],
       ),
     );
 
     ConnectResponse res = await connector!.connect(
         requiredNamespaces: {
       'eip155': const RequiredNamespace(
-        events: ['session_request','chainChanged', 'accountsChanged',],
+        events: ['session_request'],
         chains: ["eip155:1"],
         methods: [
           'personal_sign',
@@ -134,6 +137,7 @@ class HomeController extends GetxController {
 
     try {
       _uri = res.uri!;
+      pairingTopic = res.pairingTopic;
       var hasLaunched = await launchUrl(res.uri!, mode: LaunchMode.externalApplication);
       _sessionData = await res.session.future;
       if (hasLaunched == false) {
@@ -179,6 +183,7 @@ class HomeController extends GetxController {
       address.value = args.session.namespaces['eip155']!.accounts.first.split("eip155:$chainToConnect:")[1].toLowerCase();
       debugPrint('Session $address.value');
     });
+
   }
 
   String generateSessionMessage(String accountAddress) {

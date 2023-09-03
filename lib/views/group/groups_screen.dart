@@ -530,7 +530,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     IconButton(
                         onPressed: () {
                           if(_groupController.addAGroup.value == false) _groupController.searchIsActive.value = false;
-                            if(!_groupController.addAGroup.value && _groupController.nftAvailable.isEmpty) _groupController.retrieveNFTAvailableForCreation("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87");
+                            if(!_groupController.addAGroup.value && _groupController.nftAvailable.isEmpty) _groupController.retrieveNFTAvailableForCreation(_homeController.userMe.value.wallet!);
                           _groupController.addAGroup.value = !_groupController.addAGroup.value;
                         },
                         icon: Image.asset(

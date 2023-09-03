@@ -15,6 +15,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
+import 'package:sirkl/main.dart';
 import 'package:sirkl/networks/request.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -49,9 +50,9 @@ class Web3Controller extends GetxController{
       projectId: 'bdfe4b74c44308ffb46fa4e6198605af',
       metadata: const PairingMetadata(
         name: 'SIRKL',
-        description: 'SIRKL Login',
-        url: 'https://walletconnect.com',
-        icons: ['https://avatars.githubusercontent.com/u/37784886'],
+        description: 'SIRKL.io',
+        url: 'https://sirkl.io/',
+        icons: ["https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"],
       ),
     );
 
@@ -60,10 +61,6 @@ class Web3Controller extends GetxController{
         events: ['session_request','chainChanged', 'accountsChanged',],
         chains: ['eip155:5'],
         methods: [
-          'personal_sign',
-          'eth_sign',
-          'eth_signTransaction',
-          'eth_signTypedData',
           'eth_sendTransaction',
         ], // Requestable Methods
       ),
@@ -165,6 +162,7 @@ class Web3Controller extends GetxController{
           event: contract.event('GroupJoined'));
       Stream<FilterEvent> eventStream =
       client.events(filter);
+
       if (address != null) {
         showDialog(context: context, builder: (_) => WillPopScope(onWillPop : () async => false, child: alert), barrierDismissible: false);
       }
@@ -237,40 +235,43 @@ class Web3Controller extends GetxController{
     final contract = await getContract();
     final filter = FilterOptions.events(contract: contract, event: contract.event("GroupLeft"));
     Stream<FilterEvent> eventStream = client.events(filter);
-    //if (address != null) showDialog(context: context, builder: (_) => WillPopScope(onWillPop : () async => false, child: alert), barrierDismissible: false);
+    if (address != null) showDialog(context: navigatorKey.currentContext!, builder: (_) => WillPopScope(onWillPop : () async => false, child: alert), barrierDismissible: false);
     eventStream.listen((event) async {
       if(event.transactionHash == address) {
         await channel.removeMembers([id]);
         await memberListController.refresh();
-        //Get.back();
+        Get.back();
       }
     });
   }
 
-  addCreatorMethod(Web3App connector, SessionConnect? args, Channel channel, String wallet, AlertDialog alert, String id, StreamMemberListController memberListController, String walletToAddAsCreator) async {
-    var address = await addCreator(connector, args, [BigInt.parse(channel.extraData['idGroupBlockChain'] as String), EthereumAddress.fromHex(walletToAddAsCreator), BigInt.parse("source")], wallet);
+  addCreatorMethod(BuildContext context, Web3App connector, SessionConnect? args, Channel channel, String wallet, AlertDialog alert, String id, StreamMemberListController memberListController, String walletToAddAsCreator, double share) async {
+    var address = await addCreator(connector, args, [BigInt.parse(channel.extraData['idGroupBlockChain'] as String), EthereumAddress.fromHex(walletToAddAsCreator), BigInt.from(share)], wallet);
     final contract = await getContract();
     final filter = FilterOptions.events(contract: contract, event: contract.event('CreatorAdded'));
     Stream<FilterEvent> eventStream = client.events(filter);
+    if (address != null) showDialog(context: navigatorKey.currentContext!, builder: (_) => WillPopScope(onWillPop : () async => false, child: alert), barrierDismissible: false);
     eventStream.listen((event) async {
       if(event.transactionHash == address){
         await _groupController.changeAdminRole(AdminDto(idChannel: channel.id!, userToUpdate: id, makeAdmin: true));
         await _commonController.notifyUserAsAdmin(NotificationAddedAdminDto(idUser: id, idChannel: channel.id!, channelName: channel.extraData["nameOfGroup"] as String));
         await memberListController.refresh();
+        Get.back();
       }
     });
   }
 
-
-  removeCreatorMethod(Web3App connector, SessionConnect? args, Channel channel, String wallet, AlertDialog alert, String id, StreamMemberListController memberListController, String walletToAddAsCreator) async {
-    var address = await addCreator(connector, args, [BigInt.parse(channel.extraData['idGroupBlockChain'] as String), EthereumAddress.fromHex(walletToAddAsCreator)], wallet);
+  removeCreatorMethod(BuildContext context, Web3App connector, SessionConnect? args, Channel channel, String wallet, AlertDialog alert, String id, StreamMemberListController memberListController, String walletToAddAsCreator) async {
+    var address = await removeCreator(connector, args, [BigInt.parse(channel.extraData['idGroupBlockChain'] as String), EthereumAddress.fromHex(walletToAddAsCreator)], wallet);
     final contract = await getContract();
     final filter = FilterOptions.events(contract: contract, event: contract.event('CreatorRemoved'));
     Stream<FilterEvent> eventStream = client.events(filter);
+    if (address != null) showDialog(context: navigatorKey.currentContext!, builder: (_) => WillPopScope(onWillPop : () async => false, child: alert), barrierDismissible: false);
     eventStream.listen((event) async {
       if(event.transactionHash == address){
         await _groupController.changeAdminRole(AdminDto(idChannel: channel.id!, userToUpdate: id, makeAdmin: false));
         await memberListController.refresh();
+        Get.back();
       }
     });
   }
