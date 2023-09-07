@@ -13,8 +13,10 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_colors.dart';
+import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
+import 'package:sirkl/global_getx/profile/profile_controller.dart';
 import 'package:sirkl/main.dart';
 import 'package:sirkl/networks/request.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
@@ -30,6 +32,8 @@ class Web3Controller extends GetxController{
   var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
   CommonController get _commonController => Get.find<CommonController>();
   GroupsController get _groupController => Get.find<GroupsController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
+  ProfileController get _profileController => Get.find<ProfileController>();
   var _uri;
 
   Future<DeployedContract> getContract() async {
@@ -140,6 +144,10 @@ class Web3Controller extends GetxController{
     return await query(connector, sessionConnect, "removeCreator", args, false, null, wallet);
   }
 
+  Future<String?> updateGroupInfo(Web3App connector, SessionConnect? sessionConnect, List<dynamic> args, String? wallet) async {
+    return await query(connector, sessionConnect, "updateGroupInfo", args, false, null, wallet);
+  }
+
   joinGroupMethod(Web3App connector, SessionConnect? args, BuildContext context, Channel channel, String wallet, AlertDialog alert, String id) async {
     loadingToJoinGroup.value = true;
       var address = await joinGroup(
@@ -207,7 +215,6 @@ class Web3Controller extends GetxController{
       if(address != null) showDialog(context: context, builder: (_) => WillPopScope(onWillPop : () async => false, child: alert), barrierDismissible: false);
       eventStream.listen((event) async {
         if(event.transactionHash == address){
-          var kj = contract.event("InvitationCreated").decodeResults(event.topics!, event.data!);
           final inviteId = contract.event("InvitationCreated").decodeResults(event.topics!, event.data!)[4];
           await _commonController.notifyUserInvitedToJoinPayingGroup(NotificationAddedAdminDto(idUser: item.id!, idChannel: channel.id! , channelName: channel.extraData['nameOfGroup'] as String, channelPrice: fee.toString(), channelPrivate: channel.extraData["isGroupPrivate"] as bool, inviteId: inviteId.toString()));
           Get.back();
@@ -271,6 +278,44 @@ class Web3Controller extends GetxController{
       if(event.transactionHash == address){
         await _groupController.changeAdminRole(AdminDto(idChannel: channel.id!, userToUpdate: id, makeAdmin: false));
         await memberListController.refresh();
+        Get.back();
+      }
+    });
+  }
+
+  updateGroupInfoMethod(BuildContext context, Web3App connector, SessionConnect? args, Channel channel, String wallet, AlertDialog alert, String nameOfGroup, double fee, TextEditingController nameGroupController, TextEditingController priceController) async {
+    var address = await updateGroupInfo(connector, args, [BigInt.parse(channel.extraData['idGroupBlockChain'] as String), nameOfGroup, "", BigInt.from(fee * 1e18)], wallet);
+    final contract = await getContract();
+    final filter = FilterOptions.events(contract: contract, event: contract.event("GroupUpdated"));
+    Stream<FilterEvent> eventStream = client.events(filter);
+    if(address != null) showDialog(context: navigatorKey.currentContext!, builder: (_) => WillPopScope(onWillPop : () async => false, child: alert), barrierDismissible: false);
+    eventStream.listen((event) async {
+      if(event.transactionHash == address){
+        if (nameGroupController.text.isNotEmpty ||
+            !_profileController.urlPictureGroup.value
+                .isNullOrBlank!) {
+          if (_profileController.urlPictureGroup.value
+              .isNullOrBlank!) {
+            await _chatController.channel.value!.updatePartial(
+                set: {"nameOfGroup": nameGroupController.text});
+            _chatController.channel.refresh();
+          } else {
+            await _chatController.channel.value!.updatePartial(
+                set: {
+                  "nameOfGroup": nameGroupController.text.isEmpty
+                      ? _chatController.channel.value!
+                      .extraData['nameOfGroup'] as String
+                      : nameGroupController.text,
+                  "picOfGroup": _profileController.urlPictureGroup
+                      .value
+                });
+            _chatController.needToRefresh.value = true;
+            _chatController.channel.refresh();
+          }
+        }
+        _chatController.isEditingGroup.value = false;
+        nameGroupController.clear();
+        priceController.clear();
         Get.back();
       }
     });

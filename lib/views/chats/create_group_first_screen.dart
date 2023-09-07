@@ -418,8 +418,18 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                 if(_chatController.groupTextController.value.text.isEmpty) {
                   _utils.showToast(context, "Please, enter a name for you group.");
                 } else {
-                  if(_chatController.groupPaying.value == 1 && _priceController.text.isNotEmpty && isNumeric(_priceController.text)){
-                    await createPaidGroup();
+                  if(_chatController.groupPaying.value == 1){
+                    if(_priceController.text.isNotEmpty && isNumeric(_priceController.text)){
+                      await createPaidGroup();
+                    }
+                    else if(_priceController.text.isEmpty || (_priceController.text.isNotEmpty && double.parse(_priceController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '.')) == 0.0) || (_priceController.text.isNotEmpty && !isNumeric(_priceController.text))){
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437),
+                            content: Text("Fee value invalid", textAlign: TextAlign.start, style: TextStyle(fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 15, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white),),
+                          )
+                      );
+                    }
                   } else {
                     pushNewScreen(
                         context, screen: const CreateGroupSecondScreen(), withNavBar: false).then((

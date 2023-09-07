@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ndialog/ndialog.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 
@@ -13,13 +12,11 @@ import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:http/http.dart' as htp;
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/web3/web3_controller.dart';
 
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
-import 'package:web3dart/web3dart.dart';
 
 import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
@@ -48,6 +45,8 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
 
   final _nameGroupController = TextEditingController();
   final web3Controller = Get.put(Web3Controller());
+  final _priceController = TextEditingController();
+
   final utils = Utils();
 
   @override
@@ -101,7 +100,44 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
         ),
       ),
       const SizedBox(height: 32,),
+      _chatController.channel.value!.extraData["isGroupPaying"] != null && _chatController.channel.value!.extraData["isGroupPaying"] as bool  && _chatController.isEditingGroup.value ?
       Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Transform.translate(offset: const Offset(0, 3.75),
+              child:  SizedBox(width: 75,
+                child: TextField(
+                  controller: _priceController,
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center,cursorColor: SColors.activeColor, decoration:  InputDecoration(
+                  hintText: _chatController.channel.value!.extraData["price"].toString(), hintStyle: const TextStyle(fontWeight: FontWeight.w500, fontFamily: "Gilroy", fontSize: 18),contentPadding: const EdgeInsets.only(bottom: 4), isDense: true, enabledBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey, width: 0.5),
+                ), focusedBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey, width: 0.5),
+                ),  ),),)),
+          const SizedBox(width: 4,),
+          DropdownButton<dynamic>(
+              items: [DropdownMenuItem(
+                  child: Row(
+                    children: [
+                      Image.network(
+                        "https://raw.githubusercontent.com/dappradar/tokens/main/ethereum/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee/logo.png",
+                        width: 22,
+                        height: 22,
+                      ),
+                      const SizedBox(
+                        width: 4,
+                      ),
+                      const Text(
+                        "ETH",
+                        style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),
+                      )
+                    ],
+                  ))],
+              onChanged: (any){})
+        ],)
+          : Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           (_chatController.channel.value!.membership != null && _chatController.channel.value!.membership?.channelRole == "channel_member") && _chatController.channel.value?.createdBy?.id != _homeController.id.value
@@ -683,17 +719,60 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                 ),
               ), _chatController.isEditingGroup.value ? InkWell(
                 onTap: () async {
-                  if(_nameGroupController.text.isNotEmpty || !_profileController.urlPictureGroup.value.isNullOrBlank!){
-                    if(_profileController.urlPictureGroup.value.isNullOrBlank!){
-                      await _chatController.channel.value!.updatePartial(set: {"nameOfGroup": _nameGroupController.text});
-                      _chatController.channel.refresh();
-                    } else {
-                      await _chatController.channel.value!.updatePartial(set: {"nameOfGroup": _nameGroupController.text.isEmpty ? _chatController.channel.value!.extraData['nameOfGroup'] as String : _nameGroupController.text, "picOfGroup": _profileController.urlPictureGroup.value});
-                      _chatController.needToRefresh.value = true;
-                      _chatController.channel.refresh();
+                  if(_chatController.channel.value!.extraData["isGroupPaying"] != null && _chatController.channel.value!.extraData["isGroupPaying"] as bool){
+                    AlertDialog alert = _web3Controller
+                        .blockchainInfo(
+                        "Please, wait while the transaction is processed. This may take some time.");
+                    if((_priceController.text.isNotEmpty && !isNumeric(_priceController.text)) || (_priceController.text.isNotEmpty && double.parse(_priceController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '.')) == 0.0)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437),
+                            content: Text("Fee value invalid", textAlign: TextAlign.start, style: TextStyle(fontWeight: FontWeight.w600, fontFamily: "Gilroy", fontSize: 15, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white),),
+                          )
+                      );
+                    }
+                    else {
+                      var connector = await _web3Controller
+                          .connect();
+                      connector.onSessionConnect.subscribe((args) async {
+                        await _web3Controller.updateGroupInfoMethod(
+                            context,
+                            connector,
+                            args,
+                            _chatController.channel.value!,
+                            _homeController.userMe.value.wallet!,
+                            alert,
+                            _nameGroupController.text.isEmpty ? _chatController.channel.value!.extraData["nameOfGroup"] as String : _nameGroupController.text,
+                            _priceController.text.isEmpty ? _chatController.channel.value!.extraData["price"] as double : double.parse(_priceController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '.')), _nameGroupController, _priceController);
+                      });
                     }
                   }
-                  _chatController.isEditingGroup.value = false;
+                  else {
+                    if (_nameGroupController.text.isNotEmpty ||
+                        !_profileController.urlPictureGroup.value
+                            .isNullOrBlank!) {
+                      if (_profileController.urlPictureGroup.value
+                          .isNullOrBlank!) {
+                        await _chatController.channel.value!.updatePartial(
+                            set: {"nameOfGroup": _nameGroupController.text});
+                        _chatController.channel.refresh();
+                      } else {
+                        await _chatController.channel.value!.updatePartial(
+                            set: {
+                              "nameOfGroup": _nameGroupController.text.isEmpty
+                                  ? _chatController.channel.value!
+                                  .extraData['nameOfGroup'] as String
+                                  : _nameGroupController.text,
+                              "picOfGroup": _profileController.urlPictureGroup
+                                  .value
+                            });
+                        _chatController.needToRefresh.value = true;
+                        _chatController.channel.refresh();
+                      }
+                    }
+                    _nameGroupController.clear();
+                    _chatController.isEditingGroup.value = false;
+                  }
                 },
                 child:  Padding(
                   padding: const EdgeInsets.only(
@@ -733,6 +812,8 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
 
   @override
   void dispose() {
+    _priceController.clear();
+    _nameGroupController.clear();
     _chatController.isEditingGroup.value = false;
     _chatController.requestsWaiting.clear();
     super.dispose();

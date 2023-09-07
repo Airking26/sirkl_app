@@ -136,7 +136,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         padding: const EdgeInsets.only(right: 8.0, top: 8, bottom: 8),
         child: ListTile(
           onTap: () async{
-            if((item.type == 5 || item.type == 8) && !item.channelId.isNullOrBlank!){
+            if((item.type == 5 || item.type == 8) && !item.channelId.isNullOrBlank! && !item.channelPrice.isNullOrBlank!){
               AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while the transaction is processed. This may take some time.");
               var connector = await _web3Controller.connect();
               connector.onSessionConnect.subscribe((args) async {
@@ -144,7 +144,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   await _web3Controller.acceptInvitationMethod(connector, args, context, event[0],_homeController.userMe.value.wallet!, alert, item.belongTo, double.parse(item.channelPrice!), item.inviteId!);
                 });
               });
-            } else {
+            } else if(item.type == 5 && !item.channelId.isNullOrBlank!){
+              StreamChat.of(context).client.queryChannels(filter: Filter.equal("id", item.channelId!), paginationParams: const PaginationParams(limit: 1)).listen((event) async {
+                pushNewScreen(context, screen: DetailedChatScreen(create: false, fromProfile: false, channelId: event[0].id!,), withNavBar: false);
+              });
+            }
+            else {
               await _commonController.getUserById(item.idData);
               pushNewScreen(context, screen: const ProfileElseScreen(
                 fromConversation: false, fromNested: true,));
