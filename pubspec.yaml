@@ -172,6 +172,7 @@ flutter:
      - assets/images/ethereum.png
      - assets/images/logo_light_theme.png
      - assets/images/logo_dark_theme.png
+     - assets/images/trustwallet.png
      - assets/pdf/tc.pdf
      - assets/pdf/pp.pdf
      - assets/pdf/all.pdf

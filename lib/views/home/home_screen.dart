@@ -724,7 +724,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
-            "Connect or create your metamask wallet by clicking below",
+            "Connect or create your wallet by clicking below, wallets supported : ",
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark
@@ -736,7 +736,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(
-          height: 40,
+          height: 10,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/images/metamask.png", width: 32, height: 32,),
+            const SizedBox(width: 8,),
+            Image.asset("assets/images/trustwallet.png", width: 30, height: 30,),
+          ],
+        ),
+        const SizedBox(
+          height: 20,
         ),
         NiceButtons(
             stretch: false,
