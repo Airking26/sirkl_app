@@ -19,7 +19,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.2.1</string>
+	<string>1.2.3</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -34,7 +34,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>We require camera access to connect to a call</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>We require microphone access to connect to a call</string>
+	<string>We require microphone access for you to be able to call and receive calls in the app</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We require library access to show pictures to choose from</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

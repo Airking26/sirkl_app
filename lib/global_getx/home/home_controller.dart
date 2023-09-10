@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use, prefer_typing_uninitialized_variables
 
 import 'dart:io';
-import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:http/http.dart' as htp;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -23,7 +22,6 @@ import 'package:sirkl/common/model/notification_register_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
-import 'package:sirkl/common/model/token_metadata.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -50,11 +48,11 @@ class HomeController extends GetxController {
   ChatsController get _chatController => Get.find<ChatsController>();
 
   final box = GetStorage();
-  static SessionData? _sessionData;
 
+  static SessionData? _sessionData;
   var sessionStatus;
   var _uri;
-  var pairingTopic;
+  var _connectResponse;
 
   Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
   RxList<String> contractAddresses = <String>[].obs;
@@ -136,15 +134,12 @@ class HomeController extends GetxController {
     });
 
     try {
-      _uri = res.uri!;
-      pairingTopic = res.pairingTopic;
       var hasLaunched = await launchUrl(res.uri!, mode: LaunchMode.externalApplication);
-      _sessionData = await res.session.future;
       if (hasLaunched == false) {
         Fluttertoast.showToast(
             msg: "Not wallet was found, please create one in order to continue",
             toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.TOP,
+            gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 2,
             backgroundColor: SchedulerBinding
                         .instance.platformDispatcher.platformBrightness ==
@@ -197,6 +192,8 @@ class HomeController extends GetxController {
 
   signMessageWithMetamask(BuildContext context) async {
        try {
+         _uri = _connectResponse.uri!;
+         _sessionData = await _connectResponse.session.future;
          var message = generateSessionMessage(address.value);
          launchUrl(_uri, mode: LaunchMode.externalApplication);
          var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:${chainToConnect.toLowerCase()}", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex, message]));
