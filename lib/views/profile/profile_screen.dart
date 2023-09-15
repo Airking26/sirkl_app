@@ -534,7 +534,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                               newPageProgressIndicatorBuilder: (context) =>
                                    Padding(
-                                    padding: EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(8.0),
                                     child: Center(
                                       child: CircularProgressIndicator(
                                         color: SColors.activeColor,

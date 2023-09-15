@@ -41,7 +41,7 @@ import '../../repo/auth_repo.dart';
 
 class HomeController extends GetxController {
 
-
+  //RxList<DropdownMenuItem> dropDownMenuItems = <DropdownMenuItem>[].obs;
 
   NavigationController get _navigationController => Get.find<NavigationController>();
   CommonController get _commonController => Get.find<CommonController>();
@@ -56,7 +56,6 @@ class HomeController extends GetxController {
 
   Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
   RxList<String> contractAddresses = <String>[].obs;
-  //RxList<DropdownMenuItem> dropDownMenuItems = <DropdownMenuItem>[].obs;
   Rx<PagingController<int, List<StoryDto?>?>> pagingController =
       PagingController<int, List<StoryDto?>?>(firstPageKey: 0).obs;
 
@@ -486,13 +485,13 @@ class HomeController extends GetxController {
   }
 
   retrieveInboxes() async {
-    var req = await ChatRepo.walletsToMessages();
+      await ChatRepo.walletsToMessages();
       isConfiguring.value = false;
       isFirstConnexion.value = false;
   }
 
   registerNotification(NotificationRegisterDto notificationRegisterDto) async {
-    var request = await HomeRepo.registerNotification( notificationRegisterDto);
+    await HomeRepo.registerNotification( notificationRegisterDto);
   }
 
   checkOfflineNotifAndRegister() async {
