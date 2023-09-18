@@ -133,6 +133,7 @@ class HomeController extends GetxController {
     });
 
     try {
+      _connectResponse = res;
       var hasLaunched = await launchUrl(res.uri!, mode: LaunchMode.externalApplication);
       if (hasLaunched == false) {
         Fluttertoast.showToast(
@@ -172,6 +173,7 @@ class HomeController extends GetxController {
           fontSize: 16.0);
     }
 
+
     connector!.onSessionConnect.subscribe((args) {
       chainToConnect = args!.session.namespaces['eip155']!.accounts.first.split("eip155:")[1].split(':')[0];
       address.value = args.session.namespaces['eip155']!.accounts.first.split("eip155:$chainToConnect:")[1].toLowerCase();
@@ -195,7 +197,7 @@ class HomeController extends GetxController {
          _sessionData = await _connectResponse.session.future;
          var message = generateSessionMessage(address.value);
          launchUrl(_uri, mode: LaunchMode.externalApplication);
-         var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:${chainToConnect.toLowerCase()}", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex, message]));
+         var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:${chainToConnect.toLowerCase()}", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex]));
          await loginWithWallet(context, address.value, message, signature);
        } catch (exp) {
          if (kDebugMode) {
