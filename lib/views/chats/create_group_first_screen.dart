@@ -326,7 +326,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                                 child:  SizedBox(width: 50,
                                   child: TextField(
                                     controller: _priceController,
-                                    keyboardType: TextInputType.number,
+                                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                     textAlign: TextAlign.center,cursorColor: SColors.activeColor, decoration: const InputDecoration(
                                       hintText: "0.0", hintStyle: TextStyle(fontWeight: FontWeight.w500, fontFamily: "Gilroy", fontSize: 18),contentPadding: EdgeInsets.only(bottom: 4), isDense: true, enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(color: Colors.grey, width: 0.5),

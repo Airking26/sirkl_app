@@ -772,7 +772,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.w700),
             )),
         const SizedBox(height: 12,),
-
         NiceButtons(
             stretch: false,
             borderThickness: 2,
@@ -803,7 +802,6 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 18,),
         InkWell(
           onTap: ()async{
-            //await _homeController.createWallet(context);
             await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
           },
           child: Text("OR Create a wallet", style: TextStyle(
@@ -815,7 +813,6 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.w500)),
         ),
         const SizedBox(height: 24,),
-
         InkWell(
           onTap: (){
             showDialog(
@@ -908,7 +905,7 @@ class _HomeScreenState extends State<HomeScreen> {
     fontWeight: FontWeight.w500))
             ],),
           ),
-        )
+        ),
       ],
     );
   }
