@@ -7,7 +7,7 @@ import 'package:ethereum_addresses/ethereum_addresses.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 

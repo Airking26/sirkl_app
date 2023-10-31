@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 import 'package:sirkl/global_getx/web3/web3_controller.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';

@@ -129,11 +129,7 @@ class ProfileController extends GetxController{
   }
 
   Future< List<NotificationDto>> retrieveNotifications(String id, int offset) async {
-  
-  
-    
       return await ProfileRepo.retrieveNotifications( id: id, offset: offset.toString());
-
   }
 
   Future<void> updateNft(NftModificationDto nftModificationDto) async{
@@ -143,10 +139,7 @@ class ProfileController extends GetxController{
   }
 
   retrieveMyStories() async{
-
-    
-    myStories.value =await ProfileRepo.retrieveMyStories();
-  
+    myStories.value = await ProfileRepo.retrieveMyStories();
   }
 
   Future<void> retrieveUsersForAStory(String id) async{

@@ -103,7 +103,6 @@ class SRequests {
       } catch (err) {}
       throw HttpException(jsonDecode(response.body)['detail'].toString());
     }
-    if (response.statusCode != 200 && response.statusCode != 201) {}
   }
 
   get _headers async {

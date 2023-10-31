@@ -16,7 +16,7 @@ import firebase_core
 import firebase_messaging
 import flutter_local_notifications
 import just_audio
-import path_provider_macos
+import path_provider_foundation
 import photo_manager
 import record_macos
 import share_plus

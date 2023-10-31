@@ -3,7 +3,7 @@ import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
