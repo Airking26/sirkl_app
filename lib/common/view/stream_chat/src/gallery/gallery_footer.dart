@@ -1,16 +1,10 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sirkl/common/view/stream_chat/src/attachment/stream_attachment_package.dart';
-import 'package:sirkl/common/view/stream_chat/src/misc/stream_svg_icon.dart';
-import 'package:sirkl/common/view/stream_chat/src/theme/gallery_footer_theme.dart';
-import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
-import 'package:sirkl/common/view/stream_chat/src/utils/utils.dart';
 import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 

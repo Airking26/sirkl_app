@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -724,7 +725,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
-            "Connect or create your wallet by clicking below, wallets supported : ",
+            "Connect on ETH blockchain or create your wallet by clicking below, wallets supported : ",
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark
@@ -760,7 +761,6 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: (finish) async {
               //_navigationController.hideNavBar.value = !_navigationController.hideNavBar.value;
               debugPrint('Nav bar  value is ${_navigationController.hideNavBar.value}');
-              
               await _homeController.connectWallet(context);
             },
             child: const Text(

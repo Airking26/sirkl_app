@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use, prefer_typing_uninitialized_variables
 
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as htp;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -111,7 +112,7 @@ class HomeController extends GetxController {
   connectWallet(BuildContext context) async {
 
     connector ??= await Web3App.createInstance(
-      logLevel: l.Level.verbose,
+      logLevel: LogLevel.debug,
       projectId: 'bdfe4b74c44308ffb46fa4e6198605af',
       metadata: const PairingMetadata(
         name: 'SIRKL',
@@ -180,15 +181,22 @@ class HomeController extends GetxController {
       debugPrint('Session $address.value');
     });
 
+    connector!.onSessionUpdate.subscribe((args) async{
+      var t = args!.namespaces['eip155']!.accounts.last.split("eip155:")[1];
+      if(t != "eip155:1"){
+        await launchUrl(res.uri!, mode: LaunchMode.externalApplication);
+      }
+    });
+
   }
 
   String generateSessionMessage(String accountAddress) {
     String message =
         'Hello $accountAddress, welcome to our app. By signing this message you agree to learn and have fun with blockchain';
-    var hash = keccakUtf8(message);
-    final hashString = '0x${bytesToHex(hash).toString()}';
+   // var hash = keccakUtf8(message);
+    //final hashString = '0x${bytesToHex(hash).toString()}';
 
-    return hashString;
+    return message;
   }
 
   signMessageWithMetamask(BuildContext context) async {
@@ -222,6 +230,21 @@ class HomeController extends GetxController {
       isConfiguring.value = true;
       isFirstConnexion.value = true;
       _navigationController.hideNavBar.value = false;
+      var checkTime = DateTime.now().difference(userMe.value.createdAt!);
+      if(checkTime.inSeconds < 60) {
+        showCupertinoDialog(
+            context: context, barrierDismissible: true, builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text("Welcome new user!"), content: const Padding(
+            padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+            child: Text("You have received your SIRKL pass sbt in your wallet.",
+              style: TextStyle(fontSize: 15),),
+          ), actions: [TextButton(onPressed: () {
+            Navigator.pop(context);
+          }, child: const Text("Enjoy SIRKL.io"))
+          ],);
+        });
+      }
       await getAllNftConfig();
       await connectUser(StreamChat.of(context).client);
       await putFCMToken(context, StreamChat.of(context).client, false);
@@ -244,7 +267,9 @@ class HomeController extends GetxController {
           var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
           await HomeRepo.uploadAPNToken(token);
         }
-        await getTokenContractAddress(client, userMe.value.wallet!);
+        await getTokenContractAddress(client,
+            userMe.value.wallet!
+        );
     
     }
   }
@@ -410,7 +435,7 @@ class HomeController extends GetxController {
       nicknames.refresh();
       _commonController.users.refresh();
 
-      var request = await HomeRepo.updateNicknames(wallet: wallet,
+      await HomeRepo.updateNicknames(wallet: wallet,
       nickNameDto: 
         NicknameCreationDto(nickname: nickname));
 

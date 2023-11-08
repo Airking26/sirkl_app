@@ -50,7 +50,7 @@ Future<String?> downloadWebOrDesktopAttachment(
   );
 
   // Open the native file browser so the user can select the download path.
-  final path = await getSavePath(suggestedName: fileName);
+  final path = await getSaveLocation(suggestedName: fileName);
 
   if (path == null) {
     // Operation was canceled by the user.
@@ -62,10 +62,10 @@ Future<String?> downloadWebOrDesktopAttachment(
     Uint8List.fromList(response.data!),
     mimeType: attachment.mimeType,
     name: fileName,
-    path: path,
+    path: path.path,
   );
 
   // Save the file to the user's selected path.
-  await file.saveTo(path);
-  return path;
+  await file.saveTo(path.path);
+  return path.path;
 }

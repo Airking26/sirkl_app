@@ -3,8 +3,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
-import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
-import 'package:sirkl/common/view/stream_chat/src/utils/extensions.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:url_launcher/url_launcher.dart';

@@ -28,9 +28,6 @@ class ProfileController extends GetxController{
 
   final box = GetStorage();
 
-
-  final _homeService = HomeRepo();
-
   HomeController get _homeController => Get.find<HomeController>();
 
   Rx<UserDTO?> isUserExists = (null as UserDTO?).obs;
@@ -121,8 +118,6 @@ class ProfileController extends GetxController{
   }
 
   Future<void> checkIfHasUnreadNotif(String id) async{
-    var accessToken = box.read(SharedPref.ACCESS_TOKEN);
-    var refreshToken = box.read(SharedPref.REFRESH_TOKEN);
     bool hasNoti = await ProfileRepo.retrieveHasUnreadNotif(id);
     hasUnreadNotif.value = hasNoti;
 

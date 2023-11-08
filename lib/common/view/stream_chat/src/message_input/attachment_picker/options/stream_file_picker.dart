@@ -1,12 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:sirkl/common/view/stream_chat/src/attachment/handler/stream_attachment_handler_base.dart';
-import 'package:sirkl/common/view/stream_chat/src/message_input/attachment_picker/stream_attachment_picker.dart';
-import 'package:sirkl/common/view/stream_chat/src/misc/stream_svg_icon.dart';
-import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
-import 'package:sirkl/common/view/stream_chat/src/utils/helpers.dart';
-import 'package:sirkl/common/view/stream_chat/src/utils/utils.dart';
+import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 /// Widget used to pick files from the device

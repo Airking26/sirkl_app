@@ -86,9 +86,14 @@ class _ChannelPageState extends State<ChannelPage> {
             ),
           ),
           const StreamTypingIndicator(),
-          StreamMessageInput(messageInputController: _messageInputController, showCommandsButton : false, focusNode: _focusNode, actions: [
+          StreamMessageInput(
+            messageInputController: _messageInputController,
+            showCommandsButton : false,
+            focusNode: _focusNode,
+            actions: [
             RecordButton(recordingFinishedCallback: _recordingFinishedCallback)
-          ],),
+          ],
+          ),
         ],
       ),
     );

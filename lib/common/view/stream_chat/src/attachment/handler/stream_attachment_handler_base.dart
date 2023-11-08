@@ -61,12 +61,12 @@ abstract class StreamAttachmentHandlerBase {
   /// Downloads the [attachment] to the device and returns
   /// the path to the file.
   Future<String?> downloadAttachment(
-    Attachment attachment, {
-    ProgressCallback? onReceiveProgress,
-    Map<String, dynamic>? queryParameters,
-    CancelToken? cancelToken,
-    Options? options,
-  }) {
+      Attachment attachment, {
+        ProgressCallback? onReceiveProgress,
+        Map<String, dynamic>? queryParameters,
+        CancelToken? cancelToken,
+        Options? options,
+      }) {
     throw UnimplementedError('downloadAttachment is not implemented');
   }
 }
