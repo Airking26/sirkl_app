@@ -230,7 +230,7 @@ class HomeController extends GetxController {
       isConfiguring.value = true;
       isFirstConnexion.value = true;
       _navigationController.hideNavBar.value = false;
-      var checkTime = DateTime.now().difference(userMe.value.createdAt!);
+      /*var checkTime = DateTime.now().difference(userMe.value.createdAt!);
       if(checkTime.inSeconds < 60) {
         showCupertinoDialog(
             context: context, barrierDismissible: true, builder: (context) {
@@ -244,7 +244,7 @@ class HomeController extends GetxController {
           }, child: const Text("Enjoy SIRKL.io"))
           ],);
         });
-      }
+      }*/
       await getAllNftConfig();
       await connectUser(StreamChat.of(context).client);
       await putFCMToken(context, StreamChat.of(context).client, false);
