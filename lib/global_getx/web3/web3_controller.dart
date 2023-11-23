@@ -10,12 +10,14 @@ import 'package:sirkl/common/model/admin_dto.dart';
 import 'package:sirkl/common/model/eth_transaction_dto.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/global_getx/groups/groups_controller.dart';
+import 'package:sirkl/global_getx/home/home_controller.dart';
 import 'package:sirkl/global_getx/profile/profile_controller.dart';
 import 'package:sirkl/main.dart';
 import 'package:sirkl/networks/request.dart';
@@ -30,16 +32,32 @@ class Web3Controller extends GetxController{
   var loadingToJoinGroup = false.obs;
   var loadingToCreateGroup = false.obs;
   var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
+  var clientTitan = Web3Client("https://staging-v3.skalenodes.com/v1/staging-aware-chief-gianfar", Client());
   CommonController get _commonController => Get.find<CommonController>();
   GroupsController get _groupController => Get.find<GroupsController>();
   ChatsController get _chatController => Get.find<ChatsController>();
   ProfileController get _profileController => Get.find<ProfileController>();
+  HomeController get _homeController => Get.find<HomeController>();
   var _uri;
+  var isMintingInProgress = false.obs;
 
   Future<DeployedContract> getContract() async {
     String abi = await rootBundle.loadString("assets/abi.json");
     String contractAddress = "0x9B2044615349Ffe31Cf979F16945D0c785eED7da";
     String contractName = "PAIDGROUPS";
+
+    DeployedContract contract = DeployedContract(
+      ContractAbi.fromJson(abi, contractName),
+      EthereumAddress.fromHex(contractAddress),
+    );
+
+    return contract;
+  }
+
+  Future<DeployedContract> getContractMint() async {
+    String abi = await rootBundle.loadString("assets/abi_mint.json");
+    String contractAddress = "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011";
+    String contractName = "SIRKLsbt";
 
     DeployedContract contract = DeployedContract(
       ContractAbi.fromJson(abi, contractName),
@@ -60,20 +78,165 @@ class Web3Controller extends GetxController{
       ),
     );
 
-    ConnectResponse res = await connector.connect(requiredNamespaces: {
-      'eip155': const RequiredNamespace(
-        events: ['session_request','chainChanged', 'accountsChanged',],
-        chains: ['eip155:5'],
-        methods: [
-          'eth_sendTransaction',
-        ], // Requestable Methods
-      ),
+    ConnectResponse res = await connector.connect(
+        requiredNamespaces: {
+          'eip155': const RequiredNamespace(
+            events: [
+              "chainChanged",
+              "accountsChanged",
+              "session_request"
+            ],
+            chains: ["eip155:1"],
+            methods: [
+              "eth_sendTransaction",
+              "wallet_switchEthereumChain",
+              "wallet_addEthereumChain",
+            ], // Requestable Methods
+          ),
+        },
+        optionalNamespaces: {
+          'eip155': const RequiredNamespace(methods: ["eth_sendTransaction"],
+    chains: ['eip155:1517929550'],
+    events: [ "chainChanged", "accountsChanged", "session_request"]
+    )
     });
 
      _uri = res.uri!;
 
     launchUrl(res.uri!, mode: LaunchMode.externalApplication);
     return connector;
+  }
+
+  Future<Web3App> connectTitan() async {
+    var connector = await Web3App.createInstance(
+      projectId: 'bdfe4b74c44308ffb46fa4e6198605af',
+      metadata: const PairingMetadata(
+        name: 'SIRKL',
+        description: 'SIRKL.io',
+        url: 'https://sirkl.io/',
+        icons: ["https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"],
+      ),
+    );
+
+    ConnectResponse res = await connector.connect(
+        requiredNamespaces: {
+          'eip155': const RequiredNamespace(
+            events: [
+              "chainChanged",
+              "accountsChanged",
+              "session_request"
+            ],
+            chains: ["eip155:1517929550"],
+            methods: [
+              "eth_sendTransaction"
+            ], // Requestable Methods
+          ),
+        });
+
+    _uri = res.uri!;
+
+    launchUrl(res.uri!, mode: LaunchMode.externalApplication);
+    return connector;
+  }
+
+  Future<dynamic> queryMint(Web3App connector, SessionConnect? sessionConnect, String wallet) async {
+    DeployedContract contract = await getContractMint();
+    ContractFunction function = contract.function("mint");
+
+    Transaction transaction = Transaction.callContract(contract: contract, function: function, parameters: [], from: EthereumAddress.fromHex(wallet));
+    EthereumTransaction ethereumTransaction = EthereumTransaction(
+        from: wallet,
+        to: "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011",
+        data: hex.encode(List<int>.from(transaction.data!)),
+    );
+
+    if(sessionConnect!.session.namespaces['eip155']!.accounts.last.split(":0x")[0] != "eip155:1517929550") {
+
+      var canLaunch = await canLaunchUrl(_uri);
+      if(canLaunch) {
+        launchUrl(_uri, mode: LaunchMode.externalApplication);
+      } else {
+        Future.delayed(const Duration(seconds: 2), (){
+        launchUrl(_uri, mode: LaunchMode.externalApplication);
+      });
+      }
+
+      await connector.request(
+          topic: sessionConnect.session.topic,
+          chainId: "eip155:1",
+          request: SessionRequestParams(
+              method: "wallet_addEthereumChain", params: [
+            {
+              'chainName': 'Titan',
+              'nativeCurrency': {
+                'name': 'SFuel',
+                'symbol': 'SFuel',
+                'decimals': 18,
+              },
+              'rpcUrls': [
+                'https://staging-v3.skalenodes.com/v1/staging-aware-chief-gianfar'
+              ],
+
+              'chainId': '0x${1517929550.toRadixString(16)}',
+            },
+          ]));
+
+      /*
+      launchUrl(_uri, mode: LaunchMode.externalApplication);
+      await connector.request(
+          topic: sessionConnect.session.topic,
+          chainId: "eip155:1",
+          request: SessionRequestParams(
+              method: "wallet_switchEthereumChain", params: [
+            {
+              'chainId': '0x${1517929550.toRadixString(16)}',
+            },
+          ]));*/
+
+      var con = await connectTitan();
+      con.onSessionConnect.subscribe((args) async {
+
+        var canLaunch = await canLaunchUrl(_uri);
+        if(canLaunch) {
+          launchUrl(_uri, mode: LaunchMode.externalApplication);
+        } else {
+          Future.delayed(const Duration(seconds: 2), (){
+            launchUrl(_uri, mode: LaunchMode.externalApplication);
+          });
+        }
+          await con.request(
+            topic: args!.session.topic,
+            chainId: "eip155:1517929550",
+            request: SessionRequestParams(
+              method: 'eth_sendTransaction',
+              params: [ethereumTransaction.toJson()],
+            ),
+          ).then((value) => Get.back());
+
+      });
+
+    } else {
+
+      var canLaunch = await canLaunchUrl(_uri);
+      if(canLaunch) {
+        launchUrl(_uri, mode: LaunchMode.externalApplication);
+      } else {
+        Future.delayed(const Duration(seconds: 2), (){
+          launchUrl(_uri, mode: LaunchMode.externalApplication);
+        });
+      }
+
+        await connector.request(
+          topic: sessionConnect.session.topic,
+          chainId: "eip155:1517929550",
+          request: SessionRequestParams(
+            method: 'eth_sendTransaction',
+            params: [ethereumTransaction.toJson()],
+          ),
+        ).then((value) =>
+        Get.back()
+        );
+    }
   }
 
   Future<dynamic> query(Web3App connector, SessionConnect? sessionConnect, String functionName, List<dynamic> arg, bool hasFee, double? fee, String? wallet) async {
@@ -112,6 +275,10 @@ class Web3Controller extends GetxController{
     return transactionId;
   }
 
+  Future<String?> mint(Web3App connector, SessionConnect? sessionConnect, String wallet) async {
+    return await queryMint(connector, sessionConnect, wallet);
+  }
+
   Future<String?> createGroup(Web3App connector, SessionConnect? sessionConnect, List<dynamic> args, String? wallet) async {
     return await query(connector, sessionConnect, "createGroup", args, false, null, wallet);
   }
@@ -146,6 +313,11 @@ class Web3Controller extends GetxController{
 
   Future<String?> updateGroupInfo(Web3App connector, SessionConnect? sessionConnect, List<dynamic> args, String? wallet) async {
     return await query(connector, sessionConnect, "updateGroupInfo", args, false, null, wallet);
+  }
+
+  mintMethod(Web3App connector, SessionConnect? args, String wallet) async {
+    await mint(connector, args, wallet);
+    _homeController.updateMe(UpdateMeDto(hasSBT: true));
   }
 
   joinGroupMethod(Web3App connector, SessionConnect? args, BuildContext context, Channel channel, String wallet, AlertDialog alert, String id) async {

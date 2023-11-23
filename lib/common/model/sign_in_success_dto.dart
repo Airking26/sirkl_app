@@ -49,7 +49,8 @@ class UserDTO extends ISuspensionBean{
     this.following,
     this.isInFollowing,
     this.nickname,
-    this.updatedAt
+    this.updatedAt,
+    this.hasSBT
   });
 
   String? id;
@@ -64,6 +65,7 @@ class UserDTO extends ISuspensionBean{
   bool? isInFollowing;
   String? nickname;
   DateTime? updatedAt;
+  bool? hasSBT;
 
   factory UserDTO.fromJson(Map<String, dynamic> json) => UserDTO(
     id: json["id"],
@@ -77,6 +79,7 @@ class UserDTO extends ISuspensionBean{
     following: json["following"],
     isInFollowing: json["isInFollowing"],
     nickname: json['nickname'],
+    hasSBT: json['hasSBT'],
     updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
   );
 
@@ -92,6 +95,7 @@ class UserDTO extends ISuspensionBean{
     "following": following,
     "isInFollowing": isInFollowing,
     "nickname": nickname,
+    "hasSBT": hasSBT,
     "updatedAt": updatedAt == null ? null : updatedAt?.toIso8601String(),
   };
 

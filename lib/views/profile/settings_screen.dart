@@ -14,6 +14,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
@@ -40,6 +41,7 @@ class _SettingScreenState extends State<SettingScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
 
   @override
   Widget build(BuildContext context) {
@@ -207,8 +209,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       ? Colors.white : Colors.black,),
                   InkWell(
                     onTap: () async {
-
-                      showDialog(context: context,
+                        showDialog(context: context,
                           barrierDismissible: true,
                           builder: (_) => CupertinoAlertDialog(
                             title: Text("Logout", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
@@ -233,7 +234,6 @@ class _SettingScreenState extends State<SettingScreen> {
                           )).then((value) {
                             _navigationController.hideNavBar.value = true;
                              Get.back();
-
                           });
                     },
                     child: const Padding(

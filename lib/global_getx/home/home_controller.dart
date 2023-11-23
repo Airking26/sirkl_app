@@ -12,6 +12,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:sirkl/config/s_colors.dart';
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 import 'package:sirkl/repo/chats_repo.dart';
 import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
@@ -47,6 +49,7 @@ class HomeController extends GetxController {
   NavigationController get _navigationController => Get.find<NavigationController>();
   CommonController get _commonController => Get.find<CommonController>();
   ChatsController get _chatController => Get.find<ChatsController>();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
 
   final box = GetStorage();
 
@@ -230,21 +233,24 @@ class HomeController extends GetxController {
       isConfiguring.value = true;
       isFirstConnexion.value = true;
       _navigationController.hideNavBar.value = false;
-      /*var checkTime = DateTime.now().difference(userMe.value.createdAt!);
+      var checkTime = DateTime.now().difference(userMe.value.createdAt!);
       if(checkTime.inSeconds < 60) {
-        showCupertinoDialog(
-            context: context, barrierDismissible: true, builder: (context) {
-          return CupertinoAlertDialog(
+        showCupertinoDialog(context: context, barrierDismissible: false, builder: (context) {
+          return Obx(() => CupertinoAlertDialog(
             title: const Text("Welcome new user!"), content: const Padding(
             padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
-            child: Text("You have received your SIRKL pass sbt in your wallet.",
+            child: Text("To receive your SIRKL pass sbt in your wallet, please mint it, it is totally free.",
               style: TextStyle(fontSize: 15),),
-          ), actions: [TextButton(onPressed: () {
-            Navigator.pop(context);
-          }, child: const Text("Enjoy SIRKL.io"))
-          ],);
+          ), actions: [TextButton(onPressed: () async {
+            _web3Controller.isMintingInProgress.value = true;
+            var connector = await _web3Controller.connect();
+            connector.onSessionConnect.subscribe((args) async {
+              await _web3Controller.mintMethod(connector, args, userMe.value.wallet!);
+            });
+          }, child: _web3Controller.isMintingInProgress.value ? Center(child: SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: SColors.activeColor)),) : Text("MINT", style: TextStyle(color: SColors.activeColor),))
+          ],));
         });
-      }*/
+      }
       await getAllNftConfig();
       await connectUser(StreamChat.of(context).client);
       await putFCMToken(context, StreamChat.of(context).client, false);
@@ -404,6 +410,8 @@ class HomeController extends GetxController {
           .where((element) => element.isFav!)
           .map((e) => e.contractAddress!)
           .toList());
+
+        if(userMe.value.hasSBT!) nfts.add(NftDto(id: this.id.value, title: "SIRKL SBT", collectionImage: "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png", images: ["https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"]));
       return nfts;
   }
 

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:defer_pointer/defer_pointer.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_badged/flutter_badge.dart';
@@ -45,6 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   NavigationController get _navigationController => Get.find<NavigationController>();
   final TextEditingController usernameTextEditingController = TextEditingController();
   final TextEditingController descriptionTextEditingController = TextEditingController();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
 
   final PagingController<int, NftDto> pagingController =
       PagingController(firstPageKey: 0);
@@ -515,6 +517,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         )
                       : Container(),
+                ),
+                _homeController.userMe.value.hasSBT! ? Container() :
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: InkWell(onTap: (){
+                    showCupertinoDialog(context: context, barrierDismissible: false, builder: (context) {
+                      return Obx(() => CupertinoAlertDialog(
+                        title: const Text("Welcome new user!"), content: const Padding(
+                        padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+                        child: Text("To receive your SIRKL pass sbt in your wallet, please mint it, it is totally free.",
+                          style: TextStyle(fontSize: 15),),
+                      ), actions: [TextButton(onPressed: () async {
+                        _web3Controller.isMintingInProgress.value = true;
+                        var connector = await _web3Controller.connect();
+                        connector.onSessionConnect.subscribe((args) async {
+                          await _web3Controller.mintMethod(connector, args, _homeController.userMe.value.wallet!);
+                        });
+                      }, child: _web3Controller.isMintingInProgress.value ? Center(child: SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: SColors.activeColor)),) : Text("MINT", style: TextStyle(color: SColors.activeColor),))
+                      ],));
+                    });
+                  },child: Text("Mint your SIRKL SBT for free", style: TextStyle(decoration: TextDecoration.underline, color: SColors.activeColor),)),
                 ),
                 MediaQuery.removePadding(
                   context: context,
