@@ -281,6 +281,7 @@ class HomeController extends GetxController {
   }
 
   getTokenContractAddress(StreamChatClient? client, String wallet) async {
+    if(userMe.value.hasSBT!) contractAddresses.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
     var tokenContractAddress =
         await HomeRepo.getTokenContractAddressesWithAlchemy(wallet: wallet);
     var ethClient = Web3Client(

@@ -42,6 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   late final GalleryController controller;
   ProfileController get _profileController => Get.find<ProfileController>();
+  GroupsController get _groupController => Get.find<GroupsController>();
   HomeController get _homeController => Get.find<HomeController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
   final TextEditingController usernameTextEditingController = TextEditingController();

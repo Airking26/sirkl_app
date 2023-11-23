@@ -101,14 +101,14 @@ class GroupsController extends GetxController{
   }
 
   retrieveGroupsToCreate(StreamChatClient streamChatClient) async{
-    List<GroupDto> groups = await GroupRepo.retrieveGroups();
+    //List<GroupDto> groups = await GroupRepo.retrieveGroups();
     //groups = groups.sublist(2172);
   
-      for (var element in groups) {
-        if(!element.image.contains("token-image-placeholder.svg") && !element.image.contains("data:image")) {
-          await Future.delayed(const Duration(seconds: 1));
+      //for (var element in groups) {
+        //if(!element.image.contains("token-image-placeholder.svg") && !element.image.contains("data:image")) {
+         // await Future.delayed(const Duration(seconds: 1));
           try{
-            var resp = await Dio().get(element.image,
+            /*var resp = await Dio().get(element.image,
                 options: Options(responseType: ResponseType.bytes));
             final result = await ImageGallerySaver.saveImage(
                 Uint8List.fromList(resp.data), quality: 100);
@@ -116,15 +116,15 @@ class GroupsController extends GetxController{
                 File(result["filePath"].replaceAll("file://", "")),
                 "sirkl-bucket",
                 "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92",
-                AWSRegions.euCentral1, debugLog: true);
-            await createChannel(streamChatClient, element, pic);
+                AWSRegions.euCentral1, debugLog: true);*/
+            await createChannel(streamChatClient, GroupDto(name: "SIRKL SBT", image: "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png", contractAddress: "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011"), "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png");
           }
           on Exception catch (e){
             print(e);
           }
 
-        }
-      }
+        //}
+      //}
   }
 
   createGroup(StreamChatClient streamChatClient, GroupCreationDto groupCreationDto)async{
