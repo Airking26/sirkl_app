@@ -655,6 +655,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                               ? Colors.white.withOpacity(0.5)
                               : Colors.black.withOpacity(0.5)),
                   onPressed: () async {
+                    if(widget.nftDto.contractAddress != "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase()) {
                     bool fav;
                     if (homeController.isInFav.contains(widget.nftDto.contractAddress)) {
                       homeController.isInFav.remove(widget.nftDto.contractAddress);
@@ -665,7 +666,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                     }
                     // ignore: invalid_use_of_protected_member
                     widget.pagingController.notifyListeners();
-                    await _profileController.updateNft(
+                      await _profileController.updateNft(
                         NftModificationDto(
                             contractAddress: widget.nftDto.contractAddress!,
                             id: homeController.id.value,
@@ -676,7 +677,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                       await StreamChat.of(context).client.updateChannelPartial(widget.nftDto.contractAddress!, 'try', unset: ["${homeController.id.value}_favorite"]);
                     }
                     _groupController.refreshGroups.value = true;
-                  },
+                  }},
                 )),
           title: Text(widget.nftDto.title!,
               style: TextStyle(

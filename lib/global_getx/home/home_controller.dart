@@ -84,6 +84,7 @@ class HomeController extends GetxController {
   var notificationActive = true.obs;
   var streamChatToken = "".obs;
   late String chainToConnect;
+  var isSigning = false.obs;
 
   Web3App? connector;
 
@@ -401,25 +402,25 @@ class HomeController extends GetxController {
         offset: offset.toString());
 
         if (id == this.id.value) {
+          if(userMe.value.hasSBT!) nfts.add(NftDto(id: this.id.value, title: "SIRKL SBT", collectionImage: "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png", images: ["https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"], contractAddress: "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase(), isFav: false));
           iHaveNft.value = true;
         } else {
           heHasNft.value = true;
         }
-      
   
       isInFav.addAll(nfts
           .where((element) => element.isFav!)
           .map((e) => e.contractAddress!)
           .toList());
 
-        if(userMe.value.hasSBT!) nfts.add(NftDto(id: this.id.value, title: "SIRKL SBT", collectionImage: "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png", images: ["https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"]));
+        //isInFav.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
       return nfts;
   }
 
   updateMe(UpdateMeDto updateMeDto) async {
-
     UserDTO userDto = await ProfileRepo.modifyUser(updateMeDto);
-      userMe.value = userDto;
+    box.write(SharedPref.USER, userDto.toJson());
+    userMe.value = userDto;
   }
 
   updateStory(StoryModificationDto storyModificationDto) async {

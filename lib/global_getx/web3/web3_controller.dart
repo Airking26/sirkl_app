@@ -215,7 +215,11 @@ class Web3Controller extends GetxController {
                 params: [ethereumTransaction.toJson()],
               ),
             )
-            .then((value) => Get.back());
+            .then((value) {
+          _homeController.updateMe(UpdateMeDto(hasSBT: true));
+          _homeController.contractAddresses.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
+          _homeController.contractAddresses.refresh();
+              Get.back();});
       });
     } else {
       var canLaunch = await canLaunchUrl(_uri);
@@ -236,7 +240,11 @@ class Web3Controller extends GetxController {
               params: [ethereumTransaction.toJson()],
             ),
           )
-          .then((value) => Get.back());
+          .then((value) {
+        _homeController.updateMe(UpdateMeDto(hasSBT: true));
+        _homeController.contractAddresses.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
+        _homeController.contractAddresses.refresh();
+        Get.back();});
     }
   }
 
@@ -357,7 +365,8 @@ class Web3Controller extends GetxController {
 
   mintMethod(Web3App connector, SessionConnect? args, String wallet) async {
     await mint(connector, args, wallet);
-    _homeController.updateMe(UpdateMeDto(hasSBT: true));
+    //_homeController.isInFav.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
+    //await StreamChat.of(context).client.updateChannelPartial("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase(), 'try', set: {"${_homeController.id.value}_favorite" : true});
   }
 
   joinGroupMethod(Web3App connector, SessionConnect? args, BuildContext context,

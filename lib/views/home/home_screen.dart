@@ -660,7 +660,7 @@ class _HomeScreenState extends State<HomeScreen> {
           height: 50,
         ),
 
-        SliderButton(
+        _homeController.isSigning.value ? Center(child: CircularProgressIndicator(color: SColors.activeColor,),) : SliderButton(
           backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
               ? const Color(0xff9BA0A5)
               : const Color(0xFF828282),
@@ -668,6 +668,7 @@ class _HomeScreenState extends State<HomeScreen> {
           highlightedColor: Colors.white,
           alignLabel: const Alignment(0.3, 0),
           action: () async {
+            _homeController.isSigning.value = true;
             await _homeController.signMessageWithMetamask(context);
           },
           label: const Text(
