@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:convert/convert.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -22,6 +23,7 @@ import 'package:sirkl/global_getx/profile/profile_controller.dart';
 import 'package:sirkl/main.dart';
 import 'package:sirkl/networks/request.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
+import 'package:sirkl/views/profile/profile_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 import 'package:web3dart/web3dart.dart';
@@ -141,16 +143,19 @@ class Web3Controller extends GetxController {
       Web3App connector, SessionConnect? sessionConnect, String wallet) async {
     DeployedContract contract = await getContractMint();
     ContractFunction function = contract.function("mint");
+    String contractAddress = "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011";
 
     Transaction transaction = Transaction.callContract(
         contract: contract,
         function: function,
         parameters: [],
         from: EthereumAddress.fromHex(wallet));
+
     EthereumTransaction ethereumTransaction = EthereumTransaction(
       from: wallet,
-      to: "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011",
+      to: contractAddress,
       data: hex.encode(List<int>.from(transaction.data!)),
+      gas: "0x${(BigInt.parse("${100000}0")).toRadixString(16)}"
     );
 
     if (sessionConnect!.session.namespaces['eip155']!.accounts.last
@@ -208,18 +213,34 @@ class Web3Controller extends GetxController {
         }
         await con
             .request(
-              topic: args!.session.topic,
-              chainId: "eip155:1517929550",
-              request: SessionRequestParams(
-                method: 'eth_sendTransaction',
-                params: [ethereumTransaction.toJson()],
-              ),
-            )
-            .then((value) {
-          _homeController.updateMe(UpdateMeDto(hasSBT: true));
+          topic: args!.session.topic,
+          chainId: "eip155:1517929550",
+          request: SessionRequestParams(
+            method: 'eth_sendTransaction',
+            params: [ethereumTransaction.toJson()],
+          ),
+        )
+            .then((value) async {
+          await _homeController.updateMe(UpdateMeDto(hasSBT: true));
           _homeController.contractAddresses.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
           _homeController.contractAddresses.refresh();
-              Get.back();});
+          _profileController.pagingController.refresh();
+          //await _homeController.getNFT(_homeController.id.value, false, 0);
+          Get.back();
+
+          showCupertinoDialog(context: navigatorKey.currentContext!, barrierDismissible: false, builder: (context) {
+            return CupertinoAlertDialog(
+              title: const Text("SBT Minted Successfully"), content: const Padding(
+              padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+              child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl SBT Community",
+                style: TextStyle(fontSize: 15),),
+            ), actions: [TextButton(onPressed: () async {
+              Get.back();
+            }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
+            ],);
+          });
+
+        });
       });
     } else {
       var canLaunch = await canLaunchUrl(_uri);
@@ -233,18 +254,36 @@ class Web3Controller extends GetxController {
 
       await connector
           .request(
-            topic: sessionConnect.session.topic,
-            chainId: "eip155:1517929550",
-            request: SessionRequestParams(
-              method: 'eth_sendTransaction',
-              params: [ethereumTransaction.toJson()],
-            ),
-          )
-          .then((value) {
-        _homeController.updateMe(UpdateMeDto(hasSBT: true));
+        topic: sessionConnect.session.topic,
+        chainId: "eip155:1517929550",
+        request: SessionRequestParams(
+          method: 'eth_sendTransaction',
+          params: [ethereumTransaction.toJson()],
+        ),
+      )
+          .then((value) async {
+        await _homeController.updateMe(UpdateMeDto(hasSBT: true));
         _homeController.contractAddresses.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
         _homeController.contractAddresses.refresh();
-        Get.back();});
+        _profileController.pagingController.refresh();
+        Get.back();
+
+        showCupertinoDialog(
+            context: navigatorKey.currentContext!,
+            barrierDismissible: false,
+            builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text("SBT Minted Successfully"), content: const Padding(
+            padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+            child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl SBT Community",
+              style: TextStyle(fontSize: 15),),
+          ), actions: [TextButton(onPressed: () async {
+            Get.back();
+          }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
+          ],);
+        });
+
+      });
     }
   }
 

@@ -242,7 +242,9 @@ class HomeController extends GetxController {
             padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
             child: Text("To receive your SIRKL pass sbt in your wallet, please mint it, it is totally free.",
               style: TextStyle(fontSize: 15),),
-          ), actions: [TextButton(onPressed: () async {
+          ), actions: [
+            TextButton(onPressed: (){Get.back();}, child: Text("Later", style: TextStyle(color: SColors.activeColor))),
+            TextButton(onPressed: () async {
             _web3Controller.isMintingInProgress.value = true;
             var connector = await _web3Controller.connect();
             connector.onSessionConnect.subscribe((args) async {
@@ -413,7 +415,6 @@ class HomeController extends GetxController {
           .map((e) => e.contractAddress!)
           .toList());
 
-        //isInFav.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
       return nfts;
   }
 

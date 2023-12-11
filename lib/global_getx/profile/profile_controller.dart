@@ -8,11 +8,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:images_picker/images_picker.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:simple_s3/simple_s3.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/model/nft_modification_dto.dart';
 import 'package:sirkl/common/model/notification_dto.dart';
-import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/story_creation_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
@@ -33,6 +34,7 @@ class ProfileController extends GetxController{
   Rx<UserDTO?> isUserExists = (null as UserDTO?).obs;
   Rx<List<StoryDto>?> myStories = (null as List<StoryDto>?).obs;
   Rx<List<UserDTO>?> readers = (null as List<UserDTO>?).obs;
+  final PagingController<int, NftDto> pagingController = PagingController(firstPageKey: 0);
 
   var usernameElseTextEditingController = TextEditingController().obs;
 
@@ -43,6 +45,7 @@ class ProfileController extends GetxController{
   var urlPictureGroup = "".obs;
   var hasUnreadNotif = false.obs;
   var contactUsClicked = false.obs;
+  var index = 0.obs;
 
   updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
     isLoadingPicture.value = true;

@@ -42,15 +42,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   late final GalleryController controller;
   ProfileController get _profileController => Get.find<ProfileController>();
-  GroupsController get _groupController => Get.find<GroupsController>();
   HomeController get _homeController => Get.find<HomeController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
   final TextEditingController usernameTextEditingController = TextEditingController();
   final TextEditingController descriptionTextEditingController = TextEditingController();
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
 
-  final PagingController<int, NftDto> pagingController =
-      PagingController(firstPageKey: 0);
   YYDialog dialogMenu = YYDialog();
   static var pageKey = 0;
   Utils utils = Utils();
@@ -59,7 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     controller = GalleryController();
     _profileController.retrieveMyStories();
-    pagingController.addPageRequestListener((pageKey) {fetchNFTs();});
+    _profileController.pagingController.addPageRequestListener((pageKey) {fetchNFTs();});
     usernameTextEditingController.text =
         _homeController.userMe.value.userName!.isEmpty
             ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
@@ -80,13 +77,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           pageKey);
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
-        pagingController.appendLastPage(newItems);
+        _profileController.pagingController.appendLastPage(newItems);
       } else {
         final nextPageKey = pageKey++;
-        pagingController.appendPage(newItems, nextPageKey);
+        _profileController.pagingController.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
-      pagingController.error = error;
+      _profileController.pagingController.error = error;
     }
   }
 
@@ -156,10 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     ? Colors.white
                                                     : Colors.black,
                                               ),
-                                              itemCount: _profileController
-                                                      .hasUnreadNotif.value
-                                                  ? 1
-                                                  : 0,
+                                              itemCount: _profileController.hasUnreadNotif.value || !_homeController.userMe.value.hasSBT! ? 1 : 0,
                                               hideZeroCount: true,
                                               badgeColor:
                                                   SColors.activeColor,
@@ -512,33 +506,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 pageKey = 0;
                                 _homeController.isFavNftSelected.value =
                                     !_homeController.isFavNftSelected.value;
-                                pagingController.refresh();
+                                _profileController.pagingController.refresh();
                               },
                             )
                           ],
                         )
                       : Container(),
-                ),
-                _homeController.userMe.value.hasSBT! ? Container() :
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: InkWell(onTap: (){
-                    showCupertinoDialog(context: context, barrierDismissible: false, builder: (context) {
-                      return Obx(() => CupertinoAlertDialog(
-                        title: const Text("Welcome new user!"), content: const Padding(
-                        padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
-                        child: Text("To receive your SIRKL pass sbt in your wallet, please mint it, it is totally free.",
-                          style: TextStyle(fontSize: 15),),
-                      ), actions: [TextButton(onPressed: () async {
-                        _web3Controller.isMintingInProgress.value = true;
-                        var connector = await _web3Controller.connect();
-                        connector.onSessionConnect.subscribe((args) async {
-                          await _web3Controller.mintMethod(connector, args, _homeController.userMe.value.wallet!);
-                        });
-                      }, child: _web3Controller.isMintingInProgress.value ? Center(child: SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: SColors.activeColor)),) : Text("MINT", style: TextStyle(color: SColors.activeColor),))
-                      ],));
-                    });
-                  },child: Text("Mint your SIRKL SBT for free", style: TextStyle(decoration: TextDecoration.underline, color: SColors.activeColor),)),
                 ),
                 MediaQuery.removePadding(
                   context: context,
@@ -548,7 +521,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: SafeArea(
                         child: PagedListView(
-                          pagingController: pagingController,
+                          pagingController: _profileController.pagingController,
                           builderDelegate: PagedChildBuilderDelegate<NftDto>(
                               firstPageProgressIndicatorBuilder: (context) =>
                                    Center(
@@ -566,7 +539,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                               itemBuilder: (context, item, index) =>
-                                  CardNFT(item, index, pagingController)),
+                                  CardNFT(item, index, _profileController.pagingController)),
                         ),
                       ),
                     ),
