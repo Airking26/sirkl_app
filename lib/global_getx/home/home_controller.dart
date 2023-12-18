@@ -85,6 +85,7 @@ class HomeController extends GetxController {
   var streamChatToken = "".obs;
   late String chainToConnect;
   var isSigning = false.obs;
+  var mint = false.obs;
 
   Web3App? connector;
 
@@ -236,23 +237,7 @@ class HomeController extends GetxController {
       _navigationController.hideNavBar.value = false;
       var checkTime = DateTime.now().difference(userMe.value.createdAt!);
       if(checkTime.inSeconds < 60) {
-        showCupertinoDialog(context: context, barrierDismissible: false, builder: (context) {
-          return Obx(() => CupertinoAlertDialog(
-            title: const Text("Welcome new user!"), content: const Padding(
-            padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
-            child: Text("To receive your SIRKL pass sbt in your wallet, please mint it, it is totally free.",
-              style: TextStyle(fontSize: 15),),
-          ), actions: [
-            TextButton(onPressed: (){Get.back();}, child: Text("Later", style: TextStyle(color: SColors.activeColor))),
-            TextButton(onPressed: () async {
-            _web3Controller.isMintingInProgress.value = true;
-            var connector = await _web3Controller.connect();
-            connector.onSessionConnect.subscribe((args) async {
-              await _web3Controller.mintMethod(connector, args, userMe.value.wallet!);
-            });
-          }, child: _web3Controller.isMintingInProgress.value ? Center(child: SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: SColors.activeColor)),) : Text("MINT", style: TextStyle(color: SColors.activeColor),))
-          ],));
-        });
+        mint.value = true;
       }
       await getAllNftConfig();
       await connectUser(StreamChat.of(context).client);
@@ -284,7 +269,6 @@ class HomeController extends GetxController {
   }
 
   getTokenContractAddress(StreamChatClient? client, String wallet) async {
-    if(userMe.value.hasSBT!) contractAddresses.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
     var tokenContractAddress =
         await HomeRepo.getTokenContractAddressesWithAlchemy(wallet: wallet);
     var ethClient = Web3Client(

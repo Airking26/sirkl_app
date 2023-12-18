@@ -40,19 +40,21 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
   ChatsController get _chatController => Get.find<ChatsController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
   final _floatingSearchBarController = FloatingSearchBarController();
-  ProfileController get _profileController => Get.find<ProfileController>();  
+  ProfileController get _profileController => Get.find<ProfileController>();
+
   late final _controllerCommunitiesFav = StreamChannelListController(
     client: StreamChat.of(context).client,
     filter:
-    Filter.and([
-      Filter.notExists('isConv'),
-      if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
-          "contractAddress", _homeController.contractAddresses)
-      else
-        Filter.equal("contractAddress", ""),
-      Filter.exists("${_homeController.id.value}_favorite"),
-      Filter.equal("${_homeController.id.value}_favorite", true),
-    ]),
+        Filter.or([
+          Filter.and([
+            Filter.notExists('isConv'),
+            if(_homeController.contractAddresses.isNotEmpty) Filter.in_("contractAddress", _homeController.contractAddresses)
+            else Filter.equal("contractAddress", ""),
+            Filter.exists("${_homeController.id.value}_favorite"),
+            Filter.equal("${_homeController.id.value}_favorite", true),
+          ]),
+          Filter.equal("contractAddress", _homeController.userMe.value.hasSBT! ? "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase() : "")
+        ]),
     channelStateSort: const [SortOption('last_message_at')],
     limit: 10,
   );
@@ -62,7 +64,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
     Filter.and([
       Filter.notExists('isConv'),
       if(_homeController.contractAddresses.isNotEmpty) Filter.in_(
-          "contractAddress", _homeController.contractAddresses)
+          "contractAddress", _homeController.contractAddresses.where((p0) => p0 != "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase()).toList())
       else
         Filter.equal("contractAddress", ""),
       Filter.or([
@@ -78,7 +80,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
   void initState() {
     _controllerCommunitiesFav.doInitialLoad();
     _controllerCommunitiesOther.doInitialLoad();
-    _groupController.index.value = _homeController.isInFav.isEmpty ? 1 : 0;
+    _groupController.index.value = _homeController.userMe.value.hasSBT! ? 0 : _homeController.isInFav.isEmpty ? 1 : 0;
         tabController = TabController(length: 2, vsync: this);
     tabController.index = _groupController.index.value;
     tabController.addListener(indexChangingListener);

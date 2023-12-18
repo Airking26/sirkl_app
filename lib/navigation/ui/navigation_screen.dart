@@ -1,12 +1,15 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/global_getx/calls/calls_controller.dart';
 
 
 import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/global_getx/web3/web3_controller.dart';
 import '../../config/s_colors.dart';
 import '../../global_getx/home/home_controller.dart';
 import '../../global_getx/profile/profile_controller.dart';
@@ -35,7 +38,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
   CallsController get _callController => Get.find<CallsController>();
   CommonController get _commonController => Get.find<CommonController>();
   HomeController get _homeController => Get.find<HomeController>();
-  ProfileController get _profileController => Get.find<ProfileController>();  
+  ProfileController get _profileController => Get.find<ProfileController>();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
 
 
   late final List<Widget> _pages = [
@@ -160,6 +164,29 @@ class _NavigationScreenState extends State<NavigationScreen> {
               _profileController.checkIfHasUnreadNotif(_homeController.id.value);
               if(_homeController.accessToken.value.isEmpty || _homeController.isConfiguring.value){
                 _navigationController.controller.value.index = 0;
+              } else if(_homeController.mint.value){
+                showCupertinoDialog(context: context, barrierDismissible: false, builder: (context) {
+                  return Obx(() => CupertinoAlertDialog(
+                    title: const Text("Welcome new user!"), content: const Padding(
+                    padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+                    child: Text("To receive your SIRKL pass sbt in your wallet, please mint it, it is totally free.",
+                      style: TextStyle(fontSize: 15),),
+                  ), actions: [
+                    TextButton(onPressed: (){
+                      _homeController.mint.value = false;
+                      Get.back();
+                      }, child: Text("Later", style: TextStyle(color: SColors.activeColor))),
+                    TextButton(onPressed: () async {
+                      _homeController.mint.value = false;
+                      _web3Controller.isMintingInProgress.value = true;
+                      var connector = await _web3Controller.connect();
+                      connector.onSessionConnect.subscribe((args) async {
+                        await _web3Controller.mintMethod(connector, args, _homeController.userMe.value.wallet!);
+                      });
+                    }, child: _web3Controller.isMintingInProgress.value ? Center(child: SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: SColors.activeColor)),) : Text("MINT", style: TextStyle(color: SColors.activeColor),))
+                  ],));
+                });
+
               }
             }
           },

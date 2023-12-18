@@ -141,6 +141,7 @@ class Web3Controller extends GetxController {
 
   Future<dynamic> queryMint(
       Web3App connector, SessionConnect? sessionConnect, String wallet) async {
+
     DeployedContract contract = await getContractMint();
     ContractFunction function = contract.function("mint");
     String contractAddress = "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011";
@@ -222,10 +223,8 @@ class Web3Controller extends GetxController {
         )
             .then((value) async {
           await _homeController.updateMe(UpdateMeDto(hasSBT: true));
-          _homeController.contractAddresses.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
-          _homeController.contractAddresses.refresh();
           _profileController.pagingController.refresh();
-          //await _homeController.getNFT(_homeController.id.value, false, 0);
+          _groupController.refreshGroups.value = true;
           Get.back();
 
           showCupertinoDialog(context: navigatorKey.currentContext!, barrierDismissible: false, builder: (context) {
@@ -263,9 +262,8 @@ class Web3Controller extends GetxController {
       )
           .then((value) async {
         await _homeController.updateMe(UpdateMeDto(hasSBT: true));
-        _homeController.contractAddresses.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
-        _homeController.contractAddresses.refresh();
         _profileController.pagingController.refresh();
+        _groupController.refreshGroups.value = true;
         Get.back();
 
         showCupertinoDialog(

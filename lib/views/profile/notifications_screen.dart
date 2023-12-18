@@ -11,6 +11,7 @@ import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/model/notification_dto.dart';
+import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/global_getx/web3/web3_controller.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/profile/profile_else_screen.dart';
@@ -34,6 +35,7 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
   HomeController get _homeController => Get.find<HomeController>();
   ChatsController get _chatController => Get.find<ChatsController>();
   CommonController get _commonController => Get.find<CommonController>();
+  NavigationController get _navigationController => Get.find<NavigationController>();
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
   final PagingController<int, NotificationDto> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
@@ -294,6 +296,10 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
     if(_homeController.userMe.value.hasSBT!) {
       if(index == 0){
         return Padding(padding: const EdgeInsets.only(right: 8, top: 8, bottom: 8), child: ListTile(
+          onTap: (){
+            Navigator.pop(context);
+            _navigationController.controller.value.jumpToTab(2);
+          },
           titleAlignment: ListTileTitleAlignment.top,
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(90),
