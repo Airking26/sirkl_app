@@ -123,7 +123,6 @@ class ProfileController extends GetxController{
   Future<void> checkIfHasUnreadNotif(String id) async{
     bool hasNoti = await ProfileRepo.retrieveHasUnreadNotif(id);
     hasUnreadNotif.value = hasNoti;
-
   }
 
   Future< List<NotificationDto>> retrieveNotifications(String id, int offset) async {

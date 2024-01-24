@@ -46,13 +46,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController usernameTextEditingController = TextEditingController();
   final TextEditingController descriptionTextEditingController = TextEditingController();
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
+  FocusNode focusNode = FocusNode();
+  String hintText = '';
 
   YYDialog dialogMenu = YYDialog();
   static var pageKey = 0;
   Utils utils = Utils();
 
+
   @override
   void initState() {
+    focusNode.addListener(() {
+      setState(() {});
+    });
+
     controller = GalleryController();
     _profileController.retrieveMyStories();
     _profileController.pagingController.addPageRequestListener((pageKey) {fetchNFTs();});
@@ -384,7 +391,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 100,
+                  height: 90,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 48.0),
@@ -423,12 +430,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 _homeController.userMe.value.description.isNullOrBlank! ? const SizedBox(height: 0) : const SizedBox(height: 4,),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 48.0),
+                  padding:  EdgeInsets.only(left: 48.0, right: 48, top: _profileController.isEditingProfile.value ? 16 : 8),
                   child: _profileController.isEditingProfile.value
                       ? TextField(
                           maxLines: 2,
                           controller: descriptionTextEditingController,
                           maxLength: 120,
+                          focusNode: focusNode,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: 15,
@@ -437,12 +445,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               color:
                                   MediaQuery.of(context).platformBrightness ==
                                           Brightness.dark
-                                      ? const Color(0xFF9BA0A5)
-                                      : const Color(0xFF828282)),
+                                      ? Colors.white
+                                      : Colors.black),
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               isCollapsed: true,
-                              hintText: _homeController.userMe.value.description.isNullOrBlank! ? con.noDescYetRes.tr : _homeController.userMe.value.description!),
+                              hintText: focusNode.hasFocus ? '' : _homeController.userMe.value.description.isNullOrBlank! ? con.noDescYetRes.tr : _homeController.userMe.value.description!),
                         )
                       : _homeController.userMe.value.description.isNullOrBlank! ? Container(): Text(
                                _homeController.userMe.value.description!,

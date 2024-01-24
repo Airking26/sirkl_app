@@ -15,10 +15,10 @@ class GlobalDependencyManager extends Bindings {
 
   @override
   void dependencies() {
-    _globalPut();
+    globalPut();
   }
 
-  _globalPut() {
+  globalPut() {
     //Get.put(PaidGroupContract(SConfig.paidGroupContract), permanent: _permanent);
     //Get.put(SWalletConnectController(chainId: 5), permanent: _permanent);
     Get.put(NavigationController(), permanent: _permanent);
@@ -29,5 +29,9 @@ class GlobalDependencyManager extends Bindings {
     Get.put(CallsController(), permanent: _permanent);
     Get.put(CommonController(), permanent: _permanent);
     Get.put(Web3Controller(), permanent: _permanent);
+  }
+
+  _globalDelete(){
+    Get.deleteAll();
   }
 }

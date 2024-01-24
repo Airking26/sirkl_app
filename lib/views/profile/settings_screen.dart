@@ -3,9 +3,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
 
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
@@ -15,6 +17,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/global_getx/web3/web3_controller.dart';
+import 'package:sirkl/main.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
@@ -218,15 +221,15 @@ class _SettingScreenState extends State<SettingScreen> {
                               CupertinoDialogAction(child: Text("No", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)), onPressed: (){ Get.back();},),
                               CupertinoDialogAction(child: Text("Yes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
                                 onPressed: () async {
-
                                   await StreamChat.of(context).client.disconnectUser();
-                                  await StreamChat.of(context).client.dispose();
+                                  //await StreamChat.of(context).client.dispose();
                                   await GetStorage().erase();
+                                  _homeController.id.value = "";
+                                  _homeController.isConfiguring.value = false;
                                   _homeController.accessToken.value = "";
                                   _homeController.address.value = "";
+                                  RestartWidget.restartApp(context);
                                   _navigationController.controller.value.jumpToTab(0);
-                                
-                                  //await _profileController.deleteUser(_homeController.id.value);
                                   _navigationController.hideNavBar.value = true;
                                   Get.back();
                                 },)

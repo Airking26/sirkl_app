@@ -89,7 +89,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     _controllerOther.doInitialLoad();
     _commonController.controllerFriend = _controllerFriend;
     _commonController.controllerOthers = _controllerOther;
-        tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(length: 2, vsync: this);
     tabController.index = _chatController.index.value;
     tabController.addListener(indexChangeListener);
 

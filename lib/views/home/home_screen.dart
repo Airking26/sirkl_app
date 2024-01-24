@@ -57,7 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
   CommonController get _commonController => Get.find<CommonController>();
   CallsController get _callController => Get.find<CallsController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
-  Web3Controller get _web3Controller => Get.find<Web3Controller>();
 
   final utils = Utils();
   final storyController = StoryController();
@@ -670,6 +669,7 @@ class _HomeScreenState extends State<HomeScreen> {
           action: () async {
             _homeController.isSigning.value = true;
             await _homeController.signMessageWithMetamask(context);
+            _homeController.isSigning.value = false;
           },
           label: const Text(
             "Slide to sign in",

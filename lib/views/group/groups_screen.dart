@@ -166,16 +166,15 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                         )
                             : _controllerCommunitiesFav,
                         onChannelTap: (channel) {
-                          if (!_homeController.contractAddresses.contains(
-                              channel.id)) {
-                            Utils().showToast(context, "This is a private chat for holders of ${channel.name}");
-                          } else {
+                          if (_homeController.contractAddresses.contains(
+                              channel.id)  || (channel.id!.toLowerCase() == "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase() && _homeController.userMe.value.hasSBT!)) {
+
                             _chatController.channel.value = channel;
                             channel.queryMembers(filter: Filter.equal(
                                 "id", _homeController.id.value)).then((value) {
                               if (value.members.isEmpty) {
                                 channel.addMembers(
-                                  [_homeController.id.value]);
+                                    [_homeController.id.value]);
                               }
                             }
                             );
@@ -184,6 +183,9 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                                 .then((value) {
                               _navigationController.hideNavBar.value = false;
                             });
+                          } else {
+                            Utils().showToast(context, "This is a private chat for holders of ${channel.name}");
+
                           }
                         },
                       ),
@@ -220,17 +222,20 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           limit: 10,
                         ) : _controllerCommunitiesOther,
                         onChannelTap: (channel) {
-                          if (!_homeController.contractAddresses.contains(
-                              channel.id)) {
-                            Utils().showToast(context, "This is a private chat for holders of ${channel.name}");
+                          if (_homeController.contractAddresses.contains(
+                              channel.id) || (channel.id!.toLowerCase() == "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase() && _homeController.userMe.value.hasSBT!)) {
+
+                            _chatController.channel.value = channel;
+                            channel.queryMembers(filter: Filter.equal("id", _homeController.id.value)).then((value) {
+                              if(value.members.isEmpty) channel.addMembers([_homeController.id.value]);}
+                            );
+                            pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage()), withNavBar: false).then((value){
+                              _navigationController.hideNavBar.value = false;
+                            });
+
+
                           } else {
-                          _chatController.channel.value = channel;
-                          channel.queryMembers(filter: Filter.equal("id", _homeController.id.value)).then((value) {
-                            if(value.members.isEmpty) channel.addMembers([_homeController.id.value]);}
-                          );
-                          pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage()), withNavBar: false).then((value){
-                            _navigationController.hideNavBar.value = false;
-                          });
+                            Utils().showToast(context, "This is a private chat for holders of ${channel.name}");
                       }},
                       ),
                     ),

@@ -239,10 +239,12 @@ class HomeController extends GetxController {
       if(checkTime.inSeconds < 60) {
         mint.value = true;
       }
-      await getAllNftConfig();
+
       await connectUser(StreamChat.of(context).client);
-      await putFCMToken(context, StreamChat.of(context).client, false);
+      putFCMToken(context, StreamChat.of(context).client, false);
+      getAllNftConfig();
       await retrieveInboxes();
+
   }
 
   putFCMToken(BuildContext context, StreamChatClient client, bool isLogged) async {
@@ -446,7 +448,8 @@ class HomeController extends GetxController {
     retrieveAccessToken();
     if (accessToken.value.isNotEmpty) {
       if (client.wsConnectionStatus != ConnectionStatus.connected) {
-        if (streamChatToken.value.isNullOrBlank!) {
+        if (streamChatToken.value.isNullOrBlank! && (DateTime.now().difference(userMe.value.createdAt!) <
+    const Duration(minutes: 1))) {
           String token =
               await ProfileRepo.retrieveTokenStreamChat();
           streamChatToken.value = token;
@@ -477,8 +480,18 @@ class HomeController extends GetxController {
                   await getWelcomeMessage();
                   await checkIfHasMessage(client);
                 }
+          isConfiguring.value = false;
+          isFirstConnexion.value = false;
         } else {
+          if(streamChatToken.value.isNullOrBlank!){
+            String token =
+            await ProfileRepo.retrieveTokenStreamChat();
+            streamChatToken.value = token;
+            await box.write(SharedPref.STREAM_CHAT_TOKEN, token);
+          }
           await client.connectUser(User(id: id.value), streamChatToken.value);
+          isConfiguring.value = false;
+          isFirstConnexion.value = false;
           await checkIfHasMessage(client);
         }
       }
@@ -508,8 +521,6 @@ class HomeController extends GetxController {
 
   retrieveInboxes() async {
       await ChatRepo.walletsToMessages();
-      isConfiguring.value = false;
-      isFirstConnexion.value = false;
   }
 
   registerNotification(NotificationRegisterDto notificationRegisterDto) async {

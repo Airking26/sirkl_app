@@ -34,9 +34,6 @@ class Web3Controller extends GetxController {
   var loadingToCreateGroup = false.obs;
   var client = Web3Client(
       "https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
-  var clientTitan = Web3Client(
-      "https://staging-v3.skalenodes.com/v1/staging-aware-chief-gianfar",
-      Client());
 
   CommonController get _commonController => Get.find<CommonController>();
 
@@ -65,7 +62,7 @@ class Web3Controller extends GetxController {
 
   Future<DeployedContract> getContractMint() async {
     String abi = await rootBundle.loadString("assets/abi_mint.json");
-    String contractAddress = "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011";
+    String contractAddress = "0x944a7A6833074122E9c2a7A5882392224C345807";
     String contractName = "SIRKLsbt";
 
     DeployedContract contract = DeployedContract(
@@ -102,7 +99,7 @@ class Web3Controller extends GetxController {
     }, optionalNamespaces: {
       'eip155': const RequiredNamespace(
           methods: ["eth_sendTransaction"],
-          chains: ['eip155:1517929550'],
+          chains: ['eip155:1564830818'],
           events: ["chainChanged", "accountsChanged", "session_request"])
     });
 
@@ -112,7 +109,7 @@ class Web3Controller extends GetxController {
     return connector;
   }
 
-  Future<Web3App> connectTitan() async {
+  Future<Web3App> connectCalypso() async {
     var connector = await Web3App.createInstance(
       projectId: 'bdfe4b74c44308ffb46fa4e6198605af',
       metadata: const PairingMetadata(
@@ -128,7 +125,7 @@ class Web3Controller extends GetxController {
     ConnectResponse res = await connector.connect(requiredNamespaces: {
       'eip155': const RequiredNamespace(
         events: ["chainChanged", "accountsChanged", "session_request"],
-        chains: ["eip155:1517929550"],
+        chains: ["eip155:1564830818"],
         methods: ["eth_sendTransaction"], // Requestable Methods
       ),
     });
@@ -144,7 +141,7 @@ class Web3Controller extends GetxController {
 
     DeployedContract contract = await getContractMint();
     ContractFunction function = contract.function("mint");
-    String contractAddress = "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011";
+    String contractAddress = "0x944a7A6833074122E9c2a7A5882392224C345807";
 
     Transaction transaction = Transaction.callContract(
         contract: contract,
@@ -159,9 +156,10 @@ class Web3Controller extends GetxController {
       gas: "0x${(BigInt.parse("${100000}0")).toRadixString(16)}"
     );
 
+
     if (sessionConnect!.session.namespaces['eip155']!.accounts.last
             .split(":0x")[0] !=
-        "eip155:1517929550") {
+        "eip155:1564830818") {
       var canLaunch = await canLaunchUrl(_uri);
       if (canLaunch) {
         launchUrl(_uri, mode: LaunchMode.externalApplication);
@@ -177,16 +175,16 @@ class Web3Controller extends GetxController {
           request:
               SessionRequestParams(method: "wallet_addEthereumChain", params: [
             {
-              'chainName': 'Titan',
+              'chainName': '[S]Calypso Hub',
               'nativeCurrency': {
-                'name': 'SFuel',
-                'symbol': 'SFuel',
+                'name': 'sFuel',
+                'symbol': 'sFuel',
                 'decimals': 18,
               },
               'rpcUrls': [
-                'https://staging-v3.skalenodes.com/v1/staging-aware-chief-gianfar'
+                'https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague'
               ],
-              'chainId': '0x${1517929550.toRadixString(16)}',
+              'chainId': '0x${1564830818.toRadixString(16)}',
             },
           ]));
 
@@ -202,7 +200,7 @@ class Web3Controller extends GetxController {
             },
           ]));*/
 
-      var con = await connectTitan();
+      var con = await connectCalypso();
       con.onSessionConnect.subscribe((args) async {
         var canLaunch = await canLaunchUrl(_uri);
         if (canLaunch) {
@@ -215,7 +213,7 @@ class Web3Controller extends GetxController {
         await con
             .request(
           topic: args!.session.topic,
-          chainId: "eip155:1517929550",
+          chainId: "eip155:1564830818",
           request: SessionRequestParams(
             method: 'eth_sendTransaction',
             params: [ethereumTransaction.toJson()],
@@ -254,7 +252,7 @@ class Web3Controller extends GetxController {
       await connector
           .request(
         topic: sessionConnect.session.topic,
-        chainId: "eip155:1517929550",
+        chainId: "eip155:1564830818",
         request: SessionRequestParams(
           method: 'eth_sendTransaction',
           params: [ethereumTransaction.toJson()],
@@ -402,8 +400,6 @@ class Web3Controller extends GetxController {
 
   mintMethod(Web3App connector, SessionConnect? args, String wallet) async {
     await mint(connector, args, wallet);
-    //_homeController.isInFav.add("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase());
-    //await StreamChat.of(context).client.updateChannelPartial("0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase(), 'try', set: {"${_homeController.id.value}_favorite" : true});
   }
 
   joinGroupMethod(Web3App connector, SessionConnect? args, BuildContext context,

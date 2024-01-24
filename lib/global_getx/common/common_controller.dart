@@ -22,9 +22,6 @@ import '../../constants/save_pref_keys.dart';
 
 class CommonController extends GetxController {
 
-  final HomeRepo _homeService = HomeRepo();
-
-
   final box = GetStorage();
 
   Rx<UserDTO?> userClicked = (null as UserDTO?).obs;
