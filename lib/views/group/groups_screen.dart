@@ -42,7 +42,8 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
   final _floatingSearchBarController = FloatingSearchBarController();
   ProfileController get _profileController => Get.find<ProfileController>();
 
-  late final _controllerCommunitiesFav = StreamChannelListController(
+  late final _controllerCommunitiesFav =
+  StreamChannelListController(
     client: StreamChat.of(context).client,
     filter:
         Filter.or([
@@ -58,6 +59,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
     channelStateSort: const [SortOption('last_message_at')],
     limit: 10,
   );
+
   late final _controllerCommunitiesOther = StreamChannelListController(
     client: StreamChat.of(context).client,
     filter:

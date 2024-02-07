@@ -59,6 +59,12 @@ class _MyGroupScreenState extends State<MyGroupScreen> {
                 child: SafeArea(
                   minimum: const EdgeInsets.only(top: 16),
                   child: StreamChannelListView(
+                    emptyBuilder: (context){
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 48.0, vertical: 16),
+                        child: Text("Create groups and it will appear here..", style: TextStyle(fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w600), textAlign: TextAlign.center,),
+                      );
+                    },
                     channelSlidableEnabled: false ,
                     channelConv : false,
                     channelFriends: false,

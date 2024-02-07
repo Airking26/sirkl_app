@@ -243,8 +243,7 @@ class HomeController extends GetxController {
       await connectUser(StreamChat.of(context).client);
       putFCMToken(context, StreamChat.of(context).client, false);
       getAllNftConfig();
-      await retrieveInboxes();
-
+      retrieveInboxes();
   }
 
   putFCMToken(BuildContext context, StreamChatClient client, bool isLogged) async {

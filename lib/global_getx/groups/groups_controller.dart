@@ -117,7 +117,8 @@ class GroupsController extends GetxController{
                 "sirkl-bucket",
                 "eu-central-1:aef70dab-a133-4297-abba-653ca5c77a92",
                 AWSRegions.euCentral1, debugLog: true);*/
-            await createChannel(streamChatClient, GroupDto(name: "SIRKL SBT", image: "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png", contractAddress: "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011"), "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png");
+            //await createChannel(streamChatClient, GroupDto(name: "SQR", image: "https://icodrops.com/wp-content/uploads/2022/07/A-WlK2Dl_400x400-150x150.jpg", contractAddress: "0x2B72867c32CF673F7b02d208B26889fEd353B1f8"), "https://icodrops.com/wp-content/uploads/2022/07/A-WlK2Dl_400x400-150x150.jpg");
+            await createChannel(streamChatClient, GroupDto(name: "SKALE SKL", image: "https://dynamic-assets.coinbase.com/3315e1fa2ce490fd33b1fb53f6c461cda0eb53a60c5ce9951858da803fc2f93840dc11abd573262aa033cf152c3294ed1d722334c895621e2ad500d323d211b4/asset_icons/4a2915c4374f0a2f50bd851396f368d2c442706abe07707906ca35d8bb403812.png", contractAddress: "0x00c83aecc790e8a4453e5dd3b0b4b3680501a7a7"), "https://dynamic-assets.coinbase.com/3315e1fa2ce490fd33b1fb53f6c461cda0eb53a60c5ce9951858da803fc2f93840dc11abd573262aa033cf152c3294ed1d722334c895621e2ad500d323d211b4/asset_icons/4a2915c4374f0a2f50bd851396f368d2c442706abe07707906ca35d8bb403812.png");
           }
           on Exception catch (e){
             print(e);

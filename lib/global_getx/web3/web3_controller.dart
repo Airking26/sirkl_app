@@ -157,9 +157,8 @@ class Web3Controller extends GetxController {
     );
 
 
-    if (sessionConnect!.session.namespaces['eip155']!.accounts.last
-            .split(":0x")[0] !=
-        "eip155:1564830818") {
+    /// IF USER IS NOT ON THE SKALE NETWORK
+    if (sessionConnect!.session.namespaces['eip155']!.accounts.last.split(":0x")[0] != "eip155:1564830818") {
       var canLaunch = await canLaunchUrl(_uri);
       if (canLaunch) {
         launchUrl(_uri, mode: LaunchMode.externalApplication);
@@ -187,18 +186,6 @@ class Web3Controller extends GetxController {
               'chainId': '0x${1564830818.toRadixString(16)}',
             },
           ]));
-
-      /*
-      launchUrl(_uri, mode: LaunchMode.externalApplication);
-      await connector.request(
-          topic: sessionConnect.session.topic,
-          chainId: "eip155:1",
-          request: SessionRequestParams(
-              method: "wallet_switchEthereumChain", params: [
-            {
-              'chainId': '0x${1517929550.toRadixString(16)}',
-            },
-          ]));*/
 
       var con = await connectCalypso();
       con.onSessionConnect.subscribe((args) async {
@@ -239,7 +226,9 @@ class Web3Controller extends GetxController {
 
         });
       });
-    } else {
+    }
+    /// IF USER IS ON THE SKALE NETWORK
+    else {
       var canLaunch = await canLaunchUrl(_uri);
       if (canLaunch) {
         launchUrl(_uri, mode: LaunchMode.externalApplication);
@@ -273,7 +262,8 @@ class Web3Controller extends GetxController {
             padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
             child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl SBT Community",
               style: TextStyle(fontSize: 15),),
-          ), actions: [TextButton(onPressed: () async {
+          ), actions: [
+            TextButton(onPressed: () async {
             Get.back();
           }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
           ],);
