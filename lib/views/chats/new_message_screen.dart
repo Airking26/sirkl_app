@@ -7,7 +7,8 @@ import 'package:ethereum_addresses/ethereum_addresses.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
+import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar.dart';
+import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_actions.dart';
 
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 
@@ -267,8 +268,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       transitionDuration: const Duration(milliseconds: 0),
       transitionCurve: Curves.easeInOut,
       physics: const BouncingScrollPhysics(),
-      axisAlignment: 0.0,
-      openAxisAlignment: 0.0,
+      axisAlignment: 10.0,
+      openAxisAlignment: 10.0,
       queryStyle: TextStyle(
           color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
           fontSize: 16,
@@ -320,7 +321,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           }
         }
       },
-      transition: CircularFloatingSearchBarTransition(),
+      //transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
         FloatingSearchBarAction.icon(
           icon:  Image.asset(
@@ -346,9 +347,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       ],
       actions: const [],
       builder: (context, transition) {
-        return const SizedBox(
-          height: 0,
-        );
+        return const SizedBox(height: 0);
       },
     );
   }
@@ -384,11 +383,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       onTap: () async {
         if(_chatController.sendingMessageMode.value == 0 || _chatController.sendingMessageMode.value == 3){
           if(item.id.isNullOrBlank!) {
-            var idChannel = DateTime
-                .now()
-                .millisecondsSinceEpoch
-                .toString();
-           var idChannelCreated = await _chatController.createInbox(InboxCreationDto(
+            var idChannel = DateTime.now().millisecondsSinceEpoch.toString();
+            var idChannelCreated = await _chatController.createInbox(InboxCreationDto(
                 isConv: true,
                 isGroupPaying: false,
                 createdBy: _homeController.id.value,
@@ -396,7 +392,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   _homeController.userMe.value.wallet!,
                   item.wallet!
                 ],
-                idChannel: idChannel));
+               idChannel: idChannel));
             pushNewScreen(context, screen: DetailedChatScreen(
                 create: false, channelId: idChannelCreated)).then((value) {
               Navigator.pop(context);
