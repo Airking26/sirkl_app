@@ -25,6 +25,7 @@ import 'package:sirkl/networks/request.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/profile/profile_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
@@ -104,8 +105,9 @@ class Web3Controller extends GetxController {
     });
 
     _uri = res.uri!;
+    var encode = Uri.encodeComponent('${res.uri}');
 
-    launchUrl(res.uri!, mode: LaunchMode.externalApplication);
+    await launchUrlString("metamask://wc?uri=$encode", mode: LaunchMode.externalApplication);
     return connector;
   }
 
@@ -130,14 +132,14 @@ class Web3Controller extends GetxController {
       ),
     });
 
-    _uri = res.uri!;
+    var encode = Uri.encodeComponent('${res.uri}');
 
-    launchUrl(res.uri!, mode: LaunchMode.externalApplication);
+    await launchUrlString("metamask://wc?uri=$encode", mode: LaunchMode.externalApplication);
     return connector;
   }
 
   Future<dynamic> queryMint(
-      Web3App connector, SessionConnect? sessionConnect, String wallet) async {
+      BuildContext context, Web3App connector, SessionConnect? sessionConnect, String wallet) async {
 
     DeployedContract contract = await getContractMint();
     ContractFunction function = contract.function("mint");
@@ -161,10 +163,10 @@ class Web3Controller extends GetxController {
     if (sessionConnect!.session.namespaces['eip155']!.accounts.last.split(":0x")[0] != "eip155:1564830818") {
       var canLaunch = await canLaunchUrl(_uri);
       if (canLaunch) {
-        launchUrl(_uri, mode: LaunchMode.externalApplication);
+        launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
       } else {
         Future.delayed(const Duration(seconds: 2), () {
-          launchUrl(_uri, mode: LaunchMode.externalApplication);
+          launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
         });
       }
 
@@ -191,10 +193,10 @@ class Web3Controller extends GetxController {
       con.onSessionConnect.subscribe((args) async {
         var canLaunch = await canLaunchUrl(_uri);
         if (canLaunch) {
-          launchUrl(_uri, mode: LaunchMode.externalApplication);
+          launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
         } else {
           Future.delayed(const Duration(seconds: 2), () {
-            launchUrl(_uri, mode: LaunchMode.externalApplication);
+            launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
           });
         }
         await con
@@ -208,6 +210,10 @@ class Web3Controller extends GetxController {
         )
             .then((value) async {
           await _homeController.updateMe(UpdateMeDto(hasSBT: true));
+          var stream = StreamChat.of(context).client.queryChannels(filter: Filter.equal("id", "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase()));
+          var channels = await stream.first;
+          var channel = channels.first;
+          await channel.addMembers([_homeController.id.value]);
           _profileController.pagingController.refresh();
           _groupController.refreshGroups.value = true;
           Get.back();
@@ -231,10 +237,10 @@ class Web3Controller extends GetxController {
     else {
       var canLaunch = await canLaunchUrl(_uri);
       if (canLaunch) {
-        launchUrl(_uri, mode: LaunchMode.externalApplication);
+        launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
       } else {
         Future.delayed(const Duration(seconds: 2), () {
-          launchUrl(_uri, mode: LaunchMode.externalApplication);
+          launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
         });
       }
 
@@ -249,6 +255,10 @@ class Web3Controller extends GetxController {
       )
           .then((value) async {
         await _homeController.updateMe(UpdateMeDto(hasSBT: true));
+        var stream = StreamChat.of(context).client.queryChannels(filter: Filter.equal("id", "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase()));
+        var channels = await stream.first;
+        var channel = channels.first;
+        await channel.addMembers([_homeController.id.value]);
         _profileController.pagingController.refresh();
         _groupController.refreshGroups.value = true;
         Get.back();
@@ -298,7 +308,7 @@ class Web3Controller extends GetxController {
             ? EtherAmount.inWei(BigInt.from(fee! * 1e18))
             : EtherAmount.zero());
 
-    launchUrl(_uri, mode: LaunchMode.externalApplication);
+    launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
 
     EthereumTransaction ethereumTransaction = EthereumTransaction(
         from: wallet,
@@ -320,8 +330,8 @@ class Web3Controller extends GetxController {
   }
 
   Future<String?> mint(
-      Web3App connector, SessionConnect? sessionConnect, String wallet) async {
-    return await queryMint(connector, sessionConnect, wallet);
+      BuildContext context, Web3App connector, SessionConnect? sessionConnect, String wallet) async {
+    return await queryMint(context, connector, sessionConnect, wallet);
   }
 
   Future<String?> createGroup(Web3App connector, SessionConnect? sessionConnect,
@@ -388,8 +398,8 @@ class Web3Controller extends GetxController {
         false, null, wallet);
   }
 
-  mintMethod(Web3App connector, SessionConnect? args, String wallet) async {
-    await mint(connector, args, wallet);
+  mintMethod(BuildContext context, Web3App connector, SessionConnect? args, String wallet) async {
+    await mint(context, connector, args, wallet);
   }
 
   joinGroupMethod(Web3App connector, SessionConnect? args, BuildContext context,

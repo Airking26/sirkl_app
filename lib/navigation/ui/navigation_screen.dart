@@ -178,7 +178,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       _web3Controller.isMintingInProgress.value = true;
                       var connector = await _web3Controller.connect();
                       connector.onSessionConnect.subscribe((args) async {
-                        await _web3Controller.mintMethod(connector, args, _homeController.userMe.value.wallet!);
+                        await _web3Controller.mintMethod(context, connector, args, _homeController.userMe.value.wallet!);
                       });
                     }, child: _web3Controller.isMintingInProgress.value ? Center(child: SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: SColors.activeColor)),) : Text("MINT", style: TextStyle(color: SColors.activeColor),))
                   ],));

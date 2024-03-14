@@ -33,6 +33,7 @@ import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
 import 'package:sirkl/repo/profile_repo.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 import 'package:logger/logger.dart' as l;
 import 'package:web3dart/crypto.dart';
@@ -140,7 +141,8 @@ class HomeController extends GetxController {
 
     try {
       _connectResponse = res;
-      var hasLaunched = await launchUrl(res.uri!, mode: LaunchMode.externalApplication);
+      var encode = Uri.encodeComponent('${res.uri}');
+      var hasLaunched = await launchUrlString("metamask://wc?uri=$encode", mode: LaunchMode.externalApplication);
       if (hasLaunched == false) {
         Fluttertoast.showToast(
             msg: "Not wallet was found, please create one in order to continue",
@@ -198,8 +200,6 @@ class HomeController extends GetxController {
   String generateSessionMessage(String accountAddress) {
     String message =
         'Hello $accountAddress, welcome to our app. By signing this message you agree to learn and have fun with blockchain';
-   // var hash = keccakUtf8(message);
-    //final hashString = '0x${bytesToHex(hash).toString()}';
 
     return message;
   }
@@ -209,7 +209,7 @@ class HomeController extends GetxController {
          _uri = _connectResponse.uri!;
          _sessionData = await _connectResponse.session.future;
          var message = generateSessionMessage(address.value);
-         launchUrl(_uri, mode: LaunchMode.externalApplication);
+         launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
          var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:${chainToConnect.toLowerCase()}", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex]));
          await loginWithWallet(context, address.value, message, signature);
        } catch (exp) {

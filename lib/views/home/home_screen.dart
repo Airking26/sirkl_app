@@ -726,7 +726,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
-            "Connect on ETH blockchain or create your wallet by clicking below, wallets supported : ",
+            "Connect on ETH blockchain or create your wallet by clicking below, wallet supported : ",
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: MediaQuery.of(context).platformBrightness == Brightness.dark
@@ -740,14 +740,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(
           height: 10,
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset("assets/images/metamask.png", width: 32, height: 32,),
-            const SizedBox(width: 8,),
-            Image.asset("assets/images/trustwallet.png", width: 30, height: 30,),
-          ],
-        ),
+        Image.asset("assets/images/metamask.png", width: 32, height: 32,),
         const SizedBox(
           height: 20,
         ),

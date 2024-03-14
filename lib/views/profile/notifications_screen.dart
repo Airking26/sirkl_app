@@ -345,7 +345,7 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
               _web3Controller.isMintingInProgress.value = true;
               var connector = await _web3Controller.connect();
               connector.onSessionConnect.subscribe((args) async {
-                await _web3Controller.mintMethod(connector, args, _homeController.userMe.value.wallet!);
+                await _web3Controller.mintMethod(context, connector, args, _homeController.userMe.value.wallet!);
               });
             }, style: TextButton.styleFrom(backgroundColor: SColors.activeColor, elevation: 5, ), child:  Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),

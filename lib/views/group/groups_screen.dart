@@ -177,8 +177,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                             channel.queryMembers(filter: Filter.equal(
                                 "id", _homeController.id.value)).then((value) {
                               if (value.members.isEmpty) {
-                                channel.addMembers(
-                                    [_homeController.id.value]);
+                                channel.addMembers([_homeController.id.value]);
                               }
                             }
                             );
