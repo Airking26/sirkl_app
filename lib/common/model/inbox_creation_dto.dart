@@ -17,6 +17,7 @@ class InboxCreationDto {
     required this.idChannel,
     required this.isConv,
     this.message,
+    this.nameEth,
     this.nameOfGroup,
     this.picOfGroup,
     this.members,
@@ -34,6 +35,7 @@ class InboxCreationDto {
   bool isConv;
   String? nameOfGroup;
   String? picOfGroup;
+  String? nameEth;
   List<String>? members;
   List<String> wallets;
   bool? isGroupPrivate;
@@ -53,6 +55,7 @@ class InboxCreationDto {
     isGroupVisible: json["isGroupVisible"],
     isGroupPaying: json["isGroupPaying"],
     picOfGroup: json["picOfGroup"],
+    nameEth: json["nameEth"],
     price: json["price"],
     tokenAccepted: json["tokenAccepted"],
     idGroupBlockchain: json["idGroupBlockchain"],
@@ -69,6 +72,7 @@ class InboxCreationDto {
     "isGroupVisible": isGroupVisible,
     "isGroupPaying": isGroupPaying,
     "picOfGroup": picOfGroup,
+    "nameEth": nameEth,
     "price": price,
     "tokenAccepted": tokenAccepted,
     "idGroupBlockchain": idGroupBlockchain,

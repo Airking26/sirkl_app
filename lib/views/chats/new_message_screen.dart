@@ -77,10 +77,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               children: [
                 buildAppBar(),
                 Positioned(
-                    top: Platform.isAndroid ? 80 : 60,
+                    top: 65,
                     child: SizedBox(
                       height: 110,
-                      width: MediaQuery.of(context).size.width,
+                      width: MediaQuery.of(context).size.width - 24,
                       child: DeferPointer(
                         child: buildFloatingSearchBar(),
                       ),
@@ -284,7 +284,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           fontWeight: FontWeight.w500),
       elevation: 5,
       showCursor: true,
-      width: 350,
       accentColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
       borderRadius: BorderRadius.circular(10),
       backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
@@ -387,6 +386,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             var idChannelCreated = await _chatController.createInbox(InboxCreationDto(
                 isConv: true,
                 isGroupPaying: false,
+                nameEth: _searchController.query,
                 createdBy: _homeController.id.value,
                 wallets: [
                   _homeController.userMe.value.wallet!,

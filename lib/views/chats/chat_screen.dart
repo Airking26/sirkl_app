@@ -653,7 +653,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             ),
           ),
           Obx(() => Positioned(
-              top: _chatController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
+              top: _chatController.searchIsActive.value ? 65 : 110,
               child: _chatController.searchIsActive.value
                   ? DeferPointer(
                       child: SizedBox(

@@ -93,7 +93,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
                         style: const TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.w500),
                         cursorColor: SColors.activeColor,
                         maxLines: 1,
-                        maxLength: 10,
+                        maxLength: 20,
                         decoration:  InputDecoration(hintText: "Name of the group", hintStyle: const TextStyle(fontFamily: "Gilroy"),
                           enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: SColors.activeColor),

@@ -44,9 +44,13 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
   @override
   void initState(){
     _commonController.checkUserIsInFollowing();
-    pagingController.addPageRequestListener((pageKey) {
-      fetchNFTs();
-    });
+      pagingController.addPageRequestListener((pageKey) {
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
+        fetchNFTs();
+      });
+      });
+
     super.initState();
   }
 
@@ -215,6 +219,12 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
           ],
         )));
+  }
+
+  @override
+  void dispose() {
+    pageKey = 0;
+    super.dispose();
   }
 
 
