@@ -31,9 +31,6 @@ import '../../views/calls/call_invite_sending_screen.dart';
 
 class CallsController extends GetxController{
 
-
-
-
   final box = GetStorage();
 
   NavigationController get _navigationController => Get.find<NavigationController>();
@@ -114,9 +111,7 @@ class CallsController extends GetxController{
   }
 
   retrieveTokenAgoraRTC(String channel, String role, String tokenType, String id) async{
-
     tokenAgoraRTC = await ProfileRepo.retrieveTokenAgoraRTC(channel, role, tokenType, id);
-  
   }
 
   inviteCall(UserDTO user, String channel, String myID) async {

@@ -1,17 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
-import 'dart:convert';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_callkit_incoming/entities/entities.dart' as entities;
+import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/common/model/notification_register_dto.dart';
@@ -23,7 +21,6 @@ import 'package:sirkl/global_getx/chats/chats_controller.dart';
 import 'package:sirkl/global_getx/common/common_controller.dart';
 import 'package:sirkl/common/language.dart';
 import 'package:sirkl/common/local_notification_initialize.dart';
-import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
@@ -150,6 +147,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
   @override
   void initState() {
+    FirebaseMessaging.instance.requestPermission();
     _homeController.connectUser(StreamChat.of(context).client);
     _homeController.putFCMToken(context, StreamChat.of(context).client, true);
     initFirebase();
@@ -363,7 +361,7 @@ class _MyHomePageState extends State<MyHomePage>{
 }
 
 Future<void> showCallNotification(Map<String, dynamic> data) async {
-  var params = entities.CallKitParams(
+  var params = CallKitParams(
       id: data['uuid'],
       nameCaller : data["title"],
       appName: 'Sirkl',
@@ -373,20 +371,20 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
     duration: 30000,
     textAccept: 'Accept',
     textDecline: 'Decline',
-    missedCallNotification: const entities.NotificationParams(showNotification: false),
+    missedCallNotification: const NotificationParams(showNotification: false),
     extra: <String, dynamic>{'userCalling': data["caller_id"], "userCalled": data['called_id'], "callId": data["call_id"], "channel": data["channel"]},
-    android: const entities.AndroidParams(
-      isCustomNotification: true,
-      isCustomSmallExNotification: true,
+    android: const AndroidParams(
+      isCustomNotification: false,
+      isCustomSmallExNotification: false,
       isShowLogo: false,
       ringtonePath: 'system_ringtone_default',
       backgroundColor: '#102437',
       actionColor: '#4CAF50'
     ),
-    ios: const entities.IOSParams(
+    ios: const IOSParams(
       iconName: 'CallKitLogo',
       handleType: '',
-      supportsVideo: true,
+      supportsVideo: false,
       maximumCallGroups: 2,
       maximumCallsPerCallGroup: 1,
       audioSessionMode: 'default',
@@ -400,6 +398,7 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
       ringtonePath: 'system_ringtone_default'
     )
   );
+
   await FlutterCallkitIncoming.showCallkitIncoming(params);
 
 }
