@@ -87,6 +87,7 @@ class HomeController extends GetxController {
   late String chainToConnect;
   var isSigning = false.obs;
   var mint = false.obs;
+  var isLoading = false.obs;
 
   Web3App? connector;
 
@@ -144,6 +145,7 @@ class HomeController extends GetxController {
       var encode = Uri.encodeComponent('${res.uri}');
       var hasLaunched = await launchUrlString("metamask://wc?uri=$encode", mode: LaunchMode.externalApplication);
       if (hasLaunched == false) {
+        isLoading.value = false;
         Fluttertoast.showToast(
             msg: "Not wallet was found, please create one in order to continue",
             toastLength: Toast.LENGTH_LONG,
@@ -162,6 +164,7 @@ class HomeController extends GetxController {
             fontSize: 16.0);
       }
     } on Exception {
+      isLoading.value = false;
       debugPrint("II");
       Fluttertoast.showToast(
           msg: "Not wallet was found, please create one in order to continue",
@@ -213,6 +216,7 @@ class HomeController extends GetxController {
          var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:${chainToConnect.toLowerCase()}", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex]));
          await loginWithWallet(context, address.value, message, signature);
        } catch (exp) {
+         isLoading.value = false;
          if (kDebugMode) {
            print(exp);
          }
@@ -240,6 +244,7 @@ class HomeController extends GetxController {
         mint.value = true;
       }
 
+      isLoading.value = false;
       await connectUser(StreamChat.of(context).client);
       putFCMToken(context, StreamChat.of(context).client, false);
       getAllNftConfig();
@@ -381,17 +386,19 @@ class HomeController extends GetxController {
    await HomeRepo.updateAllNFTConfig();
   }
 
-  Future<List<NftDto>> getNFT(String id, bool isFav, int offset) async {
+  Future<List<NftDto>> getNFT(String id, bool isFav, int offset, UserDTO? user) async {
     if (offset == 0) isInFav.clear();
-    List<NftDto> nfts = await HomeRepo.retrieveNFTs(
-        id: id,
-        isFav: isFav,
-        offset: offset.toString());
+    List<NftDto> nfts = await HomeRepo.retrieveNFTs(id: id, isFav: isFav, offset: offset.toString());
 
         if (id == this.id.value) {
-          if(userMe.value.hasSBT!) nfts.add(NftDto(id: this.id.value, title: "SIRKL SBT", collectionImage: "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png", images: ["https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"], contractAddress: "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase(), isFav: false));
+          if(userMe.value.hasSBT! && offset == 0) {
+            nfts.add(NftDto(id: this.id.value, title: "SIRKL Club", collectionImage: "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png", images: ["https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"], contractAddress: "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase(), isFav: false));
+          }
           iHaveNft.value = true;
         } else {
+          if(user != null && (user.hasSBT ?? false) && offset == 0){
+            nfts.add(NftDto(id: id, title: "SIRKL Club", collectionImage: "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png", images: ["https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"], contractAddress: "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase(), isFav: false));
+          }
           heHasNft.value = true;
         }
   

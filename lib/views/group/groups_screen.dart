@@ -497,14 +497,14 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                   ]),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(top: 44.0),
+              padding: const EdgeInsets.only(top: 52.0),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Obx(()=>IconButton(
+                    Obx(()=>  IconButton(
                         onPressed: () async{
                           if(!_groupController.addAGroup.value) {
                             _groupController.searchIsActive.value =
@@ -554,11 +554,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
               ),
             ),
           ),
-          Obx(()=>Positioned(
+          Obx(() => Positioned(
               top: _groupController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
               child: _groupController.searchIsActive.value ? DeferPointer(
                 child: SizedBox(
-                    height: 110,
+                    height: 96,
                     width: MediaQuery.of(context).size.width,
                     child:buildFloatingSearchBar()),
               ):

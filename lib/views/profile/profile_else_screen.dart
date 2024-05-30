@@ -56,7 +56,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
   Future<void> fetchNFTs() async {
     try {
-      List<NftDto> newItems = await _homeController.getNFT(_commonController.userClicked.value!.id!, false, pageKey);
+      List<NftDto> newItems = await _homeController.getNFT(_commonController.userClicked.value!.id!, false, pageKey, _commonController.userClicked.value!);
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
         pagingController.appendLastPage(newItems);

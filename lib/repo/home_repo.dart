@@ -109,9 +109,9 @@ class HomeRepo {
   static Future<List<List<StoryDto>>> retrieveStories(String offset) async {
     SRequests req = SRequests(SUrls.baseURL);
     Response res = await req.get('${SUrls.storyOthers}/$offset');
-    // TODO @sam, please check how to resolve this? I am confused why Stories are List of List of Stories?
-    //return (res.jsonBody() as List).map((e) => ).map((e) => StoryDto.fromJson(e)).toList();
-    return [];
+    return (res.jsonBody() as List).map((list) =>
+        (list as List).map((e) => StoryDto.fromJson(e)).toList()
+    ).toList();
   }
 
   static Future<void> registerNotification(NotificationRegisterDto notification) async {

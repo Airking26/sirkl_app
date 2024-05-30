@@ -4,7 +4,6 @@
 import '../config/enviroment.dart';
 
 class SUrls {
-
   static String get ethMainNetBaseUrl => "https://eth-mainnet.g.alchemy.com/";
   static String get etherscanBaseUrl => "https://api.etherscan.io/";
   static String baseURL = Environment.baseURL;
@@ -49,6 +48,7 @@ class SUrls {
   static const String followSearchFollowing = 'follow/search/following/\$name/\$offset';
   static const String groupRetrieve = 'group/retrieve';
   static const String userAdminRole = 'user/admin_role';
+  static String userAddSirklClub(String id) => 'user/add_user_to_sirkl_club/$id';
   static const String groupCreate = 'group/create';
   static const String inboxCreate = 'inbox/create';
   static const String inboxUpdate = 'inbox/update';
@@ -64,6 +64,5 @@ class SUrls {
   static  String callRetrieveByOffset(String offset) => 'call/retrieve/$offset';
   static  String callSearchBySubstring(String substring) => 'call/search/$substring';
   static  String searchUsersBySubstringOffset(String substring, String offset ) => 'search/users/$substring/$offset';
-   
 }
 

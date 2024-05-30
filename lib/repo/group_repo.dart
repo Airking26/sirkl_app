@@ -37,5 +37,10 @@ class GroupRepo {
     Response res = await req.post(url: SUrls.userAdminRole, body: adminDto.toJson());
 
   }
+
+  static Future<void> addUserToSirklClub(String id) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    await req.get(SUrls.userAddSirklClub(id));
+  }
   
 }

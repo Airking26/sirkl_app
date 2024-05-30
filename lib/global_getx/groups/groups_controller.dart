@@ -140,6 +140,10 @@ class GroupsController extends GetxController{
 
   }
 
+  Future<void> addUserToSirklClub(String id) async {
+    await GroupRepo.addUserToSirklClub(id);
+  }
+
 
 }
 

@@ -133,8 +133,8 @@ class StreamChannelListHeader extends StatelessWidget
           showMessage: showConnectionStateTile && showStatus,
           message: statusString,
           child: AppBar(
-            toolbarTextStyle: theme.textTheme.bodyText2,
-            titleTextStyle: theme.textTheme.headline6,
+            toolbarTextStyle: theme.textTheme.bodySmall,
+            titleTextStyle: theme.textTheme.headlineSmall,
             systemOverlayStyle: theme.brightness == Brightness.dark
                 ? SystemUiOverlayStyle.light
                 : SystemUiOverlayStyle.dark,

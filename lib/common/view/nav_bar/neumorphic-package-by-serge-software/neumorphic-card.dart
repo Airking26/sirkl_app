@@ -54,7 +54,7 @@ class NeumorphicContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = decoration.color ?? Theme.of(context).backgroundColor;
+    final color = decoration.color ?? Theme.of(context).cardColor;
     final emboss = curveType == CurveType.emboss;
 
     Color colorValue = color;

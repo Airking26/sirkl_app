@@ -70,7 +70,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
-                        .headline3
+                        .headlineSmall
                         ?.copyWith(color: Colors.white, fontFamily: 'Gilroy'),
                   ),
                   const VerticalSpacing(of: 10),

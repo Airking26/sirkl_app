@@ -167,7 +167,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                                   : Colors.black),
                         ),
                         content: Text(
-                            "Once approved by the admin, you can join the group by paying a ${_chatController.channel.value!.extraData["price"] is double ? _chatController.channel.value!.extraData["price"] as double : (_chatController.channel.value!.extraData["price"] as int).toDouble()}ETH subscription fee.",
+                            _chatController.channel.value!.extraData["price"] == null ? "Request sent!" : "Once approved by the admin, you can join the group by paying a ${_chatController.channel.value!.extraData["price"] is double ? _chatController.channel.value!.extraData["price"] as double : (_chatController.channel.value!.extraData["price"] as int).toDouble()}ETH subscription fee.",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,

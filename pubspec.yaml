@@ -6,7 +6,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.1 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -69,7 +69,7 @@ dependencies:
   stop_watch_timer: ^2.0.0
   syncfusion_flutter_pdfviewer: ^20.4.43
   highlight_text: ^1.6.0
-  convert: ^3.1.1
+  convert: ^3.1.0
   camera: ^0.10.5+5
   video_trimmer: ^2.0.0
   ndialog: ^4.2.3
@@ -93,8 +93,6 @@ dependencies:
   flutter_phoenix: "^1.0.0"
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   flutter_lints: ^2.0.0
 
 flutter:

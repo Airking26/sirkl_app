@@ -319,7 +319,7 @@ Future<T?> showChannelInfoModalBottomSheet<T>({
 ///    sheet.
 ///  * [Scaffold.of], for information about how to obtain the [BuildContext].
 ///  * <https://material.io/design/components/sheets-bottom.html#standard-bottom-sheet>
-PersistentBottomSheetController<T> showChannelInfoBottomSheet<T>({
+PersistentBottomSheetController showChannelInfoBottomSheet<T>({
   required BuildContext context,
   required Channel channel,
   Color? backgroundColor,
@@ -334,7 +334,7 @@ PersistentBottomSheetController<T> showChannelInfoBottomSheet<T>({
   VoidCallback? onDeleteConversationTap,
   VoidCallback? onCancelTap,
 }) =>
-    showBottomSheet<T>(
+    showBottomSheet(
       context: context,
       backgroundColor: backgroundColor,
       elevation: elevation,

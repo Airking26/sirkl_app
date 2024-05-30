@@ -306,7 +306,7 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
             child: Image.asset("assets/images/app_icon_rounded.png" , width: 55, height: 55, fit: BoxFit.cover),
           ),
           titleTextStyle: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.7)),
-          title: const Text("You have been added to the SIRKL SBT Community"),
+          title: const Text("You have been added to the SIRKL Club Community"),
         ),);
       } else if(index == 1){
         return Padding(padding: const EdgeInsets.only(right: 8, top: 8, bottom: 8), child: ListTile(

@@ -19,15 +19,21 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.8</string>
+	<string>1.3.9</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-		<string>itms-beta</string>
-		<string>itms</string>
+	 <string>trust</string>
+     <string>safe</string>
+     <string>rainbow</string>
+     <string>uniswap</string>
+     <string>itms-beta</string>
+	 <string>metamask</string>
+     <string>itms</string>
+     <string>wc</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

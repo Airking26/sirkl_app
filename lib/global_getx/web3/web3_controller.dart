@@ -45,7 +45,7 @@ class Web3Controller extends GetxController {
   ProfileController get _profileController => Get.find<ProfileController>();
 
   HomeController get _homeController => Get.find<HomeController>();
-  var _uri;
+  Uri? _uri;
   var isMintingInProgress = false.obs;
 
   Future<DeployedContract> getContract() async {
@@ -160,8 +160,8 @@ class Web3Controller extends GetxController {
 
 
     /// IF USER IS NOT ON THE SKALE NETWORK
-    if (sessionConnect!.session.namespaces['eip155']!.accounts.last.split(":0x")[0] != "eip155:1564830818") {
-      var canLaunch = await canLaunchUrl(_uri);
+    if (sessionConnect!.session.namespaces['eip155']!.accounts.last.split(":0x")[0] == "eip155:1564830818") {
+      var canLaunch = await canLaunchUrl(_uri!);
       if (canLaunch) {
         launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
       } else {
@@ -191,17 +191,76 @@ class Web3Controller extends GetxController {
 
       var con = await connectCalypso();
       con.onSessionConnect.subscribe((args) async {
-        var canLaunch = await canLaunchUrl(_uri);
+        var canLaunch = await canLaunchUrl(_uri!);
         if (canLaunch) {
           launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
+          await con
+              .request(
+            topic: args!.session.topic,
+            chainId: "eip155:1564830818",
+            request: SessionRequestParams(
+              method: 'eth_sendTransaction',
+              params: [ethereumTransaction.toJson()],
+            ),
+          )
+              .then((value) async {
+            await updateUserAddToGroupAndRefresh(context);
+            Get.back();
+
+            showCupertinoDialog(context: navigatorKey.currentContext!, barrierDismissible: false, builder: (context) {
+              return CupertinoAlertDialog(
+                title: const Text("SBT Minted Successfully"), content: const Padding(
+                padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+                child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
+                  style: TextStyle(fontSize: 15),),
+              ), actions: [TextButton(onPressed: () async {
+                Get.back();
+              }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
+              ],);
+            });
+
+          });
         } else {
-          Future.delayed(const Duration(seconds: 2), () {
+          Future.delayed(const Duration(seconds: 2), () async {
             launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
+            await con
+                .request(
+              topic: args!.session.topic,
+              chainId: "eip155:1564830818",
+              request: SessionRequestParams(
+                method: 'eth_sendTransaction',
+                params: [ethereumTransaction.toJson()],
+              ),
+            )
+                .then((value) async {
+              await updateUserAddToGroupAndRefresh(context);
+              Get.back();
+
+              showCupertinoDialog(context: navigatorKey.currentContext!, barrierDismissible: false, builder: (context) {
+                return CupertinoAlertDialog(
+                  title: const Text("SBT Minted Successfully"), content: const Padding(
+                  padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+                  child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
+                    style: TextStyle(fontSize: 15),),
+                ), actions: [TextButton(onPressed: () async {
+                  Get.back();
+                }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
+                ],);
+              });
+
+            });
           });
         }
-        await con
+      });
+    }
+    /// IF USER IS ON THE SKALE NETWORK
+    else {
+      var canLaunch = await canLaunchUrl(_uri!);
+      if (canLaunch) {
+        launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
+        await connector
             .request(
-          topic: args!.session.topic,
+          topic: sessionConnect.session.topic,
           chainId: "eip155:1564830818",
           request: SessionRequestParams(
             method: 'eth_sendTransaction',
@@ -209,78 +268,70 @@ class Web3Controller extends GetxController {
           ),
         )
             .then((value) async {
-          await _homeController.updateMe(UpdateMeDto(hasSBT: true));
-          var stream = StreamChat.of(context).client.queryChannels(filter: Filter.equal("id", "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase()));
-          var channels = await stream.first;
-          var channel = channels.first;
-          await channel.addMembers([_homeController.id.value]);
-          _profileController.pagingController.refresh();
-          _groupController.refreshGroups.value = true;
+          await updateUserAddToGroupAndRefresh(context);
           Get.back();
 
-          showCupertinoDialog(context: navigatorKey.currentContext!, barrierDismissible: false, builder: (context) {
-            return CupertinoAlertDialog(
-              title: const Text("SBT Minted Successfully"), content: const Padding(
-              padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
-              child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl SBT Community",
-                style: TextStyle(fontSize: 15),),
-            ), actions: [TextButton(onPressed: () async {
-              Get.back();
-            }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
-            ],);
-          });
+          showCupertinoDialog(
+              context: navigatorKey.currentContext!,
+              barrierDismissible: false,
+              builder: (context) {
+                return CupertinoAlertDialog(
+                  title: const Text("SBT Minted Successfully"), content: const Padding(
+                  padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+                  child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
+                    style: TextStyle(fontSize: 15),),
+                ), actions: [
+                  TextButton(onPressed: () async {
+                    Get.back();
+                  }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
+                ],);
+              });
 
         });
-      });
-    }
-    /// IF USER IS ON THE SKALE NETWORK
-    else {
-      var canLaunch = await canLaunchUrl(_uri);
-      if (canLaunch) {
-        launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
       } else {
-        Future.delayed(const Duration(seconds: 2), () {
+        Future.delayed(const Duration(seconds: 2), () async {
           launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
+          await connector
+              .request(
+            topic: sessionConnect.session.topic,
+            chainId: "eip155:1564830818",
+            request: SessionRequestParams(
+              method: 'eth_sendTransaction',
+              params: [ethereumTransaction.toJson()],
+            ),
+          )
+              .then((value) async {
+            await updateUserAddToGroupAndRefresh(context);
+            Get.back();
+
+            showCupertinoDialog(
+                context: navigatorKey.currentContext!,
+                barrierDismissible: false,
+                builder: (context) {
+                  return CupertinoAlertDialog(
+                    title: const Text("SBT Minted Successfully"), content: const Padding(
+                    padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+                    child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
+                      style: TextStyle(fontSize: 15),),
+                  ), actions: [
+                    TextButton(onPressed: () async {
+                      Get.back();
+                    }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
+                  ],);
+                });
+
+          });
         });
       }
 
-      await connector
-          .request(
-        topic: sessionConnect.session.topic,
-        chainId: "eip155:1564830818",
-        request: SessionRequestParams(
-          method: 'eth_sendTransaction',
-          params: [ethereumTransaction.toJson()],
-        ),
-      )
-          .then((value) async {
-        await _homeController.updateMe(UpdateMeDto(hasSBT: true));
-        var stream = StreamChat.of(context).client.queryChannels(filter: Filter.equal("id", "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase()));
-        var channels = await stream.first;
-        var channel = channels.first;
-        await channel.addMembers([_homeController.id.value]);
-        _profileController.pagingController.refresh();
-        _groupController.refreshGroups.value = true;
-        Get.back();
-
-        showCupertinoDialog(
-            context: navigatorKey.currentContext!,
-            barrierDismissible: false,
-            builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text("SBT Minted Successfully"), content: const Padding(
-            padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
-            child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl SBT Community",
-              style: TextStyle(fontSize: 15),),
-          ), actions: [
-            TextButton(onPressed: () async {
-            Get.back();
-          }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
-          ],);
-        });
-
-      });
     }
+  }
+
+  Future<void> updateUserAddToGroupAndRefresh(BuildContext context) async {
+    await _homeController.updateMe(UpdateMeDto(hasSBT: true));
+    await _groupController.addUserToSirklClub(_homeController.id.value);
+    _profileController.pagingController.refresh();
+    _groupController.refreshGroups.value = true;
   }
 
   Future<dynamic> query(

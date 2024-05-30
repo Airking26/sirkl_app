@@ -583,9 +583,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   ]),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(top: 44.0),
+              padding: const EdgeInsets.only(top: 52.0),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -656,7 +656,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               child: _chatController.searchIsActive.value
                   ? DeferPointer(
                       child: SizedBox(
-                          height: 110,
+                          height: 96,
                           width: MediaQuery.of(context).size.width,
                           child: buildFloatingSearchBar()),
                     )

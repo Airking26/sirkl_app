@@ -93,7 +93,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 InkWell(
                   onTap: (){
                     _profileController.isEditingProfile.value = true;
-                    Navigator.pop(context);
+                    Navigator.pop(context, {"name" : _homeController.userMe.value.userName});
                   },
                   child: Material(
                     borderRadius: BorderRadius.circular(10),

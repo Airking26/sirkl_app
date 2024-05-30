@@ -80,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       List<NftDto> newItems = await _homeController.getNFT(
           _homeController.id.value,
           _homeController.isFavNftSelected.value,
-          pageKey);
+          pageKey, null);
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
         _profileController.pagingController.appendLastPage(newItems);
@@ -136,10 +136,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ]),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 44.0),
+                          padding: const EdgeInsets.only(top: 52.0),
                           child: Padding(
                             padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
+                                const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -192,10 +192,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               Brightness.dark
                                               ? Colors.white
                                               : Colors.black),
-                                      decoration: const InputDecoration(
+                                      decoration: InputDecoration(
                                           border: InputBorder.none,
                                           isCollapsed: true,
-                                          hintText: ""),
+                                          hintText: _homeController.userMe.value.userName!
+                                              .isEmpty ||
+                                              _homeController.userMe.value
+                                                  .userName ==
+                                                  _homeController
+                                                      .userMe.value.wallet
+                                              ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
+                                              : _homeController
+                                              .userMe.value.userName!),
                                     ),
                                   )
                                       : Text(
@@ -274,7 +282,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ) :IconButton(
                                     onPressed: () async {
-                                      pushNewScreen(context, screen: const SettingScreen(), withNavBar: false).then((value) => _navigationController.hideNavBar.value = false);
+                                      pushNewScreen(context, screen: const SettingScreen(), withNavBar: false).then((value) {
+                                        usernameTextEditingController.text = (value as Map)["name"];
+                                        _navigationController.hideNavBar.value = false;});
                                     },
                                     icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
                               ],
@@ -560,6 +570,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     controller.dispose();
+    usernameTextEditingController.dispose();
     super.dispose();
   }
 }

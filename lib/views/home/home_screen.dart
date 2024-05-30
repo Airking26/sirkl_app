@@ -56,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   CallsController get _callController => Get.find<CallsController>();
+  Web3Controller get _web3Controller => Get.find<Web3Controller>();
   NavigationController get _navigationController => Get.find<NavigationController>();
 
   final utils = Utils();
@@ -162,8 +163,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                   onPressed: () async {
-                    if(_homeController.accessToken.value.isNotEmpty) pushNewScreen(context, screen: const AddContactScreen(), withNavBar: false).then((value) => _commonController.users.refresh());
-                    //await _web3Controller.createGroup(["example", "new", BigInt.one, EthereumAddress.fromHex("0x0000000000000000000000000000000000000000")], _homeController.userMe.value.wallet!);
+//                    if(_homeController.accessToken.value.isNotEmpty) pushNewScreen(context, screen: const AddContactScreen(), withNavBar: false).then((value) => _commonController.users.refresh());
+
+                    _homeController.mint.value = false;
+                    _web3Controller.isMintingInProgress.value = true;
+                    var connector = await _web3Controller.connect();
+                    connector.onSessionConnect.subscribe((args) async {
+                      await _web3Controller.mintMethod(context, connector, args, _homeController.userMe.value.wallet!);
+                    });
                   },
                   icon: Image.asset(
                     "assets/images/add_user.png",
@@ -744,69 +751,77 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(
           height: 20,
         ),
-        NiceButtons(
-            stretch: false,
-            borderThickness: 5,
-            progress: false,
-            borderColor: const Color(0xff0063FB).withOpacity(0.5),
-            startColor: const Color(0xff1DE99B),
-            endColor: const Color(0xff0063FB),
-            gradientOrientation: GradientOrientation.Horizontal,
-            onTap: (finish) async {
-              //_navigationController.hideNavBar.value = !_navigationController.hideNavBar.value;
-              debugPrint('Nav bar  value is ${_navigationController.hideNavBar.value}');
-              await _homeController.connectWallet(context);
-            },
-            child: const Text(
-              "Connect",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w700),
-            )),
-        const SizedBox(height: 12,),
-        NiceButtons(
-            stretch: false,
-            borderThickness: 2,
-            progress: false,
-            height: 55,
-            borderColor: Colors.transparent,
-            startColor: const Color(0xff1DE99B).withOpacity(0.5),
-            endColor: const Color(0xff0063FB).withOpacity(0.5),
-            gradientOrientation: GradientOrientation.Horizontal,
-            onTap: (finish) async {
-              _navigationController.hideNavBar.value = true;
-              _homeController.qrActive.value = true;
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset("assets/images/qrcode.png", color: Colors.white, width: 28, height: 28,),
-                const Text(
-                  "Scan",
+        _homeController.isLoading.value ? Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 24),
+          child: Center(child: CircularProgressIndicator(color:Color(0xff1DE99B) ,),),
+        ) : Column(
+          children: [
+            NiceButtons(
+                stretch: false,
+                borderThickness: 5,
+                progress: false,
+                borderColor: const Color(0xff0063FB).withOpacity(0.5),
+                startColor: const Color(0xff1DE99B),
+                endColor: const Color(0xff0063FB),
+                gradientOrientation: GradientOrientation.Horizontal,
+                onTap: (finish) async {
+                  //_navigationController.hideNavBar.value = !_navigationController.hideNavBar.value;
+                  debugPrint('Nav bar  value is ${_navigationController.hideNavBar.value}');
+                  _homeController.isLoading.value = true;
+                  await _homeController.connectWallet(context);
+                },
+                child: const Text(
+                  "Connect",
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontFamily: "Gilroy",
                       fontWeight: FontWeight.w700),
-                ),
-              ],
-            )),
-        const SizedBox(height: 18,),
-        InkWell(
-          onTap: ()async{
-            await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
-          },
-          child: Text("OR Create a wallet", style: TextStyle(
-              color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.black,
-              fontSize: 13,
-              fontFamily: "Gilroy",
-              fontWeight: FontWeight.w500)),
+                )),
+            const SizedBox(height: 12,),
+            NiceButtons(
+                stretch: false,
+                borderThickness: 2,
+                progress: false,
+                height: 55,
+                borderColor: Colors.transparent,
+                startColor: const Color(0xff1DE99B).withOpacity(0.5),
+                endColor: const Color(0xff0063FB).withOpacity(0.5),
+                gradientOrientation: GradientOrientation.Horizontal,
+                onTap: (finish) async {
+                  _navigationController.hideNavBar.value = true;
+                  _homeController.qrActive.value = true;
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset("assets/images/qrcode.png", color: Colors.white, width: 28, height: 28,),
+                    const Text(
+                      "Scan",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: "Gilroy",
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                )),
+            const SizedBox(height: 18,),
+            InkWell(
+              onTap: ()async{
+                await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
+              },
+              child: Text("OR Create a wallet", style: TextStyle(
+                  color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                  fontSize: 13,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w500)),
+            ),
+            const SizedBox(height: 24,),
+          ],
         ),
-        const SizedBox(height: 24,),
         InkWell(
           onTap: (){
             showDialog(
@@ -1024,13 +1039,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) async {
+      //TODO : Activate in production
       var webWalletConnectDTO = webWalletConnectDtoFromJson(scanData.code!);
       _homeController.qrActive.value = false;
-      if(DateTime.now().isBefore(DateTime.fromMillisecondsSinceEpoch(int.parse(webWalletConnectDTO.timestamp!) * 1000))) {
+      //if(DateTime.now().isBefore(DateTime.fromMillisecondsSinceEpoch(int.parse(webWalletConnectDTO.timestamp!) * 1000))) {
         await _homeController.loginWithWallet(
             context, webWalletConnectDTO.wallet!, webWalletConnectDTO.message!,
             webWalletConnectDTO.signature!);
-      } else {
+      /*} else {
         Fluttertoast.showToast(
             msg: "Error, the QR Code is no longer valid",
             toastLength: Toast.LENGTH_SHORT,
@@ -1040,7 +1056,7 @@ class _HomeScreenState extends State<HomeScreen> {
             textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
             fontSize: 16.0
         );
-      }
+      }*/
     });
   }
 

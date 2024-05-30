@@ -222,9 +222,7 @@ class CallsController extends GetxController{
   }
 
   missedCallNotification(String id) async{
-   
-    var request = await CallRepo.missedCallNotification(id);
-
+    await CallRepo.missedCallNotification(id);
   }
 
   getUserById(String id) async {
