@@ -10,19 +10,19 @@ import 'package:sirkl/common/view/material_floating_search_bar/floating_search_b
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_actions.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_transition.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/global_getx/calls/calls_controller.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
 
 
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/call_dto.dart';
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../config/s_colors.dart';
-import '../../global_getx/home/home_controller.dart';
+import '../../controllers/home_controller.dart';
 import '../../views/profile/profile_else_screen.dart';
 import '../chats/detailed_chat_screen.dart';
 import 'new_call_screen.dart';
@@ -120,7 +120,7 @@ class _CallsScreenState extends State<CallsScreen> {
             child: Padding(
               padding: const EdgeInsets.only(top: 44.0),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

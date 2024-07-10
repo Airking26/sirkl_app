@@ -8,16 +8,16 @@ import 'package:sirkl/common/view/material_floating_search_bar/floating_search_b
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_actions.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_transition.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/global_getx/calls/calls_controller.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../config/s_colors.dart';
-import '../../global_getx/home/home_controller.dart';
+import '../../controllers/home_controller.dart';
 import '../../views/profile/profile_else_screen.dart';
 
 class NewCallScreen extends StatefulWidget {

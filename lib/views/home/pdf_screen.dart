@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-
-import '../../enums/pdf_type.dart';
 
 class PDFScreen extends StatefulWidget {
   const PDFScreen({Key? key, required  this.pdfType}) : super(key: key);

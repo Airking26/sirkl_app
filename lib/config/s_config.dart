@@ -1,9 +1,8 @@
 
 class SConfig {
-
-   static const String wBridgeUrl = 'https://bridge.walletconnect.org';
+  static const String wBridgeUrl = 'https://bridge.walletconnect.org';
   static const String wAppName = 'SIRKL';
- static const String wUrl = 'https://walletconnect.org';
+  static const String wUrl = 'https://walletconnect.org';
   static const String wIcon = 'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png';
 
   static const String alchemyApiKey =  "ELrNU9K6I9RNfXbIkJqq6H6NeoXNbF10";

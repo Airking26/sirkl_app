@@ -43,10 +43,10 @@ class StreamFileAttachment extends StreamAttachmentWidget {
   final OnAttachmentTap? onAttachmentTap;
 
   /// Checks if the attachment is a video
-  bool get isVideoAttachment => attachment.title?.mimeType?.type == 'video';
+  bool get isVideoAttachment => attachment.mimeType == 'video';
 
   /// Checks if the attachment is an image
-  bool get isImageAttachment => attachment.title?.mimeType?.type == 'image';
+  bool get isImageAttachment => attachment.mimeType == 'image';
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +240,7 @@ class _Trailing extends StatelessWidget {
     final channel = StreamChannel.of(context).channel;
     final attachmentId = attachment.id;
 
-    if (message.status == MessageSendingStatus.sent) {
+    if (message.state == MessageState.sent) {
       return IconButton(
         icon: StreamSvgIcon.cloudDownload(
           color: theme.colorTheme.textHighEmphasis,

@@ -1,13 +1,14 @@
 import 'package:get/get.dart';
-import 'package:sirkl/global_getx/calls/calls_controller.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/global_getx/common/common_controller.dart';
-import 'package:sirkl/global_getx/groups/groups_controller.dart';
-import 'package:sirkl/global_getx/home/home_controller.dart';
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
-import 'package:sirkl/global_getx/profile/profile_controller.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/groups_controller.dart';
+import 'package:sirkl/controllers/home_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
+import 'package:sirkl/controllers/profile_controller.dart';
+import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 
-import 'web3/web3_controller.dart';
+import 'web3_controller.dart';
 
 class GlobalDependencyManager extends Bindings {
 
@@ -29,6 +30,7 @@ class GlobalDependencyManager extends Bindings {
     Get.put(CallsController(), permanent: _permanent);
     Get.put(CommonController(), permanent: _permanent);
     Get.put(Web3Controller(), permanent: _permanent);
+    Get.put(WalletConnectModalController(), permanent: _permanent);
   }
 
   _globalDelete(){

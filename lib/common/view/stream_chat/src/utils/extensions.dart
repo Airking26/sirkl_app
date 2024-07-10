@@ -102,7 +102,7 @@ extension PlatformFileX on PlatformFile {
     final file = toAttachmentFile;
     final extraDataMap = <String, Object>{};
 
-    final mimeType = file.mimeType?.mimeType;
+    final mimeType = file.mediaType?.mimeType;
 
     if (mimeType != null) {
       extraDataMap['mime_type'] = mimeType;
@@ -139,7 +139,7 @@ extension XFileX on XFile {
 
     final extraDataMap = <String, Object>{};
 
-    final mimeType = this.mimeType ?? file.mimeType?.mimeType;
+    final mimeType = this.mimeType ?? file.mediaType?.mimeType;
 
     if (mimeType != null) {
       extraDataMap['mime_type'] = mimeType;

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/common/widgets/my_circular_indicator.dart';
+import 'package:sirkl/common/view/circular_indicator/my_circular_indicator.dart';
 import 'package:sirkl/config/s_colors.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
-import '../../global_getx/home/home_controller.dart';
+import '../../controllers/home_controller.dart';
 
 class DetailedChatScreen extends StatefulWidget {
 

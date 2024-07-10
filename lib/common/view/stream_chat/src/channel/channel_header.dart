@@ -5,25 +5,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/global_getx/calls/calls_controller.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
 
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/global_getx/groups/groups_controller.dart';
+import 'package:sirkl/controllers/groups_controller.dart';
 
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../../../../config/s_colors.dart';
-import '../../../../../global_getx/home/home_controller.dart';
-import '../../../../../global_getx/profile/profile_controller.dart';
+import '../../../../../controllers/home_controller.dart';
+import '../../../../../controllers/profile_controller.dart';
 import '../../../../../views/chats/settings_group_screen.dart';
 import '../../../../../views/group/community_settings_screen.dart';
 import '../../../../../views/profile/settings_profile_else_screen.dart';

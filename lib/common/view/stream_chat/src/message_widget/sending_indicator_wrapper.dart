@@ -39,8 +39,8 @@ class SendingIndicatorWrapper extends StatelessWidget {
     final memberCount = StreamChannel.of(context).channel.memberCount ?? 0;
 
     if (hasNonUrlAttachments &&
-        (message.status == MessageSendingStatus.sending ||
-            message.status == MessageSendingStatus.updating)) {
+        (message.state == MessageState.sending ||
+            message.state == MessageState.updating)) {
       final totalAttachments = message.attachments.length;
       final uploadRemaining =
           message.attachments.where((it) => !it.uploadState.isSuccess).length;

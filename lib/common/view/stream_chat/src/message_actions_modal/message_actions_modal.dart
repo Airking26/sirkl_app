@@ -148,7 +148,7 @@ class _MessageActionsModalState extends State<MessageActionsModal> {
                 : CrossAxisAlignment.start,
             children: <Widget>[
               if (widget.showReactions &&
-                  (widget.message.status == MessageSendingStatus.sent))
+                  (widget.message.state == MessageState.sent))
                 LayoutBuilder(
                   builder: (context, constraints) {
                     return Align(
@@ -188,7 +188,7 @@ class _MessageActionsModalState extends State<MessageActionsModal> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         if (widget.showReplyMessage &&
-                            widget.message.status == MessageSendingStatus.sent)
+                            widget.message.state == MessageState.sent)
                           ReplyButton(
                             onTap: () {
                               Navigator.of(context).pop();
@@ -198,8 +198,8 @@ class _MessageActionsModalState extends State<MessageActionsModal> {
                             },
                           ),
                         if (widget.showThreadReplyMessage &&
-                            (widget.message.status ==
-                                MessageSendingStatus.sent) &&
+                            (widget.message.state ==
+                                MessageState.sent) &&
                             widget.message.parentId == null)
                           ThreadReplyButton(
                             message: widget.message,
@@ -235,8 +235,8 @@ class _MessageActionsModalState extends State<MessageActionsModal> {
                           ),
                         if (widget.showDeleteMessage || channel.isGroup && channel.extraData["owner"] != null && channel.extraData['owner'] == widget.wallet)
                           DeleteMessageButton(
-                            isDeleteFailed: widget.message.status ==
-                                MessageSendingStatus.failed_delete,
+                            isDeleteFailed: widget.message.state ==
+                                const MessageState.failed(state: FailedState.deletingFailed()),
                             onTap: _showDeleteBottomSheet,
                           ),
                         ...widget.customActions

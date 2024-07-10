@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 class StreamMessageSearchPage extends StatefulWidget {

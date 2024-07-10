@@ -4,22 +4,22 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ndialog/ndialog.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
 
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/global_getx/web3/web3_controller.dart';
-import 'package:sirkl/global_getx/home/home_controller.dart';
+import 'package:sirkl/controllers/web3_controller.dart';
+import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
 
 import '../../config/s_colors.dart';
-import '../../global_getx/profile/profile_controller.dart';
-import '../../global_getx/navigation/navigation_controller.dart';
+import '../../controllers/profile_controller.dart';
+import '../../controllers/navigation_controller.dart';
 import 'create_group_second_screen.dart';
 
 class CreateGroupFirstScreen extends StatefulWidget {

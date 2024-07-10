@@ -10,18 +10,18 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/profile/settings_profile_else_screen.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../config/s_colors.dart';
-import '../../global_getx/home/home_controller.dart';
+import '../../controllers/home_controller.dart';
 
 class ProfileElseScreen extends StatefulWidget {
   const ProfileElseScreen({Key? key, required this.fromConversation, this.fromNested = false}) : super(key: key);

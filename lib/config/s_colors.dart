@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../enums/app_theme.dart';
-
-
+import 'package:sirkl/common/enums/app_theme.dart';
 
 class SColors {
   SColors._();

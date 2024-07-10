@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import '../../../../../../config/s_colors.dart';
-import '../../../../../../global_getx/home/home_controller.dart';
+import '../../../../../../controllers/home_controller.dart';
 
 /// A widget that displays a user.
 ///

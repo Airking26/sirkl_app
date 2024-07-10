@@ -218,7 +218,7 @@ extension StreamImagePickerX on StreamAttachmentPickerController {
 
     final extraDataMap = <String, Object>{};
 
-    final mimeType = file.mimeType?.mimeType;
+    final mimeType = file.mediaType?.mimeType;
 
     if (mimeType != null) {
       extraDataMap['mime_type'] = mimeType;

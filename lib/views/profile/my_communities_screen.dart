@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import '../../common/view/nav_bar/persistent-tab-view.dart';
 import '../../common/view/stream_chat/src/channel/channel_page.dart';
-import '../../global_getx/home/home_controller.dart';
+import '../../controllers/home_controller.dart';
 
 class MyCommunityScreen extends StatefulWidget {
   const MyCommunityScreen({Key? key}) : super(key: key);

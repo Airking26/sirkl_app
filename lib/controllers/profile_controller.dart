@@ -22,8 +22,8 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/repo/profile_repo.dart';
 
-import '../../constants/save_pref_keys.dart';
-import '../../global_getx/home/home_controller.dart';
+import '../common/save_pref_keys.dart';
+import 'home_controller.dart';
 
 class ProfileController extends GetxController{
 

@@ -13,19 +13,19 @@ import 'package:sirkl/common/view/material_floating_search_bar/floating_search_b
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../common/view/dialog/custom_dial.dart';
 import '../../config/s_colors.dart';
-import '../../global_getx/home/home_controller.dart';
-import '../../global_getx/profile/profile_controller.dart';
-import '../../global_getx/chats/chats_controller.dart';
+import '../../controllers/home_controller.dart';
+import '../../controllers/profile_controller.dart';
+import '../../controllers/chats_controller.dart';
 import 'add_contact_screen.dart';
 import 'create_group_first_screen.dart';
 import 'detailed_chat_screen.dart';

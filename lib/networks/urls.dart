@@ -1,15 +1,12 @@
-
-
-
-import '../config/enviroment.dart';
-
 class SUrls {
   static String get ethMainNetBaseUrl => "https://eth-mainnet.g.alchemy.com/";
   static String get etherscanBaseUrl => "https://api.etherscan.io/";
-  static String baseURL = Environment.baseURL;
+  static String baseURL = 'http://sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com/';
+  static String infura = 'https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2';
 
   static const String verifySignature = 'auth/verifySignature';
   static const String refreshToken = 'auth/refresh';
+  static String checkBetaCode(String code) => "auth/check_beta_code/$code";
 
 
   static const String userMeFCM = 'user/me/fcm';

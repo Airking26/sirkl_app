@@ -22,7 +22,7 @@ class ResendMessageButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUpdateFailed = message.status == MessageSendingStatus.failed_update;
+    final isUpdateFailed = message.state == const MessageState.failed(state: FailedState.updatingFailed());
     final streamChatThemeData = StreamChatTheme.of(context);
     return InkWell(
       onTap: () {

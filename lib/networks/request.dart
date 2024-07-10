@@ -9,7 +9,7 @@ import 'package:http/http.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/networks/urls.dart';
 
-import '../constants/save_pref_keys.dart';
+import '../common/save_pref_keys.dart';
 export 'package:http/http.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 extension ResponseConverter on Response {

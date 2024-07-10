@@ -12,32 +12,34 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sirkl/common/enums/app_theme.dart';
 import 'package:sirkl/common/model/notification_register_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/enums/app_theme.dart';
-import 'package:sirkl/global_getx/calls/calls_controller.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
 
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/language.dart';
 import 'package:sirkl/common/local_notification_initialize.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'package:sirkl/repo/home_repo.dart';
-import 'package:sirkl/util/analyticService.dart';
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/repo/profile_repo.dart';
+import 'package:sirkl/utils/analyticService.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/chats/settings_group_screen.dart';
 import 'package:sirkl/views/profile/profile_else_screen.dart';
 
 import 'package:stream_chat_persistence/stream_chat_persistence.dart';
+import 'package:web3modal_flutter/theme/w3m_theme.dart';
 
 import 'config/s_colors.dart';
-import 'constants/save_pref_keys.dart';
-import 'global_getx/dependency_manager.dart';
-import 'global_getx/home/home_controller.dart';
+import 'common/save_pref_keys.dart';
+import 'controllers/dependency_manager.dart';
+import 'controllers/home_controller.dart';
 import 'navigation/ui/navigation_screen.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
@@ -144,6 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
   ChatsController get _chatController => Get.find<ChatsController>();
 
   CommonController get _commonController => Get.find<CommonController>();
+  WalletConnectModalController get _walletConnectModalController => Get.find<WalletConnectModalController>();
 
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
@@ -152,6 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    _walletConnectModalController.initializeService(context);
     FirebaseMessaging.instance.requestPermission();
     _homeController.connectUser(StreamChat.of(context).client);
     _homeController.putFCMToken(context, StreamChat.of(context).client, true);

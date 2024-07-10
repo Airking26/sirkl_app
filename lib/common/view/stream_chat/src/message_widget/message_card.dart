@@ -11,7 +11,7 @@ import 'package:sirkl/common/view/stream_chat/src/message_widget/quoted_message.
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import '../../../../../config/s_colors.dart';
-import '../../../../../global_getx/home/home_controller.dart';
+import '../../../../../controllers/home_controller.dart';
 
 /// {@template messageCard}
 /// The widget containing a quoted message.

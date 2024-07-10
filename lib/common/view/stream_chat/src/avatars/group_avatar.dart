@@ -58,7 +58,7 @@ class StreamGroupAvatar extends StatelessWidget {
     Widget avatar = GestureDetector(
       onTap: onTap,
       child: ClipRRect(
-        borderRadius: borderRadius ?? previewTheme?.borderRadius,
+        borderRadius: BorderRadius.circular(90),
         child: Container(
           constraints: constraints ?? previewTheme?.constraints,
           decoration: BoxDecoration(color: colorTheme.accentPrimary),

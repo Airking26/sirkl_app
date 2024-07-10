@@ -4,9 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/global_getx/calls/calls_controller.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
@@ -15,8 +15,8 @@ import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
 import '../../config/s_colors.dart';
-import '../../global_getx/home/home_controller.dart';
-import '../../global_getx/profile/profile_controller.dart';
+import '../../controllers/home_controller.dart';
+import '../../controllers/profile_controller.dart';
 
 class AddContactScreen extends StatefulWidget {
   const AddContactScreen({Key? key}) : super(key: key);
@@ -64,15 +64,16 @@ class _AddContactScreenState extends State<AddContactScreen> {
               _chatController.contactAddIsEmpty.value
                   ? Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      //TODO : To check
                       child: TypeAheadField(
                         hideOnLoading: true,
                         hideOnError: true,
-                        suggestionsBoxDecoration: SuggestionsBoxDecoration(
+                        decorationBuilder: (_, __) => Container(
                             color: MediaQuery.of(context).platformBrightness ==
                                     Brightness.dark
                                 ? const Color(0xFF2D465E)
                                 : Colors.white),
-                        noItemsFoundBuilder: (context){
+                        emptyBuilder: (context){
                           return const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
                             child: Text("No user found for this search..", style: TextStyle(
@@ -80,7 +81,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                 fontFamily: "Gilroy", fontSize: 16, color: Colors.black)),
                           );
                         },
-                        textFieldConfiguration: TextFieldConfiguration(
+                        builder: (context, controller, node) => TextField(
                             controller: userController,
                             //enabled: _chatController.contactAddIsEmpty.value,
                             cursorColor: SColors.activeColor,
@@ -123,11 +124,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                           fit: BoxFit.cover,
                                           colorBlendMode: BlendMode.difference,
                                           placeholder: (context, url) =>
-                                              const Center(
+                                              Center(
                                                   child:
                                                       CircularProgressIndicator(
-                                                          color: Color(
-                                                              0xff00CB7D))),
+                                                          color: SColors.activeColor)),
                                           errorWidget: (context, url, error) =>
                                               Image.asset(
                                                   "assets/images/app_icon_rounded.png")),
@@ -147,11 +147,11 @@ class _AddContactScreenState extends State<AddContactScreen> {
                             ),
                           );
                         },
-                        onSuggestionSelected: (UserDTO suggestion) {
-                          userController.text = suggestion.wallet!;
+                        onSelected: (UserDTO value) {
+                          userController.text = value.wallet!;
                           _chatController.contactAddIsEmpty.value = false;
-                          _homeController.userAdded.value = suggestion;
-                        },
+                          _homeController.userAdded.value = value;
+                      },
                       ))
                   : ListTile(
                       leading: _homeController.userAdded.value.picture == null

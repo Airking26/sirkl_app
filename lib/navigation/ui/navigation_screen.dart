@@ -2,17 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/global_getx/calls/calls_controller.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
 
 
-import 'package:sirkl/global_getx/common/common_controller.dart';
-import 'package:sirkl/global_getx/web3/web3_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/web3_controller.dart';
 import '../../config/s_colors.dart';
-import '../../global_getx/home/home_controller.dart';
-import '../../global_getx/profile/profile_controller.dart';
+import '../../controllers/home_controller.dart';
+import '../../controllers/profile_controller.dart';
 
 
-import '../../global_getx/navigation/navigation_controller.dart';
+import '../../controllers/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
 import '../../views/calls/calls_screen.dart';

@@ -8,7 +8,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../../../../config/s_colors.dart';
-import '../../../../../global_getx/home/home_controller.dart';
+import '../../../../../controllers/home_controller.dart';
 
 /// {@template streamUserAvatar}
 /// Displays a user's avatar.
@@ -94,8 +94,7 @@ class StreamUserAvatar extends StatelessWidget {
     final streamChatConfig = StreamChatConfiguration.of(context);
 
     final backupGradientAvatar = ClipRRect(
-      borderRadius: borderRadius ??
-          streamChatTheme.ownMessageTheme.avatarTheme?.borderRadius,
+      borderRadius: BorderRadius.circular(90),
       child: streamChatConfig.defaultUserImage(context, user),
     );
 

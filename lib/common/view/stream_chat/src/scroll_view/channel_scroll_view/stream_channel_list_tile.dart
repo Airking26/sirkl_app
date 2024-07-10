@@ -6,7 +6,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../../../config/s_colors.dart';
-import '../../../../../../global_getx/home/home_controller.dart';
+import '../../../../../../controllers/home_controller.dart';
 
 /// A widget that displays a channel preview.
 ///

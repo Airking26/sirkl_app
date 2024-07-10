@@ -13,7 +13,7 @@ import 'package:sirkl/common/view/stream_chat/src/message_actions_modal/message_
 import 'package:sirkl/common/view/stream_chat/src/message_widget/message_widget_content.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
-import '../../../../../global_getx/home/home_controller.dart';
+import '../../../../../controllers/home_controller.dart';
 
 /// The display behaviour of a widget
 enum DisplayWidget {
@@ -669,13 +669,13 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
   /// {@endtemplate}
   bool get hasQuotedMessage => widget.message.quotedMessage != null;
 
-  bool get isSendFailed => widget.message.status == MessageSendingStatus.failed;
+  bool get isSendFailed => widget.message.state == const MessageState.failed(state: FailedState.sendingFailed());
 
   bool get isUpdateFailed =>
-      widget.message.status == MessageSendingStatus.failed_update;
+      widget.message.state == const MessageState.failed(state: FailedState.updatingFailed());
 
   bool get isDeleteFailed =>
-      widget.message.status == MessageSendingStatus.failed_delete;
+      widget.message.state == const MessageState.failed(state: FailedState.deletingFailed());
 
   /// {@template isFailedState}
   /// Whether the message has failed to be sent, updated, or deleted.
@@ -986,13 +986,13 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
           title: Text(
             context.translations.toggleResendOrResendEditedMessage(
               isUpdateFailed:
-                  widget.message.status == MessageSendingStatus.failed,
+                  widget.message.state == const MessageState.failed(state: FailedState.updatingFailed()),
             ),
           ),
           onClick: () {
             Navigator.of(context, rootNavigator: true).pop();
             final isUpdateFailed =
-                widget.message.status == MessageSendingStatus.failed_update;
+                widget.message.state == const MessageState.failed(state: FailedState.updatingFailed());
             final channel = StreamChannel.of(context).channel;
             if (isUpdateFailed) {
               channel.updateMessage(widget.message);
@@ -1041,7 +1041,7 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
 
   void onLongPress(BuildContext context) {
     if (widget.message.isEphemeral ||
-        widget.message.status == MessageSendingStatus.sending) {
+        widget.message.state == MessageState.sending) {
       return;
     }
 
@@ -1078,7 +1078,7 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
             showSendingIndicator: false,
             padding: EdgeInsets.zero,
             showReactionPickerIndicator: widget.showReactions &&
-                (widget.message.status == MessageSendingStatus.sent),
+                (widget.message.state == MessageState.sent),
             showPinHighlight: false,
             showUserAvatar:
                 widget.message.user!.id == channel.client.state.currentUser!.id
@@ -1109,16 +1109,16 @@ class _StreamMessageWidgetState extends State<StreamMessageWidget>
 
   void retryMessage(BuildContext context) {
     final channel = StreamChannel.of(context).channel;
-    if (widget.message.status == MessageSendingStatus.failed) {
+    if (widget.message.state == const MessageState.failed(state: FailedState.sendingFailed())) {
       channel.sendMessage(widget.message);
       return;
     }
-    if (widget.message.status == MessageSendingStatus.failed_update) {
+    if (widget.message.state == const MessageState.failed(state: FailedState.updatingFailed())) {
       channel.updateMessage(widget.message);
       return;
     }
 
-    if (widget.message.status == MessageSendingStatus.failed_delete) {
+    if (widget.message.state == const MessageState.failed(state: FailedState.deletingFailed())) {
       channel.deleteMessage(widget.message);
       return;
     }

@@ -4,7 +4,7 @@ import FirebaseCore
 import PushKit
 import flutter_callkit_incoming
 
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate {
   override func application(
     _ application: UIApplication,

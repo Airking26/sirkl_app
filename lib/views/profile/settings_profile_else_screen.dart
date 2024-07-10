@@ -6,15 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sirkl/global_getx/calls/calls_controller.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
 
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/profile/profile_else_screen.dart';
 
@@ -22,8 +22,8 @@ import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
 import '../../config/s_colors.dart';
-import '../../global_getx/home/home_controller.dart';
-import '../../global_getx/profile/profile_controller.dart';
+import '../../controllers/home_controller.dart';
+import '../../controllers/profile_controller.dart';
 
 
 class SettingsProfileElseScreen extends StatefulWidget {

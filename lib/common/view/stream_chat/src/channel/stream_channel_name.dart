@@ -6,7 +6,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import '../../../../../config/s_colors.dart';
-import '../../../../../global_getx/home/home_controller.dart';
+import '../../../../../controllers/home_controller.dart';
 
 /// It shows the current [Channel] name using a [Text] widget.
 ///

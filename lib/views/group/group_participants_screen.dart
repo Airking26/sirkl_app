@@ -8,16 +8,16 @@ import 'package:sirkl/common/model/admin_dto.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/config/s_colors.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/scroll_view/member_scroll_view/stream_member_list_view.dart';
-import 'package:sirkl/global_getx/groups/groups_controller.dart';
-import 'package:sirkl/global_getx/web3/web3_controller.dart';
+import 'package:sirkl/controllers/groups_controller.dart';
+import 'package:sirkl/controllers/web3_controller.dart';
 
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
-import '../../global_getx/home/home_controller.dart';
+import '../../controllers/home_controller.dart';
 import '../chats/add_user_to_group_screen.dart';
 import '../profile/profile_else_screen.dart';
 

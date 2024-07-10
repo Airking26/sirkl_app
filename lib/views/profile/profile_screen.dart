@@ -17,16 +17,16 @@ import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/global_getx/web3/web3_controller.dart';
-import 'package:sirkl/global_getx/groups/groups_controller.dart';
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/controllers/web3_controller.dart';
+import 'package:sirkl/controllers/groups_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/views/profile/settings_screen.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 import '../../common/view/dialog/custom_dial.dart';
 import '../../config/s_colors.dart';
-import '../../global_getx/home/home_controller.dart';
-import '../../global_getx/profile/profile_controller.dart';
+import '../../controllers/home_controller.dart';
+import '../../controllers/profile_controller.dart';
 import 'my_story_viewer_screen.dart';
 import 'notifications_screen.dart';
 
@@ -152,6 +152,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             },
                                             icon: FlutterBadge(
                                               icon: Image.asset(
+                                                width: 36,
+                                                height: 36,
                                                 "assets/images/bell.png",
                                                 color: MediaQuery.of(context)
                                                             .platformBrightness ==
@@ -286,7 +288,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         usernameTextEditingController.text = (value as Map)["name"];
                                         _navigationController.hideNavBar.value = false;});
                                     },
-                                    icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
+                                    icon: Image.asset("assets/images/more.png", width: 36, height: 36, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
                               ],
                             ),
                           ),

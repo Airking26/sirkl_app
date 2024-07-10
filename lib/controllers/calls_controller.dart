@@ -21,12 +21,12 @@ import 'package:sirkl/common/model/call_modification_dto.dart';
 import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/repo/home_repo.dart';
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/repo/profile_repo.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
-import '../../constants/save_pref_keys.dart';
-import '../../views/calls/call_invite_sending_screen.dart';
+import '../common/save_pref_keys.dart';
+import '../views/calls/call_invite_sending_screen.dart';
 
 
 class CallsController extends GetxController{

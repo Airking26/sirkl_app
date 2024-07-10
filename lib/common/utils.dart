@@ -15,9 +15,3 @@ class Utils{
   }
 
 }
-
-extension StringX on String {
-  isAz({caseSensitive = false}) {
-    final target = caseSensitive ? this : toLowerCase();
-    return target.codeUnitAt(0) > 96 && target.codeUnitAt(0) < 123;}
-}

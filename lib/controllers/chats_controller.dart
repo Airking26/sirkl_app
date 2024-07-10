@@ -12,8 +12,8 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
-import '../../constants/save_pref_keys.dart';
-import '../profile/profile_controller.dart';
+import '../common/save_pref_keys.dart';
+import 'profile_controller.dart';
 
 class ChatsController extends GetxController{
 

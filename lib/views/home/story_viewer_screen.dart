@@ -2,16 +2,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/story_modification_dto.dart';
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../global_getx/home/home_controller.dart';
+import '../../controllers/home_controller.dart';
 import '../profile/profile_else_screen.dart';
 
 class StoryViewerScreen extends StatefulWidget {
@@ -67,7 +67,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
                 Navigator.pop(context);
               }
             },
-            onStoryShow: (story) async{
+            onStoryShow: (story, index) async{
               _homeController.actualStoryIndex.value = _homeController.stories.value?.indexOf(_homeController.stories.value![_homeController.indexStory.value]!) ?? 0;
               var storyToUpdate = _homeController.stories.value?[_homeController.indexStory.value]![storyItems.indexOf(story)]?.id;
               await _homeController.updateStory(StoryModificationDto(id: storyToUpdate!, readers: [_homeController.id.value]));

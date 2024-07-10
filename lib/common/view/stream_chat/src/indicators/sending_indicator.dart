@@ -30,14 +30,14 @@ class StreamSendingIndicator extends StatelessWidget {
         color: StreamChatTheme.of(context).colorTheme.accentPrimary,
       );
     }
-    if (message.status == MessageSendingStatus.sent) {
+    if (message.state == MessageState.sent) {
       return StreamSvgIcon.check(
         size: size,
         color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
       );
     }
-    if (message.status == MessageSendingStatus.sending ||
-        message.status == MessageSendingStatus.updating) {
+    if (message.state == MessageState.sending ||
+        message.state == MessageState.updating) {
       return Icon(
         Icons.access_time,
         size: size,

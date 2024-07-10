@@ -24,9 +24,9 @@ import 'package:sirkl/common/view/stream_chat/src/message_input/simple_safe_area
 import 'package:sirkl/common/view/stream_chat/src/message_input/tld.dart';
 import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/global_getx/web3/web3_controller.dart';
-import 'package:sirkl/global_getx/chats/chats_controller.dart';
-import 'package:sirkl/global_getx/home/home_controller.dart';
+import 'package:sirkl/controllers/web3_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/home_controller.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
 
@@ -281,7 +281,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
       _effectiveController.message.quotedMessage != null;
 
   bool get _isEditing =>
-      _effectiveController.message.status != MessageSendingStatus.sending;
+      _effectiveController.message.state != MessageState.sending;
 
   BoxBorder? _draggingBorder;
 

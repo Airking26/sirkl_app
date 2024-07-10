@@ -91,7 +91,6 @@ class _GalleryPermissionViewState extends State<GalleryPermissionView>
                   child: OutlinedButton(
                     onPressed: Navigator.of(context).pop,
                     style: OutlinedButton.styleFrom(
-                      primary: scheme.secondary,
                       visualDensity: VisualDensity.comfortable,
                     ),
                     child: const Text('Deny Access'),
@@ -105,7 +104,6 @@ class _GalleryPermissionViewState extends State<GalleryPermissionView>
                 style: OutlinedButton.styleFrom(
                   visualDensity: VisualDensity.comfortable,
                   backgroundColor: scheme.primary,
-                  primary: scheme.onPrimary,
                 ),
                 child: const Text('Allow Access'),
               ),

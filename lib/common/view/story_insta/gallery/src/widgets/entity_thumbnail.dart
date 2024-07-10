@@ -86,7 +86,7 @@ class _MediaThumbnailProvider extends ImageProvider<_MediaThumbnailProvider> {
   @override
   ImageStreamCompleter load(
     _MediaThumbnailProvider key,
-    DecoderCallback decode,
+    ImageDecoderCallback decode,
   ) =>
       MultiFrameImageStreamCompleter(
         codec: _loadAsync(key, decode),
@@ -97,13 +97,14 @@ class _MediaThumbnailProvider extends ImageProvider<_MediaThumbnailProvider> {
       );
 
   Future<ui.Codec> _loadAsync(
-    _MediaThumbnailProvider key,
-    DecoderCallback decode,
-  ) async {
+      _MediaThumbnailProvider key,
+      ImageDecoderCallback decode,
+      ) async {
     assert(key == this, 'Checks _MediaThumbnailProvider');
     final bytes = await entity.thumbnailData;
     onBytesLoaded?.call(bytes);
-    return decode(bytes!);
+    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes!);
+    return decode(buffer);
   }
 
   @override

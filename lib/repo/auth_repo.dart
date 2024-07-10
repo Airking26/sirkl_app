@@ -20,4 +20,10 @@ class AuthRepo {
     return signDTO;
   }
 
+  static Future<bool> checkBetaCode(String code) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.get(SUrls.checkBetaCode(code));
+    return res.jsonBody();
+  }
+
 }

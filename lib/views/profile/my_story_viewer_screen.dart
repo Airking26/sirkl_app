@@ -5,19 +5,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/global_getx/calls/calls_controller.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
 
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/global_getx/common/common_controller.dart';
-import 'package:sirkl/global_getx/profile/profile_controller.dart';
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/profile_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/views/profile/profile_else_screen.dart';
 
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../config/s_colors.dart';
-import '../../global_getx/home/home_controller.dart';
+import '../../controllers/home_controller.dart';
 import '../chats/detailed_chat_screen.dart';
 
 class MyStoryViewerScreen extends StatefulWidget {
@@ -78,7 +78,7 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
                   controller.play();});
               }
             },
-            onStoryShow: (story) async{
+            onStoryShow: (story, index) async{
               currentIndex++;
               },
             storyItems: storyItems,

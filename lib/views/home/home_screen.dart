@@ -7,39 +7,35 @@ import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:nice_buttons/nice_buttons.dart';
-import 'package:http/http.dart' as htp;
+import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:sirkl/global_getx/web3/web3_controller.dart';
-import 'package:sirkl/global_getx/calls/calls_controller.dart';
-import 'package:sirkl/global_getx/common/common_controller.dart';
+import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/web_wallet_connect_dto.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
-import 'package:sirkl/global_getx/navigation/navigation_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/views/home/pdf_screen.dart';
 import 'package:sirkl/views/home/story_viewer_screen.dart';
 import 'package:slider_button/slider_button.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/story_view.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
-import 'package:web3dart/credentials.dart';
-import 'package:web3dart/web3dart.dart';
 import 'package:widget_circular_animator/widget_circular_animator.dart';
 
 import '../../common/utils.dart';
 import '../../config/s_colors.dart';
-import '../../enums/pdf_type.dart';
-import '../../global_getx/home/home_controller.dart';
+import '../../controllers/home_controller.dart';
 import '../chats/add_contact_screen.dart';
 import '../chats/detailed_chat_screen.dart';
 import '../profile/profile_else_screen.dart';
@@ -56,13 +52,37 @@ class _HomeScreenState extends State<HomeScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   CallsController get _callController => Get.find<CallsController>();
-  Web3Controller get _web3Controller => Get.find<Web3Controller>();
+  WalletConnectModalController get _walletConnectModalController => Get.find<WalletConnectModalController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
 
   final utils = Utils();
   final storyController = StoryController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? controller;
+  Map<String, HighlightedWord> words = {
+    "terms and conditions": HighlightedWord(
+      onTap: () {
+        Get.to(() => const PDFScreen(pdfType:  PDFType.tc,));
+      },
+      textStyle:  TextStyle(
+          color: SColors.activeColor,
+          fontSize: 16,
+          fontFamily: "Gilroy",
+          fontWeight: FontWeight.w500),
+    ),
+    "privacy policy": HighlightedWord(
+      onTap: () {
+        Get.to(() => const PDFScreen(pdfType:  PDFType.pp));
+      },
+      textStyle:  TextStyle(
+          color: SColors.activeColor,
+          fontSize: 16,
+          fontFamily: "Gilroy",
+          fontWeight: FontWeight.w500),
+    ),
+  };
+
+  TextEditingController _betaTestController = TextEditingController();
 
   @override
   void initState() {
@@ -70,43 +90,50 @@ class _HomeScreenState extends State<HomeScreen> {
       _homeController.pagingController.value.itemList = [];
       fetchPageStories();
     });
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      if(_homeController.accessToken.value.isNullOrBlank!) displayBetaPopup(context);
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
         backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
-        body: Obx(() => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                buildAppbar(context),
-                _homeController.accessToken.value.isNotEmpty
-                    ? _commonController.gettingStoryAndContacts.value
-                        ? Container()
-                        : _commonController.users.isNotEmpty
-                            ? buildListOfStories()
-                            : Container()
-                    : _homeController.address.value.isEmpty
-                        ? _homeController.qrActive.value ? buildQRCodeWidget() : buildConnectWalletUI()
-                        : buildSignWalletUI(),
-                _homeController.accessToken.value.isNotEmpty
-                    ? _commonController.gettingStoryAndContacts.value &&
-                            _homeController.loadingStories.value && !_homeController.isFirstConnexion.value
-                        ? Container(
-                            margin: const EdgeInsets.only(top: 150),
-                            child:  CircularProgressIndicator(
-                                color: SColors.activeColor))
-                        : _commonController.users.isNotEmpty
-                            ? buildRepertoireList(context)
-                            : buildEmptyFriends()
-                    : Container(),
-              ],
-            )));
+        body: Obx(() => SingleChildScrollView(
+          child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  buildAppbar(context),
+                  _homeController.accessToken.value.isNotEmpty
+                      ? _commonController.gettingStoryAndContacts.value
+                          ? Container()
+                          : _commonController.users.isNotEmpty
+                              ? buildListOfStories()
+                              : Container()
+                      : _homeController.address.value.isEmpty
+                          ? _homeController.qrActive.value ? buildQRCodeWidget() : buildConnectWalletUI()
+                          : buildSignWalletUI(),
+                  _homeController.accessToken.value.isNotEmpty
+                      ? _commonController.gettingStoryAndContacts.value &&
+                              _homeController.loadingStories.value && !_homeController.isFirstConnexion.value
+                          ? Container(
+                              margin: const EdgeInsets.only(top: 150),
+                              child:  CircularProgressIndicator(
+                                  color: SColors.activeColor))
+                          : _commonController.users.isNotEmpty
+                              ? buildRepertoireList(context)
+                              : buildEmptyFriends()
+                      : Container(),
+                ],
+              ),
+        )));
   }
 
+  ///Appbar
   Container buildAppbar(BuildContext context) {
     return Container(
       height: 115,
@@ -163,14 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                   onPressed: () async {
-//                    if(_homeController.accessToken.value.isNotEmpty) pushNewScreen(context, screen: const AddContactScreen(), withNavBar: false).then((value) => _commonController.users.refresh());
-
-                    _homeController.mint.value = false;
-                    _web3Controller.isMintingInProgress.value = true;
-                    var connector = await _web3Controller.connect();
-                    connector.onSessionConnect.subscribe((args) async {
-                      await _web3Controller.mintMethod(context, connector, args, _homeController.userMe.value.wallet!);
-                    });
+                    if(_homeController.accessToken.value.isNotEmpty) pushNewScreen(context, screen: const AddContactScreen(), withNavBar: false).then((value) => _commonController.users.refresh());
                   },
                   icon: Image.asset(
                     "assets/images/add_user.png",
@@ -185,6 +205,33 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+
+
+  ///Body
+  Future<void> fetchPageStories() async {
+    try {
+      await _homeController.retrieveStories(_homeController.pageKey.value);
+      List<List<StoryDto?>?>? newItems = _homeController.pageKey.value > 0
+          ? _homeController.stories.value!.sublist(
+          _homeController.pageKey.value * 12,
+          _homeController.stories.value!.length >=
+              (_homeController.pageKey.value + 1) * 12
+              ? (_homeController.pageKey.value + 1) * 12
+              : _homeController.stories.value!.length)
+          : _homeController.stories.value;
+      final isLastPage = newItems!.length < 12;
+      if (isLastPage) {
+        _homeController.pagingController.value.appendLastPage(newItems);
+      } else {
+        final nextPageKey = _homeController.pageKey.value++;
+        _homeController.pagingController.value
+            .appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      _homeController.pagingController.value.error = error;
+    }
   }
 
   Widget buildListOfStories() {
@@ -600,325 +647,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Map<String, HighlightedWord> words = {
-    "terms and conditions": HighlightedWord(
-      onTap: () {
-        Get.to(() => const PDFScreen(pdfType:  PDFType.tc,));
-      },
-      textStyle:  TextStyle(
-          color: SColors.activeColor,
-          fontSize: 16,
-          fontFamily: "Gilroy",
-          fontWeight: FontWeight.w500),
-    ),
-    "privacy policy": HighlightedWord(
-      onTap: () {
-        Get.to(() => const PDFScreen(pdfType:  PDFType.pp));
-      },
-      textStyle:  TextStyle(
-          color: SColors.activeColor,
-          fontSize: 16,
-          fontFamily: "Gilroy",
-          fontWeight: FontWeight.w500),
-    ),
-  };
-
-  Column buildSignWalletUI() {
-    return Column(
-      children: [
-        const SizedBox(
-          height: 100,
-        ),
-        Image.asset(
-          "assets/images/wallet.png",
-          width: MediaQuery.of(context).size.height / 5,
-          height: MediaQuery.of(context).size.height / 5,
-        ),
-        const SizedBox(
-          height: 30,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Text(
-            con.walletConnectedRes.tr,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                fontSize: 25,
-                fontFamily: "Gilroy",
-                fontWeight: FontWeight.w700),
-          ),
-        ),
-        const SizedBox(
-          height: 15,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: TextHighlight(text: con.bySigningRes.tr, words: words,
-            textAlign: TextAlign.center, textStyle: TextStyle(
-                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                fontSize: 16,
-                fontFamily: "Gilroy",
-                fontWeight: FontWeight.w500),
-          ),
-        ),
-        const SizedBox(
-          height: 50,
-        ),
-
-        _homeController.isSigning.value ? Center(child: CircularProgressIndicator(color: SColors.activeColor,),) : SliderButton(
-          backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
-              ? const Color(0xff9BA0A5)
-              : const Color(0xFF828282),
-          baseColor: MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xFF102437) : Colors.black,
-          highlightedColor: Colors.white,
-          alignLabel: const Alignment(0.3, 0),
-          action: () async {
-            _homeController.isSigning.value = true;
-            await _homeController.signMessageWithMetamask(context);
-            _homeController.isSigning.value = false;
-          },
-          label: const Text(
-            "Slide to sign in",
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                fontFamily: "Gilroy"),
-          ),
-          icon: Center(
-            child: Image.asset(
-              "assets/images/app_icon_rounded.png",
-              width: 48,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Column buildConnectWalletUI() {
-    if (_navigationController.hideNavBar.isFalse) {
-      Future.delayed(Duration.zero, () {
-       _navigationController.hideNavBar.value = true;
-      });
-    }
-    return Column(
-      children: [
-         SizedBox(
-          height: MediaQuery.of(context).size.height / 12.5,
-        ),
-        Image.asset(
-          "assets/images/wallet.png",
-          width: MediaQuery.of(context).size.height / 5,
-          height:  MediaQuery.of(context).size.height / 5,
-        ),
-        const SizedBox(
-          height: 30,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 54.0),
-          child: Text(
-            "Let's Start",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                fontSize: 25,
-                fontFamily: "Gilroy",
-                fontWeight: FontWeight.w700),
-          ),
-        ),
-        const SizedBox(
-          height: 15,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 54.0),
-          child: Text(
-            "Connect on ETH blockchain or create your wallet by clicking below, wallet supported : ",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                    ? const Color(0xFF9BA0A5)
-                    : const Color(0xFF828282),
-                fontSize: 16,
-                fontFamily: "Gilroy",
-                fontWeight: FontWeight.w500),
-          ),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Image.asset("assets/images/metamask.png", width: 32, height: 32,),
-        const SizedBox(
-          height: 20,
-        ),
-        _homeController.isLoading.value ? Padding(
-          padding: const EdgeInsets.only(top: 8.0, bottom: 24),
-          child: Center(child: CircularProgressIndicator(color:Color(0xff1DE99B) ,),),
-        ) : Column(
-          children: [
-            NiceButtons(
-                stretch: false,
-                borderThickness: 5,
-                progress: false,
-                borderColor: const Color(0xff0063FB).withOpacity(0.5),
-                startColor: const Color(0xff1DE99B),
-                endColor: const Color(0xff0063FB),
-                gradientOrientation: GradientOrientation.Horizontal,
-                onTap: (finish) async {
-                  //_navigationController.hideNavBar.value = !_navigationController.hideNavBar.value;
-                  debugPrint('Nav bar  value is ${_navigationController.hideNavBar.value}');
-                  _homeController.isLoading.value = true;
-                  await _homeController.connectWallet(context);
-                },
-                child: const Text(
-                  "Connect",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontFamily: "Gilroy",
-                      fontWeight: FontWeight.w700),
-                )),
-            const SizedBox(height: 12,),
-            NiceButtons(
-                stretch: false,
-                borderThickness: 2,
-                progress: false,
-                height: 55,
-                borderColor: Colors.transparent,
-                startColor: const Color(0xff1DE99B).withOpacity(0.5),
-                endColor: const Color(0xff0063FB).withOpacity(0.5),
-                gradientOrientation: GradientOrientation.Horizontal,
-                onTap: (finish) async {
-                  _navigationController.hideNavBar.value = true;
-                  _homeController.qrActive.value = true;
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/images/qrcode.png", color: Colors.white, width: 28, height: 28,),
-                    const Text(
-                      "Scan",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontFamily: "Gilroy",
-                          fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                )),
-            const SizedBox(height: 18,),
-            InkWell(
-              onTap: ()async{
-                await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
-              },
-              child: Text("OR Create a wallet", style: TextStyle(
-                  color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
-                  fontSize: 13,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w500)),
-            ),
-            const SizedBox(height: 24,),
-          ],
-        ),
-        InkWell(
-          onTap: (){
-            showDialog(
-              barrierDismissible: true,
-                context: context, builder: (context){
-              return AlertDialog(
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15.0))),
-                backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
-                    ? const Color(0xFF102437)
-                    : const Color.fromARGB(255, 247, 253, 255),
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(children: [
-                       Icon(Icons.lock_outline_rounded, color: SColors.activeColor, size: 36,),
-                      const SizedBox(height: 4,),
-                      Text("PRIVATE AND SECURE LOGIN", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w400),)
-                    ],),
-                ],),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text("Connecting your Wallet to the app allows you to customize the way you experience SIRKL.io",
-              textAlign: TextAlign.start,
-              style: TextStyle(
-              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-              fontSize: 13,
-              fontFamily: "Gilroy",
-              fontWeight: FontWeight.w500)
-                    ),
-                    Text("\nOnce connected, our system will analyze the assets in your Wallet to give you access to your NFTs and cryptos",
-              textAlign: TextAlign.start,
-              style: TextStyle(
-              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-              fontSize: 13,
-              fontFamily: "Gilroy",
-              fontWeight: FontWeight.w400)
-                    ),
-                    Text("\nNo personal information is required, guaranteeing your anonymity",
-              textAlign: TextAlign.start,
-              style: TextStyle(
-              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-              fontSize: 13,
-              fontFamily: "Gilroy",
-              fontWeight: FontWeight.w400)
-                    ),
-                    Text("\nThe authorization request requested during sign in is ONLY for READING. This does not grant SIRKL.io permission to make transactions with your Wallet",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                            fontSize: 13,
-                            fontFamily: "Gilroy",
-                            fontWeight: FontWeight.w500)
-                    ),
-                    Text("\nCAUTION: SIRKL.io will never ask for your private key",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                            fontSize: 13,
-                            fontFamily: "Gilroy",
-                            fontWeight: FontWeight.w400)
-                    ),
-                    const SizedBox(height: 12,),
-                    TextButton(onPressed: (){
-                      Navigator.pop(context);
-                    }, child:  Text("I UNDERSTAND", style: TextStyle(color: SColors.activeColor, fontFamily: "Gilroy", fontWeight: FontWeight.w600),))
-                  ],
-                ),
-              );
-            });
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Icon(Icons.info_outline_rounded, size: 18, color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                    ? const Color(0xFF9BA0A5)
-                    : const Color(0xFF828282),),
-              ),
-              Text("Why connecting my wallet?", style: TextStyle(
-    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-    ? const Color(0xFF9BA0A5)
-            : const Color(0xFF828282),
-    fontSize: 13,
-    fontFamily: "Gilroy",
-    fontWeight: FontWeight.w500))
-            ],),
-          ),
-        ),
-      ],
-    );
-  }
-
   Column buildEmptyFriends() {
     return Column(
       children: [
@@ -986,28 +714,380 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> fetchPageStories() async {
-    try {
-      await _homeController.retrieveStories(_homeController.pageKey.value);
-      List<List<StoryDto?>?>? newItems = _homeController.pageKey.value > 0
-          ? _homeController.stories.value!.sublist(
-          _homeController.pageKey.value * 12,
-          _homeController.stories.value!.length >=
-              (_homeController.pageKey.value + 1) * 12
-              ? (_homeController.pageKey.value + 1) * 12
-              : _homeController.stories.value!.length)
-          : _homeController.stories.value;
-      final isLastPage = newItems!.length < 12;
-      if (isLastPage) {
-        _homeController.pagingController.value.appendLastPage(newItems);
-      } else {
-        final nextPageKey = _homeController.pageKey.value++;
-        _homeController.pagingController.value
-            .appendPage(newItems, nextPageKey);
-      }
-    } catch (error) {
-      _homeController.pagingController.value.error = error;
+
+
+  ///Login
+  Column buildConnectWalletUI() {
+    if (_navigationController.hideNavBar.isFalse) {
+      Future.delayed(Duration.zero, () {
+        _navigationController.hideNavBar.value = true;
+      });
     }
+
+    return Column(
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height / 12.5,
+        ),
+        Image.asset(
+          "assets/images/wallet.png",
+          width: MediaQuery.of(context).size.height / 5,
+          height:  MediaQuery.of(context).size.height / 5,
+        ),
+        const SizedBox(
+          height: 30,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 54.0),
+          child: Text(
+            "Let's Start",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                fontSize: 25,
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w700),
+          ),
+        ),
+        const SizedBox(
+          height: 15,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 54.0),
+          child: Text(
+            "Connect on the blockchain by linking your wallet, scanning the QR Code or creating a wallet",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                    ? const Color(0xFF9BA0A5)
+                    : const Color(0xFF828282),
+                fontSize: 16,
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w500),
+          ),
+        ),
+        const SizedBox(
+          height: 30,
+        ),
+        _homeController.isLoading.value ? const Padding(
+          padding: EdgeInsets.only(top: 8.0, bottom: 24),
+          child: Center(child: CircularProgressIndicator(color:Color(0xff1DE99B) ,),),
+        ) : Column(
+          children: [
+           /* W3MConnectWalletButton(service: _walletConnectModalController.w3mService.value!,
+              custom: NiceButtons(
+                stretch: false,
+                borderThickness: 5,
+                progress: false,
+                borderColor: const Color(0xff0063FB).withOpacity(0.5),
+                startColor: const Color(0xff1DE99B),
+                endColor: const Color(0xff0063FB),
+                gradientOrientation: GradientOrientation.Horizontal,
+                onTap: (finish) async {
+                  if(_walletConnectModalController.isInitialized.value) _walletConnectModalController.w3mService.value?.openModal(context);
+                },
+                child: const Text(
+                  "Connect",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontFamily: "Gilroy",
+                      fontWeight: FontWeight.w700),
+                )),
+            ),*/
+            NiceButtons(
+                stretch: false,
+                borderThickness: 5,
+                progress: false,
+                borderColor: const Color(0xff0063FB).withOpacity(0.5),
+                startColor: const Color(0xff1DE99B),
+                endColor: const Color(0xff0063FB),
+                gradientOrientation: GradientOrientation.Horizontal,
+                onTap: (finish) async {
+                  await _homeController.connectWallet(context);
+                },
+                child: const Text(
+                  "Connect",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontFamily: "Gilroy",
+                      fontWeight: FontWeight.w700),
+                )),
+            const SizedBox(height: 12,),
+            NiceButtons(
+                stretch: false,
+                borderThickness: 2,
+                progress: false,
+                height: 55,
+                borderColor: Colors.transparent,
+                startColor: const Color(0xff1DE99B).withOpacity(0.5),
+                endColor: const Color(0xff0063FB).withOpacity(0.5),
+                gradientOrientation: GradientOrientation.Horizontal,
+                onTap: (finish) async {
+                  _navigationController.hideNavBar.value = true;
+                  _homeController.qrActive.value = true;
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset("assets/images/qrcode.png", color: Colors.white, width: 28, height: 28,),
+                    const Text(
+                      "Scan",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: "Gilroy",
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                )),
+            const SizedBox(height: 18,),
+            InkWell(
+              onTap: ()async{
+                //TODO : Implement creating wallet
+                await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
+                //await _walletConnectModalController.createWallet(context);
+              },
+              child: Text("OR Create a wallet", style: TextStyle(
+                  color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                  fontSize: 13,
+                  fontFamily: "Gilroy",
+                  fontWeight: FontWeight.w500)),
+            ),
+            const SizedBox(height: 24,),
+          ],
+        ),
+        InkWell(
+          onTap: (){
+            showDialog(
+                barrierDismissible: true,
+                context: context, builder: (context){
+              return AlertDialog(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
+                    ? const Color(0xFF102437)
+                    : const Color.fromARGB(255, 247, 253, 255),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(children: [
+                      Icon(Icons.lock_outline_rounded, color: SColors.activeColor, size: 36,),
+                      const SizedBox(height: 4,),
+                      Text("PRIVATE AND SECURE LOGIN", style: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w400),)
+                    ],),
+                  ],),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Connecting your Wallet to the app allows you to customize the way you experience SIRKL.io",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                            fontSize: 13,
+                            fontFamily: "Gilroy",
+                            fontWeight: FontWeight.w500)
+                    ),
+                    Text("\nOnce connected, our system will analyze the assets in your Wallet to give you access to your NFTs and cryptos",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                            fontSize: 13,
+                            fontFamily: "Gilroy",
+                            fontWeight: FontWeight.w400)
+                    ),
+                    Text("\nNo personal information is required, guaranteeing your anonymity",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                            fontSize: 13,
+                            fontFamily: "Gilroy",
+                            fontWeight: FontWeight.w400)
+                    ),
+                    Text("\nThe authorization request requested during sign in is ONLY for READING. This does not grant SIRKL.io permission to make transactions with your Wallet",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                            fontSize: 13,
+                            fontFamily: "Gilroy",
+                            fontWeight: FontWeight.w500)
+                    ),
+                    Text("\nCAUTION: SIRKL.io will never ask for your private key",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                            fontSize: 13,
+                            fontFamily: "Gilroy",
+                            fontWeight: FontWeight.w400)
+                    ),
+                    const SizedBox(height: 12,),
+                    TextButton(onPressed: (){
+                      Navigator.pop(context);
+                    }, child:  Text("I UNDERSTAND", style: TextStyle(color: SColors.activeColor, fontFamily: "Gilroy", fontWeight: FontWeight.w600),))
+                  ],
+                ),
+              );
+            });
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Icon(Icons.info_outline_rounded, size: 18, color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                      ? const Color(0xFF9BA0A5)
+                      : const Color(0xFF828282),),
+                ),
+                Text("Why connecting my wallet?", style: TextStyle(
+                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                        ? const Color(0xFF9BA0A5)
+                        : const Color(0xFF828282),
+                    fontSize: 13,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w500))
+              ],),
+          ),
+        ),
+      ],
+    );
+  }
+
+  displayBetaPopup(BuildContext context) {
+    showDialog(context: context, barrierDismissible: false, builder: (_) => WillPopScope(
+      onWillPop: () async => false,
+      child:  Obx(() => AlertDialog(
+        backgroundColor: const Color(0xFF102437),
+        title: const Text("SIRKL.io (BETA)", style: TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.w600),),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Please enter the code to access the Beta version of SIRKL.io", style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w500),),
+            const SizedBox(height: 12,),
+            TextField(
+              autofocus: true,
+              controller: _betaTestController,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(6),
+              ],
+              cursorColor: SColors.activeColor,
+                decoration: InputDecoration(
+                  hintText: "Enter Code",
+                  hintStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: SColors.activeColor), // Change active border color
+                  ),
+                )
+            )
+          ],
+        ),
+        actions: [
+          _homeController.isCheckingBetaCode.value ? SizedBox(width: 36, height: 36,child: CircularProgressIndicator(color: SColors.activeColor,)) : TextButton(onPressed: () async {
+            if(_betaTestController.text.isNotEmpty && _betaTestController.text.length == 6) {
+              _homeController.isCheckingBetaCode.value = true;
+              if (await _homeController.checkBetaCode(
+                  _betaTestController.text.trim())) {
+                Get.back();
+                _homeController.isCheckingBetaCode.value = false;
+                _navigationController.hideNavBar.value = true;
+              } else {
+                if(context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("Wrong code"),
+                ));
+                }
+                _homeController.isCheckingBetaCode.value = false;
+                _navigationController.hideNavBar.value = true;
+              }
+            }
+          }, child: Text("SUBMIT", style: TextStyle(color: SColors.activeColor, fontFamily: 'Gilroy', fontWeight: FontWeight.w700),))
+        ],
+      )),
+    )).then((_){
+      _navigationController.hideNavBar.value = true;
+    });
+  }
+
+  Column buildSignWalletUI() {
+    return Column(
+      children: [
+        const SizedBox(
+          height: 100,
+        ),
+        Image.asset(
+          "assets/images/wallet.png",
+          width: MediaQuery.of(context).size.height / 5,
+          height: MediaQuery.of(context).size.height / 5,
+        ),
+        const SizedBox(
+          height: 30,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Text(
+            con.walletConnectedRes.tr,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                fontSize: 25,
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w700),
+          ),
+        ),
+        const SizedBox(
+          height: 15,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: TextHighlight(text: con.bySigningRes.tr, words: words,
+            textAlign: TextAlign.center, textStyle: TextStyle(
+                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                fontSize: 16,
+                fontFamily: "Gilroy",
+                fontWeight: FontWeight.w500),
+          ),
+        ),
+        const SizedBox(
+          height: 50,
+        ),
+
+        _homeController.isSigning.value ? Center(child: CircularProgressIndicator(color: SColors.activeColor,),) : SliderButton(
+          backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
+              ? const Color(0xff9BA0A5)
+              : const Color(0xFF828282),
+          baseColor: MediaQuery.of(context).platformBrightness == Brightness.dark? const Color(0xFF102437) : Colors.black,
+          highlightedColor: Colors.white,
+          alignLabel: const Alignment(0.3, 0),
+          action: () async {
+            _homeController.isSigning.value = true;
+            //await _walletConnectModalController.signMessageWithWC(context);
+            await _homeController.signMessageWithMetamask(context);
+            _homeController.isSigning.value = false;
+          },
+          label: const Text(
+            "Slide to sign in",
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                fontFamily: "Gilroy"),
+          ),
+          icon: Center(
+            child: Image.asset(
+              "assets/images/app_icon_rounded.png",
+              width: 48,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget buildQRCodeWidget(){
@@ -1021,7 +1101,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onQRViewCreated: _onQRViewCreated,
             ),
           ),
-           const Expanded(
+          const Expanded(
             flex: 1,
             child: Center(
               child: Padding(
@@ -1043,9 +1123,9 @@ class _HomeScreenState extends State<HomeScreen> {
       var webWalletConnectDTO = webWalletConnectDtoFromJson(scanData.code!);
       _homeController.qrActive.value = false;
       //if(DateTime.now().isBefore(DateTime.fromMillisecondsSinceEpoch(int.parse(webWalletConnectDTO.timestamp!) * 1000))) {
-        await _homeController.loginWithWallet(
-            context, webWalletConnectDTO.wallet!, webWalletConnectDTO.message!,
-            webWalletConnectDTO.signature!);
+      await _homeController.loginWithWallet(
+          context, webWalletConnectDTO.wallet!.toLowerCase(), webWalletConnectDTO.message!,
+          webWalletConnectDTO.signature!);
       /*} else {
         Fluttertoast.showToast(
             msg: "Error, the QR Code is no longer valid",
@@ -1060,6 +1140,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+
+
+  ///Override
   @override
   void dispose() {
     controller?.dispose();

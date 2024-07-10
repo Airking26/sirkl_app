@@ -244,7 +244,7 @@ class _AlbumDetail extends StatelessWidget {
               isAll
                   ? controller.setting.albumTitle
                   : album.value.assetPathEntity?.name ?? 'Unknown',
-              style: Theme.of(context).textTheme.subtitle2!.copyWith(
+              style: Theme.of(context).textTheme.labelMedium!.copyWith(
                     color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.75) : Colors.black.withOpacity(0.75),
                     fontWeight: FontWeight.w600,
                   fontFamily: 'Gilroy', fontSize: 24
