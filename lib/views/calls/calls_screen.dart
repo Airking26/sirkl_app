@@ -118,20 +118,14 @@ class _CallsScreenState extends State<CallsScreen> {
                   ]),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(top: 44.0),
+              padding: const EdgeInsets.only(top: 52.0),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                        onPressed: () {},
-                        icon: Image.asset(
-                          "assets/images/arrow_left.png",
-                          color:
-                          MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.transparent,
-                        )),
+                    const SizedBox(height: 24, width: 48,),
                     Padding(
                       padding: const EdgeInsets.only(top: 12.0),
                       child: Text(
@@ -162,10 +156,10 @@ class _CallsScreenState extends State<CallsScreen> {
             ),
           ),
           _callController.callList.value == null || _callController.callList.value!.isEmpty ? Container() : Positioned(
-              top: Platform.isAndroid ? 80 : 60,
+              top: 110,
               child: DeferPointer(
                 child: SizedBox(
-                    height: 110,
+                    height: 48,
                     width: MediaQuery.of(context).size.width,
                     child: buildFloatingSearchBar()),
               ))
@@ -245,10 +239,10 @@ class _CallsScreenState extends State<CallsScreen> {
   MediaQuery buildListCall(BuildContext context) {
     return MediaQuery.removePadding(
           context: context,
-          removeTop: false,
+          removeTop: true,
           child: Expanded(
             child: SafeArea(
-              minimum: const EdgeInsets.only(top: 28),
+              minimum: const EdgeInsets.only(top: 24),
               child: PagedListView.separated(
                 pagingController: _callController.isSearchIsActive.value ? pagingSearchController :  _callController.pagingController.value,
                 padding: const EdgeInsets.symmetric(vertical: 16),

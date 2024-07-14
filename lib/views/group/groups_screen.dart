@@ -173,7 +173,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           Filter.autoComplete('name', _groupController.query.value),
                           Filter.notExists('isConv'),
                         ]),
-                          channelStateSort: const [SortOption('last_message_at')],
+                          channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
+                            final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
+                            final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
+                            return dateB.compareTo(dateA);
+                          })],
                           limit: 10,
                         )
                             : _controllerCommunitiesFav,
@@ -229,7 +233,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           Filter.autoComplete('name', _groupController.query.value),
                           Filter.notExists("isConv"),
                         ]),
-                          channelStateSort: const [SortOption('last_message_at')],
+                          channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
+                            final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
+                            final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
+                            return dateB.compareTo(dateA);
+                          })],
                           limit: 10,
                         ) : _controllerCommunitiesOther,
                         onChannelTap: (channel) {
@@ -303,7 +311,6 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                             if (_groupController.searchIsActive.value) {
                               _groupController.query.value = "";
                               _floatingSearchBarController.clear();
-                              _floatingSearchBarController.close();
                             }
                           }
                         },
@@ -311,7 +318,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           _groupController.searchIsActive.value ? "assets/images/close_big.png" : "assets/images/search.png",
                           color:
                           _groupController.addAGroup.value ? Colors.transparent : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                          width: 36, height: 36,
+                          width: 32, height: 32,
                         )
       )),
                     Padding(
@@ -341,7 +348,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           "assets/images/plus.png",
                           color:
                           MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
-                          width: 36, height: 36,
+                          width: 32, height: 32,
                         )
                     ),
                   ],
@@ -350,10 +357,10 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             ),
           ),
           Obx(() => Positioned(
-              top: _groupController.searchIsActive.value ? Platform.isAndroid ? 80 : 60 : 110,
+              top: 110,
               child: _groupController.searchIsActive.value ? DeferPointer(
                 child: SizedBox(
-                    height: 96,
+                    height: 48,
                     width: MediaQuery.of(context).size.width,
                     child:buildFloatingSearchBar()),
               ):

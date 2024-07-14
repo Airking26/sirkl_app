@@ -24,7 +24,7 @@ dependencies:
   photo_view: ^0.14.0
   share_plus: ^7.2.1
   shimmer: ^3.0.0
-  stream_chat_flutter_core: ^7.3.0
+  stream_chat_flutter_core: ^7.0.0
   synchronized: ^3.0.0
   thumblr: ^0.0.4
   video_player: ^2.4.5
@@ -36,7 +36,10 @@ dependencies:
   url_launcher: ^6.1.5
   firebase_core: ^2.7.0
   firebase_messaging: ^14.2.5
-  images_picker: ^1.2.11
+  images_picker:
+    git:
+      url: https://github.com/1119093254/images_picker.git
+      ref: master
   simple_s3: ^0.3.2
   cached_network_image: ^3.3.1
   infinite_scroll_pagination: ^4.0.0
@@ -85,7 +88,7 @@ dependencies:
   flutter_typeahead: ^5.2.0
   flutter_beep: ^1.0.0
   walletconnect_flutter_v2: ^2.2.3
-  stream_chat_persistence: ^7.3.0
+  stream_chat_persistence: ^7.0.0
   web_socket_channel: ^2.4.0
   dart_jsonwebtoken: ^2.3.1
   dynamic_theme:
@@ -184,7 +187,7 @@ flutter:
     - assets/pdf/all.pdf
     - animations/
     - svgs/
-    - lib/utils/svgs/
+    - lib/svgs/
     - assets/ca/
     - assets/abi.json
     - assets/abi_mint.json

@@ -140,7 +140,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                               widget.fromConversation ? Navigator.of(context).pop():
                               pushNewScreen(context, screen: const DetailedChatScreen(create: true, fromProfile: true), withNavBar: false).then((value) => _navigationController.hideNavBar.value = !widget.fromNested);
                             }
-                          }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :SColors.activeColor, height: 28, width: 28,)),
+                          }, icon: Image.asset(_commonController.userClickedFollowStatus.value ? "assets/images/chat_tab.png" : "assets/images/add_user.png", color: _commonController.userClickedFollowStatus.value ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black :SColors.activeColor, height: 26, width: 26,)),
                         ],),
                     ),
                   ),

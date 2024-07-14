@@ -665,34 +665,31 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
       hidden: !isVisible,
       focusable: true,
       focused: isOpen,
-      child: Padding(
-        padding: transition.lerpMargin(),
-        child: AnimatedBuilder(
-          animation: CurvedAnimation(
-            parent: _translateAnimation,
-            curve: const Interval(0.95, 1.0),
-          ),
-          builder: (BuildContext context, Widget? child) => Material(
-            elevation: transition.lerpElevation() *
-                (1.0 - interval(0.95, 1.0, _translateAnimation.value)),
-            shadowColor: style.shadowColor,
+      child: AnimatedBuilder(
+        animation: CurvedAnimation(
+          parent: _translateAnimation,
+          curve: const Interval(0.95, 1.0),
+        ),
+        builder: (BuildContext context, Widget? child) => Material(
+          elevation: transition.lerpElevation() *
+              (1.0 - interval(0.95, 1.0, _translateAnimation.value)),
+          shadowColor: style.shadowColor,
+          borderRadius: borderRadius,
+          child: child,
+        ),
+        child: Container(
+          width: transition.lerpWidth(),
+          height: transition.lerpHeight(),
+          padding: EdgeInsets.only(top: padding.top, bottom: padding.bottom),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: transition.lerpBackgroundColor(),
+            border: Border.fromBorderSide(style.border),
             borderRadius: borderRadius,
-            child: child,
           ),
-          child: Container(
-            width: transition.lerpWidth(),
-            height: transition.lerpHeight(),
-            padding: EdgeInsets.only(top: padding.top, bottom: padding.bottom),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: transition.lerpBackgroundColor(),
-              border: Border.fromBorderSide(style.border),
-              borderRadius: borderRadius,
-            ),
-            child: ClipRRect(
-              borderRadius: borderRadius,
-              child: _buildInnerBar(),
-            ),
+          child: ClipRRect(
+            borderRadius: borderRadius,
+            child: _buildInnerBar(),
           ),
         ),
       ),

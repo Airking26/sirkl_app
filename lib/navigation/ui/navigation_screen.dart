@@ -112,7 +112,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
           hideNavigationBar: _navigationController.hideNavBar.value,
           controller: _navigationController.controller.value,
           items: _navBarsItems(),
-          confineInSafeArea: true,
+          confineInSafeArea: !_navigationController.hideNavBar.value,
           handleAndroidBackButtonPress: true,
           decoration: NavBarDecoration(
             gradient: LinearGradient(

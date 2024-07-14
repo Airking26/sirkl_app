@@ -152,8 +152,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             },
                                             icon: FlutterBadge(
                                               icon: Image.asset(
-                                                width: 36,
-                                                height: 36,
+                                                width: 32,
+                                                height: 32,
                                                 "assets/images/bell.png",
                                                 color: MediaQuery.of(context)
                                                             .platformBrightness ==
@@ -288,7 +288,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         usernameTextEditingController.text = (value as Map)["name"];
                                         _navigationController.hideNavBar.value = false;});
                                     },
-                                    icon: Image.asset("assets/images/more.png", width: 36, height: 36, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
+                                    icon: Image.asset("assets/images/more.png", width: 32, height: 32, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
                               ],
                             ),
                           ),

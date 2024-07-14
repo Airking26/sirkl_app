@@ -72,14 +72,9 @@ class WalletConnectModalController extends GetxController {
 
   void _onModalConnect(ModalConnect? event) {
     debugPrint('[ExampleApp] _onModalConnect ${event?.toString()}');
-    debugPrint(
-      '[ExampleApp] _onModalConnect selectedChain ${w3mService.value?.selectedChain?.chainId}',
-    );
-    debugPrint(
-      '[ExampleApp] _onModalConnect address ${w3mService.value?.session!.address}',
-    );
-    _homeController.address.value =
-        w3mService.value!.session!.address!.toLowerCase();
+    debugPrint('[ExampleApp] _onModalConnect selectedChain ${w3mService.value?.selectedChain?.chainId}');
+    debugPrint('[ExampleApp] _onModalConnect address ${w3mService.value?.session!.address}');
+    _homeController.address.value = w3mService.value!.session!.address!.toLowerCase();
   }
 
   void _onModalNetworkChange(ModalNetworkChange? event) {
@@ -92,9 +87,6 @@ class WalletConnectModalController extends GetxController {
 
   void _onModalError(ModalError? event) {
     debugPrint('[ExampleApp] _onModalError ${event?.toString()}');
-    // When user connected to Coinbase Wallet but Coinbase Wallet does not have a session anymore
-    // (for instance if user disconnected the dapp directly within Coinbase Wallet)
-    // Then Coinbase Wallet won't emit any event
     if ((event?.message ?? '').contains('Coinbase Wallet Error')) {
       w3mService.value?.disconnect();
     }
@@ -115,7 +107,6 @@ class WalletConnectModalController extends GetxController {
   void _onRelayClientConnect(EventArgs? event) {
     debugPrint('[ExampleApp] _onSessionEvent ${event?.toString()}');
     isInitialized.value = true;
-//    showTextToast(text: 'Relay connected', context: context);
   }
 
   void _onRelayClientError(EventArgs? event) {

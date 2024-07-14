@@ -77,9 +77,9 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               children: [
                 buildAppBar(),
                 Positioned(
-                    top: 65,
+                    top: 110,
                     child: SizedBox(
-                      height: 110,
+                      height: 48,
                       width: MediaQuery.of(context).size.width - 24,
                       child: DeferPointer(
                         child: buildFloatingSearchBar(),

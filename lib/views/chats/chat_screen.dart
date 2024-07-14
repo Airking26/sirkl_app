@@ -187,7 +187,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           if (_chatController.searchIsActive.value) {
                             _chatController.query.value = "";
                             _floatingSearchBarController.clear();
-                            _floatingSearchBarController.close();
                           }
                         },
                         icon: Image.asset(
@@ -198,7 +197,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               Brightness.dark
                               ? Colors.white
                               : Colors.black,
-                          width: 36, height: 36,
+                          width: 32, height: 32,
                         )
                     )
                     ),
@@ -238,7 +237,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               Brightness.dark
                               ? Colors.white
                               : Colors.black,
-                          width: 36, height: 36,
+                          width: 32, height: 32,
                         )),
                   ],
                 ),
@@ -246,11 +245,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             ),
           ),
           Obx(() => Positioned(
-              top: _chatController.searchIsActive.value ? 65 : 110,
+              top: 110,
               child: _chatController.searchIsActive.value
                   ? DeferPointer(
                 child: SizedBox(
-                    height: 96,
+                    height: 48,
                     width: MediaQuery.of(context).size.width,
                     child: buildFloatingSearchBar()),
               )
@@ -601,7 +600,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 Filter.equal('isGroupVisible', true)
                               ])
                             ]),
-                            channelStateSort: const [SortOption('last_message_at')],
+                            channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
+                              final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
+                              final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
+                              return dateB.compareTo(dateA);
+                            })],
                             limit: 10,
                           ) : _controllerFriend,
                           onChannelTap: (channel) async {
@@ -743,7 +746,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                   "${_homeController.id.value}_follow_channel", false)
                             ]),
                           ]),
-                          channelStateSort: const [SortOption('last_message_at')],
+                            channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
+                              final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
+                              final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
+                              return dateB.compareTo(dateA);
+                            })],
                             limit: 10,): _controllerOther,
                           onChannelTap: (channel) {
                             _chatController.channel.value = channel;

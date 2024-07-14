@@ -310,7 +310,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   onPressed: () async {
                     dialogMenu = dialogPopMenu(context);
                   },
-                  icon:  Icon(Icons.more_vert_outlined, size: 30, color: MediaQuery.of(context)
+                  icon:  Icon(Icons.more_vert_outlined, size: 32, color: MediaQuery.of(context)
                       .platformBrightness ==
                       Brightness.dark
                       ? Colors.white

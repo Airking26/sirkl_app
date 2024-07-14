@@ -9,7 +9,7 @@ class CameraSetting {
     this.resolutionPreset = ResolutionPreset.high,
     this.imageFormatGroup = ImageFormatGroup.jpeg,
     this.videoDuration = const Duration(seconds: 10),
-    this.editAfterCapture = true,
+    this.editAfterCapture = false,
     this.enableGallery = true,
   });
 

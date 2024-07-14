@@ -72,9 +72,9 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
               children: [
                 buildAppBar(),
                 Positioned(
-                    top: Platform.isAndroid ? 80 : 60,
+                    top: 110,
                     child: SizedBox(
-                      height: 110,
+                      height: 48,
                       width: MediaQuery.of(context).size.width,
                       child: DeferPointer(
                         child: buildFloatingSearchBar(),
@@ -308,7 +308,7 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
             ]),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 44.0),
+        padding: const EdgeInsets.only(top: 52.0),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(

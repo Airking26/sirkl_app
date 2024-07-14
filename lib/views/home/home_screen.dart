@@ -103,34 +103,32 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
             ? const Color(0xFF102437)
             : const Color.fromARGB(255, 247, 253, 255),
-        body: Obx(() => SingleChildScrollView(
-          child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  buildAppbar(context),
-                  _homeController.accessToken.value.isNotEmpty
-                      ? _commonController.gettingStoryAndContacts.value
-                          ? Container()
-                          : _commonController.users.isNotEmpty
-                              ? buildListOfStories()
-                              : Container()
-                      : _homeController.address.value.isEmpty
-                          ? _homeController.qrActive.value ? buildQRCodeWidget() : buildConnectWalletUI()
-                          : buildSignWalletUI(),
-                  _homeController.accessToken.value.isNotEmpty
-                      ? _commonController.gettingStoryAndContacts.value &&
-                              _homeController.loadingStories.value && !_homeController.isFirstConnexion.value
-                          ? Container(
-                              margin: const EdgeInsets.only(top: 150),
-                              child:  CircularProgressIndicator(
-                                  color: SColors.activeColor))
-                          : _commonController.users.isNotEmpty
-                              ? buildRepertoireList(context)
-                              : buildEmptyFriends()
-                      : Container(),
-                ],
-              ),
-        )));
+        body: Obx(() => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                buildAppbar(context),
+                _homeController.accessToken.value.isNotEmpty
+                    ? _commonController.gettingStoryAndContacts.value
+                        ? Container()
+                        : _commonController.users.isNotEmpty
+                            ? buildListOfStories()
+                            : Container()
+                    : _homeController.address.value.isEmpty
+                        ? _homeController.qrActive.value ? buildQRCodeWidget() : buildConnectWalletUI()
+                        : buildSignWalletUI(),
+                _homeController.accessToken.value.isNotEmpty
+                    ? _commonController.gettingStoryAndContacts.value &&
+                            _homeController.loadingStories.value && !_homeController.isFirstConnexion.value
+                        ? Container(
+                            margin: const EdgeInsets.only(top: 150),
+                            child:  CircularProgressIndicator(
+                                color: SColors.activeColor))
+                        : _commonController.users.isNotEmpty
+                            ? buildRepertoireList(context)
+                            : buildEmptyFriends()
+                    : Container(),
+              ],
+            )));
   }
 
   ///Appbar

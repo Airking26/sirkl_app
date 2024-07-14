@@ -30,7 +30,11 @@ class _MyGroupScreenState extends State<MyGroupScreen> {
         Filter.equal('isConv', false),
         Filter.equal("created_by_id", _homeController.id.value),
       ]),
-      channelStateSort: const [SortOption('last_message_at')],
+      channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
+        final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
+        final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
+        return dateB.compareTo(dateA);
+      })],
       limit: 10,
     );
   }

@@ -38,7 +38,11 @@ class _MyCommunityScreenState extends State<MyCommunityScreen> {
         Filter.notExists("isConv"),
         Filter.equal('owner', _homeController.userMe.value.wallet!)
       ]),
-      channelStateSort: const [SortOption('last_message_at')],
+      channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
+        final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
+        final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
+        return dateB.compareTo(dateA);
+      })],
       limit: 10,
     );
   }

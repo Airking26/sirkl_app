@@ -1018,10 +1018,11 @@ packages:
   images_picker:
     dependency: "direct main"
     description:
-      name: images_picker
-      sha256: cc99347a6fa93228bf92f15ce36e4474256e4af0e6c0e1f0e7e9f047adbccd5b
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: "5dc7d007d8546997749eef2b3372bf4b047eb26a"
+      url: "https://github.com/1119093254/images_picker.git"
+    source: git
     version: "1.2.11"
   infinite_scroll_pagination:
     dependency: "direct main"

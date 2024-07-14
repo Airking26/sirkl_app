@@ -84,10 +84,7 @@ class _MediaThumbnailProvider extends ImageProvider<_MediaThumbnailProvider> {
   final ValueSetter<Uint8List?>? onBytesLoaded;
 
   @override
-  ImageStreamCompleter load(
-    _MediaThumbnailProvider key,
-    ImageDecoderCallback decode,
-  ) =>
+  ImageStreamCompleter loadImage(_MediaThumbnailProvider key, ImageDecoderCallback decode) =>
       MultiFrameImageStreamCompleter(
         codec: _loadAsync(key, decode),
         scale: 1,
@@ -112,7 +109,7 @@ class _MediaThumbnailProvider extends ImageProvider<_MediaThumbnailProvider> {
       SynchronousFuture<_MediaThumbnailProvider>(this);
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator == (dynamic other) {
     if (other.runtimeType != runtimeType) return false;
     // ignore: test_types_in_equals
     final typedOther = other as _MediaThumbnailProvider;
@@ -162,7 +159,7 @@ class _DurationView extends StatelessWidget {
 extension on int {
   String get formatedDuration {
     final duration = Duration(seconds: this);
-    final min = duration.inMinutes.remainder(60).toString().padRight(2, '0');
+    final min = duration.inMinutes.toString().padLeft(2, '0');
     final sec = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return '$min:$sec';
   }

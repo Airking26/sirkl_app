@@ -32,7 +32,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   final nicknameController = TextEditingController();
-  final userController = TextEditingController();
   final _utils = Utils();
   bool autofocus  = false;
   @override
@@ -64,26 +63,21 @@ class _AddContactScreenState extends State<AddContactScreen> {
               _chatController.contactAddIsEmpty.value
                   ? Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      //TODO : To check
                       child: TypeAheadField(
                         hideOnLoading: true,
                         hideOnError: true,
-                        decorationBuilder: (_, __) => Container(
-                            color: MediaQuery.of(context).platformBrightness ==
-                                    Brightness.dark
-                                ? const Color(0xFF2D465E)
-                                : Colors.white),
                         emptyBuilder: (context){
                           return const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
                             child: Text("No user found for this search..", style: TextStyle(
                                 fontWeight: FontWeight.w400,
-                                fontFamily: "Gilroy", fontSize: 16, color: Colors.black)),
+                                fontFamily: "Gilroy", fontSize: 16)),
                           );
                         },
                         builder: (context, controller, node) => TextField(
-                            controller: userController,
-                            //enabled: _chatController.contactAddIsEmpty.value,
+                            controller: controller,
+                            focusNode: node,
+                            enabled: _chatController.contactAddIsEmpty.value,
                             cursorColor: SColors.activeColor,
                             autofocus: true,
                             decoration: InputDecoration(
@@ -102,8 +96,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                       width: 1.5),
                                   borderRadius: BorderRadius.circular(5.0),
                                 ))),
-                        suggestionsCallback: (pattern) async =>
-                            await _callController.retrieveUsers(pattern, 0),
+                        suggestionsCallback: (pattern) => _callController.retrieveUsers(pattern, 0),
                         itemBuilder: (context, UserDTO suggestion) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -148,7 +141,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
                           );
                         },
                         onSelected: (UserDTO value) {
-                          userController.text = value.wallet!;
                           _chatController.contactAddIsEmpty.value = false;
                           _homeController.userAdded.value = value;
                       },
@@ -181,7 +173,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                           "assets/images/app_icon_rounded.png"))),
                       trailing: IconButton(
                           onPressed: () {
-                            userController.clear();
                             _chatController.contactAddIsEmpty.value = true;
                             _homeController.userAdded.value = UserDTO();
                           },
@@ -341,7 +332,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
                     if(await _commonController.addUserToSirkl(_homeController.userAdded.value.id!, StreamChat.of(context).client, _homeController.id.value)){
                         _utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _homeController.userAdded.value.userName.isNullOrBlank! ? "${_homeController.userAdded.value.wallet!.substring(0, 6)}...${_homeController.userAdded.value.wallet!.substring(_homeController.userAdded.value.wallet!.length - 4)}" : _homeController.userAdded.value.userName!}));
                         nicknameController.clear();
-                        userController.clear();
                         _chatController.contactAddIsEmpty.value = true;
                         _homeController.userAdded.value = UserDTO();
                         Navigator.pop(context);

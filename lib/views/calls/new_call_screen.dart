@@ -82,10 +82,10 @@ class _NewCallScreenState extends State<NewCallScreen> {
               children: [
                 buildAppBar(),
                 Positioned(
-                    top: Platform.isAndroid ? 80 : 60,
+                    top: 110,
                     child: DeferPointer(
                       child: SizedBox(
-                          height: 110,
+                          height: 48,
                           width: MediaQuery.of(context).size.width,
                           child: buildFloatingSearchBar()),
                     )),
@@ -160,7 +160,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
             ]),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 0.0),
+        padding: const EdgeInsets.only(top: 16.0),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(

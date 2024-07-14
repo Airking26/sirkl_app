@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sirkl/common/view/stream_chat/src/misc/stream_svg_icon.dart';
+import 'package:sirkl/common/view/stream_chat/src/theme/stream_chat_theme.dart';
 
 /// {@template attachmentButton}
 /// A button for adding attachments to a chat on mobile.
@@ -33,17 +34,20 @@ class AttachmentButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: StreamSvgIcon.attach(
-        color: color,
+    return Transform.translate(
+      offset: Offset(12, 0),
+      child: IconButton(
+        icon: StreamSvgIcon.attach(
+          color: StreamChatTheme.of(context).primaryIconTheme.color,
+        ),
+        padding: EdgeInsets.only(top: 0),
+        constraints: const BoxConstraints.tightFor(
+          height: 20,
+          width: 20,
+        ),
+        splashRadius: 24,
+        onPressed: onPressed,
       ),
-      padding: EdgeInsets.only(top: 2),
-      constraints: const BoxConstraints.tightFor(
-        height: 20,
-        width: 20,
-      ),
-      splashRadius: 24,
-      onPressed: onPressed,
     );
   }
 }

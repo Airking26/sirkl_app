@@ -281,7 +281,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
       _effectiveController.message.quotedMessage != null;
 
   bool get _isEditing =>
-      _effectiveController.message.state != MessageState.sending;
+      _effectiveController.message.state != const MessageState.initial();
 
   BoxBorder? _draggingBorder;
 
@@ -910,22 +910,25 @@ class StreamMessageInputState extends State<StreamMessageInput>
                 !widget.showCommandsButton &&
                 !widget.actions.isNotEmpty
             ? const Offstage()
-            : Wrap(
-                children: <Widget>[
-                  if (!widget.disableAttachments &&
-                      channel.ownCapabilities
-                          .contains(PermissionType.uploadFile))
-                    _buildAttachmentButton(context),
-                  if (widget.showCommandsButton &&
-                      !_isEditing &&
-                      channel.state != null &&
-                      channel.config?.commands.isNotEmpty == true)
-                    _buildCommandButton(context),
-                  ..._effectiveController.attachments.isEmpty
-                      ? widget.actions
-                      : [],
-                ].insertBetween(const SizedBox(width: 0)),
-              ),
+            : Transform.translate(
+          offset: Offset(0, -4),
+              child: Wrap(
+                  children: <Widget>[
+                    if (!widget.disableAttachments &&
+                        channel.ownCapabilities
+                            .contains(PermissionType.uploadFile))
+                      _buildAttachmentButton(context),
+                    if (widget.showCommandsButton &&
+                        !_isEditing &&
+                        channel.state != null &&
+                        channel.config?.commands.isNotEmpty == true)
+                      _buildCommandButton(context),
+                    ..._effectiveController.attachments.isEmpty
+                        ? widget.actions
+                        : [],
+                  ].insertBetween(const SizedBox(width: 0)),
+                ),
+            ),
         duration: const Duration(milliseconds: 300),
         alignment: Alignment.center,
       ),
