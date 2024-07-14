@@ -846,8 +846,8 @@ class _HomeScreenState extends State<HomeScreen> {
             InkWell(
               onTap: ()async{
                 //TODO : Implement creating wallet
-                await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
-                //await _walletConnectModalController.createWallet(context);
+                //await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
+                await _walletConnectModalController.createWallet(context);
               },
               child: Text("OR Create a wallet", style: TextStyle(
                   color: MediaQuery.of(context).platformBrightness == Brightness.dark
