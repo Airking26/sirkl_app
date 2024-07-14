@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? controller;
   Map<String, HighlightedWord> words = {
-    "terms and conditions": HighlightedWord(
+    "terms & conditions": HighlightedWord(
       onTap: () {
         Get.to(() => const PDFScreen(pdfType:  PDFType.tc,));
       },
