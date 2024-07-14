@@ -857,7 +857,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontFamily: "Gilroy",
                   fontWeight: FontWeight.w500)),
             ),
-            const SizedBox(height: 24,),
+            const SizedBox(height: 26,),
           ],
         ),
         InkWell(
