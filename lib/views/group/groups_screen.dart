@@ -56,7 +56,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
             Filter.exists("${_homeController.id.value}_favorite"),
             Filter.equal("${_homeController.id.value}_favorite", true),
           ]),
-          Filter.equal("contractAddress", _homeController.userMe.value.hasSBT! ? "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase() : "")
+          Filter.equal("contractAddress", _homeController.userMe.value.hasSBT! ? "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase() : ""),
         ]),
     channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
       final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
@@ -78,9 +78,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       Filter.or([
         Filter.notExists("${_homeController.id.value}_favorite"),
         Filter.equal("${_homeController.id.value}_favorite", false)
-      ])
+      ]),
+      Filter.greater('member_count', 2),
     ]),
-    channelStateSort:  [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
+    channelStateSort:  [
+      SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
       final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
       final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
       return dateB.compareTo(dateA);
@@ -114,6 +116,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
@@ -364,126 +367,124 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     width: MediaQuery.of(context).size.width,
                     child:buildFloatingSearchBar()),
               ):
-              _groupController.addAGroup.value ? Container() : Container(
-                  height: 50,
-                  width: 350,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.grey,
-                          offset: Offset(0.0, 0.01), //(x,y)
-                          blurRadius: 0.01,
+              _groupController.addAGroup.value ? Container() : Material(
+                elevation: 5,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                child: Container(
+                    height: 48,
+                    width: 350,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                            ? const Color(0xFF2D465E).withOpacity(1)
+                            : Colors.white),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 4.0, bottom: 2, left: 4, right: 4),
+                      child: Obx(
+                            () => TabBar(
+                          labelPadding: EdgeInsets.zero,
+                          indicatorPadding: EdgeInsets.zero,
+                          indicatorColor: Colors.transparent,
+                          controller: tabController,
+                          padding: EdgeInsets.zero,
+                          dividerColor: Colors.transparent,
+                          tabs: [
+                            Container(
+                              height: 48,
+                              width: 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                gradient: _groupController.index.value == 0
+                                    ? const LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Color(0xFF1DE99B),
+                                      Color(0xFF0063FB)
+                                    ])
+                                    : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                    ? const LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Color(0xFF2D465E),
+                                      Color(0xFF2D465E)
+                                    ])
+                                    : const LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Colors.white,
+                                      Colors.white
+                                    ]),
+                              ),
+                              child: Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    "Favorites",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: "Gilroy",
+                                        fontWeight: FontWeight.w700,
+                                        color: _groupController.index.value == 0
+                                            ? Colors.white
+                                            : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                            ? const Color(0xFF9BA0A5)
+                                            : const Color(0xFF828282)),
+                                  )),
+                            ),
+                            Container(
+                              height: 48,
+                              width: 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                gradient: _groupController.index.value == 1
+                                    ? const LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Color(0xFF1DE99B),
+                                      Color(0xFF0063FB)
+                                    ])
+                                    : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                    ? const LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Color(0xFF2D465E),
+                                      Color(0xFF2D465E)
+                                    ])
+                                    : const LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Colors.white,
+                                      Colors.white
+                                    ]),
+                              ),
+                              child: Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    "Others",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: "Gilroy",
+                                        fontWeight: FontWeight.w700,
+                                        color: _groupController.index.value == 1
+                                            ? Colors.white
+                                            : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                            ? const Color(0xFF9BA0A5)
+                                            : const Color(0xFF828282)),
+                                  )),
+                            )
+                          ],
                         ),
-                      ],
-                      color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                          ? const Color(0xFF2D465E).withOpacity(1)
-                          : Colors.white),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        top: 4.0, bottom: 2, left: 4, right: 4),
-                    child: Obx(
-                          () => TabBar(
-                        labelPadding: EdgeInsets.zero,
-                        indicatorPadding: EdgeInsets.zero,
-                        indicatorColor: Colors.transparent,
-                        controller: tabController,
-                        padding: EdgeInsets.zero,
-                        tabs: [
-                          Container(
-                            height: 50,
-                            width: 200,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              gradient: _groupController.index.value == 0
-                                  ? const LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Color(0xFF1DE99B),
-                                    Color(0xFF0063FB)
-                                  ])
-                                  : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                  ? const LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Color(0xFF2D465E),
-                                    Color(0xFF2D465E)
-                                  ])
-                                  : const LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Colors.white,
-                                    Colors.white
-                                  ]),
-                            ),
-                            child: Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  "Favorites",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontFamily: "Gilroy",
-                                      fontWeight: FontWeight.w700,
-                                      color: _groupController.index.value == 0
-                                          ? Colors.white
-                                          : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                          ? const Color(0xFF9BA0A5)
-                                          : const Color(0xFF828282)),
-                                )),
-                          ),
-                          Container(
-                            height: 50,
-                            width: 200,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              gradient: _groupController.index.value == 1
-                                  ? const LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Color(0xFF1DE99B),
-                                    Color(0xFF0063FB)
-                                  ])
-                                  : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                  ? const LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Color(0xFF2D465E),
-                                    Color(0xFF2D465E)
-                                  ])
-                                  : const LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Colors.white,
-                                    Colors.white
-                                  ]),
-                            ),
-                            child: Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  "Others",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontFamily: "Gilroy",
-                                      fontWeight: FontWeight.w700,
-                                      color: _groupController.index.value == 1
-                                          ? Colors.white
-                                          : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                          ? const Color(0xFF9BA0A5)
-                                          : const Color(0xFF828282)),
-                                )),
-                          )
-                        ],
                       ),
-                    ),
-                  ))))
+                    )),
+              )))
         ],
       ),
     );

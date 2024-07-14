@@ -1,13 +1,5 @@
-import 'dart:ffi';
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:simple_s3/simple_s3.dart';
-import 'package:sirkl/common/constants.dart';
 import 'package:sirkl/common/model/token_dto.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/common/model/admin_dto.dart';
@@ -16,12 +8,9 @@ import 'package:sirkl/common/model/contract_address_dto.dart';
 import 'package:sirkl/common/model/contract_creator_dto.dart';
 import 'package:sirkl/common/model/group_creation_dto.dart';
 import 'package:sirkl/common/model/group_dto.dart';
-import 'package:sirkl/common/model/nft_alchemy_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/repo/group_repo.dart';
 import 'package:sirkl/repo/home_repo.dart';
-import 'package:web3dart/web3dart.dart';
 
 class GroupsController extends GetxController{
 
@@ -134,15 +123,8 @@ class GroupsController extends GetxController{
     await createChannel(streamChatClient, GroupDto(name: groupCreationDto.name, image: groupCreationDto.picture, contractAddress: groupCreationDto.contractAddress), groupCreationDto.picture);
   }
 
-  Future<void> changeAdminRole(AdminDto adminDTO) async{
-
-    await GroupRepo.changeAdminRole(adminDTO);
-
-  }
-
-  Future<void> addUserToSirklClub(String id) async {
-    await GroupRepo.addUserToSirklClub(id);
-  }
+  Future<void> changeAdminRole(AdminDto adminDTO) async => await GroupRepo.changeAdminRole(adminDTO);
+  Future<void> addUserToSirklClub(String id) async => await GroupRepo.addUserToSirklClub(id);
 
 
 }

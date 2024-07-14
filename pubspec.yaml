@@ -24,7 +24,7 @@ dependencies:
   photo_view: ^0.14.0
   share_plus: ^7.2.1
   shimmer: ^3.0.0
-  stream_chat_flutter_core: ^7.0.0
+  stream_chat_flutter_core: ^7.3.0
   synchronized: ^3.0.0
   thumblr: ^0.0.4
   video_player: ^2.4.5
@@ -88,7 +88,7 @@ dependencies:
   flutter_typeahead: ^5.2.0
   flutter_beep: ^1.0.0
   walletconnect_flutter_v2: ^2.2.3
-  stream_chat_persistence: ^7.0.0
+  stream_chat_persistence: ^7.3.0
   web_socket_channel: ^2.4.0
   dart_jsonwebtoken: ^2.3.1
   dynamic_theme:

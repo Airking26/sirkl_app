@@ -11,6 +11,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
@@ -31,6 +32,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   CallsController get _callController => Get.find<CallsController>();
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
+  GroupsController get _groupController => Get.find<GroupsController>();
   final nicknameController = TextEditingController();
   final _utils = Utils();
   bool autofocus  = false;
@@ -334,6 +336,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         nicknameController.clear();
                         _chatController.contactAddIsEmpty.value = true;
                         _homeController.userAdded.value = UserDTO();
+                        _groupController.refreshGroups.value = true;
                         Navigator.pop(context);
                     } else {
                       _utils.showToast(context, "This user is already in your SIRKL");
