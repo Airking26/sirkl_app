@@ -959,7 +959,7 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(context: context, barrierDismissible: false, builder: (_) => WillPopScope(
       onWillPop: () async => false,
       child:  Obx(() => AlertDialog(
-        backgroundColor: const Color(0xFF102437),
+        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white,
         title: const Text("SIRKL.io (BETA)", style: TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.w600),),
         content: Column(
           mainAxisSize: MainAxisSize.min,

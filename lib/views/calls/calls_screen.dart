@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_actions.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_transition.dart';
@@ -69,6 +70,7 @@ class _CallsScreenState extends State<CallsScreen> {
 
   @override
   void initState() {
+    [Permission.microphone].request();
     _callController.pagingController.value.addPageRequestListener((pageKey) {
       fetchPageCallDTO();
     });

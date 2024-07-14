@@ -119,9 +119,21 @@ class MyApp extends StatelessWidget {
               );
             },
             darkTheme: ThemeData(
+                inputDecorationTheme: InputDecorationTheme(
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
+                  ),
+                ),
+                textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor),
                 brightness: Brightness.dark, dividerColor: Colors.transparent),
             themeMode: ThemeMode.system,
             theme: ThemeData(
+                inputDecorationTheme: InputDecorationTheme(
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
+                  ),
+                ),
+                textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor),
                 brightness: Brightness.light, dividerColor: Colors.transparent),
             debugShowCheckedModeBanner: false,
             home: const MyHomePage(),

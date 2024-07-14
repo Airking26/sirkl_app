@@ -56,7 +56,6 @@ class CallsController extends GetxController{
   var userJoinedCall = false.obs;
 
   Future<void> setupVoiceSDKEngine(BuildContext context) async {
-    await [Permission.microphone].request();
 
     rtcEngine = await RtcEngine.create("13d8acd177bf4c35a0d07bdd18c8e84e");
     await rtcEngine?.enableAudio();
