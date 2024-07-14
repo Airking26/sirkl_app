@@ -29,7 +29,6 @@ class WalletConnectModalController extends GetxController {
   var isInitialized = false.obs;
 
   void initializeService(BuildContext context) async {
-    //W3MChainPresets.chains.addAll(W3MChainPresets.extraChains);
     //W3MChainPresets.chains.putIfAbsent('1564830818', () => W3MChainInfo(chainName: "SKALE Calypso Hub", chainId: '1564830818', namespace: "eip155:1564830818", tokenName: "sFuel", rpcUrl: "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague"));
 
     w3mService.value = W3MService(
