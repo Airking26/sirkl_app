@@ -1020,8 +1020,8 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "5dc7d007d8546997749eef2b3372bf4b047eb26a"
-      url: "https://github.com/1119093254/images_picker.git"
+      resolved-ref: "2a4e1d623b8db45c74dd093618e40b6dce259c3c"
+      url: "https://github.com/Airking26/images_picker"
     source: git
     version: "1.2.11"
   infinite_scroll_pagination:

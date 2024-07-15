@@ -38,7 +38,7 @@ dependencies:
   firebase_messaging: ^14.2.5
   images_picker:
     git:
-      url: https://github.com/1119093254/images_picker.git
+      url: https://github.com/Airking26/images_picker
       ref: master
   simple_s3: ^0.3.2
   cached_network_image: ^3.3.1

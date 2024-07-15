@@ -386,7 +386,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             var idChannelCreated = await _chatController.createInbox(InboxCreationDto(
                 isConv: true,
                 isGroupPaying: false,
-                nameEth: _searchController.query,
+                nameEth: _searchController.query.contains("eth") ? _searchController.query : null,
                 createdBy: _homeController.id.value,
                 wallets: [
                   _homeController.userMe.value.wallet!,
