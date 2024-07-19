@@ -26,4 +26,10 @@ class AuthRepo {
     return res.jsonBody();
   }
 
+  static Future<bool> isWalletUser(String wallet) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.get(SUrls.checkWalletIsUser(wallet));
+    return res.jsonBody();
+  }
+
 }

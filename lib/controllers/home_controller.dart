@@ -476,18 +476,16 @@ class HomeController extends GetxController {
     });
   }
 
+}
+
+isNumeric(string) => num.tryParse(string) != null;
 
 
 
+  /*
 
 
-
-
-
-
-
-
-  connectWallet(BuildContext context) async {
+     connectWallet(BuildContext context) async {
 
     connector ??= await Web3App.createInstance(
       logLevel: LogLevel.debug,
@@ -597,14 +595,7 @@ class HomeController extends GetxController {
     }
   }
 
-}
-
-isNumeric(string) => num.tryParse(string) != null;
-
-
-
-  /*RxList<DropdownMenuItem> dropDownMenuItems = <DropdownMenuItem>[].obs;
-
+  RxList<DropdownMenuItem> dropDownMenuItems = <DropdownMenuItem>[].obs;
   getDropDownList(String wallet) async {
     /*var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
     //var ethClient = Web3Client('https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2', htp.Client());

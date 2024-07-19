@@ -368,7 +368,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     child:buildFloatingSearchBar()),
               ):
               _groupController.addAGroup.value ? Container() : Material(
-                elevation: 5,
+                elevation: 2,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 child: Container(
                     height: 48,

@@ -94,52 +94,58 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicTheme(
-        defaultBrightness: Brightness.light,
-        data: (Brightness brightness) {
-          if (brightness == Brightness.light) {
-            SColors.loadColors(AppThemeEnum.light);
-            return ThemeData.light();
-          } else {
-            SColors.loadColors(AppThemeEnum.dark);
-            return ThemeData.light();
-          }
-        },
-        themedWidgetBuilder: (BuildContext context, ThemeData theme) {
-          return GetMaterialApp(
-            navigatorKey: navigatorKey,
-            translations: Language(),
-            locale: const Locale('en'),
-            builder: (context, child) {
-              return StreamChat(
-                client: client,
-                child: MediaQuery(
-                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-                    child: child!),
-              );
-            },
-            darkTheme: ThemeData(
-                inputDecorationTheme: InputDecorationTheme(
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
+    return Web3ModalTheme(
+      themeData: Web3ModalThemeData(darkColors: Web3ModalColors.darkMode.copyWith(
+        background125: const Color(0xFF102437),
+      )),
+      isDarkMode: MediaQuery.of(context).platformBrightness == Brightness.dark ? true : false,
+      child: DynamicTheme(
+          defaultBrightness: Brightness.light,
+          data: (Brightness brightness) {
+            if (brightness == Brightness.light) {
+              SColors.loadColors(AppThemeEnum.light);
+              return ThemeData.light();
+            } else {
+              SColors.loadColors(AppThemeEnum.dark);
+              return ThemeData.light();
+            }
+          },
+          themedWidgetBuilder: (BuildContext context, ThemeData theme) {
+            return GetMaterialApp(
+              navigatorKey: navigatorKey,
+              translations: Language(),
+              locale: const Locale('en'),
+              builder: (context, child) {
+                return StreamChat(
+                  client: client,
+                  child: MediaQuery(
+                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                      child: child!),
+                );
+              },
+              darkTheme: ThemeData(
+                  inputDecorationTheme: InputDecorationTheme(
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
+                    ),
                   ),
-                ),
-                textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor),
-                brightness: Brightness.dark, dividerColor: Colors.transparent),
-            themeMode: ThemeMode.system,
-            theme: ThemeData(
-                inputDecorationTheme: InputDecorationTheme(
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
+                  textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor),
+                  brightness: Brightness.dark, dividerColor: Colors.transparent),
+              themeMode: ThemeMode.system,
+              theme: ThemeData(
+                  inputDecorationTheme: InputDecorationTheme(
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
+                    ),
                   ),
-                ),
-                textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor),
-                brightness: Brightness.light, dividerColor: Colors.transparent),
-            debugShowCheckedModeBanner: false,
-            home: const MyHomePage(),
-            initialBinding: GlobalDependencyManager(),
-          );
-        });
+                  textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor),
+                  brightness: Brightness.light, dividerColor: Colors.transparent),
+              debugShowCheckedModeBanner: false,
+              home: const MyHomePage(),
+              initialBinding: GlobalDependencyManager(),
+            );
+          }),
+    );
   }
 }
 

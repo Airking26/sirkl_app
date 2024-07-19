@@ -27,13 +27,10 @@
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 	 <string>trust</string>
-     <string>safe</string>
+     <string>ledgerlive</string>
      <string>rainbow</string>
-     <string>uniswap</string>
-     <string>itms-beta</string>
 	 <string>metamask</string>
-     <string>itms</string>
-     <string>wc</string>
+	 <string>cbwallet</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

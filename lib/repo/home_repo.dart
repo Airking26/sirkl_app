@@ -30,11 +30,7 @@ class HomeRepo {
   return UserDTO.fromJson(res.jsonBody());
 
   }
-  static Future<void> uploadAPNToken(String apnToken) async {
-    SRequests req = SRequests(SUrls.baseURL);
-    Response res = await req.put(url: '${SUrls.userMeAPN}/$apnToken', body: null);
-    // server does return a response but we dont need it I guess
-  }
+  static Future<void> uploadAPNToken(String apnToken) async => await SRequests(SUrls.baseURL).put(url: '${SUrls.userMeAPN}/$apnToken', body: null);
 
   static Future<TokenDto> getTokenContractAddressesWithAlchemy({required String wallet}) async {
     SRequests req = SRequests(SUrls.ethMainNetBaseUrl);

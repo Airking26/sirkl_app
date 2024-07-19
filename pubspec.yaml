@@ -95,8 +95,12 @@ dependencies:
     path: packages/dynamic_theme
   flutter_phoenix: "^1.0.0"
   walletconnect_modal_flutter: ^2.1.16
-  web3modal_flutter: ^3.3.0-beta05
   pointycastle: ^3.9.1
+  web3modal_flutter:
+    git:
+      url: https://github.com/Airking26/Web3ModalFlutter
+      ref: master
+  solana: ^0.30.4
 
 dependency_overrides:
   flutter_svg: ^2.0.9

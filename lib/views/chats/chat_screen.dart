@@ -252,7 +252,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     child: buildFloatingSearchBar()),
               )
                   : Material(
-                elevation: 4,
+                elevation: 2,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     child: Container(
                     height: 48,

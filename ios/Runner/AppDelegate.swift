@@ -3,6 +3,7 @@ import Flutter
 import FirebaseCore
 import PushKit
 import flutter_callkit_incoming
+import CoinbaseWalletSDK
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate {
@@ -23,10 +24,30 @@ import flutter_callkit_incoming
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
     
+    override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        if #available(iOS 13.0, *) {
+            if (CoinbaseWalletSDK.isConfigured == true) {
+                if (try? CoinbaseWalletSDK.shared.handleResponse(url)) == true {
+                    return true
+                }
+            }
+        }
+        
+        return super.application(app, open: url, options: options)
+    }
+    
     // Call back from Recent history
     override func application(_ application: UIApplication,
                               continue userActivity: NSUserActivity,
                               restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        if #available(iOS 13.0, *) {
+                 if (CoinbaseWalletSDK.isConfigured == true) {
+                     if let url = userActivity.webpageURL,
+                        (try? CoinbaseWalletSDK.shared.handleResponse(url)) == true {
+                         return true
+                     }
+                 }
+             }
         
         guard let handleObj = userActivity.handle else {
             return false

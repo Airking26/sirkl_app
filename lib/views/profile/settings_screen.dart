@@ -15,6 +15,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'package:sirkl/controllers/web3_controller.dart';
 import 'package:sirkl/main.dart';
 
@@ -43,6 +44,7 @@ class _SettingScreenState extends State<SettingScreen> {
   CommonController get _commonController => Get.find<CommonController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
+  WalletConnectModalController get _walletConnectModalController => Get.find<WalletConnectModalController>();
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +222,6 @@ class _SettingScreenState extends State<SettingScreen> {
                               CupertinoDialogAction(child: Text("Yes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
                                 onPressed: () async {
                                   await StreamChat.of(context).client.disconnectUser();
-                                  //await StreamChat.of(context).client.dispose();
                                   await GetStorage().erase();
                                   _homeController.id.value = "";
                                   _homeController.isConfiguring.value = false;
@@ -229,6 +230,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                   RestartWidget.restartApp(context);
                                   _navigationController.controller.value.jumpToTab(0);
                                   _navigationController.hideNavBar.value = true;
+                                  _walletConnectModalController.w3mService.value?.disconnect();
                                   Get.back();
                                 },)
                             ],

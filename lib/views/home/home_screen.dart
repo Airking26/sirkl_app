@@ -5,14 +5,11 @@ import 'dart:io';
 
 import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:launch_review/launch_review.dart';
-import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -188,15 +185,20 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                   onPressed: () async {
-                    if(_homeController.accessToken.value.isNotEmpty) pushNewScreen(context, screen: const AddContactScreen(), withNavBar: false).then((value) => _commonController.users.refresh());
+                    if(_homeController.accessToken.value.isNotEmpty) {
+                      pushNewScreen(context, screen: const AddContactScreen(), withNavBar: false).then((value) => _commonController.users.refresh());
+                    } else {
+                      _navigationController.hideNavBar.value = true;
+                      _homeController.qrActive.value = true;
+                    }
                   },
-                  icon: Image.asset(
+                  icon: _homeController.accessToken.value.isEmpty
+                      ? Icon(Icons.qr_code_rounded, color: SColors.activeColor, size: 28,)
+                      : Image.asset(
                     "assets/images/add_user.png",
                     width: 24,
                     height: 24,
-                    color: _homeController.accessToken.value.isEmpty
-                        ? Colors.transparent
-                        : SColors.activeColor,
+                    color: SColors.activeColor,
                   )),
             ],
           ),
@@ -765,99 +767,110 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(
-          height: 30,
+          height: 24,
         ),
         _homeController.isLoading.value ? const Padding(
           padding: EdgeInsets.only(top: 8.0, bottom: 24),
           child: Center(child: CircularProgressIndicator(color:Color(0xff1DE99B) ,),),
-        ) : Column(
-          children: [
-           /* W3MConnectWalletButton(service: _walletConnectModalController.w3mService.value!,
-              custom: NiceButtons(
-                stretch: false,
-                borderThickness: 5,
-                progress: false,
-                borderColor: const Color(0xff0063FB).withOpacity(0.5),
-                startColor: const Color(0xff1DE99B),
-                endColor: const Color(0xff0063FB),
-                gradientOrientation: GradientOrientation.Horizontal,
-                onTap: (finish) async {
-                  if(_walletConnectModalController.isInitialized.value) _walletConnectModalController.w3mService.value?.openModal(context);
-                },
-                child: const Text(
-                  "Connect",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontFamily: "Gilroy",
-                      fontWeight: FontWeight.w700),
-                )),
-            ),*/
-            NiceButtons(
-                stretch: false,
-                borderThickness: 5,
-                progress: false,
-                borderColor: const Color(0xff0063FB).withOpacity(0.5),
-                startColor: const Color(0xff1DE99B),
-                endColor: const Color(0xff0063FB),
-                gradientOrientation: GradientOrientation.Horizontal,
-                onTap: (finish) async {
-                  await _homeController.connectWallet(context);
-                },
-                child: const Text(
-                  "Connect",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontFamily: "Gilroy",
-                      fontWeight: FontWeight.w700),
-                )),
+        ) :
+        Column(children: [
+            Container(height: 48,
+              width: 280,
+              decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xff1DE99B), Color(0xff0063FB)]), borderRadius: BorderRadius.circular(10)),
+              child: ElevatedButton(onPressed: () async => await _walletConnectModalController.w3mService.value?.openModalView(),
+                  style: ElevatedButton.styleFrom(elevation : 5,backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text('Connect with wallet', style: TextStyle(fontFamily: 'Gilroy', color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),),
+                  ))),
             const SizedBox(height: 12,),
-            NiceButtons(
-                stretch: false,
-                borderThickness: 2,
-                progress: false,
-                height: 55,
-                borderColor: Colors.transparent,
-                startColor: const Color(0xff1DE99B).withOpacity(0.5),
-                endColor: const Color(0xff0063FB).withOpacity(0.5),
-                gradientOrientation: GradientOrientation.Horizontal,
-                onTap: (finish) async {
-                  _navigationController.hideNavBar.value = true;
-                  _homeController.qrActive.value = true;
+            Container(height: 48,
+                width: 280,
+                decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xff1DE99B), Color(0xff0063FB)]), borderRadius: BorderRadius.circular(10)),
+                child: ElevatedButton(onPressed: () async {
+                  //await _walletConnectModalController.createWallet(context);
                 },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/images/qrcode.png", color: Colors.white, width: 28, height: 28,),
-                    const Text(
-                      "Scan",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontFamily: "Gilroy",
-                          fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                )),
+                    style: ElevatedButton.styleFrom(elevation : 5,backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text('Connect without wallet', style: TextStyle(fontFamily: 'Gilroy', color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),),
+                    ))),
             const SizedBox(height: 18,),
             InkWell(
               onTap: ()async{
-                //TODO : Implement creating wallet
-                //await LaunchReview.launch(androidAppId: "io.metamask", iOSAppId: "1438144202", writeReview: false);
-                await _walletConnectModalController.createWallet(context);
+                /*showDialog(context: context, builder: (cc) => AlertDialog(
+                  backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  title: const Text("Enter your seed phrase", style: TextStyle(fontFamily: "Gilroy", fontSize: 16, fontWeight: FontWeight.w600), textAlign: TextAlign.center,),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextField(
+                          autofocus: true,
+                          minLines: 4,
+                          maxLines: 5,
+                          decoration: InputDecoration(
+                            hintText: "Example: boat moon hat bottle speaker wallet phone monitor cable paper chair sofa",
+                            hintStyle: const TextStyle(fontWeight: FontWeight.w500, fontFamily: 'Gilroy'),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10), // Set border radius
+                              borderSide: const BorderSide(color: Colors.grey, width: 1), // Set border color and width
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10), // Set border radius
+                              borderSide: const BorderSide(color: Colors.grey, width: 1), // Set border color and width
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10), // Set border radius
+                              borderSide: const BorderSide(color: Colors.grey, width: 1), // Set border color and width
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), // Set padding
+                          ),
+                        ),),
+                      const SizedBox(height: 12,),
+                      TextButton(
+                        onPressed: (){
+                          debugPrint("holla");
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          backgroundColor: Colors.grey,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        child:  SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            "Validate",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white,
+                              fontSize: 16,
+                              decoration: TextDecoration.none,
+                              fontFamily: "Gilroy",
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ));*/
               },
-              child: Text("OR Create a wallet", style: TextStyle(
+              child: Text("Retrieve your wallet", style: TextStyle(
+                  decoration: TextDecoration.underline,
                   color: MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? Colors.white
                       : Colors.black,
-                  fontSize: 13,
+                  fontSize: 14,
                   fontFamily: "Gilroy",
                   fontWeight: FontWeight.w500)),
             ),
             const SizedBox(height: 26,),
-          ],
-        ),
+          ]),
         InkWell(
           onTap: (){
             showDialog(
@@ -969,7 +982,7 @@ class _HomeScreenState extends State<HomeScreen> {
             TextField(
               autofocus: true,
               controller: _betaTestController,
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
               keyboardType: TextInputType.number,
               maxLength: 6,
               inputFormatters: [
@@ -1066,8 +1079,8 @@ class _HomeScreenState extends State<HomeScreen> {
           alignLabel: const Alignment(0.3, 0),
           action: () async {
             _homeController.isSigning.value = true;
-            //await _walletConnectModalController.signMessageWithWC(context);
-            await _homeController.signMessageWithMetamask(context);
+            await _walletConnectModalController.signMessageWithWC(context);
+           // await _homeController.signMessageWithMetamask(context);
             _homeController.isSigning.value = false;
           },
           label: const Text(

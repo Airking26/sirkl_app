@@ -3,10 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:sirkl/common/model/crypto/smart_contracts/aave_contract.dart';
 import 'package:sirkl/common/model/crypto/smart_contracts/usdt_contract.dart';
 import 'package:sirkl/common/model/crypto/test_data.dart';
-import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:convert/convert.dart';
+import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 
 enum EIP155UIMethods {

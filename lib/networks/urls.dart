@@ -7,6 +7,7 @@ class SUrls {
   static const String verifySignature = 'auth/verifySignature';
   static const String refreshToken = 'auth/refresh';
   static String checkBetaCode(String code) => "auth/check_beta_code/$code";
+  static String checkWalletIsUser(String wallet) => "auth/check_wallet_is_user/$wallet";
 
 
   static const String userMeFCM = 'user/me/fcm';

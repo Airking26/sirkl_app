@@ -123,134 +123,139 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
                             padding: const EdgeInsets.only(top: 0.0),
                             child: Text(con.notificationsRes.tr, textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
                           ),
-                          IconButton(onPressed: (){}, icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.transparent,)),
+                          IconButton(onPressed: (){}, icon: Image.asset("assets/images/more.png", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.transparent : Colors.transparent, width: 42, height: 42,)),
                         ],),
                     ),
                   ),
                 ),
                 Positioned(
                     top: 110,
-                    child:  Container(
-                        height: 50,
-                        width: 350,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.grey,
-                                offset: Offset(0.0, 0.01), //(x,y)
-                                blurRadius: 0.01,
-                              ),
-                            ],
-                            color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                                ? const Color(0xFF2D465E).withOpacity(1)
-                                : Colors.white),
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 4.0, bottom: 2, left: 4, right: 4),
-                          child: TabBar(
-                              labelPadding: EdgeInsets.zero,
-                              indicatorPadding: EdgeInsets.zero,
-                              indicatorColor: Colors.transparent,
-                              controller: tabController,
-                              padding: EdgeInsets.zero,
-                              tabs: [
-                                Container(
-                                  height: 50,
-                                  width: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    gradient: _profileController.index.value == 0
-                                        ? const LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [
-                                          Color(0xFF1DE99B),
-                                          Color(0xFF0063FB)
-                                        ])
-                                        : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                        ? const LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [
-                                          Color(0xFF2D465E),
-                                          Color(0xFF2D465E)
-                                        ])
-                                        : const LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [
-                                          Colors.white,
-                                          Colors.white
-                                        ]),
-                                  ),
-                                  child: Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        "All",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontFamily: "Gilroy",
-                                            fontWeight: FontWeight.w700,
-                                            color: _profileController.index.value == 0
-                                                ? Colors.white
-                                                : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                                ? const Color(0xFF9BA0A5)
-                                                : const Color(0xFF828282)),
-                                      )),
+                    child:  Material(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      child: Container(
+                          height: 48,
+                          width: 350,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                  offset: Offset(0.0, 0.01), //(x,y)
+                                  blurRadius: 0.01,
                                 ),
-                                Container(
-                                  height: 50,
-                                  width: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    gradient: _profileController.index.value == 1
-                                        ? const LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [
-                                          Color(0xFF1DE99B),
-                                          Color(0xFF0063FB)
-                                        ])
-                                        : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                        ? const LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [
-                                          Color(0xFF2D465E),
-                                          Color(0xFF2D465E)
-                                        ])
-                                        : const LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [
-                                          Colors.white,
-                                          Colors.white
-                                        ]),
-                                  ),
-                                  child: Align(
-                                      alignment: Alignment.center,
-
-                                      child: RichText(text: TextSpan(
-                                          children: [
-                                            TextSpan(text: "SIRKL Club", style: TextStyle(
-                                                fontSize: 15,
-                                                fontFamily: "Gilroy",
-                                                fontWeight: FontWeight.w700,
-                                                color: _profileController.index.value == 1
-                                                    ? Colors.white
-                                                    : MediaQuery.of(context).platformBrightness == Brightness.dark
-                                                    ? const Color(0xFF9BA0A5)
-                                                    : const Color(0xFF828282))),
-                                            _homeController.userMe.value.hasSBT! ? const WidgetSpan(child: SizedBox()) : const WidgetSpan(child: SizedBox(width: 4,)),
-                                            _homeController.userMe.value.hasSBT! ? const WidgetSpan(child: SizedBox()) : const WidgetSpan(child: Icon(Icons.circle_notifications, size: 18,))
-                                          ]))),
-                                ),
-
                               ],
-                            ),
-                        )))
+                              color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                                  ? const Color(0xFF2D465E).withOpacity(1)
+                                  : Colors.white),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 4.0, bottom: 2, left: 4, right: 4),
+                            child: TabBar(
+                                labelPadding: EdgeInsets.zero,
+                                indicatorPadding: EdgeInsets.zero,
+                                indicatorColor: Colors.transparent,
+                                controller: tabController,
+                                padding: EdgeInsets.zero,
+                                dividerColor: Colors.transparent,
+                                tabs: [
+                                  Container(
+                                    height: 48,
+                                    width: 200,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      gradient: _profileController.index.value == 0
+                                          ? const LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Color(0xFF1DE99B),
+                                            Color(0xFF0063FB)
+                                          ])
+                                          : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                          ? const LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Color(0xFF2D465E),
+                                            Color(0xFF2D465E)
+                                          ])
+                                          : const LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Colors.white,
+                                            Colors.white
+                                          ]),
+                                    ),
+                                    child: Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          "All",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontFamily: "Gilroy",
+                                              fontWeight: FontWeight.w700,
+                                              color: _profileController.index.value == 0
+                                                  ? Colors.white
+                                                  : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                                  ? const Color(0xFF9BA0A5)
+                                                  : const Color(0xFF828282)),
+                                        )),
+                                  ),
+                                  Container(
+                                    height: 48,
+                                    width: 200,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      gradient: _profileController.index.value == 1
+                                          ? const LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Color(0xFF1DE99B),
+                                            Color(0xFF0063FB)
+                                          ])
+                                          : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                          ? const LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Color(0xFF2D465E),
+                                            Color(0xFF2D465E)
+                                          ])
+                                          : const LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Colors.white,
+                                            Colors.white
+                                          ]),
+                                    ),
+                                    child: Align(
+                                        alignment: Alignment.center,
+
+                                        child: RichText(text: TextSpan(
+                                            children: [
+                                              TextSpan(text: "SIRKL Club", style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontFamily: "Gilroy",
+                                                  fontWeight: FontWeight.w700,
+                                                  color: _profileController.index.value == 1
+                                                      ? Colors.white
+                                                      : MediaQuery.of(context).platformBrightness == Brightness.dark
+                                                      ? const Color(0xFF9BA0A5)
+                                                      : const Color(0xFF828282))),
+                                              _homeController.userMe.value.hasSBT! ? const WidgetSpan(child: SizedBox()) : const WidgetSpan(child: SizedBox(width: 4,)),
+                                              _homeController.userMe.value.hasSBT! ? const WidgetSpan(child: SizedBox()) : const WidgetSpan(child: Icon(Icons.circle_notifications, size: 18,))
+                                            ]))),
+                                  ),
+
+                                ],
+                              ),
+                          )),
+                    ))
 
               ],
             ),

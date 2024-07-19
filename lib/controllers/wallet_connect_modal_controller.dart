@@ -9,8 +9,9 @@ import 'package:sirkl/common/model/crypto/eip155.dart';
 import 'package:sirkl/common/model/crypto/helpers.dart';
 import 'package:sirkl/common/model/crypto/test_data.dart';
 import 'package:sirkl/controllers/home_controller.dart';
-import 'package:web3modal_flutter/web3modal_flutter.dart';
 import 'package:bip39/bip39.dart' as bip39;
+import 'package:sirkl/repo/auth_repo.dart';
+import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class WalletConnectModalController extends GetxController {
   Rx<W3MService?> w3mService = (null as W3MService?).obs;
@@ -29,12 +30,45 @@ class WalletConnectModalController extends GetxController {
   var isInitialized = false.obs;
 
   void initializeService(BuildContext context) async {
-    //W3MChainPresets.chains.putIfAbsent('1564830818', () => W3MChainInfo(chainName: "SKALE Calypso Hub", chainId: '1564830818', namespace: "eip155:1564830818", tokenName: "sFuel", rpcUrl: "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague"));
 
     w3mService.value = W3MService(
+      includedWalletIds: {
+        'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
+        '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust
+        'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa', // Coinbase
+        '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
+        'a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393', // Phantom
+        '19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927' // Ledger
+      },
       context: context,
       projectId: projectID,
       logLevel: LogLevel.error,
+      loginWithoutWalletWidget: null /*TextButton(
+        onPressed: (){
+          debugPrint("holla");
+        },
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          backgroundColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
+        child:  SizedBox(
+          width: double.infinity,
+          child: Text(
+            "Login without wallet",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: SColors.activeColor,
+              fontSize: 16,
+              decoration: TextDecoration.none,
+              fontFamily: "Gilroy",
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      )*/,
       metadata: PairingMetadata(
         name: name,
         description: desc,
@@ -47,18 +81,15 @@ class WalletConnectModalController extends GetxController {
       ),
     );
 
-
     w3mService.value?.onModalConnect.subscribe(_onModalConnect);
     w3mService.value?.onModalNetworkChange.subscribe(_onModalNetworkChange);
     w3mService.value?.onModalDisconnect.subscribe(_onModalDisconnect);
     w3mService.value?.onModalError.subscribe(_onModalError);
 
-    //
     w3mService.value?.onSessionExpireEvent.subscribe(_onSessionExpired);
     w3mService.value?.onSessionUpdateEvent.subscribe(_onSessionUpdate);
     w3mService.value?.onSessionEventEvent.subscribe(_onSessionEvent);
 
-    //
     w3mService.value?.web3App!.core.relayClient.onRelayClientConnect
         .subscribe(_onRelayClientConnect);
     w3mService.value?.web3App!.core.relayClient.onRelayClientError
@@ -136,12 +167,8 @@ class WalletConnectModalController extends GetxController {
 
     w3mService.value!.launchConnectedWallet();
 
-    callChainMethod(
-      ChainType.eip155,
-      EIP155UIMethods.personalSign,
-      chainMetadata,
-      account,
-    ).then((value) async {
+    callChainMethod(ChainType.eip155, EIP155UIMethods.personalSign, chainMetadata, account,)
+        .then((value) async {
       await _homeController.loginWithWallet(
           context,
           account.toLowerCase(),
@@ -171,6 +198,8 @@ class WalletConnectModalController extends GetxController {
   }
 
   Future<void> createWallet(BuildContext context) async {
+    _homeController.isLoading.value = true;
+    _homeController.refresh();
     final mnemonic = bip39.generateMnemonic();
     final seed = bip39.mnemonicToSeed(mnemonic);
     final privateKey = EthPrivateKey.fromHex(seedToPrivateKey(seed));
@@ -195,18 +224,20 @@ class WalletConnectModalController extends GetxController {
     final signature = "0x${bytesToHex(signedMessage)}";
 
     await _homeController.loginWithWallet(context, wallet.toLowerCase(), testSignData(wallet.toLowerCase()), signature);
+    _homeController.isLoading.value = false;
   }
 
-  retrieveWalletFromMnemonic(String mnemonic) {
+  retrieveWalletFromMnemonic(BuildContext context, String mnemonic) async {
     final isValidLength = mnemonic.split(' ').length >= 12;
-    if(isValidLength) {
-      if(bip39.validateMnemonic(mnemonic)) {
+    if(isValidLength && bip39.validateMnemonic(mnemonic)) {
         final seed = bip39.mnemonicToSeed(mnemonic);
         final privateKey = EthPrivateKey.fromHex(seedToPrivateKey(seed));
         final address = privateKey.address.hex;
-      } else {
+        if(await AuthRepo.isWalletUser(address)){
 
-      }
+        } else {
+
+        }
     } else {
 
     }
