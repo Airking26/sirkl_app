@@ -135,7 +135,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 _commonController.gettingStoryAndContacts.value = true;
                 _homeController.loadingStories.value = true;
                 _homeController.pageKey.value = 0;
-                _homeController.pagingController.value.refresh();
+                _homeController.storyPagingController.value.refresh();
                 _commonController.showSirklUsers(_homeController.id.value);
               }
             } else if(index == 1) {

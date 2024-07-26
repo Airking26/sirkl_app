@@ -5,14 +5,9 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/repo/chats_repo.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
-import 'package:sirkl/common/model/refresh_token_dto.dart';
 import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/repo/home_repo.dart';
-import 'package:sirkl/common/constants.dart' as con;
-
-import '../common/save_pref_keys.dart';
 import 'profile_controller.dart';
 
 class ChatsController extends GetxController{
@@ -57,10 +52,12 @@ class ChatsController extends GetxController{
 
     return inboxResponse;
   }
+
   resetChannel() {
     channel = (null as Channel?).obs;
    ;
   }
+
   checkOrCreateChannel(String himId, StreamChatClient client, String myId) async{
       
       channel.value = client.channel(

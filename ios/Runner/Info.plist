@@ -19,18 +19,18 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.9</string>
+	<string>1.4.3</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-	 <string>trust</string>
-     <string>ledgerlive</string>
-     <string>rainbow</string>
-	 <string>metamask</string>
-	 <string>cbwallet</string>
+		<string>trust</string>
+		<string>ledgerlive</string>
+		<string>rainbow</string>
+		<string>metamask</string>
+		<string>cbwallet</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -58,16 +58,29 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
 	<key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>sirkl</string>
-            </array>
-            <key>CFBundleURLName</key>
-            <string>io.airking.sirkl</string>
-        </dict>
-    </array>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>io.airking.sirkl</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sirkl</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>http</string>
+				<string>https</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -93,14 +93,19 @@ dependencies:
   dart_jsonwebtoken: ^2.3.1
   dynamic_theme:
     path: packages/dynamic_theme
-  flutter_phoenix: "^1.0.0"
   walletconnect_modal_flutter: ^2.1.16
   pointycastle: ^3.9.1
   web3modal_flutter:
     git:
       url: https://github.com/Airking26/Web3ModalFlutter
       ref: master
-  solana: ^0.30.4
+  google_sign_in: ^6.2.1
+  firebase_auth: ^4.17.9
+  googleapis: ^13.1.0
+  googleapis_auth: ^1.5.1
+  encrypt: ^5.0.3
+  fancy_password_field: ^2.0.7
+  restart: ^1.0.0
 
 dependency_overrides:
   flutter_svg: ^2.0.9
@@ -186,6 +191,7 @@ flutter:
     - assets/images/logo_light_theme.png
     - assets/images/logo_dark_theme.png
     - assets/images/trustwallet.png
+    - assets/images/no_wallet.png
     - assets/pdf/tc.pdf
     - assets/pdf/pp.pdf
     - assets/pdf/all.pdf

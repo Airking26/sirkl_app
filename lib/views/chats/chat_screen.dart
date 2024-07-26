@@ -112,9 +112,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-	super.dispose();
-  tabController.removeListener(indexChangeListener);
-      _controllerOther.dispose();
+    tabController.removeListener(indexChangeListener);
+    _controllerOther.dispose();
     _controllerFriend.dispose();
     _chatController.index.value = 0;
     super.dispose();

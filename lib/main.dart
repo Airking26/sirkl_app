@@ -85,7 +85,7 @@ void main() async {
   FirebaseMessaging.instance.subscribeToTopic("all");
   await GetStorage.init();
   AnalyticService().getAnalyticObserver();
-  runApp(RestartWidget(child: MyApp(client: client)));
+  runApp(MyApp(client: client));
 }
 
 class MyApp extends StatelessWidget {
@@ -129,7 +129,7 @@ class MyApp extends StatelessWidget {
                       borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
                     ),
                   ),
-                  textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor),
+                  textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor, selectionHandleColor: SColors.activeColor,),
                   brightness: Brightness.dark, dividerColor: Colors.transparent),
               themeMode: ThemeMode.system,
               theme: ThemeData(
@@ -138,7 +138,7 @@ class MyApp extends StatelessWidget {
                       borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
                     ),
                   ),
-                  textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor),
+                  textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor, selectionHandleColor: SColors.activeColor,),
                   brightness: Brightness.light, dividerColor: Colors.transparent),
               debugShowCheckedModeBanner: false,
               home: const MyHomePage(),
@@ -452,33 +452,4 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
   await FlutterCallkitIncoming.showCallkitIncoming(params);
 }
 
-class RestartWidget extends StatefulWidget {
-  const RestartWidget({required this.child});
 
-  final Widget child;
-
-  static void restartApp(BuildContext context) {
-    context.findAncestorStateOfType<_RestartWidgetState>()!.restartApp();
-  }
-
-  @override
-  _RestartWidgetState createState() => _RestartWidgetState();
-}
-
-class _RestartWidgetState extends State<RestartWidget> {
-  Key key = UniqueKey();
-
-  void restartApp() {
-    setState(() {
-      key = UniqueKey();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return KeyedSubtree(
-      key: key,
-      child: widget.child,
-    );
-  }
-}

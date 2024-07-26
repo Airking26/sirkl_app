@@ -3,15 +3,19 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:pointycastle/digests/sha256.dart';
 import 'package:sirkl/common/model/crypto/chain_metadata.dart';
 import 'package:sirkl/common/model/crypto/eip155.dart';
 import 'package:sirkl/common/model/crypto/helpers.dart';
 import 'package:sirkl/common/model/crypto/test_data.dart';
+import 'package:sirkl/common/save_pref_keys.dart';
+import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:sirkl/repo/auth_repo.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
+import 'package:web3modal_flutter/widgets/lists/list_items/wallet_list_item.dart';
 
 class WalletConnectModalController extends GetxController {
   Rx<W3MService?> w3mService = (null as W3MService?).obs;
@@ -24,10 +28,12 @@ class WalletConnectModalController extends GetxController {
     "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"
   ];
   var nativeUrl = "sirkl://";
-  var universalUrl = 'https://walletconnect.com/appkit';
+  var universalUrl = 'http://www.sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com';
   var projectID = "bdfe4b74c44308ffb46fa4e6198605af";
 
-  var isInitialized = false.obs;
+  var errorTextRetrieving = false.obs;
+
+  final box = GetStorage();
 
   void initializeService(BuildContext context) async {
 
@@ -43,32 +49,40 @@ class WalletConnectModalController extends GetxController {
       context: context,
       projectId: projectID,
       logLevel: LogLevel.error,
-      loginWithoutWalletWidget: null /*TextButton(
-        onPressed: (){
-          debugPrint("holla");
-        },
+      loginWithoutWalletWidget: WalletListItem(title: "Connect without wallet", imageUrl: "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/no_wallet.png",
+      onTap: () async {
+        Get.back();
+        _homeController.isLoading.value = true;
+        await createWallet(context);
+      },),
+      /*TextButton(
+        onPressed: () async {
+          Get.back();
+          _homeController.isLoading.value = true;
+          await createWallet(context);
+          },
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          backgroundColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          backgroundColor: Colors.grey.shade50,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
         ),
         child:  SizedBox(
           width: double.infinity,
-          child: Text(
-            "Login without wallet",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: SColors.activeColor,
-              fontSize: 16,
-              decoration: TextDecoration.none,
-              fontFamily: "Gilroy",
-              fontWeight: FontWeight.w600,
-            ),
+          child: Row(
+            children: [
+              Image.asset("assets/images/no_wallet.png", width: 42, height: 42,),
+              const SizedBox(width: 10,),
+              Text(
+                "Connect without wallet",
+                textAlign: TextAlign.start,
+                style: Web3ModalTheme.getDataOf(context).textStyles.paragraph500.copyWith(),
+              ),
+            ],
           ),
         ),
-      )*/,
+      ),*/
       metadata: PairingMetadata(
         name: name,
         description: desc,
@@ -137,7 +151,6 @@ class WalletConnectModalController extends GetxController {
 
   void _onRelayClientConnect(EventArgs? event) {
     debugPrint('[ExampleApp] _onSessionEvent ${event?.toString()}');
-    isInitialized.value = true;
   }
 
   void _onRelayClientError(EventArgs? event) {
@@ -205,7 +218,7 @@ class WalletConnectModalController extends GetxController {
     final privateKey = EthPrivateKey.fromHex(seedToPrivateKey(seed));
     final address = privateKey.address.hex;
 
-    await _signMessageLocally(context, bytesToHex(privateKey.privateKey), address);
+    await _signMessageLocally(context, bytesToHex(privateKey.privateKey), address, mnemonic);
   }
 
   String seedToPrivateKey(Uint8List seed) {
@@ -215,7 +228,7 @@ class WalletConnectModalController extends GetxController {
   }
 
   Future<void> _signMessageLocally(
-      BuildContext context, String? privateKey, String wallet) async {
+      BuildContext context, String? privateKey, String wallet, [String? mnemonic]) async {
     if (privateKey == null) return;
 
     final privateKeyFromHex = EthPrivateKey.fromHex(privateKey);
@@ -224,22 +237,94 @@ class WalletConnectModalController extends GetxController {
     final signature = "0x${bytesToHex(signedMessage)}";
 
     await _homeController.loginWithWallet(context, wallet.toLowerCase(), testSignData(wallet.toLowerCase()), signature);
+    if(mnemonic != null) box.write(SharedPref.SEED_PHRASE, mnemonic);
     _homeController.isLoading.value = false;
   }
 
   retrieveWalletFromMnemonic(BuildContext context, String mnemonic) async {
-    final isValidLength = mnemonic.split(' ').length >= 12;
-    if(isValidLength && bip39.validateMnemonic(mnemonic)) {
-        final seed = bip39.mnemonicToSeed(mnemonic);
-        final privateKey = EthPrivateKey.fromHex(seedToPrivateKey(seed));
-        final address = privateKey.address.hex;
-        if(await AuthRepo.isWalletUser(address)){
-
-        } else {
-
-        }
+    final seed = bip39.mnemonicToSeed(mnemonic);
+    final privateKey = EthPrivateKey.fromHex(seedToPrivateKey(seed));
+    final address = privateKey.address.hex;
+    if(await AuthRepo.isWalletUser(address) && context.mounted){
+     await _signMessageLocally(context, bytesToHex(privateKey.privateKey), address);
+     Get.back();
     } else {
-
+      errorTextRetrieving.value = true;
     }
+  }
+
+SIWEConfig returnConfig() {
+    return SIWEConfig(
+      getNonce: () async {
+        // The getNonce method functions as a safeguard
+        // against spoofing, akin to a CSRF token.
+        return await "yourApigetNofefnce";
+      },
+      getMessageParams: () async {
+        // Parameters to create the SIWE message internally.
+        // More info in https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-222.method
+        return const SIWEMessageArgs(
+          domain: 'yourdomain.com',
+          uri: 'https://yourdomain.com/login',
+          statement: 'Please sign with your account',
+          methods: ['personal_sign', 'eth_sendTransaction'],
+        );
+      },
+      createMessage: (SIWECreateMessageArgs args) {
+        // Method for generating an EIP-4361-compatible message.
+        // You can use our provided formatMessage() method of implement your own
+        return AuthSignature.formatMessage(args);
+      },
+      verifyMessage: (SIWEVerifyMessageArgs args) async {
+        // This function ensures the message is valid,
+        // has not been tampered with, and has been appropriately
+        // signed by the wallet address.
+        var  m = AuthSignature.getChainIdFromMessage(args.message);
+        var l = AuthSignature.getAddressFromMessage(args.message);
+        try {
+          final isValidMessage = true;
+          return isValidMessage;
+        } catch (error) {
+          // error validating message
+          return false;
+        }
+      },
+      getSession: () async {
+        // Called after verifyMessage() succeeds
+        // The backend session should store the associated address and chainId
+        // and return it via the `getSession` method.
+        try {
+          // final session = await yourApi.getSession();
+          return const SIWESession(
+              address: "0x364fd98df51f0f908207bdddb2f231f77b815644", chains: ["1"]);
+        } catch (error) {
+          // error getting session
+          rethrow;
+        }
+      },
+      onSignIn: (SIWESession session) {
+        var k = "";
+        // Called after getSession() succeeds
+      },
+      signOut: () async {
+        // Called when wallet disconnects if `signOutOnDisconnect == true` and/or when
+        // `signOutOnAccountChange == true` and/or
+        // `signOutOnNetworkChange == true`
+        try {
+          final success = false;
+          return success;
+        } catch (error) {
+          // error signing out
+          return false;
+        }
+      },
+      onSignOut: () {
+        // Called after signOut() succeeds
+      },
+      // enabled: true, // OPTIONAL. Enables One-Click Auth + SIWE logic, if `false`, regular session proposal will be used. (default `true`)
+      // signOutOnDisconnect: true, // OPTIONAL (default `true`)
+      // signOutOnAccountChange: true, // OPTIONAL (default `true`)
+      // signOutOnNetworkChange: true, // OPTIONAL (default `true`)
+    );
   }
 }

@@ -126,6 +126,11 @@ class GroupsController extends GetxController{
   Future<void> changeAdminRole(AdminDto adminDTO) async => await GroupRepo.changeAdminRole(adminDTO);
   Future<void> addUserToSirklClub(String id) async => await GroupRepo.addUserToSirklClub(id);
 
+  @override
+  void onClose() {
+    var m = "";
+    super.onClose();
+  }
 
 }
 

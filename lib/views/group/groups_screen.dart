@@ -100,18 +100,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
     tabController.addListener(indexChangingListener);
     super.initState();
   }
+
   void indexChangingListener() {
           if (tabController.indexIsChanging) {
         _groupController.index.value = tabController.index;
       }
-  }
-  @override
-  void dispose() {
-    _controllerCommunitiesOther.dispose();
-    _controllerCommunitiesFav.dispose();
-    _groupController.index.value = 0;
-     tabController.removeListener(indexChangingListener);
-    super.dispose();
   }
 
   @override
@@ -825,6 +818,15 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _controllerCommunitiesOther.dispose();
+    _controllerCommunitiesFav.dispose();
+    _groupController.index.value = 0;
+    tabController.removeListener(indexChangingListener);
+    super.dispose();
   }
 
 }

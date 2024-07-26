@@ -14,7 +14,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "970958813193-qdke26j1b1d2i4fq9j758ivm2e50masr.apps.googleusercontent.com",
+          "client_id": "970958813193-89b38jevt9a7j1gp61euhcn9pdv3dkrc.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,14 +27,15 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "970958813193-qdke26j1b1d2i4fq9j758ivm2e50masr.apps.googleusercontent.com",
+              "client_id": "970958813193-89b38jevt9a7j1gp61euhcn9pdv3dkrc.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "970958813193-cf5vkvdea12ntdgkmvvbq3chdtfbo52k.apps.googleusercontent.com",
+              "client_id": "970958813193-12qd972nhq1nlkcujud0sjb536t8eao3.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "io.ariking.sirkl"
+                "bundle_id": "io.airking.sirkl",
+                "app_store_id": "1668076042"
               }
             }
           ]

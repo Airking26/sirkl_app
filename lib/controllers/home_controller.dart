@@ -44,14 +44,6 @@ import '../repo/auth_repo.dart';
 
 class HomeController extends GetxController {
 
-  static SessionData? _sessionData;
-  var sessionStatus;
-  var _uri;
-  var _connectResponse;
-  Web3App? connector;
-  late String chainToConnect;
-
-
   NavigationController get _navigationController => Get.find<NavigationController>();
   CommonController get _commonController => Get.find<CommonController>();
   ChatsController get _chatController => Get.find<ChatsController>();
@@ -60,7 +52,7 @@ class HomeController extends GetxController {
 
   Rx<List<List<StoryDto?>?>?> stories = (null as List<List<StoryDto?>?>?).obs;
   RxList<String> contractAddresses = <String>[].obs;
-  Rx<PagingController<int, List<StoryDto?>?>> pagingController =
+  Rx<PagingController<int, List<StoryDto?>?>> storyPagingController =
       PagingController<int, List<StoryDto?>?>(firstPageKey: 0).obs;
 
   var id = "".obs;
@@ -86,6 +78,7 @@ class HomeController extends GetxController {
   var isSigning = false.obs;
   var mint = false.obs;
   var isLoading = false.obs;
+  var isStoryLoading = false.obs;
 
   var isCheckingBetaCode = false.obs;
   Future<bool> checkBetaCode(String code) async => await AuthRepo.checkBetaCode(code);
@@ -369,7 +362,10 @@ class HomeController extends GetxController {
   }
 
   Future<List<List<StoryDto>>> retrieveStories(int offset) async {
-    if (offset == 0) stories.value?.clear();
+    if (offset == 0) {
+      stories.value?.clear();
+      pageKey.value =0;
+    }
 
     List<List<StoryDto>> retrivedStories =
         await HomeRepo.retrieveStories(offset.toString());

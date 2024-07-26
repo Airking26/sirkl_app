@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/common/enums/pdf_type.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:restart/restart.dart';
 
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
@@ -16,8 +18,8 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
-import 'package:sirkl/controllers/web3_controller.dart';
-import 'package:sirkl/main.dart';
+import 'package:sirkl/navigation/ui/navigation_screen.dart';
+import 'package:sirkl/views/home/home_screen.dart';
 
 import 'package:tiny_avatar/tiny_avatar.dart';
 
@@ -37,13 +39,15 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+
+  final box = GetStorage();
   YYDialog dialogMenu = YYDialog();
 
   ProfileController get _profileController => Get.find<ProfileController>();  
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
+  ChatsController get _chatController => Get.find<ChatsController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
-  Web3Controller get _web3Controller => Get.find<Web3Controller>();
   WalletConnectModalController get _walletConnectModalController => Get.find<WalletConnectModalController>();
 
   @override
@@ -107,7 +111,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         children: [
                         Icon(Icons.edit_rounded, color : MediaQuery.of(context).platformBrightness == Brightness.dark ?  Colors.white : Colors.black),
                         const SizedBox(height: 4),
-                        const Text("Edit", style: TextStyle(fontFamily: "Gilroy"),)
+                        const Text("Edit", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),)
                       ],),
                     ),
                   ),
@@ -130,7 +134,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         children: [
                         Icon(Icons.share_outlined, color : MediaQuery.of(context).platformBrightness == Brightness.dark ?  Colors.white : Colors.black),
                         const SizedBox(height: 4),
-                        const Text("Share", style: TextStyle(fontFamily: "Gilroy"),)
+                        const Text("Share", style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),)
                       ],),
                     ),
                   ),
@@ -165,12 +169,20 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                   Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? Colors.white : Colors.black,),
-                  /*const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text("Blocked users", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
-                  ),
-                  Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                      ? Colors.white : Colors.black,),*/
+                  /*box.read(SharedPref.SEED_PHRASE) == null ? const SizedBox() : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: () async  => await promptChoseBackupMethod(context),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text("Save my wallet", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500, color: Colors.redAccent),),
+                        ),
+                      ),
+                      Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                          ? Colors.white : Colors.black,),
+                    ],
+                  ),*/
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Row(
@@ -227,11 +239,13 @@ class _SettingScreenState extends State<SettingScreen> {
                                   _homeController.isConfiguring.value = false;
                                   _homeController.accessToken.value = "";
                                   _homeController.address.value = "";
-                                  RestartWidget.restartApp(context);
                                   _navigationController.controller.value.jumpToTab(0);
                                   _navigationController.hideNavBar.value = true;
                                   _walletConnectModalController.w3mService.value?.disconnect();
                                   Get.back();
+                                  Get.deleteAll(force: true);
+                                  Get.offAll(const NavigationScreen());
+                                  restart();
                                 },)
                             ],
                           )).then((value) {

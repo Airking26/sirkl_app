@@ -46,18 +46,19 @@ class StreamChannelName extends StatelessWidget {
         ),
         noDataBuilder: (context) => _generateName(
           channel.client.state.currentUser!,
-          channel.state!.members,
-        ),
+          channel.state!.members),
       );
 
   Widget _generateName(
     User currentUser,
-    List<Member> members,
+    List<Member> members
   ) =>
       LayoutBuilder(
+
         builder: (context, constraints) {
           var channelName = context.translations.noTitleText;
-          final otherMembers = members.where((member) => member.userId != currentUser.id,);
+          final otherMembers = members.where((member) => member.userId != _homeController.id.value,);
+
 
           if (otherMembers.isNotEmpty) {
             if (otherMembers.length == 1) {
@@ -72,7 +73,7 @@ class StreamChannelName extends StatelessWidget {
                     : (userDTO.userName.isNullOrBlank! ? "${userDTO.wallet!.substring(0, 6)}...${userDTO.wallet!.substring(userDTO.wallet!.length - 4)}": userDTO.userName!);
               }
             } else {
-              channelName = channel.extraData['nameOfGroup'] as String;
+              channelName = channel.extraData['nameOfGroup'] as String? ?? "";
             }
           } else {
             if(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true){

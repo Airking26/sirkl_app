@@ -45,7 +45,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   NavigationController get _navigationController => Get.find<NavigationController>();
   final TextEditingController usernameTextEditingController = TextEditingController();
   final TextEditingController descriptionTextEditingController = TextEditingController();
-  Web3Controller get _web3Controller => Get.find<Web3Controller>();
   FocusNode focusNode = FocusNode();
   String hintText = '';
 
@@ -322,7 +321,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   _navigationController.hideNavBar.value = false;
                                                 }
                                                 // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
-                                                _homeController.pagingController.value.notifyListeners();
+                                                _homeController.storyPagingController.value.notifyListeners();
                                               });
                                         }
                                       },

@@ -6,11 +6,14 @@ import 'dart:io';
 import 'package:azlistview/azlistview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/enums/pdf_type.dart';
+import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
@@ -22,6 +25,7 @@ import 'package:sirkl/common/model/web_wallet_connect_dto.dart';
 import 'package:sirkl/common/constants.dart' as con;
 
 import 'package:sirkl/controllers/navigation_controller.dart';
+import 'package:sirkl/repo/google_repo.dart';
 import 'package:sirkl/views/home/pdf_screen.dart';
 import 'package:sirkl/views/home/story_viewer_screen.dart';
 import 'package:slider_button/slider_button.dart';
@@ -46,6 +50,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   CallsController get _callController => Get.find<CallsController>();
@@ -79,12 +84,12 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
   };
 
-  TextEditingController _betaTestController = TextEditingController();
+  final TextEditingController _betaTestController = TextEditingController();
 
   @override
   void initState() {
-    _homeController.pagingController.value.addPageRequestListener((pageKey) {
-      _homeController.pagingController.value.itemList = [];
+    _homeController.storyPagingController.value.addPageRequestListener((pageKey) {
+      _homeController.storyPagingController.value.itemList = [];
       fetchPageStories();
     });
     WidgetsBinding.instance.addPostFrameCallback((_){
@@ -211,6 +216,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   ///Body
   Future<void> fetchPageStories() async {
+    if (_homeController.isStoryLoading.value) return;
+    _homeController.isStoryLoading.value = true;
+
     try {
       await _homeController.retrieveStories(_homeController.pageKey.value);
       List<List<StoryDto?>?>? newItems = _homeController.pageKey.value > 0
@@ -223,14 +231,16 @@ class _HomeScreenState extends State<HomeScreen> {
           : _homeController.stories.value;
       final isLastPage = newItems!.length < 12;
       if (isLastPage) {
-        _homeController.pagingController.value.appendLastPage(newItems);
+        _homeController.storyPagingController.value.appendLastPage(newItems);
       } else {
         final nextPageKey = _homeController.pageKey.value++;
-        _homeController.pagingController.value
+        _homeController.storyPagingController.value
             .appendPage(newItems, nextPageKey);
       }
     } catch (error) {
-      _homeController.pagingController.value.error = error;
+      _homeController.storyPagingController.value.error = error;
+    } finally{
+      _homeController.isStoryLoading.value = false;
     }
   }
 
@@ -244,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
           : 125,
       child: PagedListView(
         scrollDirection: Axis.horizontal,
-        pagingController: _homeController.pagingController.value,
+        pagingController: _homeController.storyPagingController.value,
         builderDelegate: PagedChildBuilderDelegate<List<StoryDto?>?>(
             itemBuilder: (context, item, index) => buildStory(item, index),
             firstPageProgressIndicatorBuilder: (context) =>  Center(
@@ -275,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     _navigationController.hideNavBar.value = false;
                   }
                   // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
-                  _homeController.pagingController.value.notifyListeners();
+                  _homeController.storyPagingController.value.notifyListeners();
                 });
           },
           child: Container(
@@ -306,18 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         SizedBox(
           width: 70,
-          child: Text(
-            _homeController.stories.value![index]!.first!.createdBy.nickname.isNullOrBlank! ?
-                (_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
-                    ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 5)}..."
-                    : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 6
-                        ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 7)}..."
-                        : _homeController.stories.value![index]!.first!.createdBy.userName!) :
-            "${_homeController.stories.value![index]!.first!.createdBy.nickname!.length > 5 ? "${_homeController.stories.value![index]!.first!.createdBy.nickname!.substring(0,5)}..." : _homeController.stories.value![index]!.first!.createdBy.nickname!} (${_homeController.stories.value![index]!.first!.createdBy.userName.isNullOrBlank!
-                ? "${_homeController.stories.value![index]!.first!.createdBy.wallet!.substring(0, 3)}..."
-                : _homeController.stories.value![index]!.first!.createdBy.userName!.length > 3
-                ? "${_homeController.stories.value![index]!.first!.createdBy.userName!.substring(0, 4)}..."
-                : _homeController.stories.value![index]!.first!.createdBy.userName!})",
+          child: Text(_homeController.stories.value != null && _homeController.stories.value!.length > index ? displayName(_homeController.stories.value![index]!.first!.createdBy) : "Unknown",
             maxLines: 2,
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -329,6 +328,25 @@ class _HomeScreenState extends State<HomeScreen> {
         )
       ],
     );
+  }
+
+  String displayName(UserDTO createdBy) {
+    String wallet = createdBy.wallet!;
+    String userName = createdBy.userName ?? '';
+    String nickname = createdBy.nickname ?? '';
+
+    if (nickname.isEmpty) {
+      if (userName.isEmpty) {
+        return "${wallet.substring(0, 5)}...";
+      } else {
+        return userName.length > 6 ? "${userName.substring(0, 7)}..." : userName;
+      }
+    } else {
+      String userDisplayName = userName.isEmpty ? "${wallet.substring(0, 3)}..."
+          : userName.length > 3 ? "${userName.substring(0, 4)}..." : userName;
+      return nickname.length > 5 ? "${nickname.substring(0, 5)}... ($userDisplayName)"
+          : "$nickname ($userDisplayName)";
+    }
   }
 
   Widget buildRepertoireList(BuildContext context) {
@@ -781,84 +799,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: ElevatedButton.styleFrom(elevation : 5,backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text('Connect with wallet', style: TextStyle(fontFamily: 'Gilroy', color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),),
+                    child: Text('Connect', style: TextStyle(fontFamily: 'Gilroy', color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),),
                   ))),
-            const SizedBox(height: 12,),
+            /*const SizedBox(height: 12,),
             Container(height: 48,
                 width: 280,
                 decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xff1DE99B), Color(0xff0063FB)]), borderRadius: BorderRadius.circular(10)),
                 child: ElevatedButton(onPressed: () async {
-                  //await _walletConnectModalController.createWallet(context);
+                  await _walletConnectModalController.createWallet(context);
                 },
                     style: ElevatedButton.styleFrom(elevation : 5,backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
                     child: const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text('Connect without wallet', style: TextStyle(fontFamily: 'Gilroy', color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),),
-                    ))),
+                    ))),*/
             const SizedBox(height: 18,),
             InkWell(
               onTap: ()async{
-                /*showDialog(context: context, builder: (cc) => AlertDialog(
-                  backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                  title: const Text("Enter your seed phrase", style: TextStyle(fontFamily: "Gilroy", fontSize: 16, fontWeight: FontWeight.w600), textAlign: TextAlign.center,),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: TextField(
-                          autofocus: true,
-                          minLines: 4,
-                          maxLines: 5,
-                          decoration: InputDecoration(
-                            hintText: "Example: boat moon hat bottle speaker wallet phone monitor cable paper chair sofa",
-                            hintStyle: const TextStyle(fontWeight: FontWeight.w500, fontFamily: 'Gilroy'),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10), // Set border radius
-                              borderSide: const BorderSide(color: Colors.grey, width: 1), // Set border color and width
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10), // Set border radius
-                              borderSide: const BorderSide(color: Colors.grey, width: 1), // Set border color and width
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10), // Set border radius
-                              borderSide: const BorderSide(color: Colors.grey, width: 1), // Set border color and width
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), // Set padding
-                          ),
-                        ),),
-                      const SizedBox(height: 12,),
-                      TextButton(
-                        onPressed: (){
-                          debugPrint("holla");
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          backgroundColor: Colors.grey,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                        ),
-                        child:  SizedBox(
-                          width: double.infinity,
-                          child: Text(
-                            "Validate",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white,
-                              fontSize: 16,
-                              decoration: TextDecoration.none,
-                              fontFamily: "Gilroy",
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ));*/
+                //await promptChoseRetrieveMethod(context);
               },
               child: Text("Retrieve your wallet", style: TextStyle(
                   decoration: TextDecoration.underline,
@@ -1130,14 +1088,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) async {
-      //TODO : Activate in production
       var webWalletConnectDTO = webWalletConnectDtoFromJson(scanData.code!);
       _homeController.qrActive.value = false;
-      //if(DateTime.now().isBefore(DateTime.fromMillisecondsSinceEpoch(int.parse(webWalletConnectDTO.timestamp!) * 1000))) {
+      if(DateTime.now().isBefore(DateTime.fromMillisecondsSinceEpoch(int.parse(webWalletConnectDTO.timestamp!) * 1000))) {
       await _homeController.loginWithWallet(
           context, webWalletConnectDTO.wallet!.toLowerCase(), webWalletConnectDTO.message!,
           webWalletConnectDTO.signature!);
-      /*} else {
+      } else {
         Fluttertoast.showToast(
             msg: "Error, the QR Code is no longer valid",
             toastLength: Toast.LENGTH_SHORT,
@@ -1147,7 +1104,7 @@ class _HomeScreenState extends State<HomeScreen> {
             textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
             fontSize: 16.0
         );
-      }*/
+      }
     });
   }
 
@@ -1157,9 +1114,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     controller?.dispose();
+    _betaTestController.dispose();
     _homeController.loadingStories.value = true;
     _homeController.stories.value = [];
-    _homeController.pagingController.value.dispose();
+    _homeController.storyPagingController.value.dispose();
     super.dispose();
   }
 

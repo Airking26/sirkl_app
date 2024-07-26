@@ -32,8 +32,4 @@ class GlobalDependencyManager extends Bindings {
     Get.put(Web3Controller(), permanent: _permanent);
     Get.put(WalletConnectModalController(), permanent: _permanent);
   }
-
-  _globalDelete(){
-    Get.deleteAll();
-  }
 }

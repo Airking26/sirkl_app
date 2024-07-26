@@ -84,7 +84,6 @@ class Language extends Translations{
       c.contactOwnerRes: "• Contact owner",
       c.claimOwnershipeRes: "• Claim ownership",
       c.messageSuccessfullySentRes: "Message successfully sent",
-      c.profileMenuTabRes: "• Profile",
       c.maxUserSelectedRes: "Maximum number of users selected for broadcast list"
     }
   };
