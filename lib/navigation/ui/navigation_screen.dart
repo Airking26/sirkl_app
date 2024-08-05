@@ -158,7 +158,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
               }
             } else if(index == 4){
               _homeController.checkOfflineNotifAndRegister();
-              _profileController.checkIfHasUnreadNotif(_homeController.id.value);
+              _profileController.checkIfHasUnreadNotification(_homeController.id.value);
               if(_homeController.accessToken.value.isEmpty || _homeController.isConfiguring.value){
                 _navigationController.controller.value.index = 0;
               } else if(_homeController.mint.value){

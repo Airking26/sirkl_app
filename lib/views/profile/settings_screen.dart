@@ -3,10 +3,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/common/enums/pdf_type.dart';
+import 'package:sirkl/common/save_pref_keys.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:restart/restart.dart';
 
@@ -18,9 +21,7 @@ import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
-import 'package:sirkl/navigation/ui/navigation_screen.dart';
-import 'package:sirkl/views/home/home_screen.dart';
-
+import 'package:sirkl/repo/google_repo.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../config/s_colors.dart';
@@ -46,9 +47,14 @@ class _SettingScreenState extends State<SettingScreen> {
   ProfileController get _profileController => Get.find<ProfileController>();  
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
   WalletConnectModalController get _walletConnectModalController => Get.find<WalletConnectModalController>();
+
+  @override
+  void initState() {
+    seedPhrase.value = box.read(SharedPref.SEED_PHRASE);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,20 +175,6 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                   Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? Colors.white : Colors.black,),
-                  /*box.read(SharedPref.SEED_PHRASE) == null ? const SizedBox() : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InkWell(
-                        onTap: () async  => await promptChoseBackupMethod(context),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text("Save my wallet", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500, color: Colors.redAccent),),
-                        ),
-                      ),
-                      Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                          ? Colors.white : Colors.black,),
-                    ],
-                  ),*/
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Row(
@@ -205,6 +197,20 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                   Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? Colors.white : Colors.black,),
+                  seedPhrase.value == null ? const SizedBox() : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: () async  => await promptChoseBackupMethod(context),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text("Save my SIRKL wallet", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500, color: Colors.redAccent),),
+                        ),
+                      ),
+                      Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                          ? Colors.white : Colors.black,),
+                    ],
+                  ),
                   InkWell(
                     onTap: () async {
                       if(!_profileController.contactUsClicked.value) {
@@ -243,8 +249,8 @@ class _SettingScreenState extends State<SettingScreen> {
                                   _navigationController.hideNavBar.value = true;
                                   _walletConnectModalController.w3mService.value?.disconnect();
                                   Get.back();
-                                  Get.deleteAll(force: true);
-                                  Get.offAll(const NavigationScreen());
+                                  //Get.deleteAll(force: true);
+                                  //Get.offAll(const HomeScreen());
                                   restart();
                                 },)
                             ],

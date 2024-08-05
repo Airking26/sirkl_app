@@ -126,8 +126,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 12.0),
                                 child: Text(
-                                  _homeController.nicknames[_commonController.userClicked.value!.wallet!] != null ?
-                                _homeController.nicknames[_commonController.userClicked.value!.wallet!] + (_commonController.userClicked.value!.userName!.isEmpty ? "" : " (${_commonController.userClicked.value!.userName!})") : (_commonController.userClicked.value!.userName!.isEmpty ? "${_commonController.userClicked.value!.wallet!.substring(0, 6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}" : _commonController.userClicked.value!.userName!), textAlign: TextAlign.center, maxLines: 1, style: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
+                                  displayName(_commonController.userClicked.value!, _homeController), textAlign: TextAlign.center, maxLines: 1, style: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 20, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),),
                               ),
                             ),
                           ),

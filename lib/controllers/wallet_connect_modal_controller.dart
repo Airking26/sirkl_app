@@ -10,10 +10,10 @@ import 'package:sirkl/common/model/crypto/eip155.dart';
 import 'package:sirkl/common/model/crypto/helpers.dart';
 import 'package:sirkl/common/model/crypto/test_data.dart';
 import 'package:sirkl/common/save_pref_keys.dart';
-import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:sirkl/repo/auth_repo.dart';
+import 'package:sirkl/repo/google_repo.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 import 'package:web3modal_flutter/widgets/lists/list_items/wallet_list_item.dart';
 
@@ -55,34 +55,6 @@ class WalletConnectModalController extends GetxController {
         _homeController.isLoading.value = true;
         await createWallet(context);
       },),
-      /*TextButton(
-        onPressed: () async {
-          Get.back();
-          _homeController.isLoading.value = true;
-          await createWallet(context);
-          },
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-          backgroundColor: Colors.grey.shade50,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-        child:  SizedBox(
-          width: double.infinity,
-          child: Row(
-            children: [
-              Image.asset("assets/images/no_wallet.png", width: 42, height: 42,),
-              const SizedBox(width: 10,),
-              Text(
-                "Connect without wallet",
-                textAlign: TextAlign.start,
-                style: Web3ModalTheme.getDataOf(context).textStyles.paragraph500.copyWith(),
-              ),
-            ],
-          ),
-        ),
-      ),*/
       metadata: PairingMetadata(
         name: name,
         description: desc,
@@ -237,7 +209,12 @@ class WalletConnectModalController extends GetxController {
     final signature = "0x${bytesToHex(signedMessage)}";
 
     await _homeController.loginWithWallet(context, wallet.toLowerCase(), testSignData(wallet.toLowerCase()), signature);
-    if(mnemonic != null) box.write(SharedPref.SEED_PHRASE, mnemonic);
+
+    if(mnemonic != null) {
+      box.write(SharedPref.SEED_PHRASE, mnemonic);
+      if(context.mounted) await promptChoseBackupMethod(context);
+    }
+
     _homeController.isLoading.value = false;
   }
 
@@ -245,9 +222,12 @@ class WalletConnectModalController extends GetxController {
     final seed = bip39.mnemonicToSeed(mnemonic);
     final privateKey = EthPrivateKey.fromHex(seedToPrivateKey(seed));
     final address = privateKey.address.hex;
-    if(await AuthRepo.isWalletUser(address) && context.mounted){
-     await _signMessageLocally(context, bytesToHex(privateKey.privateKey), address);
-     Get.back();
+    if(await AuthRepo.isWalletUser(address)){
+      if(context.mounted) {
+        await _signMessageLocally(
+            context, bytesToHex(privateKey.privateKey), address);
+        Get.back();
+      }
     } else {
       errorTextRetrieving.value = true;
     }

@@ -3,7 +3,9 @@ import 'dart:math';
 
 import 'package:fancy_password_field/fancy_password_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:get_storage/get_storage.dart';
@@ -42,6 +44,7 @@ var wordFourValidate = false.obs;
 
 var backupIsLoading = false.obs;
 var saveIsLoading = false.obs;
+var seedPhrase = (null as String?).obs;
 
 final box = GetStorage();
 
@@ -51,6 +54,14 @@ final GoogleSignIn _googleSignIn = GoogleSignIn(
     drive.DriveApi.driveFileScope
   ],
 );
+
+Future<void> signOutWithGoogle() async {
+  try {
+    await _googleSignIn.signOut();
+  } catch (error){
+    debugPrint(error.toString());
+  }
+}
 
 Future<GoogleSignInAccount?> signInWithGoogle() async {
   try {
@@ -204,7 +215,7 @@ Future<void> promptChoseBackupMethod(BuildContext context) async =>
     //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
     title: const Column(
       children: [
-        Text("Save the seed phrase", style: TextStyle(fontFamily: 'Gilroy', fontSize: 24, fontWeight: FontWeight.w700), textAlign: TextAlign.center,),
+        Text("Save my SIRKL wallet", style: TextStyle(fontFamily: 'Gilroy', fontSize: 24, fontWeight: FontWeight.w700), textAlign: TextAlign.center,),
         SizedBox(height: 2,),
         Text("Create a backup of your seed phrase to never lose the access to your wallet", style: TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.w500, fontSize: 14), textAlign: TextAlign.center,),
       ],
@@ -271,11 +282,14 @@ Future<void> promptChoseBackupMethod(BuildContext context) async =>
             ),
           ),
         ),
+        const SizedBox(height: 8,),
+        InkWell(
+          onTap: () => Get.back(),
+            child: Text("Later", style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Gilroy', color: SColors.activeColor, decoration: TextDecoration.underline, decorationColor: SColors.activeColor, fontSize: 18),))
       ],
     ),
   ));
 
-//TODO : Test not logged in save
 Future<void> promptForPassword(BuildContext context) async => await showDialog(
     context: context,
     builder: (context) {
@@ -578,7 +592,17 @@ Future<void> promptCompleteGoogleDriveBackup(BuildContext context, String passwo
             await saveWalletToDrive(box.read(SharedPref.SEED_PHRASE), _nameBackupTextController.text, password);
             Get.back();
             backupIsLoading.value = false;
+            seedPhrase.value = null;
             box.remove(SharedPref.SEED_PHRASE);
+            Fluttertoast.showToast(
+                msg: "Wallet saved successfully, enjoy SIRKL.io",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 1,
+                backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
+                textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
+                fontSize: 16.0
+            );
           }
         },
         style: TextButton.styleFrom(
@@ -619,7 +643,7 @@ Future<void> promptBackupManuallyTerms(BuildContext context) async => await show
     //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
     title: const Column(
       children: [
-        Text("Save the seed phrase", style: TextStyle(fontFamily: 'Gilroy', fontSize: 24, fontWeight: FontWeight.w700), textAlign: TextAlign.center,),
+        Text("Save my SIRKL wallet", style: TextStyle(fontFamily: 'Gilroy', fontSize: 24, fontWeight: FontWeight.w700), textAlign: TextAlign.center,),
         SizedBox(height: 2,),
         Text("Check all the boxes to confirm that you understand the importance of your seed phrase", style: TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.w500, fontSize: 14), textAlign: TextAlign.center,),
       ],
@@ -940,8 +964,18 @@ Future<void> promptCompleteManualBackup(BuildContext context) async {
               Obx(() => ElevatedButton(
                 onPressed: () {
                   if (wordOneValidate.value && wordTwoValidate.value && wordThreeValidate.value && wordFourValidate.value) {
+                    seedPhrase.value = null;
                     box.remove(SharedPref.SEED_PHRASE);
                     Get.back();
+                    Fluttertoast.showToast(
+                        msg: "Wallet saved successfully, enjoy SIRKL.io",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.white : const Color(0xFF102437) ,
+                        textColor: SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Colors.black : Colors.white,
+                        fontSize: 16.0
+                    );
                   }
                 },
                 style: TextButton.styleFrom(
@@ -1061,8 +1095,6 @@ Future<void> promptChoseRetrieveMethod(BuildContext context) async =>
           ],
         ),
       )).then((v)  => _navigationController.hideNavBar.value = _homeController.accessToken.value.isNullOrBlank! ? true : false);
-
-//TODO : Handle scenario not connected, change account, no files
 Future<void> promptChoseFileGoogleDrive(BuildContext context) async => await showDialog(context: context, builder: (context) => LayoutBuilder(
     builder: (context, constraints) => AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -1089,8 +1121,9 @@ Future<void> promptChoseFileGoogleDrive(BuildContext context) async => await sho
               } else if(projectSnap.connectionState == ConnectionState.waiting){
                 return CircularProgressIndicator(color: SColors.activeColor,);
               } else if(projectSnap.connectionState == ConnectionState.done &&
-                projectSnap.hasData == false){
-                return const Text("No file was found", style: TextStyle(fontSize: 22, fontFamily: 'Gilroy', fontWeight: FontWeight.w600),);
+                  (projectSnap.data == null ||
+                projectSnap.data!.isEmpty)){
+                return const Text("No file was found", style: TextStyle(fontSize: 18, fontFamily: 'Gilroy', fontWeight: FontWeight.w600),);
               }
               return SizedBox(
                 height: constraints.maxHeight * .355, // 70% height
@@ -1118,7 +1151,22 @@ Future<void> promptChoseFileGoogleDrive(BuildContext context) async => await sho
                 ),
               );
             },
-          )
+          ),
+          /*TextButton(
+            style: TextButton.styleFrom(textStyle: TextStyle(color: SColors.activeColor, fontFamily: 'Gilroy', fontWeight: FontWeight.w600)),
+            onPressed: () async {
+            await signOutWithGoogle();
+            await listFilesInSirklFolder();
+            setState(() {});
+            }, child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Icon(Icons.change_circle_rounded, color: SColors.activeColor, size: 18,),
+              const SizedBox(width: 4,),
+              Text("Change Google account", style: TextStyle(color: SColors.activeColor),),
+            ],
+          ),)*/
         ],
       ),
     ),
@@ -1290,8 +1338,7 @@ Widget buildLabeledRadioButtons(
       String label,
       List<String> options,
       ValueChanged<String> onSelected,
-      ) =>
-    Column(
+      ) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(

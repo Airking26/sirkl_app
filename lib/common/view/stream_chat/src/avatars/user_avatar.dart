@@ -82,10 +82,11 @@ class StreamUserAvatar extends StatelessWidget {
 
   /// {@macro placeholderUserImage}
   final PlaceholderUserImage? placeholder;
-  UserDTO get userDTO => userFromJson(json.encode(user.extraData["userDTO"]));
+
   @override
   Widget build(BuildContext context) {
-    
+
+    var userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
     final haveNotPicture = userDTO.picture.isNullOrBlank!;
     final notYetUser = userDTO.id == _homeController.id.value;
     final isGroup = channel?.extraData["isConv"];

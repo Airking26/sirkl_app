@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_actions.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_transition.dart';
@@ -319,9 +320,7 @@ class _CallsScreenState extends State<CallsScreen> {
           ],
         ),
         title: Transform.translate(offset: const Offset(-4, 0),child: Text(
-            callDto.called.nickname.isNullOrBlank! ?
-            (callDto.called.userName.isNullOrBlank! ? "${callDto.called.wallet!.substring(0, 6)}...${callDto.called.wallet!.substring(callDto.called.wallet!.length - 4)}" : callDto.called.userName!.length > 15 ? "${callDto.called.userName!.substring(0,15)}..." : callDto.called.userName!):
-            "${callDto.called.nickname!} (${callDto.called.userName.isNullOrBlank! ? "${callDto.called.wallet!.substring(0, 6)}...${callDto.called.wallet!.substring(callDto.called.wallet!.length - 4)}" : callDto.called.userName!.length > 10 ? "${callDto.called.userName!.substring(0,10)}..." : callDto.called.userName!}"")",
+            displayName(callDto.called, _homeController),
             maxLines: 2, overflow: TextOverflow.ellipsis,
             style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black))),
         subtitle: Transform.translate(

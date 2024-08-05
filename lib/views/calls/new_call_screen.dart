@@ -299,7 +299,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
         ),
         title: Transform.translate(
           offset: const Offset(-8, 0),
-          child: Text(item.nickname != null ? item.nickname! + (item.userName.isNullOrBlank! ? "" : " (${item.userName!})") : item.userName.isNullOrBlank! ? item.wallet! : item.userName!,
+          child: Text(item.nickname != null ? item.nickname! + (item.userName.isNullOrBlank! ? "" : " (${item.userName!})") : item.userName.isNullOrBlank! ? "${item.wallet!.substring(0,6)}...${item.wallet!.substring(item.wallet!.length - 4)}" : item.userName!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(

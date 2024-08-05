@@ -5,8 +5,10 @@ import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/controllers/calls_controller.dart';
 import 'package:sirkl/config/size_config.dart';
+import 'package:sirkl/controllers/home_controller.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class CallInviteSendingScreen extends StatefulWidget {
@@ -19,6 +21,7 @@ class CallInviteSendingScreen extends StatefulWidget {
 class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
 
   CallsController get _callController => Get.find<CallsController>();
+  HomeController get _homeController => Get.find<HomeController>();
   late Timer timer ;
 
   @override
@@ -64,9 +67,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                 children: [
                   const VerticalSpacing(of: 24),
                   Text(
-                    _callController.userCalled.value.nickname.isNullOrBlank!
-                        ? (_callController.userCalled.value.userName.isNullOrBlank! ? "${_callController.userCalled.value.wallet!.substring(0, 6)}...${_callController.userCalled.value.wallet!.substring(_callController.userCalled.value.wallet!.length - 4)}" : _callController.userCalled.value.userName!) :
-                    "${_callController.userCalled.value.nickname!} (${_callController.userCalled.value.userName.isNullOrBlank! ? "${_callController.userCalled.value.wallet!.substring(0, 6)}...${_callController.userCalled.value.wallet!.substring(_callController.userCalled.value.wallet!.length - 4)}" :  _callController.userCalled.value.userName!})",
+                    displayName(_callController.userCalled.value, _homeController),
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme

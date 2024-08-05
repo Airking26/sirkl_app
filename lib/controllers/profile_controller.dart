@@ -43,7 +43,7 @@ class ProfileController extends GetxController{
   var isLoadingPicture = false.obs;
   var urlPicture = "".obs;
   var urlPictureGroup = "".obs;
-  var hasUnreadNotif = false.obs;
+  var hasUnreadNotification = false.obs;
   var contactUsClicked = false.obs;
   var index = 0.obs;
 
@@ -51,9 +51,9 @@ class ProfileController extends GetxController{
     isLoadingPicture.value = true;
 
     UserDTO userDto = await ProfileRepo.modifyUser(updateMeDto );
-        _homeController.userMe.value = userDto;
-      box.write(SharedPref.USER, userDto.toJson());
-      if(!updateMeDto.userName.isNullOrBlank! || !updateMeDto.picture.isNullOrBlank!) {
+    _homeController.userMe.value = userDto;
+    box.write(SharedPref.USER, userDto.toJson());
+    if(!updateMeDto.userName.isNullOrBlank! || !updateMeDto.picture.isNullOrBlank!) {
         UserDTO userToPass = UserDTO(id: _homeController.userMe.value.id,
             userName: _homeController.userMe.value.userName,
             picture: _homeController.userMe.value.picture,
@@ -71,17 +71,12 @@ class ProfileController extends GetxController{
   }
 
   Future<UserDTO?> getUserByWallet(String wallet) async{
-
-
   try {
-        UserDTO userDto = await ProfileRepo.getUserByWallet( wallet);
-
+    UserDTO userDto = await ProfileRepo.getUserByWallet( wallet);
     return userDto;
   } catch(err) {
     return null;
   }
-  
-
   }
 
   Future<bool> postStory(File file, int type) async{
@@ -120,36 +115,21 @@ class ProfileController extends GetxController{
     isLoadingPicture.value = false;
   }
 
-  Future<void> checkIfHasUnreadNotif(String id) async{
-    bool hasNoti = await ProfileRepo.retrieveHasUnreadNotif(id);
-    hasUnreadNotif.value = hasNoti;
+  Future<void> checkIfHasUnreadNotification(String id) async{
+    bool hasNotification = await ProfileRepo.retrieveHasUnreadNotif(id);
+    hasUnreadNotification.value = hasNotification;
   }
 
-  Future< List<NotificationDto>> retrieveNotifications(String id, int offset) async {
-      return await ProfileRepo.retrieveNotifications( id: id, offset: offset.toString());
-  }
-
-  Future<void> updateNft(NftModificationDto nftModificationDto) async{
-
-   await HomeRepo.updateNFTStatus(nftModificationDto);
-
-  }
-
-  retrieveMyStories() async{
-    myStories.value = await ProfileRepo.retrieveMyStories();
-  }
+  Future< List<NotificationDto>> retrieveNotifications(String id, int offset) async => await ProfileRepo.retrieveNotifications( id: id, offset: offset.toString());
+  Future<void> updateNft(NftModificationDto nftModificationDto) async => await HomeRepo.updateNFTStatus(nftModificationDto);
+  retrieveMyStories() async => myStories.value = await ProfileRepo.retrieveMyStories();
 
   Future<void> retrieveUsersForAStory(String id) async{
-
     List<UserDTO> users = await ProfileRepo.retrieveReadersForAStory(id);
-
     readers.value = users;
-    
   }
 
-  deleteUser(String id) async{
-      await ProfileRepo.deleteUser(id);
-  }
+  deleteUser(String id) async => await ProfileRepo.deleteUser(id);
 
   Future<Uri> createDynamicLink(String link) async{
     FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
@@ -158,10 +138,6 @@ class ProfileController extends GetxController{
     return shortLink.shortUrl;
   }
 
-  Future<void> deleteNotification(String id) async{
-  
-   await ProfileRepo.deleteNotification( id);
-
-  }
+  Future<void> deleteNotification(String id) async => await ProfileRepo.deleteNotification( id);
 
 }

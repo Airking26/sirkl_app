@@ -46,8 +46,8 @@ android {
         applicationId "io.airking.sirkl"
         minSdkVersion 24
         targetSdkVersion 34
-        versionCode 79
-        versionName "1.6.1"
+        versionCode 80
+        versionName "1.6.2"
         multiDexEnabled = true
     }
 

@@ -430,8 +430,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                   ),
                 ):
                 Text(
-                  _homeController.nicknames[_commonController.userClicked.value!.wallet!] != null ?
-                  _homeController.nicknames[_commonController.userClicked.value!.wallet!] + (_commonController.userClicked.value!.userName!.isEmpty ? "" : " (${_commonController.userClicked.value!.userName!})") : (_commonController.userClicked.value!.userName!.isEmpty ? "${_commonController.userClicked.value!.wallet!.substring(0, 6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}" : _commonController.userClicked.value!.userName!),
+                  displayName(_commonController.userClicked.value!, _homeController),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 20,

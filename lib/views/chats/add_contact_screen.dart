@@ -136,7 +136,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                               ),
                               subtitle: suggestion.userName.isNullOrBlank!
                                   ? const SizedBox()
-                                  : Text('${(suggestion).wallet}',
+                                  : Text("${suggestion.wallet!.substring(0, 6)}...${suggestion.wallet!.substring(suggestion.wallet!.length - 4)}",
                                       style: const TextStyle(
                                           fontFamily: "Gilroy")),
                             ),
@@ -185,18 +185,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       title: Transform.translate(
                           offset: const Offset(-8, 0),
                           child: Text(
-                              _homeController
-                                      .userAdded.value.nickname.isNullOrBlank!
-                                  ? (_homeController.userAdded.value.userName
-                                          .isNullOrBlank!
-                                      ? "${_homeController.userAdded.value.wallet!.substring(0, 6)}...${_homeController.userAdded.value.wallet!.substring(_homeController.userAdded.value.wallet!.length)}"
-                                      : _homeController
-                                          .userAdded.value.userName!)
-                                  : _homeController.userAdded.value.nickname! +
-                                      (_homeController.userAdded.value.userName
-                                              .isNullOrBlank!
-                                          ? ""
-                                          : " (${_homeController.userAdded.value.userName!})"),
+                              displayName(_homeController.userAdded.value, _homeController),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(

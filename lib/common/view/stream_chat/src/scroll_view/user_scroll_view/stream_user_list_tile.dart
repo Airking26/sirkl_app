@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -161,10 +162,7 @@ class StreamUserListTile extends StatelessWidget {
     final title = Row(
       children: [
         this.title ??
-            Text(
-                (_homeController.nicknames[userFromJson(json.encode(user.extraData["userDTO"])).wallet!] != null ?
-              _homeController.nicknames[userFromJson(json.encode(user.extraData["userDTO"])).wallet!] + " (" + (userFromJson(json.encode(user.extraData["userDTO"])).userName.isNullOrBlank! ? "${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(0,6)}...${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(user.extraData["userDTO"])).wallet!.length -4)}": userFromJson(json.encode(user.extraData["userDTO"])).userName!) + ")"
-                  : (userFromJson(json.encode(user.extraData["userDTO"])).userName.isNullOrBlank! ? "${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(0,10)}...${userFromJson(json.encode(user.extraData["userDTO"])).wallet!.substring(userFromJson(json.encode(user.extraData["userDTO"])).wallet!.length - 4)}": userFromJson(json.encode(user.extraData["userDTO"])).userName!)),
+            Text(displayName(userFromJson(json.encode(user.extraData["userDTO"])), _homeController),
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, fontFamily: "Gilroy",color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
             ),
         SizedBox(width: channelRole == "channel_moderator" || _chatController.channel.value!.createdBy!.id == user.id  ? 4 : 0,),

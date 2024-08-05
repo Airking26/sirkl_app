@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart'
     hide GetStringUtils;
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/bottom_row.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/parse_attachments.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/quoted_message.dart';
@@ -240,8 +241,8 @@ class _MessageCardState extends State<MessageCard> {
                 children: [
                   !widget.showTimeStamp || widget.showUserAvatar == DisplayWidget.gone  ? const SizedBox() :  Padding(
                     padding: const EdgeInsets.only(left: 15.0, right: 12, top: 12),
-                    child: Text(_homeController.nicknames[userDTO.wallet] != null ?
-                    _homeController.nicknames[userDTO.wallet] + (userDTO.userName!.isEmpty ? "" : " (${userDTO.userName!})") : (userDTO.userName!.isEmpty ? "${userDTO.wallet!.substring(0, 6)}...${userDTO.wallet!.substring(userDTO.wallet!.length - 4)}" : userDTO.userName!), maxLines: 1, overflow: TextOverflow.ellipsis,
+                    child: Text(
+                      displayName(userDTO, _homeController), maxLines: 1, overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? SColors.activeColor: Colors.blueGrey),),
                   ),
                   if (widget.hasQuotedMessage) QuotedMessage(

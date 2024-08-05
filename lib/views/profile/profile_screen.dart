@@ -147,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     .isEditingProfile.value
                                     ? const SizedBox(width: 42, height: 24,) : IconButton(
                                             onPressed: () async {
-                                              pushNewScreen(context, screen: const NotificationScreen()).then((value) => _profileController.checkIfHasUnreadNotif(_homeController.id.value));
+                                              pushNewScreen(context, screen: const NotificationScreen()).then((value) => _profileController.checkIfHasUnreadNotification(_homeController.id.value));
                                             },
                                             icon: FlutterBadge(
                                               icon: Image.asset(
@@ -160,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     ? Colors.white
                                                     : Colors.black,
                                               ),
-                                              itemCount: _profileController.hasUnreadNotif.value || !_homeController.userMe.value.hasSBT! ? 1 : 0,
+                                              itemCount: _profileController.hasUnreadNotification.value || !_homeController.userMe.value.hasSBT! ? 1 : 0,
                                               hideZeroCount: true,
                                               badgeColor:
                                                   SColors.activeColor,

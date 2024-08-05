@@ -316,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         SizedBox(
           width: 70,
-          child: Text(_homeController.stories.value != null && _homeController.stories.value!.length > index ? displayName(_homeController.stories.value![index]!.first!.createdBy) : "Unknown",
+          child: Text(_homeController.stories.value != null && _homeController.stories.value!.length > index ? displayNameStory(_homeController.stories.value![index]!.first!.createdBy) : "Unknown",
             maxLines: 2,
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -330,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String displayName(UserDTO createdBy) {
+  String displayNameStory(UserDTO createdBy) {
     String wallet = createdBy.wallet!;
     String userName = createdBy.userName ?? '';
     String nickname = createdBy.nickname ?? '';
@@ -735,6 +735,65 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   ///Login
+  Future<void> displayBetaPopup(BuildContext context) async {
+    await showDialog(context: context, barrierDismissible: false, builder: (_) => WillPopScope(
+      onWillPop: () async => false,
+      child:  Obx(() => AlertDialog(
+        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white,
+        title: const Text("SIRKL.io (BETA)", style: TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.w600),),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Please enter the code to access the Beta version of SIRKL.io", style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w500),),
+            const SizedBox(height: 12,),
+            TextField(
+                autofocus: true,
+                controller: _betaTestController,
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(6),
+                ],
+                cursorColor: SColors.activeColor,
+                decoration: InputDecoration(
+                  hintText: "Enter Code",
+                  hintStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: SColors.activeColor), // Change active border color
+                  ),
+                )
+            )
+          ],
+        ),
+        actions: [
+          _homeController.isCheckingBetaCode.value ? SizedBox(width: 36, height: 36,child: CircularProgressIndicator(color: SColors.activeColor,)) : TextButton(onPressed: () async {
+            if(_betaTestController.text.isNotEmpty && _betaTestController.text.length == 6) {
+              _homeController.isCheckingBetaCode.value = true;
+              if (await _homeController.checkBetaCode(
+                  _betaTestController.text.trim())) {
+                Get.back();
+                _homeController.isCheckingBetaCode.value = false;
+                _navigationController.hideNavBar.value = true;
+              } else {
+                if(context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Wrong code"),
+                  ));
+                }
+                _homeController.isCheckingBetaCode.value = false;
+                _navigationController.hideNavBar.value = true;
+              }
+            }
+          }, child: Text("SUBMIT", style: TextStyle(color: SColors.activeColor, fontFamily: 'Gilroy', fontWeight: FontWeight.w700),))
+        ],
+      )),
+    )).then((_){
+      _navigationController.hideNavBar.value = true;
+    });
+  }
+
   Column buildConnectWalletUI() {
     if (_navigationController.hideNavBar.isFalse) {
       Future.delayed(Duration.zero, () {
@@ -801,23 +860,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text('Connect', style: TextStyle(fontFamily: 'Gilroy', color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),),
                   ))),
-            /*const SizedBox(height: 12,),
-            Container(height: 48,
-                width: 280,
-                decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xff1DE99B), Color(0xff0063FB)]), borderRadius: BorderRadius.circular(10)),
-                child: ElevatedButton(onPressed: () async {
-                  await _walletConnectModalController.createWallet(context);
-                },
-                    style: ElevatedButton.styleFrom(elevation : 5,backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text('Connect without wallet', style: TextStyle(fontFamily: 'Gilroy', color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),),
-                    ))),*/
             const SizedBox(height: 18,),
             InkWell(
-              onTap: ()async{
-                //await promptChoseRetrieveMethod(context);
-              },
+              onTap: () async => await promptChoseRetrieveMethod(context),
               child: Text("Retrieve your wallet", style: TextStyle(
                   decoration: TextDecoration.underline,
                   color: MediaQuery.of(context).platformBrightness == Brightness.dark
@@ -926,65 +971,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  displayBetaPopup(BuildContext context) {
-    showDialog(context: context, barrierDismissible: false, builder: (_) => WillPopScope(
-      onWillPop: () async => false,
-      child:  Obx(() => AlertDialog(
-        backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF102437) : Colors.white,
-        title: const Text("SIRKL.io (BETA)", style: TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.w600),),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Please enter the code to access the Beta version of SIRKL.io", style: TextStyle(fontFamily: 'Gilroy', fontSize: 16, fontWeight: FontWeight.w500),),
-            const SizedBox(height: 12,),
-            TextField(
-              autofocus: true,
-              controller: _betaTestController,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-              keyboardType: TextInputType.number,
-              maxLength: 6,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(6),
-              ],
-              cursorColor: SColors.activeColor,
-                decoration: InputDecoration(
-                  hintText: "Enter Code",
-                  hintStyle: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: SColors.activeColor), // Change active border color
-                  ),
-                )
-            )
-          ],
-        ),
-        actions: [
-          _homeController.isCheckingBetaCode.value ? SizedBox(width: 36, height: 36,child: CircularProgressIndicator(color: SColors.activeColor,)) : TextButton(onPressed: () async {
-            if(_betaTestController.text.isNotEmpty && _betaTestController.text.length == 6) {
-              _homeController.isCheckingBetaCode.value = true;
-              if (await _homeController.checkBetaCode(
-                  _betaTestController.text.trim())) {
-                Get.back();
-                _homeController.isCheckingBetaCode.value = false;
-                _navigationController.hideNavBar.value = true;
-              } else {
-                if(context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Wrong code"),
-                ));
-                }
-                _homeController.isCheckingBetaCode.value = false;
-                _navigationController.hideNavBar.value = true;
-              }
-            }
-          }, child: Text("SUBMIT", style: TextStyle(color: SColors.activeColor, fontFamily: 'Gilroy', fontWeight: FontWeight.w700),))
-        ],
-      )),
-    )).then((_){
-      _navigationController.hideNavBar.value = true;
-    });
-  }
-
   Column buildSignWalletUI() {
     return Column(
       children: [
@@ -1038,8 +1024,8 @@ class _HomeScreenState extends State<HomeScreen> {
           action: () async {
             _homeController.isSigning.value = true;
             await _walletConnectModalController.signMessageWithWC(context);
-           // await _homeController.signMessageWithMetamask(context);
             _homeController.isSigning.value = false;
+            return _homeController.isSigning.value;
           },
           label: const Text(
             "Slide to sign in",
@@ -1107,7 +1093,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
   }
-
 
 
   ///Override

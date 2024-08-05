@@ -487,14 +487,7 @@ class StreamChannelHeader extends StatelessWidget
     } else {
       var memberData = channel.state?.members.where((element) => element.userId != StreamChat.of(context).currentUser!.id).first.user!.extraData["userDTO"];
       var user = userFromJson(json.encode(memberData));
-
-      if (_homeController.nicknames[user.wallet!] != null) {
-        var userNickname = _homeController.nicknames[user.wallet!];
-        var userNameOrWallet = !user.userName.isNullOrBlank! ? user.userName! : "${user.wallet!.substring(0, 6)}...${user.wallet!.substring(user.wallet!.length - 4)}";
-        return "$userNickname ($userNameOrWallet)";
-      } else {
-        return !user.userName.isNullOrBlank! ? user.userName! : "${user.wallet!.substring(0, 6)}...${user.wallet!.substring(user.wallet!.length - 4)}";
-      }
+      return displayName(user, _homeController);
     }
   }
 

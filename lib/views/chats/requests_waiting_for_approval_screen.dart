@@ -88,8 +88,8 @@ class _RequestWaitingForApprovalScreenState extends State<RequestWaitingForAppro
           ),
           title: Transform.translate(
             offset: Offset(item.picture.isNullOrBlank! ? 0 : -8, 0),
-            child: Text(_homeController.nicknames[item.wallet!] != null ?
-            _homeController.nicknames[item.wallet!] + (item.userName!.isEmpty ? "" : " (${item.userName!})") : "${item.userName!.isEmpty ? "${item.wallet!.substring(0, 6)}...${item.wallet!.substring(item.wallet!.length - 4)}" : item.userName!} has requested to join ${_chatController.channel.value!.extraData['nameOfGroup'] as String}", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color:MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.6))),
+            child: Text(
+            "${displayName(item, _homeController)} has requested to join ${_chatController.channel.value!.extraData['nameOfGroup'] as String}", style: TextStyle(fontSize: 15, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color:MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.6))),
           ),
           //subtitle: Text("Lorem Ipsum is simply...", style: TextStyle(fontSize: 13, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Get.isDarkMode ? Color(0xFF9BA0A5) : Color(0xFF828282))),
         ),

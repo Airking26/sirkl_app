@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import '../../../../../config/s_colors.dart';
@@ -54,7 +55,6 @@ class StreamChannelName extends StatelessWidget {
     List<Member> members
   ) =>
       LayoutBuilder(
-
         builder: (context, constraints) {
           var channelName = context.translations.noTitleText;
           final otherMembers = members.where((member) => member.userId != _homeController.id.value,);
@@ -67,10 +67,7 @@ class StreamChannelName extends StatelessWidget {
                 channelName = channel.extraData["nameOfGroup"] as String;
               }
               else if (user != null) {
-                var userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
-                channelName = _homeController.nicknames[userDTO.wallet!] != null ?
-                _homeController.nicknames[userDTO.wallet!] + " (" + (userDTO.userName.isNullOrBlank! ? "${userDTO.wallet!.substring(0, 6)}...${userDTO.wallet!.substring(userDTO.wallet!.length - 4)}" : userDTO.userName!) + ")"
-                    : (userDTO.userName.isNullOrBlank! ? "${userDTO.wallet!.substring(0, 6)}...${userDTO.wallet!.substring(userDTO.wallet!.length - 4)}": userDTO.userName!);
+                channelName = displayName(userFromJson(json.encode(user.extraData["userDTO"])), _homeController);
               }
             } else {
               channelName = channel.extraData['nameOfGroup'] as String? ?? "";
