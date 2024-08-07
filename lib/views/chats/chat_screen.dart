@@ -43,13 +43,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     client: StreamChat.of(context).client,
     filter: Filter.and([
       Filter.equal("type", "try"),
+      Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
+      Filter.exists('last_message_at'),
       Filter.or([
         Filter.in_("members", [_homeController.id.value]),
         Filter.equal("created_by_id", _homeController.id.value),
       ]),
       Filter.or([
         Filter.and([
-          Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
           Filter.exists("${_homeController.id.value}_follow_channel"),
           Filter.equal("${_homeController.id.value}_follow_channel", true),
           Filter.equal('isConv', true),
@@ -57,11 +58,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         Filter.equal('isConv', false),
       ]),
     ]),
-    channelStateSort: [SortOption('last_message_at', direction: SortOption.DESC, comparator: (a, b) {
-      final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
-      final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
-      return dateB.compareTo(dateA);
-    },)],
     limit: 10,
   );
 
@@ -71,6 +67,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     Filter.and([
       Filter.equal("type", "try"),
       Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
+      Filter.exists('last_message_at'),
       Filter.equal('isConv', true),
       Filter.or([
         Filter.equal("created_by_id", _homeController.id.value),
@@ -83,18 +80,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             "${_homeController.id.value}_follow_channel", false)
       ])
     ]),
-    channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
-      final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
-      final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
-      return dateB.compareTo(dateA);
-    })],
     limit: 10,
   );
 
   @override
   void initState() {
-    _controllerFriend.doInitialLoad();
-    _controllerOther.doInitialLoad();
     _commonController.controllerFriend = _controllerFriend;
     _commonController.controllerOthers = _controllerOther;
     tabController = TabController(length: 2, vsync: this);
@@ -110,20 +100,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       }
   }
 
-  @override
-  void dispose() {
-    tabController.removeListener(indexChangeListener);
-    _controllerOther.dispose();
-    _controllerFriend.dispose();
-    _chatController.index.value = 0;
-    super.dispose();
-}
-
 
   @override
   Widget build(BuildContext context) {
-
-
     return Obx(() {
       return Scaffold(
           backgroundColor:
@@ -137,6 +116,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     });
   }
 
+  // UI appbar
   Widget buildAppbar(BuildContext context, TabController tabController) {
     return DeferredPointerHandler(
       child: Stack(
@@ -386,6 +366,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
+  // UI searchbar
   Widget buildFloatingSearchBar() {
     return FloatingSearchBar(
       automaticallyImplyBackButton: false,
@@ -451,7 +432,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-
+  // UI list chats
   Widget buildListConv(BuildContext context, TabController tabController) {
     return MediaQuery.removePadding(
       context: context,
@@ -597,11 +578,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 Filter.equal('isGroupVisible', true)
                               ])
                             ]),
-                            channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
-                              final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
-                              final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
-                              return dateB.compareTo(dateA);
-                            })],
                             limit: 10,
                           ) : _controllerFriend,
                           onChannelTap: (channel) async {
@@ -743,11 +719,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                   "${_homeController.id.value}_follow_channel", false)
                             ]),
                           ]),
-                            channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
-                              final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
-                              final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
-                              return dateB.compareTo(dateA);
-                            })],
                             limit: 10,): _controllerOther,
                           onChannelTap: (channel) {
                             _chatController.channel.value = channel;
@@ -768,6 +739,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
+  // UI no group found
   Column noGroupUI() {
     return Column(
       children: [
@@ -820,6 +792,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
+  // UI retry no group found
   Column noGroupRetry(bool isMySirkl) {
     return Column(
       children: [
@@ -878,6 +851,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-
+  @override
+  void dispose() {
+    tabController.removeListener(indexChangeListener);
+    _controllerOther.dispose();
+    _controllerFriend.dispose();
+    _chatController.index.value = 0;
+    super.dispose();
+  }
 
 }

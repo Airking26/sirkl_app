@@ -19,6 +19,7 @@ import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
+import 'package:sirkl/repo/profile_repo.dart';
 
 WalletConnectModalController get _walletConnectModalController => Get.find<WalletConnectModalController>();
 NavigationController get _navigationController => Get.find<NavigationController>();
@@ -45,6 +46,7 @@ var wordFourValidate = false.obs;
 var backupIsLoading = false.obs;
 var saveIsLoading = false.obs;
 var seedPhrase = (null as String?).obs;
+
 
 final box = GetStorage();
 
@@ -203,6 +205,7 @@ Future<List<drive.File>> listFilesInSirklFolder() async {
   );
   return fileList.files ?? [];
 }
+
 
 ///Save prompts
 Future<void> promptChoseBackupMethod(BuildContext context) async =>

@@ -3,15 +3,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:sirkl/common/save_pref_keys.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:restart/restart.dart';
+import 'package:sirkl/config/s_config.dart';
 
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
@@ -29,6 +27,7 @@ import '../../controllers/home_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../../views/home/pdf_screen.dart';
 import '../chats/detailed_chat_screen.dart';
+import '../home/home_screen.dart';
 import 'my_communities_screen.dart';
 import 'my_group_screen.dart';
 
@@ -211,12 +210,25 @@ class _SettingScreenState extends State<SettingScreen> {
                           ? Colors.white : Colors.black,),
                     ],
                   ),
+                  _homeController.userMe.value.userName == null || _homeController.userMe.value.userName!.isEmpty ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: () async => await _profileController.promptClaimUsername(context),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text("Claim your username", style: TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
+                        ),
+                      ),
+                      Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                          ? Colors.white : Colors.black,),
+                    ],
+                  ) : const SizedBox(),
                   InkWell(
                     onTap: () async {
                       if(!_profileController.contactUsClicked.value) {
                         _profileController.contactUsClicked.value = true;
-                        await _commonController.getUserById(
-                            "63f78a6188f7d4001f68699a");
+                        await _commonController.getUserById(SConfig.SIRKL_ID);
                         await pushNewScreen(context,
                             screen: const DetailedChatScreen(create: true)).then((value) => _profileController.contactUsClicked.value = false);
                       }
@@ -228,6 +240,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                   Divider(color: MediaQuery.of(context).platformBrightness == Brightness.dark
                       ? Colors.white : Colors.black,),
+
                   InkWell(
                     onTap: () async {
                         showDialog(context: context,
@@ -249,8 +262,8 @@ class _SettingScreenState extends State<SettingScreen> {
                                   _navigationController.hideNavBar.value = true;
                                   _walletConnectModalController.w3mService.value?.disconnect();
                                   Get.back();
-                                  //Get.deleteAll(force: true);
-                                  //Get.offAll(const HomeScreen());
+                                  Get.deleteAll(force: true);
+                                  Get.offAll(const HomeScreen());
                                   restart();
                                 },)
                             ],

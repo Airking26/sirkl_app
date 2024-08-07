@@ -174,7 +174,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             )),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 12.0),
-                                  child:  _profileController
+                                  child:  /*_profileController
                                       .isEditingProfile.value
                                       ? SizedBox(
                                     width: 200,
@@ -207,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               .userMe.value.userName!),
                                     ),
                                   )
-                                      : Text(
+                                      : */ Text(
                                           _homeController.userMe.value.userName!
                                                       .isEmpty ||
                                                   _homeController.userMe.value

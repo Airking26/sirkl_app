@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/model/crypto/chain_metadata.dart';
+import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/web3_controller.dart';
 import 'package:sirkl/networks/urls.dart';
 import 'package:sirkl/repo/chats_repo.dart';
@@ -76,7 +77,7 @@ class HomeController extends GetxController {
   var notificationActive = true.obs;
   var streamChatToken = "".obs;
   var isSigning = false.obs;
-  var mint = false.obs;
+  var displayPopupFirstConnection = false.obs;
   var isLoading = false.obs;
   var isStoryLoading = false.obs;
 
@@ -132,7 +133,7 @@ class HomeController extends GetxController {
     _navigationController.hideNavBar.value = false;
     var checkTime = DateTime.now().difference(userMe.value.createdAt!);
     if (checkTime.inSeconds < 60) {
-      mint.value = true;
+      displayPopupFirstConnection.value = true;
     }
 
     isLoading.value = false;
@@ -304,56 +305,78 @@ class HomeController extends GetxController {
   }
 
   Future<void> connectUser(StreamChatClient client) async {
+    // Récupère le jeton d'accès depuis la méthode appropriée
     retrieveAccessToken();
+
     if (accessToken.value.isNotEmpty) {
+      // Vérifie si le client n'est pas déjà connecté
       if (client.wsConnectionStatus != ConnectionStatus.connected) {
-        if (streamChatToken.value.isNullOrBlank! &&
-            (DateTime.now().difference(userMe.value.createdAt!) <
-                const Duration(minutes: 1))) {
-          String token = await ProfileRepo.retrieveTokenStreamChat();
-          streamChatToken.value = token;
-          await box.write(SharedPref.STREAM_CHAT_TOKEN, token);
-          var userToPass = UserDTO(
-              id: userMe.value.id,
-              userName: userMe.value.userName,
-              picture: userMe.value.picture,
-              isAdmin: userMe.value.isAdmin,
-              createdAt: userMe.value.createdAt,
-              description: userMe.value.description,
-              fcmToken: userMe.value.fcmToken,
-              wallet: userMe.value.wallet,
-              following: userMe.value.following,
-              isInFollowing: userMe.value.isInFollowing);
-          await client.connectUser(
-              User(
-                  id: id.value,
-                  name: userMe.value.userName.isNullOrBlank!
-                      ? userMe.value.wallet
-                      : userMe.value.userName!,
-                  extraData: {"userDTO": userToPass}),
-              token);
-          if (DateTime.now().difference(userMe.value.createdAt!) <
-              const Duration(minutes: 1)) {
-            await _commonController.addUserToSirkl(
-                "63f78a6188f7d4001f68699a", client, id.value);
-            await getWelcomeMessage();
-            await checkIfHasMessage(client);
-          }
-          isConfiguring.value = false;
-          isFirstConnexion.value = false;
+
+        // Si le jeton de Stream Chat n'est pas défini
+        if (streamChatToken.value.isNullOrBlank!) {
+          await _handleNewUser(client);
         } else {
-          if (streamChatToken.value.isNullOrBlank!) {
-            String token = await ProfileRepo.retrieveTokenStreamChat();
-            streamChatToken.value = token;
-            await box.write(SharedPref.STREAM_CHAT_TOKEN, token);
-          }
-          await client.connectUser(User(id: id.value), streamChatToken.value);
-          isConfiguring.value = false;
-          isFirstConnexion.value = false;
-          await checkIfHasMessage(client);
+          await _handleExistingUser(client);
         }
+
+        // Effectue les actions communes après la connexion de l'utilisateur
+        isConfiguring.value = false;
+        isFirstConnexion.value = false;
+        await checkIfHasMessage(client);
       }
     }
+  }
+
+  Future<void> _handleNewUser(StreamChatClient client) async {
+    // Récupère un nouveau jeton pour Stream Chat
+    String token = await ProfileRepo.retrieveTokenStreamChat();
+
+    // Crée l'objet utilisateur à passer à Stream Chat
+    var userToPass = UserDTO(
+      id: userMe.value.id,
+      userName: userMe.value.userName,
+      picture: userMe.value.picture,
+      isAdmin: userMe.value.isAdmin,
+      createdAt: userMe.value.createdAt,
+      description: userMe.value.description,
+      fcmToken: userMe.value.fcmToken,
+      wallet: userMe.value.wallet,
+      following: userMe.value.following,
+      isInFollowing: userMe.value.isInFollowing,
+    );
+
+    // Connecte l'utilisateur avec le nouveau jeton
+    try {
+      await client.connectUser(
+        User(id: userMe.value.id!, extraData: {"userDTO": userToPass.toJson()}),
+        token,
+      );
+
+      if (DateTime.now().difference(userMe.value.createdAt!) < const Duration(minutes: 1)) {
+        await _commonController.addUserToSirkl(
+            SConfig.SIRKL_ID, client, userMe.value.id!);
+        await getWelcomeMessage();
+      }
+
+      await box.write(SharedPref.STREAM_CHAT_TOKEN, token);
+      streamChatToken.value = token;
+    } catch (e){
+      debugPrint("ERROR_CONNECTION");
+    }
+
+
+  }
+
+  Future<void> _handleExistingUser(StreamChatClient client) async {
+    // Si le jeton de Stream Chat n'est pas défini, récupère un nouveau jeton
+    if (streamChatToken.value.isNullOrBlank!) {
+      String token = await ProfileRepo.retrieveTokenStreamChat();
+      streamChatToken.value = token;
+      await box.write(SharedPref.STREAM_CHAT_TOKEN, token);
+    }
+
+    // Connecte l'utilisateur avec le jeton existant
+    await client.connectUser(User(id: userMe.value.id!), streamChatToken.value);
   }
 
   retrieveNicknames() async {
@@ -419,14 +442,6 @@ class HomeController extends GetxController {
                 Filter.equal('isConv', false),
               ]),
             ]),
-            channelStateSort: [
-              SortOption('last_message_at', direction: SortOption.DESC,
-                  comparator: (a, b) {
-                final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
-                final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
-                return dateB.compareTo(dateA);
-              })
-            ],
             paginationParams: const PaginationParams(limit: 1))
         .listen((event) {
       if (event.first.state != null && event.first.state!.unreadCount > 0) {
@@ -449,16 +464,6 @@ class HomeController extends GetxController {
                     Filter.equal("${id.value}_follow_channel", false)
                   ])
                 ]),
-                channelStateSort: [
-                  SortOption('last_message_at', direction: SortOption.DESC,
-                      comparator: (a, b) {
-                    final dateA =
-                        a.channel?.lastMessageAt ?? a.channel!.createdAt;
-                    final dateB =
-                        b.channel?.lastMessageAt ?? b.channel!.createdAt;
-                    return dateB.compareTo(dateA);
-                  })
-                ],
                 paginationParams: const PaginationParams(limit: 1))
             .listen((event) {
           if (event.isNotEmpty &&
@@ -475,252 +480,4 @@ class HomeController extends GetxController {
 }
 
 isNumeric(string) => num.tryParse(string) != null;
-
-
-
-  /*
-
-
-     connectWallet(BuildContext context) async {
-
-    connector ??= await Web3App.createInstance(
-      logLevel: LogLevel.debug,
-      projectId: 'bdfe4b74c44308ffb46fa4e6198605af',
-      metadata: const PairingMetadata(
-          name: 'SIRKL',
-          description: 'SIRKL Login',
-          url: 'https://sirkl.io/',
-          icons: ["https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"],
-          redirect: Redirect(
-              native: "sirkl://",
-              universal: 'https://www.walletconnect.com',
-          )
-      ),
-    );
-
-    ConnectResponse res = await connector!.connect(requiredNamespaces: {
-          'eip155': const RequiredNamespace(
-            events: ['session_request'],
-            chains: ["eip155:1"],
-            methods: [
-              'personal_sign', 'eth_sendTransaction'
-            ], // Requestable Methods
-          ),
-        });
-
-    try {
-      _connectResponse = res;
-      var encode = Uri.encodeComponent('${res.uri}');
-      var hasLaunched = await launchUrlString("metamask://wc?uri=$encode", mode: LaunchMode.externalApplication);
-      if (hasLaunched == false) {
-        isLoading.value = false;
-        Fluttertoast.showToast(
-            msg: "Not wallet was found, please create one in order to continue",
-            toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 2,
-            backgroundColor: SchedulerBinding
-                .instance.platformDispatcher.platformBrightness ==
-                Brightness.dark
-                ? Colors.white
-                : const Color(0xFF102437),
-            textColor: SchedulerBinding
-                .instance.platformDispatcher.platformBrightness ==
-                Brightness.dark
-                ? Colors.black
-                : Colors.white,
-            fontSize: 16.0);
-      }
-    } on Exception {
-      isLoading.value = false;
-      debugPrint("II");
-      Fluttertoast.showToast(
-          msg: "Not wallet was found, please create one in order to continue",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 10,
-          backgroundColor:
-          SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-              Brightness.dark
-              ? Colors.white
-              : const Color(0xFF102437),
-          textColor:
-          SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-              Brightness.dark
-              ? Colors.black
-              : Colors.white,
-          fontSize: 16.0);
-    }
-
-
-    connector!.onSessionConnect.subscribe((args) {
-      chainToConnect = args!.session.namespaces['eip155']!.accounts.first.split("eip155:")[1].split(':')[0];
-      address.value = args.session.namespaces['eip155']!.accounts.first.split("eip155:$chainToConnect:")[1].toLowerCase();
-      debugPrint('Session $address.value');
-    });
-
-    connector!.onSessionUpdate.subscribe((args) async{
-      var t = args!.namespaces['eip155']!.accounts.last.split("eip155:")[1];
-      if(t != "eip155:1"){
-        await launchUrl(res.uri!, mode: LaunchMode.externalApplication);
-      }
-    });
-
-  }
-
-  String generateSessionMessage(String accountAddress) {
-    String message =
-        'Hello $accountAddress, welcome to our app. By signing this message you agree to learn and have fun with blockchain';
-
-    return message;
-  }
-
-  signMessageWithMetamask(BuildContext context) async {
-    try {
-      _uri = _connectResponse.uri!;
-      _sessionData = await _connectResponse.session.future;
-      var message = generateSessionMessage(address.value);
-      launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
-      var signature = await connector?.request(topic: _sessionData!.topic, chainId: "eip155:${chainToConnect.toLowerCase()}", request: SessionRequestParams(method: 'personal_sign', params: [message, EthereumAddress.fromHex(address.value).hex]));
-      await loginWithWallet(context, address.value, message, signature);
-    } catch (exp) {
-      isLoading.value = false;
-      if (kDebugMode) {
-        print(exp);
-      }
-    }
-  }
-
-  RxList<DropdownMenuItem> dropDownMenuItems = <DropdownMenuItem>[].obs;
-  getDropDownList(String wallet) async {
-    /*var request = await _homeService.getTokenContractAddressesWithAlchemy(wallet, "");
-    //var ethClient = Web3Client('https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2', htp.Client());
-    //var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet));
-    //if(balance.getInWei > BigInt.zero) {
-    dropDownMenuItems.add(DropdownMenuItem(
-        child: Row(
-      children: [
-        Image.network(
-          "https://raw.githubusercontent.com/dappradar/tokens/main/ethereum/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee/logo.png",
-          width: 22,
-          height: 22,
-        ),
-        const SizedBox(
-          width: 4,
-        ),
-        const Text(
-          "ETH",
-          style: TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),
-        )
-      ],
-    )));
-    //}
-    if(request.isOk){
-      var tokenContractAddress = tokenDtoFromJson(json.encode(request.body));
-      tokenContractAddress.result?.tokenBalances?.forEach((element) async {
-        if(element.tokenBalance != "0x0000000000000000000000000000000000000000000000000000000000000000"){
-          var tokenMetadata = await getTokenMetadata(element.contractAddress!);
-          dropDownMenuItems.add(DropdownMenuItem(
-              child:
-          Row(
-            children: [
-              tokenMetadata != null && tokenMetadata.result != null && tokenMetadata.result?.logo != null ? Image.network(tokenMetadata.result!.logo!, width: 22, height: 22,) : const SizedBox(),
-              const SizedBox(width: 4,),
-              tokenMetadata != null && tokenMetadata.result != null && tokenMetadata.result?.symbol != null ? Text(tokenMetadata.result!.symbol!, style: const TextStyle(fontFamily: "Gilroy", fontWeight: FontWeight.w500),) : const SizedBox()
-            ],
-          )));
-        }
-      });
-    }*/
-  }
-
-
-
-
-  Future<dynamic> callChainMethod(
-      ChainType type,
-      String method,
-      ChainMetadata chainMetadata,
-      String address,
-      ) {
-    switch (type) {
-      case ChainType.eip155:
-        return EIP155.callMethod(
-          web3App: _web3App,
-          topic: _walletConnectModalService.session!.topic,
-          method: method.toEip155Method()!,
-          chainId: chainMetadata.namespace,
-          address: address,
-        );
-      case ChainType.polkadot:
-        return Polkadot.callMethod(
-          web3App: _web3App,
-          topic: _walletConnectModalService.session!.topic,
-          method: method,
-          chainId: chainMetadata.namespace,
-          address: address,
-        );
-      case ChainType.solana:
-        return Solana.callMethod(
-          web3App: _web3App,
-          topic: _walletConnectModalService.session!.topic,
-          method: method,
-          chainId: chainMetadata.namespace,
-          address: address,
-        );
-      default:
-        return Future<dynamic>.value();
-    }
-  }
-
-     connectWalletModal(BuildContext context) async {
-
-    _web3App = Web3App(core: Core(projectId: "bdfe4b74c44308ffb46fa4e6198605af"), metadata: const PairingMetadata(
-        name: 'SIRKL',
-        description: 'SIRKL Login',
-        url: 'https://sirkl.io/',
-        icons: ["https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"],
-        redirect: Redirect(
-            native: "sirkl://",
-            universal: 'https://www.walletconnect.com')));
-
-    _web3App.onSessionConnect.subscribe(_onWeb3AppConnect);
-    _web3App.onSessionDelete.subscribe(_onWeb3AppDisconnect);
-
-    await _web3App.init();
-
-    _walletConnectModalService = WalletConnectModalService(web3App: _web3App,
-      //  recommendedWalletIds: {"a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393", "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96", "fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa"}, excludedWalletState: ExcludedWalletState.all,
-    );
-    await _walletConnectModalService.init();
-    await _walletConnectModalService.open(context: context);
-    //showCupertinoDialog(context: context, builder: (con) => WalletConnectModalConnect(service: _walletConnectModalService));
-
-  }
-
-  void _onWeb3AppConnect(SessionConnect? args) {
-    isWalletConnected.value = true;
-    address.value = "dz";
-  }
-
-  void _onWeb3AppDisconnect(SessionDelete? args) {
-    isWalletConnected.value = false;
-  }
-
-  signMessageWithWC(BuildContext context) async {
-
-    callChainMethod(
-      ChainType.polkadot,
-      "personal_sign",
-      getChainMetadataFromChain(NamespaceUtils.getChainFromAccount(_walletConnectModalService.session!.namespaces.values.first.accounts.first)),
-      NamespaceUtils.getAccount(_walletConnectModalService.session!.namespaces.values.first.accounts.first),
-    ).then((value) async {
-      await loginWithWallet(context, NamespaceUtils.getAccount(_walletConnectModalService.session!.namespaces.values.first.accounts.first), 'Welcome to SIRKL.io by signing this message you agree to learn and have fun with blockchain', value);
-    });
-
-    final redirect = _walletConnectModalService.session?.peer.metadata.redirect;
-    if (redirect != null) {_walletConnectModalService.launchCurrentWallet();}
-  }
-
-*/
 

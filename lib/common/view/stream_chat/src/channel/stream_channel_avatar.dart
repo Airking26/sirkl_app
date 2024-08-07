@@ -141,7 +141,6 @@ class StreamChannelAvatar extends StatelessWidget {
           return BetterStreamBuilder<User>(
             stream: client.currentUserStream.map((it) => it!),
             initialData: currentUser,
-            
             builder: (context, user) =>  StreamUserAvatar(
               borderRadius: borderRadius ?? previewTheme?.borderRadius,
               user: user,

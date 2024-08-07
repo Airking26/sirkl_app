@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/controllers/calls_controller.dart';
 
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
@@ -318,11 +319,7 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
                           child: Transform.translate(
                               offset: const Offset(-8, 0),
                               child: Text(
-                                  _profileController.readers.value![index].nickname.isNullOrBlank! ?
-                                  (_profileController.readers.value![index].userName.isNullOrBlank!
-                                      ? "${_profileController.readers.value![index].wallet!.substring(0, 6)}...${_profileController.readers.value![index].wallet!.substring(_profileController.readers.value![index].wallet!.length)}"
-                                      : _profileController.readers.value![index].userName!) :
-                                  _profileController.readers.value![index].nickname!  + (_profileController.readers.value![index].userName.isNullOrBlank! ? "" : " (${_profileController.readers.value![index].userName!})"),
+                                displayName(_profileController.readers.value![index], _homeController),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
@@ -332,7 +329,7 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
                                       color:MediaQuery.of(context).platformBrightness == Brightness.dark
                                           ? Colors.white
                                           : Colors.black)))),
-                      subtitle: !_profileController.readers.value![index].userName.isNullOrBlank! || !_profileController.readers.value![index].nickname.isNullOrBlank!
+                      subtitle: !_profileController.readers.value![index].userName.isNullOrBlank!
                           ? InkWell(
                           onTap: () {
                             _commonController.userClicked.value =

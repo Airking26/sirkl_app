@@ -37,8 +37,8 @@ class Utils{
 }
 
 String displayName(UserDTO user, HomeController controller){
-  if(controller.nicknames[user.wallet] != null){
-    if(user.userName == null || user.userName!.isEmpty){
+  if(controller.nicknames[user.wallet] != null && controller.nicknames[user.wallet]!.isNotEmpty){
+    if(user.userName != null && user.userName!.isNotEmpty){
       return controller.nicknames[user.wallet] + " (" + user.userName + ")";
     } else {
       return controller.nicknames[user.wallet] + " (" + user.wallet!.substring(0,6) + "..." + user.wallet!.substring(user.wallet!.length - 4) + ")";

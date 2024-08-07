@@ -86,6 +86,7 @@ class StreamUserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    var u = user;
     var userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
     final haveNotPicture = userDTO.picture.isNullOrBlank!;
     final notYetUser = userDTO.id == _homeController.id.value;

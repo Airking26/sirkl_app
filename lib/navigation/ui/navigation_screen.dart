@@ -161,8 +161,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
               _profileController.checkIfHasUnreadNotification(_homeController.id.value);
               if(_homeController.accessToken.value.isEmpty || _homeController.isConfiguring.value){
                 _navigationController.controller.value.index = 0;
-              } else if(_homeController.mint.value){
-                showCupertinoDialog(context: context, barrierDismissible: false, builder: (context) {
+              } else if(_homeController.displayPopupFirstConnection.value){
+                _profileController.promptClaimUsername(context).then((v) => _homeController.displayPopupFirstConnection.value = false);
+                /*showCupertinoDialog(context: context, barrierDismissible: false, builder: (context) {
                   return Obx(() => CupertinoAlertDialog(
                     title: const Text("Welcome new user!"), content: const Padding(
                     padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
@@ -170,11 +171,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       style: TextStyle(fontSize: 15),),
                   ), actions: [
                     TextButton(onPressed: (){
-                      _homeController.mint.value = false;
+                      _homeController.displayPopupFirstConnection.value = false;
                       Get.back();
                       }, child: Text("Later", style: TextStyle(color: SColors.activeColor))),
                     TextButton(onPressed: () async {
-                      _homeController.mint.value = false;
+                      _homeController.displayPopupFirstConnection.value = false;
                       _web3Controller.isMintingInProgress.value = true;
                       var connector = await _web3Controller.connect();
                       connector.onSessionConnect.subscribe((args) async {
@@ -182,7 +183,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       });
                     }, child: _web3Controller.isMintingInProgress.value ? Center(child: SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: SColors.activeColor)),) : Text("MINT", style: TextStyle(color: SColors.activeColor),))
                   ],));
-                });
+                });*/
 
               }
             }

@@ -71,6 +71,12 @@ class ProfileRepo {
     Response res = await req.get(SUrls.userMeTokenAgoraRTC(channel, role, tokenType, id));
     return res.body;
   }
+
+  static Future<bool> checkIsUsernameAvailable(String value) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.get(SUrls.checkIsUsernameAvailable(value));
+    return res.jsonBody();
+  }
  
   //Future<Response<String>> retrieveTokenAgoraRTM(String accessToken, String id) => get('${con.URL_SERVER}user/me/tokenAgoraRTM/$id', headers: {'Authorization':'Bearer $accessToken'});
 

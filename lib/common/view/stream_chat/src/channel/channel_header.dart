@@ -222,7 +222,11 @@ class StreamChannelHeader extends StatelessWidget
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           InkWell(
-                            onTap: (){Navigator.pop(context);},
+                            onTap: (){
+                              //TODO : Check if not break
+                              Navigator.pop(context);
+                              _chatController.resetChannel();
+                              },
                             child: Icon(Icons.keyboard_arrow_left_rounded,size: 42,color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
                             ),
                           ),

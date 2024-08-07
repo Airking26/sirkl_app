@@ -316,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         SizedBox(
           width: 70,
-          child: Text(_homeController.stories.value != null && _homeController.stories.value!.length > index ? displayNameStory(_homeController.stories.value![index]!.first!.createdBy) : "Unknown",
+          child: Text(_homeController.stories.value != null && _homeController.stories.value!.length > index ? displayName(_homeController.stories.value![index]!.first!.createdBy, _homeController) : "Unknown",
             maxLines: 2,
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -473,11 +473,11 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               children: [
                 Text(
-                  _commonController.users[index].nickname.isNullOrBlank! ?
+                  _homeController.nicknames[_commonController.users[index].wallet] == null ?
                       (_commonController.users[index].userName.isNullOrBlank!
                           ? _commonController.users[index].wallet![0]
                           : _commonController.users[index].userName![0]
-                              .toUpperCase()) : _commonController.users[index].nickname![0].toUpperCase(),
+                              .toUpperCase()) : _homeController.nicknames[_commonController.users[index].wallet][0].toUpperCase(),
                   softWrap: false,
                   style: TextStyle(
                       fontFamily: "Gilroy",
@@ -615,11 +615,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Transform.translate(
                     offset: const Offset(-8, 0),
                     child: Text(
-                        _commonController.users[index].nickname.isNullOrBlank! ?
-                            (_commonController.users[index].userName.isNullOrBlank!
-                                ? "${_commonController.users[index].wallet!.substring(0, 6)}...${_commonController.users[index].wallet!.substring(_commonController.users[index].wallet!.length)}"
-                                : _commonController.users[index].userName!) :
-                        _commonController.users[index].nickname!  + (_commonController.users[index].userName.isNullOrBlank! ? "" : " (${_commonController.users[index].userName!})"),
+                      displayName(_commonController.users[index], _homeController),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -629,7 +625,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color:MediaQuery.of(context).platformBrightness == Brightness.dark
                                 ? Colors.white
                                 : Colors.black)))),
-            subtitle: !_commonController.users[index].userName.isNullOrBlank! || !_commonController.users[index].nickname.isNullOrBlank!
+            subtitle: !_commonController.users[index].userName.isNullOrBlank!
                 ? InkWell(
                     onTap: () {
                       _commonController.userClicked.value =

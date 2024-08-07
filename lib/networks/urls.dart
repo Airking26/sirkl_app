@@ -61,6 +61,7 @@ class SUrls {
   static const String callUpdate = 'call/update';
   static  String callRetrieveByOffset(String offset) => 'call/retrieve/$offset';
   static  String callSearchBySubstring(String substring) => 'call/search/$substring';
-  static  String searchUsersBySubstringOffset(String substring, String offset ) => 'search/users/$substring/$offset';
+  static  String searchUsersBySubstringOffset(String substring, String offset) => 'search/users/$substring/$offset';
+  static String checkIsUsernameAvailable(String value) => 'user/check_username_free/$value';
 }
 

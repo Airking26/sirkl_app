@@ -13,6 +13,7 @@ import 'package:sirkl/common/view/material_floating_search_bar/floating_search_b
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/controllers/calls_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/inbox_creation_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -43,12 +44,14 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   ProfileController get _profileController => Get.find<ProfileController>();
   CommonController get _commonController => Get.find<CommonController>();
+  CallsController get _callController => Get.find<CallsController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
   YYDialog dialogMenu = YYDialog();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
   final utils = Utils();
   final StreamMessageInputController _messageInputController = StreamMessageInputController();
   final _searchController = FloatingSearchBarController();
+  static var pageKey = 0;
 
   @override
   void initState() {
@@ -59,6 +62,26 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       }
     });
     super.initState();
+  }
+
+  Future<void> fetchPageUsers() async {
+    _commonController.isSearchLoading.value = true;
+    try {
+      List<UserDTO> newItems;
+      if(pageKey == 0) newItems = [];
+      newItems = await _callController.retrieveUsers(_commonController.query.value, pageKey);
+      final isLastPage = newItems.length < 12;
+      if (isLastPage) {
+        pagingController.appendLastPage(newItems);
+      } else {
+        final nextPageKey = pageKey++;
+        pagingController.appendPage(newItems, nextPageKey);
+      }
+    } catch (error) {
+      pagingController.error = error;
+    } finally {
+      _commonController.isSearchLoading.value = false;
+    }
   }
 
   @override
@@ -167,7 +190,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                             MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
                       ),
                     ),
-                    MediaQuery.removePadding(
+                    _commonController.isSearchLoading.value ? Padding(
+                      padding: const EdgeInsets.only(top: 48.0),
+                      child: Center(child: CircularProgressIndicator(color: SColors.activeColor,)),
+                    ) : MediaQuery.removePadding(
                       context: context,
                       removeTop: true,
                       child: Expanded(
@@ -240,14 +266,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                       fontSize: 20),
                 ),
               ),
-              IconButton(
-                  onPressed: () {},
-                  icon: Image.asset(
-                    "assets/images/plus.png",
-                    color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? Colors.transparent
-                        : Colors.transparent,
-                  )),
+              const SizedBox(width: 42, height: 42,)
             ],
           ),
         ),
@@ -262,7 +281,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       controller: _searchController,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      hint: 'Paste a wallet address or an ENS',
+      hint: 'Search username, wallet or ENS',
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 0, bottom: 0),
       transitionDuration: const Duration(milliseconds: 0),
@@ -291,7 +310,9 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           : Colors.white,
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async{
+        ///Search for ENS
         if(query.isNotEmpty && query.contains('.eth')){
+          _commonController.isSearchLoading.value = true;
           String? ethFromEns = await _chatController.getEthFromEns(query, _homeController.userMe.value.wallet!);
           if(_profileController.isUserExists.value == null && ethFromEns != "" && ethFromEns != "0") {
             pagingController.itemList = [UserDTO(id: '', userName: query, picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: ethFromEns, following: 0, isInFollowing: false)];
@@ -301,19 +322,28 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
           else {
             pagingController.itemList = [];
           }
+          _commonController.isSearchLoading.value = false;
         }
+        ///Search for wallet
         else if(query.isNotEmpty && isValidEthereumAddress(query.toLowerCase()) && query.toLowerCase() != _homeController.userMe.value.wallet!.toLowerCase()){
+          _commonController.isSearchLoading.value = true;
           _profileController.isUserExists.value = await _profileController.getUserByWallet(query.toLowerCase());
           if(_profileController.isUserExists.value == null) {
             pagingController.itemList = [UserDTO(id: '', userName: "", picture: "", isAdmin: false, createdAt: DateTime.now(), description: '', fcmToken: "", wallet: query.toLowerCase(), following: 0, isInFollowing: false)];
           } else {
             pagingController.itemList = [_profileController.isUserExists.value!];
           }
+          _commonController.isSearchLoading.value = false;
         }
+        ///Search by substring
         else {
+          pageKey = 0;
+          _commonController.query.value = query;
           if(query.isNotEmpty) {
             _chatController.searchIsActiveInCompose.value = true;
             pagingController.itemList = [];
+            await fetchPageUsers();
+            //pagingController.itemList = await _callController.retrieveUsers(query.toLowerCase(), 0);
           } else {
             _chatController.searchIsActiveInCompose.value = false;
             pagingController.refresh();
@@ -435,46 +465,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             (states) =>  BorderSide(width: 1.0, color: SColors.activeColor),
           ),
         ) :
-        /*_chatController.sendingMessageMode.value == 3 ? Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: IconButton(icon : item.id.isNullOrBlank! ? Image.asset("assets/images/chat_tab.png", color:  SColors.activeColor,) :
-          const Icon(Icons.person_add_alt_1_rounded, size: 28,), onPressed: () async {
-            if(item.id.isNullOrBlank!){
-              var idChannel = DateTime
-                  .now()
-                  .millisecondsSinceEpoch
-                  .toString();
-              var idChannelCreated = await _chatController.createInbox(InboxCreationDto(
-                  isConv: true,
-                  createdBy: _homeController.id.value,
-                  wallets: [
-                    _homeController.userMe.value.wallet!,
-                    item.wallet!
-                  ],
-                  idChannel: idChannel));
-              _navigationController.hideNavBar.value = true;
-              pushNewScreen(context, screen: DetailedChatScreen(
-                  create: false, channelId: idChannelCreated)).then((value) => _navigationController.hideNavBar.value = true);
-            } else {
-              _commonController.userClicked.value = item;
-              if (await _commonController.addUserToSirkl(
-                  _commonController.userClicked.value!.id!, StreamChat
-                  .of(context)
-                  .client, _homeController.id.value)) {
-                utils.showToast(context,
-                    con.userAddedToSirklRes.trParams({"user": _commonController
-                        .userClicked.value!.userName ?? _commonController
-                        .userClicked.value!.wallet!}));
-              } else {
-                utils.showToast(context, "This user is already in your SIRKL");
-              }
-            }
-          }, color: SColors.activeColor,),
-        ) :*/
         const SizedBox(height: 0, width: 0,),
         title: Transform.translate(
           offset: const Offset(-8, 0),
-          child: Text(item.nickname != null ? item.nickname! + (item.userName.isNullOrBlank! ? "" : " (${item.userName!})") : item.userName.isNullOrBlank! ? "${item.wallet!.substring(0, 6)}...${item.wallet!.substring(item.wallet!.length - 4)}" : item.userName!,
+          child: Text(displayName(item, _homeController),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -483,7 +477,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                   fontWeight: FontWeight.w600,
                   color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
         ),
-        subtitle: !item.userName.isNullOrBlank! || !item.nickname.isNullOrBlank! ? Transform.translate(
+        subtitle: !item.userName.isNullOrBlank! ? Transform.translate(
           offset: const Offset(-8, 0),
           child: Text("${item.wallet!.substring(0,6)}...${item.wallet!.substring(item.wallet!.length - 4)}",
               maxLines: 1,
@@ -498,7 +492,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         ) : null
     ));
   }
-
 
   Container buildBottomBar() {
     return Container(
@@ -576,7 +569,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     );
   }
 
-
   Future<void> sendMessageAsBroadcastList() async {
     _chatController.messageSending.value = true;
     for (UserDTO element in _chatController.chipsList) {
@@ -635,6 +627,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
 
   @override
   void dispose() {
+    _commonController.isSearchLoading.value = false;
     _chatController.searchIsActiveInCompose.value = false;
     _chatController.sendingMessageMode.value = 0;
     _chatController.chipsList.clear();

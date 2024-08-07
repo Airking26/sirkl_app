@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/story_dto.dart';
@@ -127,8 +128,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  story.createdBy.nickname.isNullOrBlank! ?
-    (story.createdBy.userName.isNullOrBlank! ? "${story.createdBy.wallet!.substring(0, 6)}...${story.createdBy.wallet!.substring(story.createdBy.wallet!.length - 4)}" : story.createdBy.userName!) :"${story.createdBy.nickname!} (${story.createdBy.userName.isNullOrBlank! ? "${story.createdBy.wallet!.substring(0, 10)}..." : story.createdBy.userName!})",
+                  displayName(story.createdBy, _homeController),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontFamily: "Gilroy",

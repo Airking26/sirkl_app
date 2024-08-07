@@ -215,23 +215,27 @@ class _MyHomePageState extends State<MyHomePage> {
               title: message.data["title"],
               body: message.data["body"],
               flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-        } else if (message.data['type'] == "2") {
+        }
+        else if (message.data['type'] == "2") {
           await FlutterCallkitIncoming.endAllCalls();
           await _callController.leaveChannel();
-        } else if (message.data['type'] == "3") {
+        }
+        else if (message.data['type'] == "3") {
           await FlutterCallkitIncoming.endAllCalls();
           LocalNotificationInitialize.showBigTextNotification(
               title: message.data["title"],
               body: message.data["body"],
               flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-        } else if (message.data['type'] == "4") {
+        }
+        else if (message.data['type'] == "4") {
           LocalNotificationInitialize.showBigTextNotification(
               title: message.data["title"],
               body: message.data["body"],
               flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
           await HomeRepo.registerNotification(
               NotificationRegisterDto(message: message.data["body"]));
-        } else if (message.data['type'] == "message.new" &&
+        }
+        else if (message.data['type'] == "message.new" &&
             message.data['channel_id'] != _chatController.channel.value?.id) {
           final client = StreamChat.of(context).client;
           final response = await client.getMessage(message.data['id']);

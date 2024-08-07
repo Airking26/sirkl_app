@@ -65,6 +65,7 @@ class CallsController extends GetxController{
     rtcEngine?.setEventHandler(
       RtcEngineEventHandler(
         joinChannelSuccess: (String x, int y, int elapsed) {
+          [Permission.microphone].request();
           playRingback(1);
           pushNewScreen(context, screen: const CallInviteSendingScreen(), withNavBar: false).then((value) {
             pageKey.value = 0;
@@ -74,6 +75,7 @@ class CallsController extends GetxController{
           });
         },
         userJoined: (int remoteUid, int elapsed) {
+          [Permission.microphone].request();
           playRingback(50);
           timer.value = StopWatchTimer();
           timer.value.onStartTimer();

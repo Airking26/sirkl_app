@@ -8,4 +8,6 @@ class SConfig {
   static const String alchemyApiKey =  "ELrNU9K6I9RNfXbIkJqq6H6NeoXNbF10";
   static const String ethScanApiKey = "V3EVCZS2JV1WG9SSB14171DEFDQYQ63QFU";
 
+  static const String SIRKL_ID = "63f78a6188f7d4001f68699a";
+
 }

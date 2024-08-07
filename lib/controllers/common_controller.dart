@@ -21,7 +21,7 @@ class CommonController extends GetxController {
   Rx<UserDTO?> userClicked = (null as UserDTO?).obs;
   var userClickedFollowStatus = false.obs;
   var isCardExpandedList = <int>[].obs;
-  var isLoadingUsers = true.obs;
+  var isSearchLoading = false.obs;
   var users = <UserDTO>[].obs;
   var gettingStoryAndContacts = true.obs;
   var query = "".obs;

@@ -58,11 +58,6 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
           ]),
           Filter.equal("contractAddress", _homeController.userMe.value.hasSBT! ? "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase() : ""),
         ]),
-    channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
-      final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
-      final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
-      return dateB.compareTo(dateA);
-    })],
     limit: 10,
   );
 
@@ -81,19 +76,11 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
       ]),
       Filter.greater('member_count', 2),
     ]),
-    channelStateSort:  [
-      SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
-      final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
-      final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
-      return dateB.compareTo(dateA);
-    })],
     limit: 10,
   );
 
   @override
   void initState() {
-    _controllerCommunitiesFav.doInitialLoad();
-    _controllerCommunitiesOther.doInitialLoad();
     _groupController.index.value = _homeController.userMe.value.hasSBT! ? 0 : _homeController.isInFav.isEmpty ? 1 : 0;
         tabController = TabController(length: 2, vsync: this);
     tabController.index = _groupController.index.value;
@@ -169,11 +156,6 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           Filter.autoComplete('name', _groupController.query.value),
                           Filter.notExists('isConv'),
                         ]),
-                          channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
-                            final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
-                            final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
-                            return dateB.compareTo(dateA);
-                          })],
                           limit: 10,
                         )
                             : _controllerCommunitiesFav,
@@ -229,11 +211,6 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                           Filter.autoComplete('name', _groupController.query.value),
                           Filter.notExists("isConv"),
                         ]),
-                          channelStateSort: [SortOption('last_message_at',  direction: SortOption.DESC, comparator: (a, b) {
-                            final dateA = a.channel?.lastMessageAt ?? a.channel!.createdAt;
-                            final dateB = b.channel?.lastMessageAt ?? b.channel!.createdAt;
-                            return dateB.compareTo(dateA);
-                          })],
                           limit: 10,
                         ) : _controllerCommunitiesOther,
                         onChannelTap: (channel) {

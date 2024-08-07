@@ -71,5 +71,12 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
         ));
   }
 
+  @override
+  void dispose() {
+    //TODO : Check if not break
+    _chatController.resetChannel();
+    super.dispose();
+  }
+
 
 }

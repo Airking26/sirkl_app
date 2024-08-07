@@ -206,7 +206,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
       controller: _searchController,
       closeOnBackdropTap: false,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      hint: 'Paste a wallet address or a username',
+      hint: 'Search wallet or username',
       backdropColor: Colors.transparent,
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 0),
@@ -236,13 +236,11 @@ class _NewCallScreenState extends State<NewCallScreen> {
           : Colors.white,
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async{
+        pageKey = 0;
+        _callController.callQuery.value = query;
         if(query.isNotEmpty) {
           pagingController.itemList = [];
-          _callController.callQuery.value = query;
           fetchPageUsers();
-        } else {
-          pagingController.refresh();
-          pagingController.appendLastPage(_commonController.users);
         }
       },
       transition: CircularFloatingSearchBarTransition(),
@@ -299,7 +297,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
         ),
         title: Transform.translate(
           offset: const Offset(-8, 0),
-          child: Text(item.nickname != null ? item.nickname! + (item.userName.isNullOrBlank! ? "" : " (${item.userName!})") : item.userName.isNullOrBlank! ? "${item.wallet!.substring(0,6)}...${item.wallet!.substring(item.wallet!.length - 4)}" : item.userName!,
+          child: Text(displayName(item, _homeController),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -308,7 +306,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
                   fontWeight: FontWeight.w600,
                   color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
         ),
-        subtitle: !item.userName.isNullOrBlank! || !item.nickname.isNullOrBlank! ? Transform.translate(
+        subtitle: !item.userName.isNullOrBlank! ? Transform.translate(
           offset: const Offset(-8, 0),
           child: Text("${item.wallet!.substring(0,6)}...${item.wallet!.substring(item.wallet!.length - 4)}",
               maxLines: 1,
