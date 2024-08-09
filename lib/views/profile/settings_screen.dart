@@ -258,6 +258,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                   _homeController.isConfiguring.value = false;
                                   _homeController.accessToken.value = "";
                                   _homeController.address.value = "";
+                                  _homeController.streamChatToken.value = "";
                                   _navigationController.controller.value.jumpToTab(0);
                                   _navigationController.hideNavBar.value = true;
                                   _walletConnectModalController.w3mService.value?.disconnect();

@@ -92,9 +92,10 @@ class _HomeScreenState extends State<HomeScreen> {
       _homeController.storyPagingController.value.itemList = [];
       fetchPageStories();
     });
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    //TODO : Activate beta if needed
+    /*WidgetsBinding.instance.addPostFrameCallback((_){
       if(_homeController.accessToken.value.isNullOrBlank!) displayBetaPopup(context);
-    });
+    });*/
     super.initState();
   }
 

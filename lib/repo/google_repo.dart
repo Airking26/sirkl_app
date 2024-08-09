@@ -288,7 +288,7 @@ Future<void> promptChoseBackupMethod(BuildContext context) async =>
         const SizedBox(height: 8,),
         InkWell(
           onTap: () => Get.back(),
-            child: Text("Later", style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Gilroy', color: SColors.activeColor, decoration: TextDecoration.underline, decorationColor: SColors.activeColor, fontSize: 18),))
+            child: Text("Maybe later", style: TextStyle(fontWeight: FontWeight.w500, fontFamily: 'Gilroy', color: Colors.grey, decoration: TextDecoration.underline, decorationColor: Colors.grey, fontSize: 18),))
       ],
     ),
   ));
