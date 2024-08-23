@@ -161,12 +161,14 @@ class StreamUserListTile extends StatelessWidget {
 
     final title = Row(
       children: [
-        this.title ??
-            Text(displayName(userFromJson(json.encode(user.extraData["userDTO"])), _homeController),
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, fontFamily: "Gilroy",color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
-            ),
-        SizedBox(width: channelRole == "channel_moderator" || _chatController.channel.value!.createdBy!.id == user.id  ? 4 : 0,),
-        channelRole == "channel_moderator" || _chatController.channel.value!.createdBy!.id == user.id  ?  Icon(Icons.diamond_outlined, color: SColors.activeColor, size: 16,) : const SizedBox(height: 0, width: 0,)
+        Expanded(
+          child: this.title ??
+              Text(displayName(userFromJson(json.encode(user.extraData["userDTO"])), _homeController),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, fontFamily: "Gilroy",color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
+              ),
+        ),
+        SizedBox(width: (_chatController.channel.value?.extraData["isConv"] != null && (channelRole == "channel_moderator" || _chatController.channel.value!.createdBy!.id == user.id)) || (_chatController.channel.value?.extraData["isConv"] == null && _chatController.channel.value?.extraData["owner"] != null && _chatController.channel.value?.extraData["owner"] == _homeController.userMe.value.wallet) ? 4 : 0,),
+        (_chatController.channel.value?.extraData["isConv"] != null && (channelRole == "channel_moderator" || _chatController.channel.value!.createdBy!.id == user.id)) || (_chatController.channel.value?.extraData["isConv"] == null && _chatController.channel.value?.extraData["owner"] != null && _chatController.channel.value?.extraData["owner"] == _homeController.userMe.value.wallet) ?  Icon(Icons.diamond_outlined, color: SColors.activeColor, size: 16,) : const SizedBox(height: 0, width: 0,)
       ],
     );
 
@@ -181,7 +183,7 @@ class StreamUserListTile extends StatelessWidget {
         );
 
     return Slidable(
-      enabled: _chatController.channel.value!.createdBy!.id != user.id ? slidableEnabled ?? false : false,
+      enabled: (_chatController.channel.value?.extraData["isConv"] != null && (channelRole == "channel_moderator" || _chatController.channel.value!.createdBy!.id == user.id)) || (_chatController.channel.value?.extraData["isConv"] == null && _chatController.channel.value?.extraData["owner"] != null && _chatController.channel.value?.extraData["owner"] == _homeController.userMe.value.wallet)  ? slidableEnabled ?? false : false,
       endActionPane: ActionPane(
         extentRatio: 0.33,
         motion: const ScrollMotion(), children: [

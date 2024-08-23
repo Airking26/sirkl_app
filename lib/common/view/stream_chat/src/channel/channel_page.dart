@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:sirkl/common/view/stream_chat/src/attachment/attachment_widget.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/view/stream_chat/src/utils/audio_loading_message.dart';
@@ -131,3 +132,4 @@ class _ChannelPageState extends State<ChannelPage> {
 
 
 }
+

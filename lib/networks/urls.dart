@@ -18,6 +18,7 @@ class SUrls {
   static const String nicknamesRetrieve = 'nicknames/retrieve';
   static const String storyOthers = 'story/others';
   static const String nftRetrieve = 'nft/retrieve';
+  static const String retrieveContractAddress = 'nft/retrieve_contract_address';
   static const String nftRetrieveAll = 'nft/retrieveAll';
   static const String nftUpdateAll = 'nft/updateAll';
   static const String notificationRegister = 'notification/register';

@@ -110,7 +110,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
           }
             return Column(children: [
           buildAppbar(context, tabController),
-              _groupController.nftAvailable.isNotEmpty && _groupController.addAGroup.value ? const Padding(
+              _groupController.nftAndTokenAvailableToCreateGroup.isNotEmpty && _groupController.addAGroup.value ? const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text("Add a community from your collectibles and tokens", textAlign: TextAlign.center,
                   style: TextStyle(
@@ -178,8 +178,16 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                             });
                           } else {
                             Utils().showToast(context, "This is a private chat for holders of ${channel.name}");
-
                           }
+
+
+                          if (_groupController.searchIsActive.value) {
+                            _groupController.searchIsActive.value =
+                            !_groupController.searchIsActive.value;
+                            _groupController.query.value = "";
+                            _floatingSearchBarController.clear();
+                          }
+
                         },
                       ),
                     ),
@@ -312,7 +320,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     IconButton(
                         onPressed: () {
                           if(_groupController.addAGroup.value == false) _groupController.searchIsActive.value = false;
-                          if(!_groupController.addAGroup.value && _groupController.nftAvailable.isEmpty) _groupController.retrieveNFTAvailableForCreation(_homeController.userMe.value.wallet!);
+                          if(!_groupController.addAGroup.value && _groupController.nftAndTokenAvailableToCreateGroup.isEmpty) _groupController.retrieveNFTAvailableForCreation(_homeController.userMe.value.wallet!);
                           _groupController.addAGroup.value = !_groupController.addAGroup.value;
                         },
                         icon:Image.asset(
@@ -692,7 +700,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                Text("Please wait while we are loading your NFTs and Tokens available. This may take some time.",textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black),)
              ],
            ),
-         ) : _groupController.nftAvailable.isEmpty ? noNFTFound() :
+         ) : _groupController.nftAndTokenAvailableToCreateGroup.isEmpty ? noNFTFound() :
      MediaQuery.removePadding(
       context: context,
       removeTop: true,
@@ -701,7 +709,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
           padding: const EdgeInsets.only(top: 8.0),
           child: SafeArea(
             child: ListView.builder(
-              itemCount: _groupController.nftAvailable.length,
+              itemCount: _groupController.nftAndTokenAvailableToCreateGroup.length,
               itemBuilder: (context, index){
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 6),
@@ -720,15 +728,15 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                     ),
                     child: ListTile(
                       onTap: () async{
-                        await _groupController.createGroup(StreamChat.of(context).client, GroupCreationDto(name: _groupController.nftAvailable[index].collectionName, picture: _groupController.nftAvailable[index].collectionImage, contractAddress: _groupController.nftAvailable[index].contractAddress));
+                        await _groupController.createGroup(StreamChat.of(context).client, GroupCreationDto(name: _groupController.nftAndTokenAvailableToCreateGroup[index].collectionName, picture: _groupController.nftAndTokenAvailableToCreateGroup[index].collectionImage, contractAddress: _groupController.nftAndTokenAvailableToCreateGroup[index].contractAddress));
                         pushNewScreen(context, screen: const DetailedChatScreen(create: false, resetChannel: false,), withNavBar: false).then((value) {
                           _navigationController.hideNavBar.value = false;
                           _groupController.addAGroup.value = false;
                         });
                       },
-                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftAvailable[index].collectionImage, width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
+                      leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: _groupController.nftAndTokenAvailableToCreateGroup[index].collectionImage, width: 50, height: 50, fit: BoxFit.cover, placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)), errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png", fit: BoxFit.cover,)),),
 
-                      title: Text(_groupController.nftAvailable[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
+                      title: Text(_groupController.nftAndTokenAvailableToCreateGroup[index].collectionName, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black)),
                     ),
                   ),
                 );

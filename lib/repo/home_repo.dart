@@ -73,6 +73,14 @@ class HomeRepo {
     SRequests req = SRequests(SUrls.baseURL);
     await req.get(SUrls.nftUpdateAll);
   }
+
+  static Future<List<String>> retrieveContactAddress() async{
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.get(SUrls.retrieveContractAddress);
+    List<dynamic> list = res.jsonBody();
+    return list.cast<String>();
+  }
+
   static Future<List<NftDto>> retrieveNFTs({required String id, required bool isFav, required String offset }) async {
     SRequests req = SRequests(SUrls.baseURL);
     Response res = await req.get('${SUrls.nftRetrieve}/$id/$isFav/$offset');

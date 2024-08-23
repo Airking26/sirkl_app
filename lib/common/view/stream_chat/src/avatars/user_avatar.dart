@@ -86,9 +86,8 @@ class StreamUserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    var u = user;
     var userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
-    final haveNotPicture = userDTO.picture.isNullOrBlank!;
+    final userHavePicture = !userDTO.picture.isNullOrBlank!;
     final notYetUser = userDTO.id == _homeController.id.value;
     final isGroup = channel?.extraData["isConv"];
     final picOfGroup = channel?.extraData["picOfGroup"];
@@ -100,15 +99,16 @@ class StreamUserAvatar extends StatelessWidget {
       child: streamChatConfig.defaultUserImage(context, user),
     );
 
+    //TODO : Removed memberPage with userHavePicture to display picture of user
     Widget avatar = FittedBox(
       fit: BoxFit.cover,
       child: Container(
         constraints: const BoxConstraints(minWidth: 56, maxHeight: 56, maxWidth: 56, minHeight: 56),
         child: notYetUser && isGroup != null && isGroup as bool ?
         Image.asset("assets/images/app_icon_rounded.png", width: 56, height: 56, fit: BoxFit.cover,) :
-        (!haveNotPicture && isGroup != null && (isGroup as bool))
+        (userHavePicture && isGroup != null && (isGroup as bool))
             || (isGroup != null && picOfGroup != null && !(isGroup as bool))
-            || (!haveNotPicture && memberPage)
+            || userHavePicture
             ? CachedNetworkImage(
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.high,

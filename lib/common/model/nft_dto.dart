@@ -12,6 +12,8 @@ class NftDto {
     this.collectionImage,
     this.contractAddress,
     this.isFav,
+    this.isNft,
+    this.subtitle
   });
 
   String? id;
@@ -20,6 +22,8 @@ class NftDto {
   String? collectionImage;
   String? contractAddress;
   bool? isFav;
+  bool? isNft;
+  String? subtitle;
 
   factory NftDto.fromJson(Map<String, dynamic> json) => NftDto(
     id: json["id"],
@@ -28,6 +32,8 @@ class NftDto {
     collectionImage: json["collectionImage"],
     contractAddress: json["contractAddress"],
     isFav: json["isFav"],
+    isNft: json["isNft"],
+      subtitle: json["subtitle"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -37,5 +43,7 @@ class NftDto {
     "collectionImage": collectionImage,
     "contractAddress": contractAddress,
     "isFav": isFav,
+    "isNft": isNft,
+    "subtitle": subtitle
   };
 }

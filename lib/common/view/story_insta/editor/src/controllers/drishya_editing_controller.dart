@@ -1,5 +1,8 @@
+import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:path_provider/path_provider.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/story_insta/camera/src/widgets/ui_handler.dart';
 import 'package:sirkl/common/view/story_insta/editor/src/widgets/widgets.dart';
@@ -165,35 +168,76 @@ class DrishyaEditingController extends ValueNotifier<EditorValue> {
     try {
       final bg = _backgroundNotifier.value;
 
+      // If background is a DrishyaBackground and no stickers added, return the entity
       if (bg is DrishyaBackground && !value.hasStickers) {
-        // If background is drishya background and user has not edit the image
-        // return its enity
         return bg.entity;
-      } else if (bg is MemoryAssetBackground && !value.hasStickers) {
-        // If background is memory bytes background and user has not edited the
-        // image, create entity and return it
-        final entity = await PhotoManager.editor.saveImage(
-          bg.bytes,
-          title: const Uuid().v4(),
+      }
+      // If background is memory bytes and no stickers, save the image
+      else if (bg is MemoryAssetBackground && !value.hasStickers) {
+
+        final fileName = const Uuid().v4();
+        final filePath = await getTemporaryDirectory();
+        final file = File('${filePath.path}/$fileName.png');
+        await file.writeAsBytes(bg.bytes);
+
+        final entity = await PhotoManager.editor.saveImageWithPath(
+          file.path,
+          title: fileName,
         );
         return entity?.toDrishya;
-      } else {
-        // If user has edited the background take screenshot
-        // todo: remove screenshot approach, edit image properly
+      }
+      // If the image is edited, take a screenshot and save it
+      else {
         final boundary = _editorKey.currentContext?.findRenderObject()
-            as RenderRepaintBoundary?;
-        final image = await boundary!.toImage();
+        as RenderRepaintBoundary?;
+
+
+        // Ensure boundary is not null
+        if (boundary == null) {
+          throw Exception("Render boundary is null");
+        }
+
+        // Capture image from boundary
+        final image = await boundary.toImage();
+
+        // Convert image to byte data
         final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-        final data = byteData!.buffer.asUint8List();
-        final entity = await PhotoManager.editor.saveImage(
-          data,
-          title: const Uuid().v4(),
+
+        /*final bytes = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+        if (bytes != null) {
+          ui.decodeImageFromPixels(
+              Uint8List.view(bytes.buffer),
+              image.width,
+              image.height,
+              ui.PixelFormat.rgba8888, (result) async {
+            await result.toByteData(format: ui.ImageByteFormat.png);
+          });
+        }*/
+
+        // Ensure byteData is not null
+        if (byteData == null) {
+          throw Exception("Failed to get byte data from image");
+        }
+
+        // Convert byte data to Uint8List
+        final data = byteData.buffer.asUint8List();
+        final fileName = const Uuid().v4();
+        final filePath = await getTemporaryDirectory();
+
+        // Create file in temporary directory and write the image data
+        final file = File('${filePath.path}/$fileName.png');
+        await file.writeAsBytes(data);
+
+        // Save the image using PhotoManager
+        final entity = await PhotoManager.editor.saveImageWithPath(
+          file.path,
+          title: fileName,
         );
         return entity?.toDrishya;
       }
     } catch (e) {
       onException?.call(
-        Exception('Exception occured while capturing picture : $e'),
+        Exception('Exception occurred while capturing picture: $e'),
       );
     }
     return null;

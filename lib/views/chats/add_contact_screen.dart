@@ -315,7 +315,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 onPressed: () async {
                   if (_chatController.contactAddIsEmpty.value) {
                     _utils.showToast(context, "Please enter a user");
-                  } else {
+                  }
+                  else {
                     if(nicknameController.text.isNotEmpty){
                       await _profileController.updateMe(UpdateMeDto(nicknames: {_homeController.userAdded.value.wallet! : nicknameController.text}), StreamChat.of(context).client);
                       _homeController.updateNickname(_homeController.userAdded.value.wallet!, nicknameController.text);
@@ -327,7 +328,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         _homeController.userAdded.value = UserDTO();
                         _groupController.refreshGroups.value = true;
                         Navigator.pop(context);
-                    } else {
+                    }
+                    else {
+                      _commonController.contactAddLoading.value = false;
                       _utils.showToast(context, "This user is already in your SIRKL");
                     }
                   }

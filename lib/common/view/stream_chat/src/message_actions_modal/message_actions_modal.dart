@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart' hide ButtonStyle;
-import 'package:get/get.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_actions_modal/copy_message_button.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_actions_modal/delete_message_button.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_actions_modal/edit_message_button.dart';
@@ -147,8 +146,7 @@ class _MessageActionsModalState extends State<MessageActionsModal> {
                 ? CrossAxisAlignment.end
                 : CrossAxisAlignment.start,
             children: <Widget>[
-              if (widget.showReactions &&
-                  (widget.message.state == MessageState.sent))
+              if (widget.showReactions)
                 LayoutBuilder(
                   builder: (context, constraints) {
                     return Align(

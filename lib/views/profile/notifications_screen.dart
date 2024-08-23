@@ -347,6 +347,7 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
             const Text("Get your Free SBT SIRKL Pass to access of the Club Community group. \n \n Powered by SKALE Network with 0 gas fee",),
             Obx(() => TextButton(onPressed: () async
             {
+              //TODO : Mint through server if needed
               _web3Controller.isMintingInProgress.value = true;
               var connector = await _web3Controller.connect();
               connector.onSessionConnect.subscribe((args) async {
@@ -354,7 +355,7 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
               });
             }, style: TextButton.styleFrom(backgroundColor: SColors.activeColor, elevation: 5, ), child:  Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
-              child: _web3Controller.isMintingInProgress.value ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white)) :const Text("MINT NOW", style: TextStyle(fontFamily: "Gilroy", color: Colors.white, fontWeight: FontWeight.w700),),
+              child: _web3Controller.isMintingInProgress.value ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: SColors.activeColor)) :const Text("MINT NOW", style: TextStyle(fontFamily: "Gilroy", color: Colors.white, fontWeight: FontWeight.w700),),
             ) ))
           ],
         ),

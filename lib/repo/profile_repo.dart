@@ -15,6 +15,13 @@ class ProfileRepo {
     Response res = await req.get(SUrls.userMeTokenStreamChat);
     return res.body;
   }
+
+  static Future<UserDTO> retrieveUser() async{
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.get(SUrls.userMe);
+    return UserDTO.fromJson(res.jsonBody());
+  }
+
   static Future<UserDTO> modifyUser(UpdateMeDto updateMeDto) async {
     SRequests req = SRequests(SUrls.baseURL);
     Response res = await req.patch(url: SUrls.userMe, body: updateMeDto.toJson());

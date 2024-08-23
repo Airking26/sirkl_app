@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/common/enums/app_theme.dart';
@@ -24,6 +26,8 @@ import 'package:sirkl/common/local_notification_initialize.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/controllers/groups_controller.dart';
+import 'package:sirkl/controllers/profile_controller.dart';
 import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
@@ -57,8 +61,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         var notificationSaved = GetStorage().read(con.notificationSaved) ?? [];
         (notificationSaved as List<dynamic>).add(message.data["body"]);
         await GetStorage().write(con.notificationSaved, notificationSaved);
-      } on Error {
-        throw Error();
+      } catch (e) {
+        throw e;
       }
     } else if (message.data['type'] == "8") {
       debugPrint("ENTERING 8 MODE");
@@ -68,9 +72,15 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
+//AppsflyerSdk appsflyerSdk = AppsflyerSdk(AppsFlyerOptions(afDevKey: afDevKey, appId: appId, showDebug: true));
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  /*await appsflyerSdk.initSdk(
+      registerConversionDataCallback: true,
+      registerOnAppOpenAttributionCallback: true,
+      registerOnDeepLinkingCallback: true
+  );*/
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark));
@@ -85,7 +95,7 @@ void main() async {
   FirebaseMessaging.instance.subscribeToTopic("all");
   await GetStorage.init();
   AnalyticService().getAnalyticObserver();
-  runApp(MyApp(client: client));
+  runApp(Phoenix(child: MyApp(client: client)));
 }
 
 class MyApp extends StatelessWidget {
@@ -124,6 +134,7 @@ class MyApp extends StatelessWidget {
                 );
               },
               darkTheme: ThemeData(
+                  colorSchemeSeed: SColors.activeColor,
                   inputDecorationTheme: InputDecorationTheme(
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
@@ -133,6 +144,7 @@ class MyApp extends StatelessWidget {
                   brightness: Brightness.dark, dividerColor: Colors.transparent),
               themeMode: ThemeMode.system,
               theme: ThemeData(
+                colorSchemeSeed: SColors.activeColor,
                   inputDecorationTheme: InputDecorationTheme(
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
@@ -157,15 +169,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   HomeController get _homeController => Get.find<HomeController>();
-
   CallsController get _callController => Get.find<CallsController>();
-
   ChatsController get _chatController => Get.find<ChatsController>();
-
   CommonController get _commonController => Get.find<CommonController>();
+  GroupsController get _groupController => Get.find<GroupsController>();
+  ProfileController get _profileController => Get.find<ProfileController>();
   WalletConnectModalController get _walletConnectModalController => Get.find<WalletConnectModalController>();
-
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -235,6 +246,18 @@ class _MyHomePageState extends State<MyHomePage> {
           await HomeRepo.registerNotification(
               NotificationRegisterDto(message: message.data["body"]));
         }
+        else if((message.data['type'] == "8")){
+          showCallNotification(message.data);
+        }
+        else if((message.data["type"] == "9")){
+          await _profileController.retrieveMe();
+          _profileController.pagingController.refresh();
+          _groupController.refreshGroups.value = true;
+          LocalNotificationInitialize.showBigTextNotification(
+              title: message.data["title"],
+              body: message.data["body"],
+              flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+        }
         else if (message.data['type'] == "message.new" &&
             message.data['channel_id'] != _chatController.channel.value?.id) {
           final client = StreamChat.of(context).client;
@@ -256,8 +279,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 flutterLocalNotificationsPlugin:
                     flutterLocalNotificationsPlugin);
           }
-        } else {
-          if (message.data['type'] == "8") showCallNotification(message.data);
         }
       }
     });

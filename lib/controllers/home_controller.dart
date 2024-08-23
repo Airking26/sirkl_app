@@ -2,8 +2,6 @@
 
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as htp;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -12,9 +10,7 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:sirkl/common/model/crypto/chain_metadata.dart';
 import 'package:sirkl/config/s_config.dart';
-import 'package:sirkl/controllers/web3_controller.dart';
 import 'package:sirkl/networks/urls.dart';
 import 'package:sirkl/repo/chats_repo.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
@@ -34,10 +30,7 @@ import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/repo/profile_repo.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
-import 'package:walletconnect_modal_flutter/walletconnect_modal_flutter.dart';
 
 import '../common/model/update_fcm_dto.dart';
 import '../common/save_pref_keys.dart';
@@ -137,9 +130,9 @@ class HomeController extends GetxController {
     }
 
     isLoading.value = false;
+    await getAllNftConfig();
     await connectUser(StreamChat.of(context).client);
     putFCMToken(context, StreamChat.of(context).client, false);
-    getAllNftConfig();
     retrieveInboxes();
   }
 
@@ -163,14 +156,20 @@ class HomeController extends GetxController {
         var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
         await HomeRepo.uploadAPNToken(token);
       }
-      await getTokenContractAddress(client, userMe.value.wallet!);
+      await retrieveContractAddress();
     }
   }
 
-  getTokenContractAddress(StreamChatClient? client, String wallet) async {
+  retrieveContractAddress() async {
+    contractAddresses.value = await HomeRepo.retrieveContactAddress();
+    box.write(con.contractAddresses, contractAddresses);
+  }
+
+  /*
+  getTokenContractAddress(String wallet) async {
     var emptyBalanceHex = "0x0000000000000000000000000000000000000000000000000000000000000000";
     var ethContractAddress = "0x0000000000000000000000000000000000000000";
-    var tokenContractAddress = await HomeRepo.getTokenContractAddressesWithAlchemy(wallet: wallet);
+    var tokenContractAddress = await HomeRepo.getTokenContractAddressesWithAlchemy(wallet: wallet.toLowerCase());
     var ethClient = Web3Client(SUrls.infura, htp.Client());
     var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet.toLowerCase()));
     if (balance.getInWei > BigInt.zero && !contractAddresses.contains(ethContractAddress)) {
@@ -187,10 +186,9 @@ class HomeController extends GetxController {
       }
     });
 
-    await getNFTsContractAddresses(client, wallet);
+    await getNFTsContractAddresses("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87".toLowerCase());
   }
-
-  getNFTsContractAddresses(StreamChatClient? client, String wallet) async {
+  getNFTsContractAddresses(String wallet) async {
     ContractAddressDto contractAddress = await HomeRepo.getContractAddressesWithAlchemy(wallet: wallet, cursor: '');
     var initialArray = contractAddress.contracts;
     if (contractAddress.pageKey != null) {
@@ -203,8 +201,7 @@ class HomeController extends GetxController {
     }
 
     initialArray.removeWhere((element) =>
-        element.title == null ||
-        element.title!.isEmpty ||
+    ((element.title == null || element.title!.isEmpty ) && (element.name == null || element.name!.isEmpty))  ||
         element.opensea == null ||
         element.opensea!.imageUrl == null ||
         element.opensea!.imageUrl!.isEmpty ||
@@ -222,13 +219,13 @@ class HomeController extends GetxController {
     }
 
     box.write(con.contractAddresses, contractAddresses);
-  }
+  }*/
 
   getAllNftConfig() async => await HomeRepo.getAllNFTConfig();
   updateAllNftConfig() async => await HomeRepo.updateAllNFTConfig();
 
   Future<List<NftDto>> getNFT(String id, bool isFav, int offset, UserDTO? user) async {
-    if (offset == 0) isInFav.clear();
+    if (offset == 0 && id == this.id.value) isInFav.clear();
     List<NftDto> nfts = await HomeRepo.retrieveNFTs(
         id: id, isFav: isFav, offset: offset.toString());
 
@@ -247,6 +244,12 @@ class HomeController extends GetxController {
             isFav: false));
       }
       iHaveNft.value = true;
+
+      isInFav.addAll(nfts
+          .where((element) => element.isFav!)
+          .map((e) => e.contractAddress!)
+          .toList());
+
     } else {
       if (user != null && (user.hasSBT ?? false) && offset == 0) {
         nfts.add(NftDto(
@@ -263,12 +266,6 @@ class HomeController extends GetxController {
       }
       heHasNft.value = true;
     }
-
-    isInFav.addAll(nfts
-        .where((element) => element.isFav!)
-        .map((e) => e.contractAddress!)
-        .toList());
-
     return nfts;
   }
 

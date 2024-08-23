@@ -113,9 +113,10 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                   onTap: (){
                     pushNewScreen(context, screen: const GroupParticipantScreen());
                   },
+                  //TODO : check -3
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text("Participants (${_chatController.channel.value!.memberCount!})", style: const TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
+                    child: Text("Participants (${_chatController.channel.value!.memberCount! - 3})", style: const TextStyle(fontFamily: "Gilroy", fontSize: 18, fontWeight: FontWeight.w500),),
                   ),
                 ),
 

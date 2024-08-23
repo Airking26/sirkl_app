@@ -343,8 +343,9 @@ class StreamChannelHeader extends StatelessWidget
                                               : Colors.black),
                                     ),
                                   ),
+                                  //TODO : check -3
                                   (channel.extraData['isConv'] == null) || (channel.extraData["isConv"] != null && channel.extraData["isConv"] == false)|| (channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true)  ? Text(
-                                    "${_chatController.channel.value!.memberCount!} ${_chatController.channel.value!.memberCount! == 1 ? "participant" : "participants"}",
+                                    "${channel.extraData['isConv'] == null ? _chatController.channel.value!.memberCount! - 3 : _chatController.channel.value!.memberCount!} ${_chatController.channel.value!.memberCount! == 1 ? "participant" : "participants"}",
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(

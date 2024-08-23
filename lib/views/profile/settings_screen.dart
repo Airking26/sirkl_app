@@ -3,22 +3,25 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:sirkl/common/save_pref_keys.dart';
-import 'package:restart/restart.dart';
 import 'package:sirkl/config/s_config.dart';
 
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/controllers/dependency_manager.dart';
 
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
+import 'package:sirkl/main.dart';
+import 'package:sirkl/navigation/ui/navigation_screen.dart';
 import 'package:sirkl/repo/google_repo.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
@@ -262,10 +265,10 @@ class _SettingScreenState extends State<SettingScreen> {
                                   _navigationController.controller.value.jumpToTab(0);
                                   _navigationController.hideNavBar.value = true;
                                   _walletConnectModalController.w3mService.value?.disconnect();
-                                  Get.back();
                                   Get.deleteAll(force: true);
-                                  Get.offAll(const HomeScreen());
-                                  restart();
+                                  Phoenix.rebirth(Get.context!);
+                                  Get.offAll(() => const MyHomePage(), duration: const Duration(seconds: 0), opaque: true);
+                                  Get.reset();
                                 },)
                             ],
                           )).then((value) {

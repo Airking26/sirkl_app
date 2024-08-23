@@ -4,7 +4,6 @@ import FirebaseCore
 import PushKit
 import flutter_callkit_incoming
 import CoinbaseWalletSDK
-import restart
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate {
@@ -21,10 +20,6 @@ import restart
       let voipRegistry: PKPushRegistry = PKPushRegistry(queue: mainQueue)
       voipRegistry.delegate = self
       voipRegistry.desiredPushTypes = [PKPushType.voIP]
-      
-      RestartPlugin.generatedPluginRegistrantRegisterCallback = { [weak self] in
-          GeneratedPluginRegistrant.register(with: self!)
-      }
       
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

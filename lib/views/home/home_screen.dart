@@ -1099,7 +1099,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _betaTestController.dispose();
     _homeController.loadingStories.value = true;
     _homeController.stories.value = [];
-    _homeController.storyPagingController.value.dispose();
+    //_homeController.storyPagingController.value.dispose();
     super.dispose();
   }
 

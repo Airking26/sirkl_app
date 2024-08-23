@@ -60,7 +60,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     ]),
     limit: 10,
   );
-
   late final _controllerOther = StreamChannelListController(
     client: StreamChat.of(context).client,
     filter:
@@ -609,6 +608,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 _chatController.needToRefresh.value = false;
                               });
                             }
+
+                            if (_chatController.searchIsActive.value) {
+                              _chatController.query.value = "";
+                              _floatingSearchBarController.clear();
+                              _chatController.searchIsActive.value = !_chatController.searchIsActive.value;
+                            }
+
                           },
                         ),
                     StreamChannelListView(

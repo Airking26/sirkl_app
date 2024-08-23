@@ -31,20 +31,17 @@ import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as htp;
 
 class Web3Controller extends GetxController {
+
   var loadingToJoinGroup = false.obs;
   var loadingToCreateGroup = false.obs;
-  var client = Web3Client(
-      "https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
+  var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
 
   CommonController get _commonController => Get.find<CommonController>();
-
   GroupsController get _groupController => Get.find<GroupsController>();
-
   ChatsController get _chatController => Get.find<ChatsController>();
-
   ProfileController get _profileController => Get.find<ProfileController>();
-
   HomeController get _homeController => Get.find<HomeController>();
+
   Uri? _uri;
   var isMintingInProgress = false.obs;
 
@@ -341,7 +338,8 @@ class Web3Controller extends GetxController {
       List<dynamic> arg,
       bool hasFee,
       double? fee,
-      String? wallet) async {
+      String? wallet)
+  async {
     DeployedContract contract = await getContract();
     ContractFunction function = contract.function(functionName);
 
@@ -507,12 +505,13 @@ class Web3Controller extends GetxController {
     final filter = FilterOptions.events(
         contract: contract, event: contract.event('GroupLeft'));
     Stream<FilterEvent> eventStream = client.events(filter);
-    if (address != null)
+    if (address != null) {
       showDialog(
           context: context,
           builder: (_) =>
               WillPopScope(onWillPop: () async => false, child: alert),
           barrierDismissible: false);
+    }
     eventStream.listen((event) async {
       if (event.transactionHash == address) {
         await channel.removeMembers([id]);
@@ -546,12 +545,13 @@ class Web3Controller extends GetxController {
     final filter = FilterOptions.events(
         contract: contract, event: contract.event('InvitationCreated'));
     Stream<FilterEvent> eventStream = client.events(filter);
-    if (address != null)
+    if (address != null) {
       showDialog(
           context: context,
           builder: (_) =>
               WillPopScope(onWillPop: () async => false, child: alert),
           barrierDismissible: false);
+    }
     eventStream.listen((event) async {
       if (event.transactionHash == address) {
         final inviteId = contract
@@ -586,12 +586,13 @@ class Web3Controller extends GetxController {
     final filter = FilterOptions.events(
         contract: contract, event: contract.event("GroupJoined"));
     Stream<FilterEvent> eventStream = client.events(filter);
-    if (address != null)
+    if (address != null) {
       showDialog(
           context: context,
           builder: (_) =>
               WillPopScope(onWillPop: () async => false, child: alert),
           barrierDismissible: false);
+    }
     eventStream.listen((event) async {
       if (event.transactionHash == address) {
         await channel.addMembers([id]);
@@ -628,12 +629,13 @@ class Web3Controller extends GetxController {
     final filter = FilterOptions.events(
         contract: contract, event: contract.event("GroupLeft"));
     Stream<FilterEvent> eventStream = client.events(filter);
-    if (address != null)
+    if (address != null) {
       showDialog(
           context: navigatorKey.currentContext!,
           builder: (_) =>
               WillPopScope(onWillPop: () async => false, child: alert),
           barrierDismissible: false);
+    }
     eventStream.listen((event) async {
       if (event.transactionHash == address) {
         await channel.removeMembers([id]);
@@ -667,12 +669,13 @@ class Web3Controller extends GetxController {
     final filter = FilterOptions.events(
         contract: contract, event: contract.event('CreatorAdded'));
     Stream<FilterEvent> eventStream = client.events(filter);
-    if (address != null)
+    if (address != null) {
       showDialog(
           context: navigatorKey.currentContext!,
           builder: (_) =>
               WillPopScope(onWillPop: () async => false, child: alert),
           barrierDismissible: false);
+    }
     eventStream.listen((event) async {
       if (event.transactionHash == address) {
         await _groupController.changeAdminRole(AdminDto(
@@ -709,12 +712,13 @@ class Web3Controller extends GetxController {
     final filter = FilterOptions.events(
         contract: contract, event: contract.event('CreatorRemoved'));
     Stream<FilterEvent> eventStream = client.events(filter);
-    if (address != null)
+    if (address != null) {
       showDialog(
           context: navigatorKey.currentContext!,
           builder: (_) =>
               WillPopScope(onWillPop: () async => false, child: alert),
           barrierDismissible: false);
+    }
     eventStream.listen((event) async {
       if (event.transactionHash == address) {
         await _groupController.changeAdminRole(AdminDto(
@@ -750,12 +754,13 @@ class Web3Controller extends GetxController {
     final filter = FilterOptions.events(
         contract: contract, event: contract.event("GroupUpdated"));
     Stream<FilterEvent> eventStream = client.events(filter);
-    if (address != null)
+    if (address != null) {
       showDialog(
           context: navigatorKey.currentContext!,
           builder: (_) =>
               WillPopScope(onWillPop: () async => false, child: alert),
           barrierDismissible: false);
+    }
     eventStream.listen((event) async {
       if (event.transactionHash == address) {
         if (nameGroupController.text.isNotEmpty ||

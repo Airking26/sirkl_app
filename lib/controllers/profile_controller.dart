@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -53,27 +52,22 @@ class ProfileController extends GetxController{
   final _isCheckingUsernameValidity = false.obs;
   final _errorMessage = ''.obs;
 
+  retrieveMe() async {
+    _homeController.userMe.value = await ProfileRepo.retrieveUser();
+    box.write(SharedPref.USER, _homeController.userMe.value.toJson());
+  }
+
   updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
     isLoadingPicture.value = true;
 
-    UserDTO userDto = await ProfileRepo.modifyUser(updateMeDto );
+    UserDTO userDto = await ProfileRepo.modifyUser(updateMeDto);
     _homeController.userMe.value = userDto;
     box.write(SharedPref.USER, userDto.toJson());
     if(!updateMeDto.userName.isNullOrBlank! || !updateMeDto.picture.isNullOrBlank!) {
-        UserDTO userToPass = UserDTO(id: _homeController.userMe.value.id,
-            userName: _homeController.userMe.value.userName,
-            picture: _homeController.userMe.value.picture,
-            isAdmin: _homeController.userMe.value.isAdmin,
-            createdAt: _homeController.userMe.value.createdAt,
-            description: _homeController.userMe.value.description,
-            fcmToken: _homeController.userMe.value.fcmToken,
-            wallet: _homeController.userMe.value.wallet,
-            following: _homeController.userMe.value.following,
-            isInFollowing: _homeController.userMe.value.isInFollowing);
-        await streamChatClient.updateUser(User(id: _homeController.id.value, name: _homeController.userMe.value.userName!, extraData: {"userDTO": userToPass}));
-      }
-      isEditingProfile.value = false;
-      isLoadingPicture.value = false;
+        await streamChatClient.updateUser(User(id: _homeController.id.value, name: _homeController.userMe.value.userName!, extraData: {"userDTO": userDto}));
+    }
+    isEditingProfile.value = false;
+    isLoadingPicture.value = false;
   }
 
   Future<UserDTO?> getUserByWallet(String wallet) async{

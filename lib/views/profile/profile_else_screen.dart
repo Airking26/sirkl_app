@@ -260,37 +260,43 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin{
               ),
             ],
           ),
-          child: ExpansionTile(
-              leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.nftDto.collectionImage!, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
-                  errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
-            title: Text(widget.nftDto.title!, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black)),
-            subtitle: Text("${widget.nftDto.images!.length} available", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
-            onExpansionChanged: (expanded){
-              if(expanded) {
-                widget.commonController.isCardExpandedList.assign(widget.index);
-              } else {
-                widget.commonController.isCardExpandedList.remove(widget.index);
-              }
-              widget.commonController.isCardExpandedList.refresh();
-            },
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
-                child: SizedBox(height: 80,
-                    child: ListView.builder(
-                  itemCount: widget.nftDto.images!.length,
-                  itemBuilder: (context, i){
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: SizedBox.fromSize(
-                              child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: widget.nftDto.images![i], width: 80, height: 70,placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
-                                  errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
-                    );
-                  }, scrollDirection: Axis.horizontal,)),
-              )
-            ],
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              splashColor: Colors.transparent,
+            ),
+            child: ExpansionTile(
+              enabled: widget.nftDto.isNft ?? true,
+                leading: ClipRRect(borderRadius: BorderRadius.circular(90), child: CachedNetworkImage(imageUrl: widget.nftDto.collectionImage!, width: 56, height: 56, fit: BoxFit.cover, placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
+                    errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")),),
+              title: Text(widget.nftDto.title!, style: TextStyle(fontSize: 16, fontFamily: "Gilroy", fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark? Colors.white : Colors.black)),
+              subtitle: Text(widget.nftDto.isNft ?? false ?  "${widget.nftDto.images!.length} available" : widget.nftDto.subtitle == null ? "" : "Currency : ${widget.nftDto.subtitle?.toUpperCase()}", style: const TextStyle(fontSize: 12, fontFamily: "Gilroy", fontWeight: FontWeight.w500, color: Color(0xFF828282))),
+              onExpansionChanged: (expanded){
+                if(expanded) {
+                  widget.commonController.isCardExpandedList.assign(widget.index);
+                } else {
+                  widget.commonController.isCardExpandedList.remove(widget.index);
+                }
+                widget.commonController.isCardExpandedList.refresh();
+              },
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
+                  child: SizedBox(height: 80,
+                      child: ListView.builder(
+                    itemCount: widget.nftDto.images!.length,
+                    itemBuilder: (context, i){
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: SizedBox.fromSize(
+                                child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: widget.nftDto.images![i], width: 80, height: 70,placeholder: (context, url) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
+                                    errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png")))),
+                      );
+                    }, scrollDirection: Axis.horizontal,)),
+                )
+              ],
+            ),
           ),
         ),
       );

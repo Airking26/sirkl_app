@@ -1,11 +1,8 @@
 import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:sirkl/common/view/stream_chat/src/utils/audio_loading_message.dart';
-
 import '../../../../../config/s_colors.dart';
+import 'audio_loading_message.dart';
 
 class AudioPlayerMessage extends StatefulWidget {
   const AudioPlayerMessage({
@@ -80,11 +77,12 @@ class AudioPlayerMessageState extends State<AudioPlayerMessage> {
         return Padding(
           padding: const EdgeInsets.all(4.0),
           child: GestureDetector(
-            onTap: () {
+            onTap: () async {
               if (_audioPlayer.playerState.playing) {
-                pause();
+                await pause();
               } else {
-                play();
+                await AudioManager().play(_audioPlayer, widget.id);
+                setState(() {});
               }
             },
             child: SizedBox(
@@ -119,16 +117,46 @@ class AudioPlayerMessageState extends State<AudioPlayerMessage> {
     );
   }
 
-  Future<void> play() {
-    return _audioPlayer.play();
+  Future<void> play() async {
+    await AudioManager().play(_audioPlayer, widget.id);
   }
 
-  Future<void> pause() {
-    return _audioPlayer.pause();
+  Future<void> pause() async {
+    await _audioPlayer.pause();
   }
 
   Future<void> reset() async {
     await _audioPlayer.stop();
     return _audioPlayer.seek(const Duration(milliseconds: 0));
   }
+}
+
+class AudioManager {
+  static final AudioManager _instance = AudioManager._internal();
+
+  factory AudioManager() => _instance;
+
+  AudioManager._internal();
+
+  AudioPlayer? _currentPlayer;
+  String? _currentAudioId;
+
+  Future<void> play(AudioPlayer player, String audioId) async {
+    if (_currentPlayer != null && _currentPlayer != player) {
+      await _currentPlayer?.stop();
+    }
+    _currentPlayer = player;
+    _currentAudioId = audioId;
+    await player.play();
+  }
+
+  Future<void> stopCurrent() async {
+    if (_currentPlayer != null) {
+      await _currentPlayer?.stop();
+      _currentPlayer = null;
+      _currentAudioId = null;
+    }
+  }
+
+  String? get currentAudioId => _currentAudioId;
 }

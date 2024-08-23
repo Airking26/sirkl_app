@@ -43,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get _homeController => Get.find<HomeController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
-  final TextEditingController usernameTextEditingController = TextEditingController();
+  //final TextEditingController usernameTextEditingController = TextEditingController();
   final TextEditingController descriptionTextEditingController = TextEditingController();
   FocusNode focusNode = FocusNode();
   String hintText = '';
@@ -62,10 +62,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     controller = GalleryController();
     _profileController.retrieveMyStories();
     _profileController.pagingController.addPageRequestListener((pageKey) {fetchNFTs();});
-    usernameTextEditingController.text =
+    /*usernameTextEditingController.text =
         _homeController.userMe.value.userName!.isEmpty
             ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
-            : _homeController.userMe.value.userName!;
+            : _homeController.userMe.value.userName!;*/
     descriptionTextEditingController.text =
         _homeController.userMe.value.description.isNullOrBlank!
             ? ""
@@ -244,7 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   onTap: () async {
                                     await _profileController.updateMe(
                                         UpdateMeDto(
-                                            userName: usernameTextEditingController
+                                            /*userName: usernameTextEditingController
                                                 .text
                                                 .isEmpty
                                                 ? "${_homeController
@@ -252,7 +252,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 .value
                                                 .wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
                                                 : usernameTextEditingController
-                                                .text,
+                                                .text,*/
                                             description: descriptionTextEditingController
                                                 .text
                                                 .isEmpty
@@ -265,7 +265,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 .value),
                                         StreamChat.of(context)
                                             .client);
-                                    usernameTextEditingController.clear();
+                                    //usernameTextEditingController.clear();
                                     descriptionTextEditingController.clear();
                                   },
                                   child:  Padding(
@@ -284,7 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ) :IconButton(
                                     onPressed: () async {
                                       pushNewScreen(context, screen: const SettingScreen(), withNavBar: false).then((value) {
-                                        usernameTextEditingController.text = (value as Map)["name"];
+                                        //usernameTextEditingController.text = (value as Map)["name"];
                                         _navigationController.hideNavBar.value = false;});
                                     },
                                     icon: Image.asset("assets/images/more.png", width: 32, height: 32, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
@@ -538,26 +538,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: SafeArea(
-                        child: PagedListView(
-                          pagingController: _profileController.pagingController,
-                          builderDelegate: PagedChildBuilderDelegate<NftDto>(
-                              firstPageProgressIndicatorBuilder: (context) =>
-                                   Center(
-                                    child: CircularProgressIndicator(
-                                      color: SColors.activeColor,
-                                    ),
-                                  ),
-                              newPageProgressIndicatorBuilder: (context) =>
-                                   Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Center(
+                        child: RefreshIndicator(
+                          onRefresh: () async => _profileController.pagingController.refresh(),
+                          color: SColors.activeColor,
+                          child: PagedListView(
+                            pagingController: _profileController.pagingController,
+                            builderDelegate: PagedChildBuilderDelegate<NftDto>(
+                                firstPageProgressIndicatorBuilder: (context) =>
+                                     Center(
                                       child: CircularProgressIndicator(
                                         color: SColors.activeColor,
                                       ),
                                     ),
-                                  ),
-                              itemBuilder: (context, item, index) =>
-                                  CardNFT(item, index, _profileController.pagingController)),
+                                newPageProgressIndicatorBuilder: (context) =>
+                                     Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          color: SColors.activeColor,
+                                        ),
+                                      ),
+                                    ),
+                                itemBuilder: (context, item, index) =>
+                                    CardNFT(item, index, _profileController.pagingController)),
+                          ),
                         ),
                       ),
                     ),
@@ -571,7 +575,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     controller.dispose();
-    usernameTextEditingController.dispose();
+    //usernameTextEditingController.dispose();
     super.dispose();
   }
 }
@@ -614,117 +618,124 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
             ),
           ],
         ),
-        child: ExpansionTile(
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(90),
-            child: CachedNetworkImage(
-                imageUrl: widget.nftDto.collectionImage!,
-                width: 56,
-                height: 56,
-                fit: BoxFit.cover,
-                placeholder: (context, url) =>  Center(
-                    child: CircularProgressIndicator(color: SColors.activeColor)),
-                errorWidget: (context, url, error) =>
-                    Image.asset("assets/images/app_icon_rounded.png")),
+        child: Theme(
+          data: Theme.of(context).copyWith(
+            splashColor: Colors.transparent,  // Removes the splash effect
           ),
-          trailing: Obx(() => homeController.isFavNftSelected.value
-              ? const SizedBox(
-                  width: 0,
-                  height: 0,
-                )
-              : IconButton(
-                  icon: Icon(
-                      homeController.isInFav
-                              .contains(widget.nftDto.contractAddress)
-                          ? Icons.favorite_rounded
-                          : Icons.favorite_border_rounded,
-                      size: 18,
-                      color: homeController.isInFav
-                              .contains(widget.nftDto.contractAddress)
-                          ? SColors.activeColor
-                          : MediaQuery.of(context).platformBrightness ==
-                                  Brightness.dark
-                              ? Colors.white.withOpacity(0.5)
-                              : Colors.black.withOpacity(0.5)),
-                  onPressed: () async {
-                    if(widget.nftDto.contractAddress != "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase()) {
-                    bool fav;
-                    if (homeController.isInFav.contains(widget.nftDto.contractAddress)) {
-                      homeController.isInFav.remove(widget.nftDto.contractAddress);
-                      fav = false;
-                    } else {
-                      homeController.isInFav.add(widget.nftDto.contractAddress!);
-                      fav = true;
-                    }
-                    // ignore: invalid_use_of_protected_member
-                    widget.pagingController.notifyListeners();
-                      await _profileController.updateNft(
-                        NftModificationDto(
-                            contractAddress: widget.nftDto.contractAddress!,
-                            id: homeController.id.value,
-                            isFav: fav));
-                    if(fav) {
-                      await StreamChat.of(context).client.updateChannelPartial(widget.nftDto.contractAddress!, 'try', set: {"${homeController.id.value}_favorite" : true});
-                    } else {
-                      await StreamChat.of(context).client.updateChannelPartial(widget.nftDto.contractAddress!, 'try', unset: ["${homeController.id.value}_favorite"]);
-                    }
-                    _groupController.refreshGroups.value = true;
-                  }},
-                )),
-          title: Text(widget.nftDto.title!,
-              style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w600,
-                  color: MediaQuery.of(context).platformBrightness ==
-                          Brightness.dark
-                      ? Colors.white
-                      : Colors.black)),
-          subtitle: Text("${widget.nftDto.images!.length} available",
-              style: const TextStyle(
-                  fontSize: 12,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF828282))),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
-              child: SizedBox(
-                  height: 80,
-                  child: ListView.builder(
-                    itemCount: widget.nftDto.images!.length,
-                    itemBuilder: (context, i) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: InkWell(
-                          onTap: () {
-                            if (_profileController.isEditingProfile.value) {
-                              _profileController.urlPicture.value =
-                                  widget.nftDto.images![i];
-                            }
-                          },
-                          child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: SizedBox.fromSize(
-                                  child: CachedNetworkImage(
-                                      fit: BoxFit.cover,
-                                      imageUrl: widget.nftDto.images![i],
-                                      width: 80,
-                                      height: 70,
-                                      placeholder: (context, url) =>
-                                           Center(
-                                              child: CircularProgressIndicator(
-                                                  color: SColors.activeColor)),
-                                      errorWidget: (context, url, error) =>
-                                          Image.asset(
-                                              "assets/images/app_icon_rounded.png")))),
-                        ),
-                      );
-                    },
-                    scrollDirection: Axis.horizontal,
+          child: ExpansionTile(
+            enableFeedback: false,
+            enabled: (widget.nftDto.isNft ?? true),
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(90),
+              child: CachedNetworkImage(
+                  imageUrl: widget.nftDto.collectionImage!,
+                  width: 56,
+                  height: 56,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) =>  Center(
+                      child: CircularProgressIndicator(color: SColors.activeColor)),
+                  errorWidget: (context, url, error) =>
+                      Image.asset("assets/images/app_icon_rounded.png")),
+            ),
+            trailing: Obx(() => homeController.isFavNftSelected.value
+                ? const SizedBox(
+                    width: 0,
+                    height: 0,
+                  )
+                : IconButton(
+                    icon: Icon(
+                        homeController.isInFav
+                                .contains(widget.nftDto.contractAddress)
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_border_rounded,
+                        size: 18,
+                        color: homeController.isInFav
+                                .contains(widget.nftDto.contractAddress)
+                            ? SColors.activeColor
+                            : MediaQuery.of(context).platformBrightness ==
+                                    Brightness.dark
+                                ? Colors.white.withOpacity(0.5)
+                                : Colors.black.withOpacity(0.5)),
+                    onPressed: () async {
+                      if(widget.nftDto.contractAddress != "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase()) {
+                      bool fav;
+                      if (homeController.isInFav.contains(widget.nftDto.contractAddress)) {
+                        homeController.isInFav.remove(widget.nftDto.contractAddress);
+                        fav = false;
+                      } else {
+                        homeController.isInFav.add(widget.nftDto.contractAddress!);
+                        fav = true;
+                      }
+                      // ignore: invalid_use_of_protected_member
+                      widget.pagingController.notifyListeners();
+                        await _profileController.updateNft(
+                          NftModificationDto(
+                              contractAddress: widget.nftDto.contractAddress!,
+                              id: homeController.id.value,
+                              isFav: fav));
+                      if(fav) {
+                        await StreamChat.of(context).client.updateChannelPartial(widget.nftDto.contractAddress!, 'try', set: {"${homeController.id.value}_favorite" : true});
+                      } else {
+                        await StreamChat.of(context).client.updateChannelPartial(widget.nftDto.contractAddress!, 'try', unset: ["${homeController.id.value}_favorite"]);
+                      }
+                      _groupController.refreshGroups.value = true;
+                    }},
                   )),
-            )
-          ],
+            title: Text(widget.nftDto.title!,
+                style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w600,
+                    color: MediaQuery.of(context).platformBrightness ==
+                            Brightness.dark
+                        ? Colors.white
+                        : Colors.black)),
+            subtitle: Text(widget.nftDto.isNft ?? false ?  "${widget.nftDto.images!.length} available" : widget.nftDto.subtitle == null ? "" : "Currency : ${widget.nftDto.subtitle?.toUpperCase()}" ,
+                style: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: "Gilroy",
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF828282))),
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
+                child: SizedBox(
+                    height: 80,
+                    child: ListView.builder(
+                      itemCount: widget.nftDto.images!.length,
+                      itemBuilder: (context, i) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: InkWell(
+                            onTap: () {
+                              if (_profileController.isEditingProfile.value) {
+                                _profileController.urlPicture.value =
+                                    widget.nftDto.images![i];
+                              }
+                            },
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: SizedBox.fromSize(
+                                    child: CachedNetworkImage(
+                                        fit: BoxFit.cover,
+                                        imageUrl: widget.nftDto.images![i],
+                                        width: 80,
+                                        height: 70,
+                                        placeholder: (context, url) =>
+                                             Center(
+                                                child: CircularProgressIndicator(
+                                                    color: SColors.activeColor)),
+                                        errorWidget: (context, url, error) =>
+                                            Image.asset(
+                                                "assets/images/app_icon_rounded.png")))),
+                          ),
+                        );
+                      },
+                      scrollDirection: Axis.horizontal,
+                    )),
+              )
+            ],
+          ),
         ),
       ),
     );
