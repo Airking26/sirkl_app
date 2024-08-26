@@ -50,8 +50,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   YYDialog dialogMenu = YYDialog();
   static var pageKey = 0;
-  Utils utils = Utils();
-
 
   @override
   void initState() {
@@ -361,12 +359,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     if (!value.first.isFavorite) {
                                       final file = await value.first.file;
                                       if (await _profileController.postStory(file!, value.first.type == AssetType.image ? 0 : 1)) {
-                                        utils.showToast(context, "Story has been posted");
+                                        showToast(context, "Story has been posted");
                                         _profileController.retrieveMyStories();
                                       }
                                     } else {
                                       if (await _profileController.postStory(value.first.pickedFile!, value.first.type == AssetType.image ? 0 : 1)) {
-                                        utils.showToast(context, "Story has been posted");
+                                        showToast(context, "Story has been posted");
                                         _profileController.retrieveMyStories();
                                       }
                                     }
@@ -410,7 +408,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: () async {
                       await Clipboard.setData(ClipboardData(
                           text: _homeController.userMe.value.wallet!));
-                      utils.showToast(context, con.walletCopiedRes.tr);
+                      showToast(context, con.walletCopiedRes.tr);
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

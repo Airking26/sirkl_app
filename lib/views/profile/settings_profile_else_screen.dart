@@ -44,8 +44,6 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
   CommonController get _commonController => Get.find<CommonController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
 
-  final utils = Utils();
-
   @override
   void initState() {
     _commonController.checkUserIsInFollowing();
@@ -97,7 +95,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                 _commonController.userClickedFollowStatus.value ? const SizedBox() : InkWell(
                   onTap: () async {
                     if( await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)){
-                      utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName.isNullOrBlank! ? "${_commonController.userClicked.value!.wallet!.substring(0, 6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}" : _commonController.userClicked.value!.userName!}));
+                      showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName.isNullOrBlank! ? "${_commonController.userClicked.value!.wallet!.substring(0, 6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}" : _commonController.userClicked.value!.userName!}));
                     }
                   },
                   child: Material(
@@ -272,7 +270,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                   _commonController.userClickedFollowStatus.value ? InkWell(
                     onTap: () async {
                       if(await _commonController.removeUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)) {
-                        utils.showToast(context, con.userRemovedofSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
+                        showToast(context, con.userRemovedofSirklRes.trParams({"user": _commonController.userClicked.value!.userName ?? _commonController.userClicked.value!.wallet!}));
                       }
                     },
                     child: const Padding(
@@ -323,27 +321,27 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                             actions: [
                               CupertinoDialogAction(child:Text("Harassment or bullying", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                                 onPressed: () async {
-                                  await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Harassment or bullying", type: 0), utils);
+                                  await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Harassment or bullying", type: 0));
                                   Get.back();
                                 },),
                               CupertinoDialogAction(child:Text("Hate speech or discrimination", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                                 onPressed: () async {
-                                  await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Hate speech or discrimination", type: 0), utils);
+                                  await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Hate speech or discrimination", type: 0));
                                   Get.back();
                                 },),
                               CupertinoDialogAction(child:Text("Explicit or inappropriate content", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                                 onPressed: () async {
-                                  await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Explicit or inappropriate content", type: 0), utils);
+                                  await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Explicit or inappropriate content", type: 0));
                                   Get.back();
                                 },),
                               CupertinoDialogAction(child:Text("Spam or scams", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                                 onPressed: () async {
-                                  await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Spam or scams", type: 0), utils);
+                                  await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Spam or scams", type: 0));
                                   Get.back();
                                 },),
                               CupertinoDialogAction(child:Text("Privacy violations", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                               onPressed: () async {
-                                await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Privacy violations", type: 0), utils);
+                                await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _commonController.userClicked.value!.id!, description: "Privacy violations", type: 0));
                                 Get.back();
                                 },),
                             ],

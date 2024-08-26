@@ -72,15 +72,16 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
-//AppsflyerSdk appsflyerSdk = AppsflyerSdk(AppsFlyerOptions(afDevKey: afDevKey, appId: appId, showDebug: true));
+AppsflyerSdk appsflyerSdk = AppsflyerSdk(AppsFlyerOptions(afDevKey: "KdGKBY4Q3u3ooKjm4KT5am", appId: "1668076042", showDebug: true));
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  /*await appsflyerSdk.initSdk(
+  await appsflyerSdk.initSdk(
       registerConversionDataCallback: true,
       registerOnAppOpenAttributionCallback: true,
       registerOnDeepLinkingCallback: true
-  );*/
+  );
+  Get.put<AppsflyerSdk>(appsflyerSdk);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark));

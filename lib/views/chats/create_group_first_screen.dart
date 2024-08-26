@@ -39,7 +39,6 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
 
   NavigationController get _navigationController => Get.find<NavigationController>();
   final _priceController = TextEditingController();
-  final _utils = Utils();
 
   @override
   void initState() {
@@ -416,7 +415,7 @@ class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
               ),
               TextButton(onPressed: () async {
                 if(_chatController.groupTextController.value.text.isEmpty) {
-                  _utils.showToast(context, "Please, enter a name for you group.");
+                  showToast(context, "Please, enter a name for you group.");
                 } else {
                   if(_chatController.groupPaying.value == 1){
                     if(_priceController.text.isNotEmpty && isNumeric(_priceController.text)){

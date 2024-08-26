@@ -145,9 +145,9 @@ class CommonController extends GetxController {
         notificationAddedAdminDto);
   }
 
-  report(BuildContext context, ReportDto reportDTO, Utils utils) async {
+  report(BuildContext context, ReportDto reportDTO) async {
     await CommonRepo.report(reportDTO);
-    utils.showToast(context, "Thank you! Your report has been correctly sent.");
+    showToast(context, "Thank you! Your report has been correctly sent.");
   }
 
 }

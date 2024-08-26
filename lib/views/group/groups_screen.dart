@@ -177,7 +177,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
                               _navigationController.hideNavBar.value = false;
                             });
                           } else {
-                            Utils().showToast(context, "This is a private chat for holders of ${channel.name}");
+                            showToast(context, "This is a private chat for holders of ${channel.name}");
                           }
 
 
@@ -235,7 +235,7 @@ class _GroupsScreenState extends State<GroupsScreen> with TickerProviderStateMix
 
 
                           } else {
-                            Utils().showToast(context, "This is a private chat for holders of ${channel.name}");
+                            showToast(context, "This is a private chat for holders of ${channel.name}");
                       }},
                       ),
                     ),

@@ -20,7 +20,6 @@ class _MyGroupScreenState extends State<MyGroupScreen> {
   StreamChannelListController? streamChannelListControllerGroups;
   HomeController get _homeController => Get.find<HomeController>();
   ChatsController get _chatController => Get.find<ChatsController>();
-  final utils = Utils();
 
   StreamChannelListController buildStreamChannelListController(){
     return StreamChannelListController(

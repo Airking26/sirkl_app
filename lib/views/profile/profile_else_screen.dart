@@ -37,7 +37,6 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
-  final utils = Utils();
   final PagingController<int, NftDto> pagingController = PagingController(firstPageKey: 0);
   static var pageKey = 0;
 
@@ -133,7 +132,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                           IconButton(onPressed: () async{
                             if(!_commonController.userClickedFollowStatus.value) {
                               if( await _commonController.addUserToSirkl(_commonController.userClicked.value!.id!, StreamChat.of(context).client, _homeController.id.value)){
-                                utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName.isNullOrBlank! ? "${_commonController.userClicked.value!.wallet!.substring(0, 6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}" : _commonController.userClicked.value!.userName!}));
+                                showToast(context, con.userAddedToSirklRes.trParams({"user": _commonController.userClicked.value!.userName.isNullOrBlank! ? "${_commonController.userClicked.value!.wallet!.substring(0, 6)}...${_commonController.userClicked.value!.wallet!.substring(_commonController.userClicked.value!.wallet!.length - 4)}" : _commonController.userClicked.value!.userName!}));
                               }
                             } else {
                               widget.fromConversation ? Navigator.of(context).pop():
@@ -170,7 +169,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                 onTap: () async {
                   await Clipboard.setData(ClipboardData(text: _commonController.userClicked.value!.wallet!));
                   // ignore: use_build_context_synchronously
-                  utils.showToast(context, con.walletCopiedRes.tr);
+                  showToast(context, con.walletCopiedRes.tr);
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

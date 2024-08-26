@@ -48,7 +48,6 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   NavigationController get _navigationController => Get.find<NavigationController>();
   YYDialog dialogMenu = YYDialog();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
-  final utils = Utils();
   final StreamMessageInputController _messageInputController = StreamMessageInputController();
   final _searchController = FloatingSearchBarController();
   static var pageKey = 0;
@@ -448,7 +447,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
         trailing: _chatController.sendingMessageMode.value == 2 ? Checkbox(
           onChanged: (selected) {
             if (_chatController.chipsList.value.length == 3 && _chatController.sendingMessageMode.value == 2 && selected!) {
-              utils.showToast(context, con.maxUserSelectedRes.tr);
+              showToast(context, con.maxUserSelectedRes.tr);
             }
             else if (selected!) {
                 _chatController.chipsList.add(item);
@@ -536,7 +535,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
             child: InkWell(
               onTap: () async {
                 if(_chatController.chipsList.length <2){
-                  utils.showToast(context, "Please, choose at least 2 participants");
+                  showToast(context, "Please, choose at least 2 participants");
                 }
                  else if(_chatController.sendingMessageMode.value == 2 && _messageInputController.text.isNotEmpty && !_messageInputController.text.isBlank!){
                   await sendMessageAsBroadcastList();

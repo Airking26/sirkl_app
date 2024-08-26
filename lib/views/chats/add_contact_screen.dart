@@ -34,7 +34,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
   CommonController get _commonController => Get.find<CommonController>();
   GroupsController get _groupController => Get.find<GroupsController>();
   final nicknameController = TextEditingController();
-  final _utils = Utils();
   bool autofocus  = false;
   @override
   Widget build(BuildContext context) {
@@ -314,7 +313,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
               TextButton(
                 onPressed: () async {
                   if (_chatController.contactAddIsEmpty.value) {
-                    _utils.showToast(context, "Please enter a user");
+                    showToast(context, "Please enter a user");
                   }
                   else {
                     if(nicknameController.text.isNotEmpty){
@@ -322,7 +321,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       _homeController.updateNickname(_homeController.userAdded.value.wallet!, nicknameController.text);
                     }
                     if(await _commonController.addUserToSirkl(_homeController.userAdded.value.id!, StreamChat.of(context).client, _homeController.id.value)){
-                        _utils.showToast(context, con.userAddedToSirklRes.trParams({"user": _homeController.userAdded.value.userName.isNullOrBlank! ? "${_homeController.userAdded.value.wallet!.substring(0, 6)}...${_homeController.userAdded.value.wallet!.substring(_homeController.userAdded.value.wallet!.length - 4)}" : _homeController.userAdded.value.userName!}));
+                        showToast(context, con.userAddedToSirklRes.trParams({"user": _homeController.userAdded.value.userName.isNullOrBlank! ? "${_homeController.userAdded.value.wallet!.substring(0, 6)}...${_homeController.userAdded.value.wallet!.substring(_homeController.userAdded.value.wallet!.length - 4)}" : _homeController.userAdded.value.userName!}));
                         nicknameController.clear();
                         _chatController.contactAddIsEmpty.value = true;
                         _homeController.userAdded.value = UserDTO();
@@ -331,7 +330,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                     }
                     else {
                       _commonController.contactAddLoading.value = false;
-                      _utils.showToast(context, "This user is already in your SIRKL");
+                      showToast(context, "This user is already in your SIRKL");
                     }
                   }
                 },

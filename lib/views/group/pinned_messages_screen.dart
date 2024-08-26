@@ -1,15 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
-import 'package:sirkl/controllers/common_controller.dart';
-import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/groups_controller.dart';
 
 import '../../config/s_colors.dart';
-import '../../controllers/home_controller.dart';
-import '../../controllers/profile_controller.dart';
 
 class PinnedMessageScreen extends StatefulWidget {
   const PinnedMessageScreen({Key? key}) : super(key: key);
@@ -21,8 +15,6 @@ class PinnedMessageScreen extends StatefulWidget {
 class _PinnedMessageScreenState extends State<PinnedMessageScreen> {
 
   ChatsController get _chatController => Get.find<ChatsController>();
-  final utils = Utils();
-
 
   @override
   Widget build(BuildContext context) {

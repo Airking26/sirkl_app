@@ -35,6 +35,12 @@ PODS:
     - AppAuth/Core
   - appcheck (1.0.3):
     - Flutter
+  - appsflyer_sdk (6.14.3):
+    - AppsFlyerFramework (= 6.14.3)
+    - Flutter
+  - AppsFlyerFramework (6.14.3):
+    - AppsFlyerFramework/Main (= 6.14.3)
+  - AppsFlyerFramework/Main (6.14.3)
   - audio_session (0.0.1):
     - Flutter
   - AWSCognito (2.19.1):
@@ -373,6 +379,7 @@ PODS:
 DEPENDENCIES:
   - agora_rtc_engine (from `.symlinks/plugins/agora_rtc_engine/ios`)
   - appcheck (from `.symlinks/plugins/appcheck/ios`)
+  - appsflyer_sdk (from `.symlinks/plugins/appsflyer_sdk/ios`)
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - coinbase_wallet_sdk (from `.symlinks/plugins/coinbase_wallet_sdk/ios`)
@@ -423,6 +430,7 @@ SPEC REPOS:
     - AgoraIrisRTC_iOS
     - AgoraRtcEngine_iOS
     - AppAuth
+    - AppsFlyerFramework
     - AWSCognito
     - AWSCore
     - AWSS3
@@ -463,6 +471,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/agora_rtc_engine/ios"
   appcheck:
     :path: ".symlinks/plugins/appcheck/ios"
+  appsflyer_sdk:
+    :path: ".symlinks/plugins/appsflyer_sdk/ios"
   audio_session:
     :path: ".symlinks/plugins/audio_session/ios"
   camera_avfoundation:
@@ -558,6 +568,8 @@ SPEC CHECKSUMS:
   AgoraRtcEngine_iOS: 549bb3853d5afb18fabca4197786f39f31141da8
   AppAuth: 501c04eda8a8d11f179dbe8637b7a91bb7e5d2fa
   appcheck: e1ab9d4e03736f03e0401554a134d1ed502d7629
+  appsflyer_sdk: e59c6b99ce2f28b93fe6b3045a97e8e1a20bce97
+  AppsFlyerFramework: 0a68f5b72bbbadfa71d4ae3eaf040e82d62e8518
   audio_session: 088d2483ebd1dc43f51d253d4a1c517d9a2e7207
   AWSCognito: f50de600804941d083af37a7568905f31a774727
   AWSCore: 55c154ae27efc5c98bdc30a0eeea5a35d10a2ab5

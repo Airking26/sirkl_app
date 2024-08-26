@@ -57,7 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
   WalletConnectModalController get _walletConnectModalController => Get.find<WalletConnectModalController>();
   NavigationController get _navigationController => Get.find<NavigationController>();
 
-  final utils = Utils();
   final storyController = StoryController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? controller;

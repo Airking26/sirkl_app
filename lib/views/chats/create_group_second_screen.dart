@@ -43,7 +43,6 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
   NavigationController get _navigationController => Get.find<NavigationController>();
  HomeController get _homeController => Get.find<HomeController>();
   ProfileController get _profileController => Get.find<ProfileController>();  
-  final _utils = Utils();
 
   @override
   void initState() {
@@ -203,7 +202,7 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
         trailing: Checkbox(
           onChanged: (selected) {
             if (item.id.isNullOrBlank!) {
-              _utils.showToast(context, "Only users from SIRKL can be part of a group");
+              showToast(context, "Only users from SIRKL can be part of a group");
             } else {
               if (selected!) {
                 _chatController.chipsList.add(item);
@@ -329,7 +328,7 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
               ),
               TextButton(onPressed: () async{
                 if(_chatController.chipsList.isEmpty || _chatController.chipsList.length < 2){
-                  _utils.showToast(context, "Please select at least 2 participants");
+                  showToast(context, "Please select at least 2 participants");
                 } else {
                   await sendMessageAsGroup();
                 }

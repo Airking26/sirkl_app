@@ -22,8 +22,6 @@ class _RequestWaitingForApprovalScreenState extends State<RequestWaitingForAppro
 
   HomeController get _homeController => Get.find<HomeController>();
   ChatsController get _chatController => Get.find<ChatsController>();
-  final utils = Utils();
-
 
   @override
   Widget build(BuildContext context) {

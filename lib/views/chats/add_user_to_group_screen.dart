@@ -44,7 +44,6 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   final _priceController = TextEditingController();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
-  final utils = Utils();
   final _searchController = FloatingSearchBarController();
   static var pageKey = 0;
 
@@ -527,7 +526,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
                   _chatController.chipsListAddUsers.add(item);
                 }
               } else {
-                utils.showToast(
+                showToast(
                     context, "This user is already present in this group");
               }
             }

@@ -25,7 +25,6 @@ class DetailedChatScreen extends StatefulWidget {
 }
 
 class _DetailedChatScreenState extends State<DetailedChatScreen> {
-  final utils = Utils();
   YYDialog dialogMenu = YYDialog();
   CommonController get _commonController => Get.find<CommonController>();
   ChatsController get _chatController => Get.find<ChatsController>();

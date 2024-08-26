@@ -47,8 +47,6 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
   final web3Controller = Get.put(Web3Controller());
   final _priceController = TextEditingController();
 
-  final utils = Utils();
-
   @override
   void initState() {
     _chatController.retrieveRequestsWaiting(_chatController.channel.value!.id!);
@@ -300,7 +298,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                                         ));
                               } else {
                                 Get.back();
-                                utils.showToast(context, "Request already sent");
+                                showToast(context, "Request already sent");
                               }
                             },
                           )
@@ -392,7 +390,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                 if(_chatController.channel.value!.membership != null || _chatController.channel.value!.state!.members.map((e) => e.userId!).contains(_homeController.id.value)) {
                   pushNewScreen(context, screen: const GroupParticipantScreen());
                 } else {
-                  utils.showToast(context, "You have to be a member to access this data");
+                  showToast(context, "You have to be a member to access this data");
                 }
               },
               child: Padding(
@@ -470,27 +468,27 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
                       actions: [
                         CupertinoDialogAction(child:Text("Harassment or bullying", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                           onPressed: () async {
-                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Harassment or bullying", type: 1), utils);
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Harassment or bullying", type: 1));
                             Get.back();
                           },),
                         CupertinoDialogAction(child:Text("Hate speech or discrimination", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                           onPressed: () async {
-                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Hate speech or discrimination", type: 1), utils);
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Hate speech or discrimination", type: 1));
                             Get.back();
                           },),
                         CupertinoDialogAction(child:Text("Explicit or inappropriate content", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                           onPressed: () async {
-                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Explicit or inappropriate content", type: 1), utils);
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Explicit or inappropriate content", type: 1));
                             Get.back();
                           },),
                         CupertinoDialogAction(child:Text("Spam or scams", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                           onPressed: () async {
-                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Spam or scams", type: 1), utils);
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Spam or scams", type: 1));
                             Get.back();
                           },),
                         CupertinoDialogAction(child:Text("Privacy violations", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Gilroy", color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.5): Colors.black.withOpacity(0.5))),
                           onPressed: () async {
-                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Privacy violations", type: 1), utils);
+                            await _commonController.report(context, ReportDto(createdBy: _homeController.id.value, idSignaled: _chatController.channel.value!.id!, description: "Privacy violations", type: 1));
                             Get.back();
                           },),
                       ],

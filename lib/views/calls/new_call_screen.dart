@@ -33,7 +33,6 @@ class _NewCallScreenState extends State<NewCallScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   final PagingController<int, UserDTO> pagingController = PagingController(firstPageKey: 0);
-  final utils = Utils();
   final _searchController = FloatingSearchBarController();
   static var pageKey = 0;
 
