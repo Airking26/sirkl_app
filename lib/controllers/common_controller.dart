@@ -10,10 +10,6 @@ import 'package:sirkl/repo/common_repo.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/repo/profile_repo.dart';
-import 'package:sirkl/utils/multi_load.util.dart';
-
-import '../common/model/refresh_token_dto.dart';
-import '../common/save_pref_keys.dart';
 
 class CommonController extends GetxController {
   final box = GetStorage();
@@ -30,21 +26,10 @@ class CommonController extends GetxController {
   late StreamChannelListController controllerOthers;
 
   void refreshAllInbox() async {
-    List<StreamChannelListController> chatStreamControllers = [
-      controllerFriend,
-      controllerOthers
-    ];
-    MultiLoadUtil multiLoad = MultiLoadUtil();
-
-    for (StreamChannelListController element in chatStreamControllers) {
-      try {
-        multiLoad.startLoading();
-        element.refresh().then((value) => multiLoad.stopLoading());
-      } catch (err) {
-        multiLoad.stopLoading();
-      }
-    }
-    await multiLoad.isDone();
+    await Future.wait([
+      controllerFriend.refresh(),
+      controllerOthers.refresh()
+    ]);
   }
 
   Future<bool> addUserToSirkl(

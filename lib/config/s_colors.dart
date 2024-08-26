@@ -6,12 +6,12 @@ class SColors {
   static late Color activeColor;
   static void loadColors(AppThemeEnum appTheme) {
     if (appTheme == AppThemeEnum.light) {
-      _loadlight();
+      _loadLight();
     }
     _loadDark();
   }
 
-  static void _loadlight() {
+  static void _loadLight() {
     activeColor = const Color(0xFF00CB7D);
   }
 

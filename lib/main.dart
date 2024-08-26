@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -32,7 +33,6 @@ import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/repo/profile_repo.dart';
-import 'package:sirkl/utils/analyticService.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/chats/settings_group_screen.dart';
 import 'package:sirkl/views/profile/profile_else_screen.dart';
@@ -95,7 +95,7 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.instance.subscribeToTopic("all");
   await GetStorage.init();
-  AnalyticService().getAnalyticObserver();
+  FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance);
   runApp(Phoenix(child: MyApp(client: client)));
 }
 
