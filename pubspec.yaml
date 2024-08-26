@@ -198,7 +198,7 @@ flutter:
     - assets/pdf/all.pdf
     - animations/
     - svgs/
-    - lib/svgs/
+    - assets/svgs/
     - assets/ca/
     - assets/abi.json
     - assets/abi_mint.json

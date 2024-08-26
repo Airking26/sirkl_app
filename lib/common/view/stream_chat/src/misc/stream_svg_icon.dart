@@ -1085,7 +1085,7 @@ class StreamSvgIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final key = Key('StreamSvgIcon-$assetName');
     return SvgPicture.asset(
-      'lib/svgs/$assetName',
+      'assets/svgs/$assetName',
       //package: 'sirkl',
       key: key,
       width: width,
