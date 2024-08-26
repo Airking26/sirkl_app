@@ -270,15 +270,19 @@ class MessageWidgetContent extends StatelessWidget {
                       if (!reverse && showUserAvatar == DisplayWidget.show && message.user != null) ...[
                         Padding(
                           padding: const EdgeInsets.only(top: 2.0),
-                          child: UserAvatarTransform(
-                            onUserAvatarTap:(user){
-                              _commonController.userClicked.value = userFromJson(json.encode(user.extraData["userDTO"]));
-                              pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: true), withNavBar: true).then((value) => _navigationController.hideNavBar.value = true);
-                            },
-                            userAvatarBuilder: userAvatarBuilder,
-                            translateUserAvatar: translateUserAvatar,
-                            messageTheme: messageTheme,
-                            message: message,
+                          child: SizedBox(
+                            width: 35,
+                            height: 35,
+                            child: UserAvatarTransform(
+                              onUserAvatarTap:(user){
+                                _commonController.userClicked.value = userFromJson(json.encode(user.extraData["userDTO"]));
+                                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: true), withNavBar: true).then((value) => _navigationController.hideNavBar.value = true);
+                              },
+                              userAvatarBuilder: userAvatarBuilder,
+                              translateUserAvatar: translateUserAvatar,
+                              messageTheme: messageTheme,
+                              message: message,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 9),

@@ -78,9 +78,9 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
           ),
           Container(
             padding: const EdgeInsets.only(
-              top: 48,
-              left: 16,
-              right: 16,
+              top: 64,
+              left: 24,
+              right: 24,
             ),
             child: _buildProfileView(_homeController.stories.value![_homeController.indexStory.value]!.first!),
           )

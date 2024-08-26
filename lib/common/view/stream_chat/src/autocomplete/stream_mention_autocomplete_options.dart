@@ -107,7 +107,7 @@ class _StreamMentionAutocompleteOptionsState
     return {
       ...state.watchers,
       ...state.members.map((it) => it.user),
-    }.whereType<User>().toList(growable: false);
+    }.whereType<User>().where((user) => user.id != "bot_one" && user.id != "bot_two" && user.id != "bot_three").toList(growable: false);
   }
 
   Future<List<User>> queryMentions(String query) async {
@@ -133,6 +133,7 @@ class _StreamMentionAutocompleteOptionsState
     return result
         .map((it) => it.user)
         .whereType<User>()
+        .where((user) => user.id != "bot_one" && user.id != "bot_two" && user.id != "bot_three")
         .toList(growable: false);
   }
 

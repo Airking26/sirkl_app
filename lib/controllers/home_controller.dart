@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use, prefer_typing_uninitialized_variables
 
 import 'dart:io';
+import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as htp;
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -115,6 +116,8 @@ class HomeController extends GetxController {
                 ? "android"
                 : "iOS"));
 
+    AppsflyerSdk appsflyerSdk = Get.find<AppsflyerSdk>();
+    bool? result = await appsflyerSdk.logEvent("af_login", {});
     box.write(SharedPref.USER, signSuccess.user!.toJson());
     userMe.value = signSuccess.user!;
 
@@ -164,62 +167,6 @@ class HomeController extends GetxController {
     contractAddresses.value = await HomeRepo.retrieveContactAddress();
     box.write(con.contractAddresses, contractAddresses);
   }
-
-  /*
-  getTokenContractAddress(String wallet) async {
-    var emptyBalanceHex = "0x0000000000000000000000000000000000000000000000000000000000000000";
-    var ethContractAddress = "0x0000000000000000000000000000000000000000";
-    var tokenContractAddress = await HomeRepo.getTokenContractAddressesWithAlchemy(wallet: wallet.toLowerCase());
-    var ethClient = Web3Client(SUrls.infura, htp.Client());
-    var balance = await ethClient.getBalance(EthereumAddress.fromHex(wallet.toLowerCase()));
-    if (balance.getInWei > BigInt.zero && !contractAddresses.contains(ethContractAddress)) {
-      contractAddresses.add(ethContractAddress);
-    }
-
-    tokenContractAddress.result?.tokenBalances?.forEach((element) {
-      if (element.tokenBalance != emptyBalanceHex) {
-        if (!contractAddresses.contains(element.contractAddress)) {
-          contractAddresses.add(element.contractAddress!);
-        }
-      } else {
-        contractAddresses.remove(element.contractAddress!);
-      }
-    });
-
-    await getNFTsContractAddresses("0xC6A4434619fCe9266bD7e3d0A9117D2C9b49Fd87".toLowerCase());
-  }
-  getNFTsContractAddresses(String wallet) async {
-    ContractAddressDto contractAddress = await HomeRepo.getContractAddressesWithAlchemy(wallet: wallet, cursor: '');
-    var initialArray = contractAddress.contracts;
-    if (contractAddress.pageKey != null) {
-      String? cursor = contractAddress.pageKey;
-      while (cursor != null) {
-        ContractAddressDto newContractAddress = await HomeRepo.getContractAddressesWithAlchemy(wallet: wallet, cursor: "&pageKey=$cursor");
-        initialArray.addAll(newContractAddress.contracts);
-        cursor = newContractAddress.pageKey;
-      }
-    }
-
-    initialArray.removeWhere((element) =>
-    ((element.title == null || element.title!.isEmpty ) && (element.name == null || element.name!.isEmpty))  ||
-        element.opensea == null ||
-        element.opensea!.imageUrl == null ||
-        element.opensea!.imageUrl!.isEmpty ||
-        element.opensea!.collectionName == null ||
-        element.opensea!.collectionName!.isEmpty ||
-        element.tokenType == TokenType.UNKNOWN ||
-        (element.tokenType == TokenType.ERC1155 &&
-            element.opensea?.safelistRequestStatus ==
-                SafelistRequestStatus.NOT_REQUESTED));
-
-    for (var element in initialArray) {
-      if (!contractAddresses.contains(element.address?.toLowerCase())) {
-        contractAddresses.add(element.address!.toLowerCase());
-      }
-    }
-
-    box.write(con.contractAddresses, contractAddresses);
-  }*/
 
   getAllNftConfig() async => await HomeRepo.getAllNFTConfig();
   updateAllNftConfig() async => await HomeRepo.updateAllNFTConfig();
@@ -404,7 +351,7 @@ class HomeController extends GetxController {
   registerNotification(NotificationRegisterDto notificationRegisterDto) async =>
       await HomeRepo.registerNotification(notificationRegisterDto);
 
-  checkOfflineNotifAndRegister() async {
+  checkOfflineNotificationAndRegister() async {
     var notifications = GetStorage().read(con.notificationSaved) ?? [];
     var notificationsToDelete = [];
     for (var notification in (notifications as List<dynamic>)) {

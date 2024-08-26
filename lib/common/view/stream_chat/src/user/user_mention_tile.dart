@@ -43,11 +43,15 @@ class StreamUserMentionTile extends StatelessWidget {
           const SizedBox(
             width: 16,
           ),
-          leading ??
-              StreamUserAvatar(
-                user: user,
-                constraints: BoxConstraints.tight(const Size(40, 40)),
-              ),
+          SizedBox(
+            width: 35,
+            height: 35,
+            child: leading ??
+                StreamUserAvatar(
+                  user: user,
+                  constraints: BoxConstraints.tight(const Size(35, 35)),
+                ),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Align(
