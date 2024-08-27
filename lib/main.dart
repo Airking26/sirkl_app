@@ -453,8 +453,8 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
         "channel": data["channel"]
       },
       android: const AndroidParams(
-          isCustomNotification: true,
-          isCustomSmallExNotification: true,
+          isCustomNotification: false,
+          isCustomSmallExNotification: false,
           isShowLogo: false,
           ringtonePath: 'system_ringtone_default',
           backgroundColor: '#102437',

@@ -793,10 +793,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_callkit_incoming
-      sha256: "46074904ff9d70aee05ee7d16b8638fb0f7d56f57ab6dc5b387bed66539986f0"
+      sha256: "911978c1db30d2cf886daf80c874ac0beac8482682769b397c0dc3190f3f6cef"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.4+1"
   flutter_keyboard_visibility:
     dependency: transitive
     description:
