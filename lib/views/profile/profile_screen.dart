@@ -9,20 +9,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_badged/flutter_badge.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/model/nft_modification_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/web3_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/views/profile/settings_screen.dart';
-
 import 'package:tiny_avatar/tiny_avatar.dart';
+
 import '../../common/view/dialog/custom_dial.dart';
 import '../../config/s_colors.dart';
 import '../../controllers/home_controller.dart';
@@ -38,13 +37,14 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-
   late final GalleryController controller;
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get _homeController => Get.find<HomeController>();
-  NavigationController get _navigationController => Get.find<NavigationController>();
+  NavigationController get _navigationController =>
+      Get.find<NavigationController>();
   //final TextEditingController usernameTextEditingController = TextEditingController();
-  final TextEditingController descriptionTextEditingController = TextEditingController();
+  final TextEditingController descriptionTextEditingController =
+      TextEditingController();
   FocusNode focusNode = FocusNode();
   String hintText = '';
 
@@ -59,7 +59,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     controller = GalleryController();
     _profileController.retrieveMyStories();
-    _profileController.pagingController.addPageRequestListener((pageKey) {fetchNFTs();});
+    _profileController.pagingController.addPageRequestListener((pageKey) {
+      fetchNFTs();
+    });
     /*usernameTextEditingController.text =
         _homeController.userMe.value.userName!.isEmpty
             ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
@@ -68,7 +70,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _homeController.userMe.value.description.isNullOrBlank!
             ? ""
             : _homeController.userMe.value.description!;
-    _profileController.urlPicture.value = _homeController.userMe.value.picture == null ? "" : _homeController.userMe.value.picture!;
+    _profileController.urlPicture.value =
+        _homeController.userMe.value.picture == null
+            ? ""
+            : _homeController.userMe.value.picture!;
     super.initState();
   }
 
@@ -77,7 +82,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       List<NftDto> newItems = await _homeController.getNFT(
           _homeController.id.value,
           _homeController.isFavNftSelected.value,
-          pageKey, null);
+          pageKey,
+          null);
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
         _profileController.pagingController.appendLastPage(newItems);
@@ -141,38 +147,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                _profileController
-                                    .isEditingProfile.value
-                                    ? const SizedBox(width: 42, height: 24,) : IconButton(
-                                            onPressed: () async {
-                                              pushNewScreen(context, screen: const NotificationScreen()).then((value) => _profileController.checkIfHasUnreadNotification(_homeController.id.value));
-                                            },
-                                            icon: FlutterBadge(
-                                              icon: Image.asset(
-                                                width: 32,
-                                                height: 32,
-                                                "assets/images/bell.png",
-                                                color: MediaQuery.of(context)
-                                                            .platformBrightness ==
-                                                        Brightness.dark
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                              ),
-                                              itemCount: _profileController.hasUnreadNotification.value || !_homeController.userMe.value.hasSBT! ? 1 : 0,
-                                              hideZeroCount: true,
-                                              badgeColor:
-                                                  SColors.activeColor,
-                                              badgeTextColor:
-                                                  SColors.activeColor,
-                                              contentPadding:
-                                                  const EdgeInsets.only(
-                                                      top: 0.1,
-                                                      right: 16,
-                                                      left: 12),
-                                            )),
+                                _profileController.isEditingProfile.value
+                                    ? const SizedBox(
+                                        width: 42,
+                                        height: 24,
+                                      )
+                                    : IconButton(
+                                        onPressed: () async {
+                                          pushNewScreen(context,
+                                                  screen:
+                                                      const NotificationScreen())
+                                              .then((value) => _profileController
+                                                  .checkIfHasUnreadNotification(
+                                                      _homeController
+                                                          .id.value));
+                                        },
+                                        icon: FlutterBadge(
+                                          icon: Image.asset(
+                                            width: 32,
+                                            height: 32,
+                                            "assets/images/bell.png",
+                                            color: MediaQuery.of(context)
+                                                        .platformBrightness ==
+                                                    Brightness.dark
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
+                                          itemCount: _profileController
+                                                      .hasUnreadNotification
+                                                      .value ||
+                                                  !_homeController
+                                                      .userMe.value.hasSBT!
+                                              ? 1
+                                              : 0,
+                                          hideZeroCount: true,
+                                          badgeColor: SColors.activeColor,
+                                          badgeTextColor: SColors.activeColor,
+                                          contentPadding: const EdgeInsets.only(
+                                              top: 0.1, right: 16, left: 12),
+                                        )),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 12.0),
-                                  child:  /*_profileController
+                                  child: /*_profileController
                                       .isEditingProfile.value
                                       ? SizedBox(
                                     width: 200,
@@ -205,44 +221,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               .userMe.value.userName!),
                                     ),
                                   )
-                                      : */ Text(
-                                          _homeController.userMe.value.userName!
-                                                      .isEmpty ||
-                                                  _homeController.userMe.value
-                                                          .userName ==
-                                                      _homeController
-                                                          .userMe.value.wallet
-                                              ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
-                                              : _homeController
-                                                  .userMe.value.userName!,
-                                          textAlign: TextAlign.center,
-                                          maxLines: 1,
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis,
-                                              fontSize: 20,
-                                              fontFamily: "Gilroy",
-                                              fontWeight: FontWeight.w600,
-                                              color: MediaQuery.of(context)
-                                                          .platformBrightness ==
-                                                      Brightness.dark
-                                                  ? Colors.white
-                                                  : Colors.black),
-                                        ),
+                                      : */
+                                      Text(
+                                    _homeController.userMe.value.userName!
+                                                .isEmpty ||
+                                            _homeController
+                                                    .userMe.value.userName ==
+                                                _homeController
+                                                    .userMe.value.wallet
+                                        ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
+                                        : _homeController
+                                            .userMe.value.userName!,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontSize: 20,
+                                        fontFamily: "Gilroy",
+                                        fontWeight: FontWeight.w600,
+                                        color: MediaQuery.of(context)
+                                                    .platformBrightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : Colors.black),
+                                  ),
                                 ),
                                 _profileController.isLoadingPicture.value
                                     ? Container(
-                                    padding: const EdgeInsets.all(8),
-                                    width: 48,
-                                    height: 48,
-                                    child:  CircularProgressIndicator(
-                                      color: SColors.activeColor,
-                                    )) :
-                                _profileController.isEditingProfile.value
-                                    ? InkWell(
-                                  onTap: () async {
-                                    await _profileController.updateMe(
-                                        UpdateMeDto(
-                                            /*userName: usernameTextEditingController
+                                        padding: const EdgeInsets.all(8),
+                                        width: 48,
+                                        height: 48,
+                                        child: CircularProgressIndicator(
+                                          color: SColors.activeColor,
+                                        ))
+                                    : _profileController.isEditingProfile.value
+                                        ? InkWell(
+                                            onTap: () async {
+                                              await _profileController.updateMe(
+                                                  UpdateMeDto(
+                                                      /*userName: usernameTextEditingController
                                                 .text
                                                 .isEmpty
                                                 ? "${_homeController
@@ -251,41 +268,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 .wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
                                                 : usernameTextEditingController
                                                 .text,*/
-                                            description: descriptionTextEditingController
-                                                .text
-                                                .isEmpty
-                                                ? ""
-                                                : descriptionTextEditingController
-                                                .text,
-                                            picture:
-                                            _profileController
-                                                .urlPicture
-                                                .value),
-                                        StreamChat.of(context)
-                                            .client);
-                                    //usernameTextEditingController.clear();
-                                    descriptionTextEditingController.clear();
-                                  },
-                                  child:  Padding(
-                                    padding: const  EdgeInsets.only(
-                                        top: 16.0, left: 16),
-                                    child: Text("DONE",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontFamily: 'Gilroy',
-                                            fontSize: 16,
-                                            fontWeight:
-                                            FontWeight.w700,
-                                            color:
-                                            SColors.activeColor)),
-                                  ),
-                                ) :IconButton(
-                                    onPressed: () async {
-                                      pushNewScreen(context, screen: const SettingScreen(), withNavBar: false).then((value) {
-                                        //usernameTextEditingController.text = (value as Map)["name"];
-                                        _navigationController.hideNavBar.value = false;});
-                                    },
-                                    icon: Image.asset("assets/images/more.png", width: 32, height: 32, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,)),
+                                                      description:
+                                                          descriptionTextEditingController
+                                                                  .text.isEmpty
+                                                              ? ""
+                                                              : descriptionTextEditingController
+                                                                  .text,
+                                                      picture:
+                                                          _profileController
+                                                              .urlPicture
+                                                              .value),
+                                                  StreamChat.of(context)
+                                                      .client);
+                                              //usernameTextEditingController.clear();
+                                              descriptionTextEditingController
+                                                  .clear();
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 16.0, left: 16),
+                                              child: Text("DONE",
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      fontFamily: 'Gilroy',
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color:
+                                                          SColors.activeColor)),
+                                            ),
+                                          )
+                                        : IconButton(
+                                            onPressed: () async {
+                                              pushNewScreen(context,
+                                                      screen:
+                                                          const SettingScreen(),
+                                                      withNavBar: false)
+                                                  .then((value) {
+                                                //usernameTextEditingController.text = (value as Map)["name"];
+                                                _navigationController
+                                                    .hideNavBar.value = false;
+                                              });
+                                            },
+                                            icon: Image.asset(
+                                              "assets/images/more.png",
+                                              width: 32,
+                                              height: 32,
+                                              color: MediaQuery.of(context)
+                                                          .platformBrightness ==
+                                                      Brightness.dark
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                            )),
                               ],
                             ),
                           ),
@@ -296,12 +330,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Container(
                             decoration: BoxDecoration(
                                 border: Border.all(
-                                    color: _profileController.myStories.value == null || _profileController.myStories.value!.isEmpty ? MediaQuery.of(context)
-                                                .platformBrightness ==
-                                            Brightness.dark
-                                        ? const Color(0xFF122034)
-                                        : Colors.white :
-                                    SColors.activeColor,
+                                    color: _profileController.myStories.value ==
+                                                null ||
+                                            _profileController
+                                                .myStories.value!.isEmpty
+                                        ? MediaQuery.of(context)
+                                                    .platformBrightness ==
+                                                Brightness.dark
+                                            ? const Color(0xFF122034)
+                                            : Colors.white
+                                        : SColors.activeColor,
                                     width: 5),
                                 borderRadius: BorderRadius.circular(90)),
                             child: DeferPointer(
@@ -310,46 +348,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   size: const Size.fromRadius(70),
                                   child: GestureDetector(
                                       onTap: () async {
-                                        if(_profileController.isEditingProfile.value){
-                                          await _profileController.getImageForProfile();
-                                        }
-                                        else if(_profileController.myStories.value != null && _profileController.myStories.value!.isNotEmpty){
-                                          pushNewScreen(context, screen: const MyStoryViewerScreen(), withNavBar: false).then((value) {
-                                                if(value == null){
-                                                  _navigationController.hideNavBar.value = false;
-                                                }
-                                                // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
-                                                _homeController.storyPagingController.value.notifyListeners();
-                                              });
+                                        if (_profileController
+                                            .isEditingProfile.value) {
+                                          await _profileController
+                                              .getImageForProfile();
+                                        } else if (_profileController
+                                                    .myStories.value !=
+                                                null &&
+                                            _profileController
+                                                .myStories.value!.isNotEmpty) {
+                                          pushNewScreen(context,
+                                                  screen:
+                                                      const MyStoryViewerScreen(),
+                                                  withNavBar: false)
+                                              .then((value) {
+                                            if (value == null) {
+                                              _navigationController
+                                                  .hideNavBar.value = false;
+                                            }
+                                            // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+                                            _homeController
+                                                .storyPagingController.value
+                                                .notifyListeners();
+                                          });
                                         }
                                       },
                                       child: _profileController.urlPicture.value.isEmpty
                                           ? TinyAvatar(
-                                              baseString: _profileController.urlPicture.value,
+                                              baseString: _profileController
+                                                  .urlPicture.value,
                                               dimension: 140,
                                               circular: true,
-                                              colourScheme: TinyAvatarColourScheme
-                                                  .seascape)
+                                              colourScheme:
+                                                  TinyAvatarColourScheme
+                                                      .seascape)
                                           : CachedNetworkImage(
-                                              imageUrl: _profileController.urlPicture.value,
-                                              color: Colors.white.withOpacity(_profileController
-                                                  .isEditingProfile
-                                                  .value
-                                                  ? 0.2
-                                                  : 0.0),
+                                              imageUrl: _profileController
+                                                  .urlPicture.value,
+                                              color: Colors.white.withOpacity(
+                                                  _profileController
+                                                          .isEditingProfile
+                                                          .value
+                                                      ? 0.2
+                                                      : 0.0),
                                               fit: BoxFit.cover,
                                               colorBlendMode:
                                                   BlendMode.difference,
-                                              placeholder: (context, url) =>
-                                                   Center(
-                                                      child: CircularProgressIndicator(
-                                                          color: SColors.activeColor)),
+                                              placeholder: (context, url) => Center(
+                                                  child: CircularProgressIndicator(
+                                                      color: SColors.activeColor)),
                                               errorWidget: (context, url, error) => Image.asset("assets/images/app_icon_rounded.png"))),
                                 ),
                               ),
                             )),
                       ),
-                      _profileController.isEditingProfile.value ? const SizedBox() : Positioned(
+                      _profileController.isEditingProfile.value
+                          ? const SizedBox()
+                          : Positioned(
                               top: Platform.isAndroid ? 210 : 190,
                               right: MediaQuery.of(context).size.width / 3.25,
                               child: DeferPointer(
@@ -358,13 +413,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   onCapture: (value) async {
                                     if (!value.first.isFavorite) {
                                       final file = await value.first.file;
-                                      if (await _profileController.postStory(file!, value.first.type == AssetType.image ? 0 : 1)) {
-                                        showToast(context, "Story has been posted");
+                                      if (await _profileController.postStory(
+                                          file!,
+                                          value.first.type == AssetType.image
+                                              ? 0
+                                              : 1)) {
+                                        showToast(
+                                            context, "Story has been posted");
                                         _profileController.retrieveMyStories();
                                       }
                                     } else {
-                                      if (await _profileController.postStory(value.first.pickedFile!, value.first.type == AssetType.image ? 0 : 1)) {
-                                        showToast(context, "Story has been posted");
+                                      if (await _profileController.postStory(
+                                          value.first.pickedFile!,
+                                          value.first.type == AssetType.image
+                                              ? 0
+                                              : 1)) {
+                                        showToast(
+                                            context, "Story has been posted");
                                         _profileController.retrieveMyStories();
                                       }
                                     }
@@ -418,7 +483,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           textAlign: TextAlign.center,
-                          style:  TextStyle(
+                          style: TextStyle(
                               fontFamily: "Gilroy",
                               fontWeight: FontWeight.w500,
                               color: SColors.activeColor,
@@ -437,9 +502,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-                _homeController.userMe.value.description.isNullOrBlank! ? const SizedBox(height: 0) : const SizedBox(height: 4,),
+                _homeController.userMe.value.description.isNullOrBlank!
+                    ? const SizedBox(height: 0)
+                    : const SizedBox(
+                        height: 4,
+                      ),
                 Padding(
-                  padding:  EdgeInsets.only(left: 48.0, right: 48, top: _profileController.isEditingProfile.value ? 16 : 8),
+                  padding: EdgeInsets.only(
+                      left: 48.0,
+                      right: 48,
+                      top: _profileController.isEditingProfile.value ? 16 : 8),
                   child: _profileController.isEditingProfile.value
                       ? TextField(
                           maxLines: 2,
@@ -459,18 +531,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               isCollapsed: true,
-                              hintText: focusNode.hasFocus ? '' : _homeController.userMe.value.description.isNullOrBlank! ? con.noDescYetRes.tr : _homeController.userMe.value.description!),
+                              hintText: focusNode.hasFocus
+                                  ? ''
+                                  : _homeController.userMe.value.description
+                                          .isNullOrBlank!
+                                      ? con.noDescYetRes.tr
+                                      : _homeController
+                                          .userMe.value.description!),
                         )
-                      : _homeController.userMe.value.description.isNullOrBlank! ? Container(): Text(
-                               _homeController.userMe.value.description!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              height: 1.5,
-                              fontFamily: "Gilroy",
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF828282),
-                              fontSize: 15),
-                        ),
+                      : _homeController.userMe.value.description.isNullOrBlank!
+                          ? Container()
+                          : Text(
+                              _homeController.userMe.value.description!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                  height: 1.5,
+                                  fontFamily: "Gilroy",
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF828282),
+                                  fontSize: 15),
+                            ),
                 ),
                 const SizedBox(
                   height: 20,
@@ -537,19 +617,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: SafeArea(
                         child: RefreshIndicator(
-                          onRefresh: () async => _profileController.pagingController.refresh(),
+                          onRefresh: () async =>
+                              _profileController.pagingController.refresh(),
                           color: SColors.activeColor,
                           child: PagedListView(
-                            pagingController: _profileController.pagingController,
+                            pagingController:
+                                _profileController.pagingController,
                             builderDelegate: PagedChildBuilderDelegate<NftDto>(
                                 firstPageProgressIndicatorBuilder: (context) =>
-                                     Center(
+                                    Center(
                                       child: CircularProgressIndicator(
                                         color: SColors.activeColor,
                                       ),
                                     ),
                                 newPageProgressIndicatorBuilder: (context) =>
-                                     Padding(
+                                    Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Center(
                                         child: CircularProgressIndicator(
@@ -557,8 +639,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                       ),
                                     ),
-                                itemBuilder: (context, item, index) =>
-                                    CardNFT(item, index, _profileController.pagingController)),
+                                itemBuilder: (context, item, index) => CardNFT(
+                                    item,
+                                    index,
+                                    _profileController.pagingController)),
                           ),
                         ),
                       ),
@@ -568,7 +652,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             )));
   }
-
 
   @override
   void dispose() {
@@ -591,8 +674,7 @@ class CardNFT extends StatefulWidget {
 }
 
 class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
-
-  ProfileController get _profileController => Get.find<ProfileController>();  
+  ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get homeController => Get.find<HomeController>();
   GroupsController get _groupController => Get.find<GroupsController>();
 
@@ -618,7 +700,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
         ),
         child: Theme(
           data: Theme.of(context).copyWith(
-            splashColor: Colors.transparent,  // Removes the splash effect
+            splashColor: Colors.transparent, // Removes the splash effect
           ),
           child: ExpansionTile(
             enableFeedback: false,
@@ -630,8 +712,9 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                   width: 56,
                   height: 56,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) =>  Center(
-                      child: CircularProgressIndicator(color: SColors.activeColor)),
+                  placeholder: (context, url) => Center(
+                      child: CircularProgressIndicator(
+                          color: SColors.activeColor)),
                   errorWidget: (context, url, error) =>
                       Image.asset("assets/images/app_icon_rounded.png")),
             ),
@@ -655,29 +738,45 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                                 ? Colors.white.withOpacity(0.5)
                                 : Colors.black.withOpacity(0.5)),
                     onPressed: () async {
-                      if(widget.nftDto.contractAddress != "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase()) {
-                      bool fav;
-                      if (homeController.isInFav.contains(widget.nftDto.contractAddress)) {
-                        homeController.isInFav.remove(widget.nftDto.contractAddress);
-                        fav = false;
-                      } else {
-                        homeController.isInFav.add(widget.nftDto.contractAddress!);
-                        fav = true;
+                      if (widget.nftDto.contractAddress !=
+                          "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011"
+                              .toLowerCase()) {
+                        bool fav;
+                        if (homeController.isInFav
+                            .contains(widget.nftDto.contractAddress)) {
+                          homeController.isInFav
+                              .remove(widget.nftDto.contractAddress);
+                          fav = false;
+                        } else {
+                          homeController.isInFav
+                              .add(widget.nftDto.contractAddress!);
+                          fav = true;
+                        }
+                        // ignore: invalid_use_of_protected_member
+                        widget.pagingController.notifyListeners();
+                        await _profileController.updateNft(NftModificationDto(
+                            contractAddress: widget.nftDto.contractAddress!,
+                            id: homeController.id.value,
+                            isFav: fav));
+                        if (fav) {
+                          await StreamChat.of(context)
+                              .client
+                              .updateChannelPartial(
+                                  widget.nftDto.contractAddress!, 'try', set: {
+                            "${homeController.id.value}_favorite": true
+                          });
+                        } else {
+                          await StreamChat.of(context)
+                              .client
+                              .updateChannelPartial(
+                                  widget.nftDto.contractAddress!, 'try',
+                                  unset: [
+                                "${homeController.id.value}_favorite"
+                              ]);
+                        }
+                        _groupController.refreshGroups.value = true;
                       }
-                      // ignore: invalid_use_of_protected_member
-                      widget.pagingController.notifyListeners();
-                        await _profileController.updateNft(
-                          NftModificationDto(
-                              contractAddress: widget.nftDto.contractAddress!,
-                              id: homeController.id.value,
-                              isFav: fav));
-                      if(fav) {
-                        await StreamChat.of(context).client.updateChannelPartial(widget.nftDto.contractAddress!, 'try', set: {"${homeController.id.value}_favorite" : true});
-                      } else {
-                        await StreamChat.of(context).client.updateChannelPartial(widget.nftDto.contractAddress!, 'try', unset: ["${homeController.id.value}_favorite"]);
-                      }
-                      _groupController.refreshGroups.value = true;
-                    }},
+                    },
                   )),
             title: Text(widget.nftDto.title!,
                 style: TextStyle(
@@ -688,7 +787,12 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                             Brightness.dark
                         ? Colors.white
                         : Colors.black)),
-            subtitle: Text(widget.nftDto.isNft ?? false ?  "${widget.nftDto.images!.length} available" : widget.nftDto.subtitle == null ? "" : "Currency : ${widget.nftDto.subtitle?.toUpperCase()}" ,
+            subtitle: Text(
+                widget.nftDto.isNft ?? false
+                    ? "${widget.nftDto.images!.length} available"
+                    : widget.nftDto.subtitle == null
+                        ? ""
+                        : "Currency : ${widget.nftDto.subtitle?.toUpperCase()}",
                 style: const TextStyle(
                     fontSize: 12,
                     fontFamily: "Gilroy",
@@ -696,7 +800,8 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                     color: Color(0xFF828282))),
             children: [
               Padding(
-                padding: const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
+                padding:
+                    const EdgeInsets.only(bottom: 18.0, left: 80, right: 20),
                 child: SizedBox(
                     height: 80,
                     child: ListView.builder(
@@ -719,10 +824,9 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                                         imageUrl: widget.nftDto.images![i],
                                         width: 80,
                                         height: 70,
-                                        placeholder: (context, url) =>
-                                             Center(
-                                                child: CircularProgressIndicator(
-                                                    color: SColors.activeColor)),
+                                        placeholder: (context, url) => Center(
+                                            child: CircularProgressIndicator(
+                                                color: SColors.activeColor)),
                                         errorWidget: (context, url, error) =>
                                             Image.asset(
                                                 "assets/images/app_icon_rounded.png")))),

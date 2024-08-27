@@ -6,9 +6,9 @@ import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';
 import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
-import 'package:sirkl/repo/common_repo.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/repo/common_repo.dart';
 import 'package:sirkl/repo/profile_repo.dart';
 
 class CommonController extends GetxController {
@@ -26,10 +26,7 @@ class CommonController extends GetxController {
   late StreamChannelListController controllerOthers;
 
   void refreshAllInbox() async {
-    await Future.wait([
-      controllerFriend.refresh(),
-      controllerOthers.refresh()
-    ]);
+    await Future.wait([controllerFriend.refresh(), controllerOthers.refresh()]);
   }
 
   Future<bool> addUserToSirkl(
@@ -134,5 +131,4 @@ class CommonController extends GetxController {
     await CommonRepo.report(reportDTO);
     showToast(context, "Thank you! Your report has been correctly sent.");
   }
-
 }

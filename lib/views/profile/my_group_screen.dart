@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
-import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
 
 import '../../controllers/home_controller.dart';
 
@@ -16,16 +15,14 @@ class MyGroupScreen extends StatefulWidget {
 }
 
 class _MyGroupScreenState extends State<MyGroupScreen> {
-
   StreamChannelListController? streamChannelListControllerGroups;
   HomeController get _homeController => Get.find<HomeController>();
   ChatsController get _chatController => Get.find<ChatsController>();
 
-  StreamChannelListController buildStreamChannelListController(){
+  StreamChannelListController buildStreamChannelListController() {
     return StreamChannelListController(
       client: StreamChat.of(context).client,
-      filter:
-      Filter.and([
+      filter: Filter.and([
         Filter.equal('isConv', false),
         Filter.equal("created_by_id", _homeController.id.value),
       ]),
@@ -39,14 +36,13 @@ class _MyGroupScreenState extends State<MyGroupScreen> {
     super.initState();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
-          ? const Color(0xFF102437)
-          : const Color.fromARGB(255, 247, 253, 255),
+      backgroundColor:
+          MediaQuery.of(context).platformBrightness == Brightness.dark
+              ? const Color(0xFF102437)
+              : const Color.fromARGB(255, 247, 253, 255),
       body: Column(
         children: [
           buildAppbar(context),
@@ -57,20 +53,32 @@ class _MyGroupScreenState extends State<MyGroupScreen> {
                 child: SafeArea(
                   minimum: const EdgeInsets.only(top: 16),
                   child: StreamChannelListView(
-                    emptyBuilder: (context){
+                    emptyBuilder: (context) {
                       return const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 48.0, vertical: 16),
-                        child: Text("Create groups and it will appear here..", style: TextStyle(fontSize: 18, fontFamily: "Gilroy", fontWeight: FontWeight.w600), textAlign: TextAlign.center,),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 48.0, vertical: 16),
+                        child: Text(
+                          "Create groups and it will appear here..",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: "Gilroy",
+                              fontWeight: FontWeight.w600),
+                          textAlign: TextAlign.center,
+                        ),
                       );
                     },
-                    channelSlidableEnabled: false ,
-                    channelConv : false,
+                    channelSlidableEnabled: false,
+                    channelConv: false,
                     channelFriends: false,
                     channelFav: false,
                     controller: streamChannelListControllerGroups!,
-                  onChannelTap: (channel){
-                    _chatController.channel.value = channel;
-                    pushNewScreen(context, screen: StreamChannel(channel: channel, child: const ChannelPage()));                  },),
+                    onChannelTap: (channel) {
+                      _chatController.channel.value = channel;
+                      pushNewScreen(context,
+                          screen: StreamChannel(
+                              channel: channel, child: const ChannelPage()));
+                    },
+                  ),
                 ),
               ))
         ],
@@ -95,8 +103,12 @@ class _MyGroupScreenState extends State<MyGroupScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
-              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
+              MediaQuery.of(context).platformBrightness == Brightness.dark
+                  ? const Color(0xFF113751)
+                  : Colors.white,
+              MediaQuery.of(context).platformBrightness == Brightness.dark
+                  ? const Color(0xFF1E2032)
+                  : Colors.white
             ]),
       ),
       child: Padding(
@@ -108,8 +120,16 @@ class _MyGroupScreenState extends State<MyGroupScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                onTap: (){Navigator.pop(context);},
-                child: Icon(Icons.keyboard_arrow_left_rounded,size: 42,color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Icon(
+                  Icons.keyboard_arrow_left_rounded,
+                  size: 42,
+                  color: MediaQuery.of(context).platformBrightness ==
+                          Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
                 ),
               ),
               Padding(
@@ -121,25 +141,24 @@ class _MyGroupScreenState extends State<MyGroupScreen> {
                       fontSize: 20,
                       fontFamily: "Gilroy",
                       fontWeight: FontWeight.w600,
-                      color: MediaQuery.of(context)
-                          .platformBrightness ==
-                          Brightness.dark
+                      color: MediaQuery.of(context).platformBrightness ==
+                              Brightness.dark
                           ? Colors.white
                           : Colors.black),
                 ),
-              ),IconButton(
-                  onPressed: () async {
-                  },
-                  icon:  Icon(Icons.more_vert_outlined, size: 30, color: MediaQuery.of(context)
-                      .platformBrightness ==
-                      Brightness.dark
-                      ? Colors.transparent
-                      : Colors.transparent))
+              ),
+              IconButton(
+                  onPressed: () async {},
+                  icon: Icon(Icons.more_vert_outlined,
+                      size: 30,
+                      color: MediaQuery.of(context).platformBrightness ==
+                              Brightness.dark
+                          ? Colors.transparent
+                          : Colors.transparent))
             ],
           ),
         ),
       ),
     );
   }
-
 }

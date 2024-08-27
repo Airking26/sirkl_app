@@ -56,7 +56,9 @@ class TextBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     if (message.text?.trim().isEmpty ?? false) return const Offstage();
     return Padding(
-      padding: isOnlyEmoji ? EdgeInsets.zero : EdgeInsets.only(left: 16, right: 16, top: 8),
+      padding:
+      //isOnlyEmoji ? EdgeInsets.zero :
+      const EdgeInsets.only(left: 16, right: 16, top: 8),
       child: textBuilder != null
           ? textBuilder!(context, message)
           : StreamMessageText(
@@ -66,7 +68,7 @@ class TextBubble extends StatelessWidget {
               messageTheme: isOnlyEmoji
                   ? messageTheme.copyWith(
                       messageTextStyle: messageTheme.messageTextStyle!.copyWith(
-                        fontSize: 42
+                        fontSize: 24
                       ),
                     )
                   : messageTheme.copyWith(messageTextStyle: TextStyle(color: reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black : MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black , fontSize: 15, fontFamily: 'Gilroy', fontWeight: FontWeight.w500)),

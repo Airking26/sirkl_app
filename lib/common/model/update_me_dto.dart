@@ -4,18 +4,18 @@
 
 import 'dart:convert';
 
-UpdateMeDto updateMeDtoFromJson(String str) => UpdateMeDto.fromJson(json.decode(str));
+UpdateMeDto updateMeDtoFromJson(String str) =>
+    UpdateMeDto.fromJson(json.decode(str));
 
 String updateMeDtoToJson(UpdateMeDto data) => json.encode(data.toJson());
 
 class UpdateMeDto {
-  UpdateMeDto({
-    this.userName,
-    this.picture,
-    this.description,
-    this.nicknames,
-    this.hasSBT
-  });
+  UpdateMeDto(
+      {this.userName,
+      this.picture,
+      this.description,
+      this.nicknames,
+      this.hasSBT});
 
   String? userName;
   String? picture;
@@ -24,18 +24,17 @@ class UpdateMeDto {
   Map<String, String>? nicknames;
 
   factory UpdateMeDto.fromJson(Map<String, dynamic> json) => UpdateMeDto(
-    userName: json["userName"],
-    picture: json["picture"],
-    description: json["description"],
-    nicknames: json['nicknames'],
-    hasSBT: json['hasSBT']
-  );
+      userName: json["userName"],
+      picture: json["picture"],
+      description: json["description"],
+      nicknames: json['nicknames'],
+      hasSBT: json['hasSBT']);
 
   Map<String, dynamic> toJson() => {
-    "userName": userName,
-    "picture": picture,
-    "description": description,
-    "nicknames": nicknames,
-    'hasSBT': hasSBT
-  };
+        "userName": userName,
+        "picture": picture,
+        "description": description,
+        "nicknames": nicknames,
+        'hasSBT': hasSBT
+      };
 }

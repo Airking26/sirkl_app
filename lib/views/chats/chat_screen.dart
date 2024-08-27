@@ -3,19 +3,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
+import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_actions.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_transition.dart';
-
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/controllers/web3_controller.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
-
-import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
+import 'package:sirkl/controllers/web3_controller.dart';
 import 'package:sirkl/views/chats/settings_group_screen.dart';
 
 import '../../controllers/home_controller.dart';
@@ -29,11 +27,11 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
-
   ChatsController get _chatController => Get.find<ChatsController>();
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
-  NavigationController get _navigationController => Get.find<NavigationController>();
+  NavigationController get _navigationController =>
+      Get.find<NavigationController>();
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
 
   final _floatingSearchBarController = FloatingSearchBarController();
@@ -62,8 +60,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   );
   late final _controllerOther = StreamChannelListController(
     client: StreamChat.of(context).client,
-    filter:
-    Filter.and([
+    filter: Filter.and([
       Filter.equal("type", "try"),
       Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
       Filter.exists('last_message_at'),
@@ -73,10 +70,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         Filter.in_("members", [_homeController.id.value]),
       ]),
       Filter.or([
-        Filter.notExists(
-            "${_homeController.id.value}_follow_channel"),
-        Filter.equal(
-            "${_homeController.id.value}_follow_channel", false)
+        Filter.notExists("${_homeController.id.value}_follow_channel"),
+        Filter.equal("${_homeController.id.value}_follow_channel", false)
       ])
     ]),
     limit: 10,
@@ -94,11 +89,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   void indexChangeListener() {
-       if (tabController.indexIsChanging) {
-        _chatController.index.value = tabController.index;
-      }
+    if (tabController.indexIsChanging) {
+      _chatController.index.value = tabController.index;
+    }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +129,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 ),
               ],
               borderRadius:
-              const BorderRadius.vertical(bottom: Radius.circular(35)),
+                  const BorderRadius.vertical(bottom: Radius.circular(35)),
               gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -159,7 +153,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     Obx(() => IconButton(
                         onPressed: () {
                           _chatController.searchIsActive.value =
-                          !_chatController.searchIsActive.value;
+                              !_chatController.searchIsActive.value;
                           if (_chatController.searchIsActive.value) {
                             _chatController.query.value = "";
                             _floatingSearchBarController.clear();
@@ -170,37 +164,36 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               ? "assets/images/close_big.png"
                               : "assets/images/search.png",
                           color: MediaQuery.of(context).platformBrightness ==
-                              Brightness.dark
+                                  Brightness.dark
                               ? Colors.white
                               : Colors.black,
-                          width: 32, height: 32,
-                        )
-                    )
-                    ),
+                          width: 32,
+                          height: 32,
+                        ))),
                     Padding(
                       padding: const EdgeInsets.only(top: 12.0),
                       child: Obx(() => Text(
-                        _chatController.searchIsActive.value
-                            ? _chatController.index.value == 0
-                            ? "Inbox"
-                            : "Others"
-                            : con.chatsTabRes.tr,
-                        style: TextStyle(
-                            color:
-                            MediaQuery.of(context).platformBrightness ==
-                                Brightness.dark
-                                ? Colors.white
-                                : Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: "Gilroy",
-                            fontSize: 20),
-                      )),
+                            _chatController.searchIsActive.value
+                                ? _chatController.index.value == 0
+                                    ? "Inbox"
+                                    : "Others"
+                                : con.chatsTabRes.tr,
+                            style: TextStyle(
+                                color:
+                                    MediaQuery.of(context).platformBrightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: "Gilroy",
+                                fontSize: 20),
+                          )),
                     ),
                     IconButton(
                         onPressed: () {
                           pushNewScreen(context,
-                              withNavBar: false,
-                              screen: const NewMessageScreen())
+                                  withNavBar: false,
+                                  screen: const NewMessageScreen())
                               .then((value) {
                             _navigationController.hideNavBar.value =
                                 _chatController.fromGroupCreation.value;
@@ -210,10 +203,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         icon: Image.asset(
                           "assets/images/edit.png",
                           color: MediaQuery.of(context).platformBrightness ==
-                              Brightness.dark
+                                  Brightness.dark
                               ? Colors.white
                               : Colors.black,
-                          width: 32, height: 32,
+                          width: 32,
+                          height: 32,
                         )),
                   ],
                 ),
@@ -224,142 +218,147 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               top: 110,
               child: _chatController.searchIsActive.value
                   ? DeferPointer(
-                child: SizedBox(
-                    height: 48,
-                    width: MediaQuery.of(context).size.width,
-                    child: buildFloatingSearchBar()),
-              )
+                      child: SizedBox(
+                          height: 48,
+                          width: MediaQuery.of(context).size.width,
+                          child: buildFloatingSearchBar()),
+                    )
                   : Material(
-                elevation: 2,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    child: Container(
-                    height: 48,
-                    width: 350,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-
-                        color: MediaQuery.of(context).platformBrightness ==
-                            Brightness.dark
-                            ? const Color(0xFF2D465E).withOpacity(1)
-                            : Colors.white),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 4.0, bottom: 2, left: 4, right: 4),
-                      child: Obx(
-                            () => TabBar(
-                          labelPadding: EdgeInsets.zero,
-                          indicatorPadding: EdgeInsets.zero,
-                          indicatorColor: Colors.transparent,
-                          unselectedLabelColor: Colors.transparent,
-                          controller: tabController,
-                          padding: EdgeInsets.zero,
-                          dividerColor: Colors.transparent,
-                          tabs: [
-                            Container(
-                              height: 48,
-                              width: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                gradient: _chatController.index.value == 0
-                                    ? const LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Color(0xFF1DE99B),
-                                      Color(0xFF0063FB)
-                                    ])
-                                    : MediaQuery.of(context)
-                                    .platformBrightness ==
-                                    Brightness.dark
-                                    ? const LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Color(0xFF2D465E),
-                                      Color(0xFF2D465E)
-                                    ])
-                                    : const LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Colors.white,
-                                      Colors.white
-                                    ]),
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Container(
+                          height: 48,
+                          width: 350,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color:
+                                  MediaQuery.of(context).platformBrightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF2D465E).withOpacity(1)
+                                      : Colors.white),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 4.0, bottom: 2, left: 4, right: 4),
+                            child: Obx(
+                              () => TabBar(
+                                labelPadding: EdgeInsets.zero,
+                                indicatorPadding: EdgeInsets.zero,
+                                indicatorColor: Colors.transparent,
+                                unselectedLabelColor: Colors.transparent,
+                                controller: tabController,
+                                padding: EdgeInsets.zero,
+                                dividerColor: Colors.transparent,
+                                tabs: [
+                                  Container(
+                                    height: 48,
+                                    width: 200,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      gradient: _chatController.index.value == 0
+                                          ? const LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [
+                                                  Color(0xFF1DE99B),
+                                                  Color(0xFF0063FB)
+                                                ])
+                                          : MediaQuery.of(context)
+                                                      .platformBrightness ==
+                                                  Brightness.dark
+                                              ? const LinearGradient(
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
+                                                  colors: [
+                                                      Color(0xFF2D465E),
+                                                      Color(0xFF2D465E)
+                                                    ])
+                                              : const LinearGradient(
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
+                                                  colors: [
+                                                      Colors.white,
+                                                      Colors.white
+                                                    ]),
+                                    ),
+                                    child: Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          "My SIRKL",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontFamily: "Gilroy",
+                                              fontWeight: FontWeight.w700,
+                                              color: _chatController
+                                                          .index.value ==
+                                                      0
+                                                  ? Colors.white
+                                                  : MediaQuery.of(context)
+                                                              .platformBrightness ==
+                                                          Brightness.dark
+                                                      ? const Color(0xFF9BA0A5)
+                                                      : const Color(
+                                                          0xFF828282)),
+                                        )),
+                                  ),
+                                  Container(
+                                    height: 48,
+                                    width: 200,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      gradient: _chatController.index.value == 1
+                                          ? const LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [
+                                                  Color(0xFF1DE99B),
+                                                  Color(0xFF0063FB)
+                                                ])
+                                          : MediaQuery.of(context)
+                                                      .platformBrightness ==
+                                                  Brightness.dark
+                                              ? const LinearGradient(
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
+                                                  colors: [
+                                                      Color(0xFF2D465E),
+                                                      Color(0xFF2D465E)
+                                                    ])
+                                              : const LinearGradient(
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
+                                                  colors: [
+                                                      Colors.white,
+                                                      Colors.white
+                                                    ]),
+                                    ),
+                                    child: Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          "Others",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontFamily: "Gilroy",
+                                              fontWeight: FontWeight.w700,
+                                              color: _chatController
+                                                          .index.value ==
+                                                      1
+                                                  ? Colors.white
+                                                  : MediaQuery.of(context)
+                                                              .platformBrightness ==
+                                                          Brightness.dark
+                                                      ? const Color(0xFF9BA0A5)
+                                                      : const Color(
+                                                          0xFF828282)),
+                                        )),
+                                  )
+                                ],
                               ),
-                              child: Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "My SIRKL",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: "Gilroy",
-                                        fontWeight: FontWeight.w700,
-                                        color: _chatController.index.value ==
-                                            0
-                                            ? Colors.white
-                                            : MediaQuery.of(context)
-                                            .platformBrightness ==
-                                            Brightness.dark
-                                            ? const Color(0xFF9BA0A5)
-                                            : const Color(0xFF828282)),
-                                  )),
                             ),
-                            Container(
-                              height: 48,
-                              width: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                gradient: _chatController.index.value == 1
-                                    ? const LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Color(0xFF1DE99B),
-                                      Color(0xFF0063FB)
-                                    ])
-                                    : MediaQuery.of(context)
-                                    .platformBrightness ==
-                                    Brightness.dark
-                                    ? const LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Color(0xFF2D465E),
-                                      Color(0xFF2D465E)
-                                    ])
-                                    : const LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Colors.white,
-                                      Colors.white
-                                    ]),
-                              ),
-                              child: Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "Others",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: "Gilroy",
-                                        fontWeight: FontWeight.w700,
-                                        color: _chatController.index.value ==
-                                            1
-                                            ? Colors.white
-                                            : MediaQuery.of(context)
-                                            .platformBrightness ==
-                                            Brightness.dark
-                                            ? const Color(0xFF9BA0A5)
-                                            : const Color(0xFF828282)),
-                                  )),
-                            )
-                          ],
-                        ),
-                      ),
-                    )),
-                  )))
+                          )),
+                    )))
         ],
       ),
     );
@@ -405,7 +404,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           : Colors.white,
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async {
-        if (query.isNotEmpty){
+        if (query.isNotEmpty) {
           _chatController.query.value = query;
         }
       },
@@ -441,305 +440,321 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           minimum: const EdgeInsets.only(top: 28),
           child: TabBarView(
             viewportFraction: 0.99,
-                  physics: const NeverScrollableScrollPhysics(),
-                  controller: tabController,
-                  children: [
-                    StreamChannelListView(
-                      errorBuilder: (context, error){
-                        return noGroupRetry(true);
-                      },
-                          channelSlidableEnabled:
-                              !_chatController.searchIsActive.value,
-                          channelConv: true,
-                          channelFriends: true,
-                          channelFav: false,
-                          onChannelDeletePressed: (context, channel) async {
-                            showDialog(
-                                context: context,
-                                barrierDismissible: true,
-                                builder: (_) => CupertinoAlertDialog(
-                                      title: Text(
-                                        (channel.membership != null &&
-                                                        channel.membership!
-                                                                .channelRole ==
-                                                            "channel_moderator" ||
-                                                    channel.createdBy?.id ==
-                                                        _homeController
-                                                            .id.value) ||
-                                                channel.extraData['isConv'] ==
-                                                    true
-                                            ? "Delete"
-                                            : "Leave",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            fontFamily: "Gilroy",
-                                            color: MediaQuery.of(context)
-                                                        .platformBrightness ==
-                                                    Brightness.dark
-                                                ? Colors.white
-                                                : Colors.black),
-                                      ),
-                                      content: Text(
-                                          "Are you sure? This action is irreversible",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              fontFamily: "Gilroy",
-                                              color: MediaQuery.of(context)
-                                                          .platformBrightness ==
-                                                      Brightness.dark
-                                                  ? Colors.white
-                                                      .withOpacity(0.5)
-                                                  : Colors.black
-                                                      .withOpacity(0.5))),
-                                      actions: [
-                                        CupertinoDialogAction(
-                                          child: Text("No",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontFamily: "Gilroy",
-                                                  color: MediaQuery.of(context)
-                                                              .platformBrightness ==
-                                                          Brightness.dark
-                                                      ? Colors.white
-                                                      : Colors.black)),
-                                          onPressed: () {
-                                            Get.back();
-                                          },
-                                        ),
-                                        CupertinoDialogAction(
-                                          child: Text("Yes",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontFamily: "Gilroy",
-                                                  color: MediaQuery.of(context)
-                                                              .platformBrightness ==
-                                                          Brightness.dark
-                                                      ? Colors.white
-                                                      : Colors.black)),
-                                          onPressed: () async {
-                                            if ((channel.membership != null &&
-                                                        channel.membership!
-                                                                .channelRole ==
-                                                            "channel_moderator" ||
-                                                    channel.createdBy?.id ==
-                                                        _homeController
-                                                            .id.value) ||
-                                                channel.extraData['isConv'] ==
-                                                    true) {
-                                              channel.extraData['isConv'] == true ? await channel.truncate(skipPush: false) : await channel.delete();
-                                              _commonController.refreshAllInbox();
-                                              Get.back();
-                                            } else {
-                                              if(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true){
-                                                AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while the transaction is processed. This may take some time.");
-                                                var connector = await _web3Controller.connect();
-                                                connector.onSessionConnect.subscribe((args) async {
-                                                  await _web3Controller.leaveGroupMethod(connector, args, context, _chatController.channel.value!, _homeController.userMe.value.wallet!, alert, _homeController.id.value);
-                                                });
-                                              } else {
-                                                await channel.removeMembers([_homeController.id.value]);
-                                              }
-                                              _commonController.refreshAllInbox();
-                                              Get.back();
-                                            }
-                                          },
-                                        )
-                                      ],
-                                    ));
-                          },
-                          emptyBuilder: (context) {
-                            return noGroupUI();
-                          },
-                          controller: _chatController.searchIsActive.value &&
-                              _chatController.query.value.isNotEmpty
-                              ? StreamChannelListController(
-                            client: StreamChat.of(context).client,
-                            filter: Filter.or([
-                              Filter.and([
-                                Filter.equal("type", "try"),
-                                Filter.in_("members", [_homeController.id.value]),
-                                Filter.autoComplete(
-                                    'member.user.name', _chatController.query.value),
-                                Filter.exists("${_homeController.id.value}_follow_channel"),
-                                Filter.equal(
-                                    "${_homeController.id.value}_follow_channel", true),
-                                Filter.equal('isConv', true),
-                              ]),
-                              Filter.and([
-                                Filter.equal("type", "try"),
-                                Filter.autoComplete(
-                                    'nameOfGroup', _chatController.query.value),
-                                Filter.equal('isConv', false),
-                                Filter.equal('isGroupVisible', true)
-                              ])
-                            ]),
-                            limit: 10,
-                          ) : _controllerFriend,
-                          onChannelTap: (channel) async {
-                            _chatController.channel.value = channel;
-                            if ((channel.membership == null &&
-                                    !channel.state!.members
-                                        .map((e) => e.userId!)
-                                        .contains(_homeController.id.value)) &&
-                                channel.extraData["isConv"] != null &&
-                                channel.extraData["isConv"] == false && (channel.extraData["isGroupPaying"] == null || channel.extraData["isGroupPaying"] == false)) {
-                              pushNewScreen(context,
-                                   withNavBar: false,
-                                      screen: const SettingsGroupScreen())
-                                  .then((value) {
-                                _controllerFriend.refresh();
-                                _navigationController.hideNavBar.value =
-                                    _chatController.fromGroupJoin.value;
-                                _chatController.fromGroupJoin.value = false;
-                              });
-                            } else {
-                              pushNewScreen(context,
-                              withNavBar: false,
-                                      screen: StreamChannel(
-                                          channel: channel,
-                                          child: const ChannelPage()))
-                                  .then((value) async{
-                                _navigationController.hideNavBar.value = false;
-                                if(_chatController.needToRefresh.value) await _controllerFriend.refresh();
-                                _chatController.needToRefresh.value = false;
-                              });
-                            }
-
-                            if (_chatController.searchIsActive.value) {
-                              _chatController.query.value = "";
-                              _floatingSearchBarController.clear();
-                              _chatController.searchIsActive.value = !_chatController.searchIsActive.value;
-                            }
-
-                          },
-                        ),
-                    StreamChannelListView(
-                      errorBuilder: (context, error){
-                        return noGroupRetry(false);
-                      },
-                          channelSlidableEnabled:
-                              !_chatController.searchIsActive.value,
-                          onChannelDeletePressed: (context, channel) async {
-                            showDialog(
-                                context: context,
-                                barrierDismissible: true,
-                                builder: (_) => CupertinoAlertDialog(
-                                      title: Text(
-                                        "Delete",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            fontFamily: "Gilroy",
-                                            color: MediaQuery.of(context)
-                                                        .platformBrightness ==
-                                                    Brightness.dark
-                                                ? Colors.white
-                                                : Colors.black),
-                                      ),
-                                      content: Text(
-                                          "Are you sure? This action is irreversible",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              fontFamily: "Gilroy",
-                                              color: MediaQuery.of(context)
-                                                          .platformBrightness ==
-                                                      Brightness.dark
-                                                  ? Colors.white
-                                                      .withOpacity(0.5)
-                                                  : Colors.black
-                                                      .withOpacity(0.5))),
-                                      actions: [
-                                        CupertinoDialogAction(
-                                          child: Text("No",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontFamily: "Gilroy",
-                                                  color: MediaQuery.of(context)
-                                                              .platformBrightness ==
-                                                          Brightness.dark
-                                                      ? Colors.white
-                                                      : Colors.black)),
-                                          onPressed: () {
-                                            Get.back();
-                                          },
-                                        ),
-                                        CupertinoDialogAction(
-                                          child: Text("Yes",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontFamily: "Gilroy",
-                                                  color: MediaQuery.of(context)
-                                                              .platformBrightness ==
-                                                          Brightness.dark
-                                                      ? Colors.white
-                                                      : Colors.black)),
-                                          onPressed: () async {
-                                            await channel.truncate(skipPush: false);
-                                            if (!channel.id!
-                                                .startsWith("!members")) {
-                                              await _chatController
-                                                  .deleteInbox(channel.id!);
-                                            }
-                                            _commonController.refreshAllInbox();
-                                            Get.back();
-                                          },
-                                        )
-                                      ],
-                                    ));
-                          },
-                          onChannelAddPressed: (context, id, client) async {
-                            await _commonController.addUserToSirkl(
-                                id, client, _homeController.id.value);
-                                       _commonController.refreshAllInbox();
-                          },
-                          channelConv: true,
-                          channelFriends: false,
-                          channelFav: false,
-                          emptyBuilder: (context) {
-                            return noGroupUI();
-                          },
-                          controller: _chatController.searchIsActive.value &&
-                              _chatController.query.value.isNotEmpty ? StreamChannelListController(
-                            client: StreamChat.of(context).client, filter: Filter.and([
+            physics: const NeverScrollableScrollPhysics(),
+            controller: tabController,
+            children: [
+              StreamChannelListView(
+                errorBuilder: (context, error) {
+                  return noGroupRetry(true);
+                },
+                channelSlidableEnabled: !_chatController.searchIsActive.value,
+                channelConv: true,
+                channelFriends: true,
+                channelFav: false,
+                onChannelDeletePressed: (context, channel) async {
+                  showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (_) => CupertinoAlertDialog(
+                            title: Text(
+                              (channel.membership != null &&
+                                              channel.membership!.channelRole ==
+                                                  "channel_moderator" ||
+                                          channel.createdBy?.id ==
+                                              _homeController.id.value) ||
+                                      channel.extraData['isConv'] == true
+                                  ? "Delete"
+                                  : "Leave",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: "Gilroy",
+                                  color: MediaQuery.of(context)
+                                              .platformBrightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black),
+                            ),
+                            content: Text(
+                                "Are you sure? This action is irreversible",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: "Gilroy",
+                                    color: MediaQuery.of(context)
+                                                .platformBrightness ==
+                                            Brightness.dark
+                                        ? Colors.white.withOpacity(0.5)
+                                        : Colors.black.withOpacity(0.5))),
+                            actions: [
+                              CupertinoDialogAction(
+                                child: Text("No",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: "Gilroy",
+                                        color: MediaQuery.of(context)
+                                                    .platformBrightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : Colors.black)),
+                                onPressed: () {
+                                  Get.back();
+                                },
+                              ),
+                              CupertinoDialogAction(
+                                child: Text("Yes",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: "Gilroy",
+                                        color: MediaQuery.of(context)
+                                                    .platformBrightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : Colors.black)),
+                                onPressed: () async {
+                                  if ((channel.membership != null &&
+                                              channel.membership!.channelRole ==
+                                                  "channel_moderator" ||
+                                          channel.createdBy?.id ==
+                                              _homeController.id.value) ||
+                                      channel.extraData['isConv'] == true) {
+                                    channel.extraData['isConv'] == true
+                                        ? await channel.truncate(
+                                            skipPush: false)
+                                        : await channel.delete();
+                                    _commonController.refreshAllInbox();
+                                    Get.back();
+                                  } else {
+                                    if (channel.extraData["isGroupPaying"] !=
+                                            null &&
+                                        channel.extraData["isGroupPaying"] ==
+                                            true) {
+                                      AlertDialog alert =
+                                          _web3Controller.blockchainInfo(
+                                              "Please, wait while the transaction is processed. This may take some time.");
+                                      var connector =
+                                          await _web3Controller.connect();
+                                      connector.onSessionConnect
+                                          .subscribe((args) async {
+                                        await _web3Controller.leaveGroupMethod(
+                                            connector,
+                                            args,
+                                            context,
+                                            _chatController.channel.value!,
+                                            _homeController
+                                                .userMe.value.wallet!,
+                                            alert,
+                                            _homeController.id.value);
+                                      });
+                                    } else {
+                                      await channel.removeMembers(
+                                          [_homeController.id.value]);
+                                    }
+                                    _commonController.refreshAllInbox();
+                                    Get.back();
+                                  }
+                                },
+                              )
+                            ],
+                          ));
+                },
+                emptyBuilder: (context) {
+                  return noGroupUI();
+                },
+                controller: _chatController.searchIsActive.value &&
+                        _chatController.query.value.isNotEmpty
+                    ? StreamChannelListController(
+                        client: StreamChat.of(context).client,
+                        filter: Filter.or([
+                          Filter.and([
+                            Filter.equal("type", "try"),
+                            Filter.in_("members", [_homeController.id.value]),
+                            Filter.autoComplete('member.user.name',
+                                _chatController.query.value),
+                            Filter.exists(
+                                "${_homeController.id.value}_follow_channel"),
+                            Filter.equal(
+                                "${_homeController.id.value}_follow_channel",
+                                true),
+                            Filter.equal('isConv', true),
+                          ]),
+                          Filter.and([
                             Filter.equal("type", "try"),
                             Filter.autoComplete(
-                                'member.user.name', _chatController.query.value),
-                            Filter.greater(
-                                "last_message_at", "2020-11-23T12:00:18.54912Z"),
-                            Filter.equal('isConv', true),
-                            Filter.or([
-                              Filter.equal("created_by_id", _homeController.id.value),
-                              Filter.in_("members", [_homeController.id.value]),
-                            ]),
-                            Filter.or([
-                              Filter.notExists(
-                                  "${_homeController.id.value}_follow_channel"),
-                              Filter.equal(
-                                  "${_homeController.id.value}_follow_channel", false)
-                            ]),
-                          ]),
-                            limit: 10,): _controllerOther,
-                          onChannelTap: (channel) {
-                            _chatController.channel.value = channel;
-                            pushNewScreen(context,
+                                'nameOfGroup', _chatController.query.value),
+                            Filter.equal('isConv', false),
+                            Filter.equal('isGroupVisible', true)
+                          ])
+                        ]),
+                        limit: 10,
+                      )
+                    : _controllerFriend,
+                onChannelTap: (channel) async {
+                  _chatController.channel.value = channel;
+                  if ((channel.membership == null &&
+                          !channel.state!.members
+                              .map((e) => e.userId!)
+                              .contains(_homeController.id.value)) &&
+                      channel.extraData["isConv"] != null &&
+                      channel.extraData["isConv"] == false &&
+                      (channel.extraData["isGroupPaying"] == null ||
+                          channel.extraData["isGroupPaying"] == false)) {
+                    pushNewScreen(context,
                             withNavBar: false,
-                                    screen: StreamChannel(
-                                        channel: channel,
-                                        child: const ChannelPage()))
-                                .then((value) {
-                              _navigationController.hideNavBar.value = false;
-                            });
-                          },
-                        )
-                  ],
-                ),
+                            screen: const SettingsGroupScreen())
+                        .then((value) {
+                      _controllerFriend.refresh();
+                      _navigationController.hideNavBar.value =
+                          _chatController.fromGroupJoin.value;
+                      _chatController.fromGroupJoin.value = false;
+                    });
+                  } else {
+                    pushNewScreen(context,
+                            withNavBar: false,
+                            screen: StreamChannel(
+                                channel: channel, child: const ChannelPage()))
+                        .then((value) async {
+                      _navigationController.hideNavBar.value = false;
+                      if (_chatController.needToRefresh.value)
+                        await _controllerFriend.refresh();
+                      _chatController.needToRefresh.value = false;
+                    });
+                  }
+
+                  if (_chatController.searchIsActive.value) {
+                    _chatController.query.value = "";
+                    _floatingSearchBarController.clear();
+                    _chatController.searchIsActive.value =
+                        !_chatController.searchIsActive.value;
+                  }
+                },
+              ),
+              StreamChannelListView(
+                errorBuilder: (context, error) {
+                  return noGroupRetry(false);
+                },
+                channelSlidableEnabled: !_chatController.searchIsActive.value,
+                onChannelDeletePressed: (context, channel) async {
+                  showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (_) => CupertinoAlertDialog(
+                            title: Text(
+                              "Delete",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: "Gilroy",
+                                  color: MediaQuery.of(context)
+                                              .platformBrightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black),
+                            ),
+                            content: Text(
+                                "Are you sure? This action is irreversible",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: "Gilroy",
+                                    color: MediaQuery.of(context)
+                                                .platformBrightness ==
+                                            Brightness.dark
+                                        ? Colors.white.withOpacity(0.5)
+                                        : Colors.black.withOpacity(0.5))),
+                            actions: [
+                              CupertinoDialogAction(
+                                child: Text("No",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: "Gilroy",
+                                        color: MediaQuery.of(context)
+                                                    .platformBrightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : Colors.black)),
+                                onPressed: () {
+                                  Get.back();
+                                },
+                              ),
+                              CupertinoDialogAction(
+                                child: Text("Yes",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: "Gilroy",
+                                        color: MediaQuery.of(context)
+                                                    .platformBrightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : Colors.black)),
+                                onPressed: () async {
+                                  await channel.truncate(skipPush: false);
+                                  if (!channel.id!.startsWith("!members")) {
+                                    await _chatController
+                                        .deleteInbox(channel.id!);
+                                  }
+                                  _commonController.refreshAllInbox();
+                                  Get.back();
+                                },
+                              )
+                            ],
+                          ));
+                },
+                onChannelAddPressed: (context, id, client) async {
+                  await _commonController.addUserToSirkl(
+                      id, client, _homeController.id.value);
+                  _commonController.refreshAllInbox();
+                },
+                channelConv: true,
+                channelFriends: false,
+                channelFav: false,
+                emptyBuilder: (context) {
+                  return noGroupUI();
+                },
+                controller: _chatController.searchIsActive.value &&
+                        _chatController.query.value.isNotEmpty
+                    ? StreamChannelListController(
+                        client: StreamChat.of(context).client,
+                        filter: Filter.and([
+                          Filter.equal("type", "try"),
+                          Filter.autoComplete(
+                              'member.user.name', _chatController.query.value),
+                          Filter.greater(
+                              "last_message_at", "2020-11-23T12:00:18.54912Z"),
+                          Filter.equal('isConv', true),
+                          Filter.or([
+                            Filter.equal(
+                                "created_by_id", _homeController.id.value),
+                            Filter.in_("members", [_homeController.id.value]),
+                          ]),
+                          Filter.or([
+                            Filter.notExists(
+                                "${_homeController.id.value}_follow_channel"),
+                            Filter.equal(
+                                "${_homeController.id.value}_follow_channel",
+                                false)
+                          ]),
+                        ]),
+                        limit: 10,
+                      )
+                    : _controllerOther,
+                onChannelTap: (channel) {
+                  _chatController.channel.value = channel;
+                  pushNewScreen(context,
+                          withNavBar: false,
+                          screen: StreamChannel(
+                              channel: channel, child: const ChannelPage()))
+                      .then((value) {
+                    _navigationController.hideNavBar.value = false;
+                  });
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -816,7 +831,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
-                 "No Chat Found",
+            "No Chat Found",
             textAlign: TextAlign.center,
             style: TextStyle(
                 color:
@@ -831,7 +846,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         const SizedBox(
           height: 12,
         ),
-        Obx(()=>NiceButtons(
+        Obx(() => NiceButtons(
             stretch: false,
             borderThickness: 5,
             width: 150,
@@ -843,16 +858,26 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             gradientOrientation: GradientOrientation.Horizontal,
             onTap: (finish) async {
               _chatController.retryProgress.value = true;
-              isMySirkl ? await _controllerFriend.doInitialLoad() : await _controllerOther.doInitialLoad();
+              isMySirkl
+                  ? await _controllerFriend.doInitialLoad()
+                  : await _controllerOther.doInitialLoad();
               _chatController.retryProgress.value = false;
             },
-            child:
-            _chatController.retryProgress.value ? const Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white)),) : const Text("RETRY", style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontFamily: "Gilroy",
-                  fontWeight: FontWeight.w700),)
-        )),
+            child: _chatController.retryProgress.value
+                ? const Center(
+                    child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(color: Colors.white)),
+                  )
+                : const Text(
+                    "RETRY",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontFamily: "Gilroy",
+                        fontWeight: FontWeight.w700),
+                  ))),
       ],
     );
   }
@@ -865,5 +890,4 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     _chatController.index.value = 0;
     super.dispose();
   }
-
 }

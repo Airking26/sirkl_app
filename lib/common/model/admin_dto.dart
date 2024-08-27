@@ -1,7 +1,6 @@
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
-AdminDto adminDtoFromJson(String str) => AdminDto.fromJson(json.decode(str));
+adminDtoFromJson(String str) => AdminDto.fromJson(json.decode(str));
 
 String adminDtoToJson(AdminDto data) => json.encode(data.toJson());
 
@@ -17,14 +16,14 @@ class AdminDto {
   bool makeAdmin;
 
   factory AdminDto.fromJson(Map<String, dynamic> json) => AdminDto(
-    idChannel: json["idChannel"],
-    userToUpdate: json["userToUpdate"],
-    makeAdmin: json["makeAdmin"],
-  );
+        idChannel: json["idChannel"],
+        userToUpdate: json["userToUpdate"],
+        makeAdmin: json["makeAdmin"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "idChannel": idChannel,
-    "userToUpdate": userToUpdate,
-    "makeAdmin": makeAdmin,
-  };
+        "idChannel": idChannel,
+        "userToUpdate": userToUpdate,
+        "makeAdmin": makeAdmin,
+      };
 }

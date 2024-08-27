@@ -16,9 +16,6 @@ class SColors {
   }
 
   static void _loadDark() {
-     activeColor = const Color(0xFF00CB7D);
-
+    activeColor = const Color(0xFF00CB7D);
   }
-
-
 }

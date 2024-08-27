@@ -1,3 +1,1 @@
-enum PDFType {
-  tc,pp,all
-}
+enum PDFType { tc, pp, all }

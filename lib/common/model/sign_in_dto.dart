@@ -14,12 +14,12 @@ class SignInDto {
   String? password;
 
   factory SignInDto.fromJson(Map<String, dynamic> json) => SignInDto(
-    wallet: json["wallet"],
-    password: json["password"],
-  );
+        wallet: json["wallet"],
+        password: json["password"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "wallet": wallet,
-    "password": password,
-  };
+        "wallet": wallet,
+        "password": password,
+      };
 }

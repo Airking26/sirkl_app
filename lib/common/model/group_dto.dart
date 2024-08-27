@@ -1,9 +1,10 @@
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
-List<GroupDto> groupDtoFromJson(String str) => List<GroupDto>.from(json.decode(str).map((x) => GroupDto.fromJson(x)));
+List<GroupDto> groupDtoFromJson(String str) =>
+    List<GroupDto>.from(json.decode(str).map((x) => GroupDto.fromJson(x)));
 
-String groupDtoToJson(List<GroupDto> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String groupDtoToJson(List<GroupDto> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class GroupDto {
   GroupDto({
@@ -17,14 +18,14 @@ class GroupDto {
   final String contractAddress;
 
   factory GroupDto.fromJson(Map<String, dynamic> json) => GroupDto(
-    name: json["name"],
-    image: json["image"],
-    contractAddress: json["contractAddress"],
-  );
+        name: json["name"],
+        image: json["image"],
+        contractAddress: json["contractAddress"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "name": name,
-    "image": image,
-    "contractAddress": contractAddress,
-  };
+        "name": name,
+        "image": image,
+        "contractAddress": contractAddress,
+      };
 }

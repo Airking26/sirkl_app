@@ -5,17 +5,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
-
-import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/model/report_dto.dart';
 import 'package:sirkl/common/model/request_to_join_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/web3_controller.dart';
-
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
+import 'package:sirkl/controllers/web3_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../config/s_colors.dart';
@@ -42,6 +40,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
   ChatsController get _chatController => Get.find<ChatsController>();
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
   NavigationController get _navigationController => Get.find<NavigationController>();
+
 
   final _nameGroupController = TextEditingController();
   final web3Controller = Get.put(Web3Controller());
@@ -70,6 +69,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
             await _profileController.getImageForGroup();
           }
         },
+
         child: Align(
           alignment: Alignment.center,
           child: ClipOval(

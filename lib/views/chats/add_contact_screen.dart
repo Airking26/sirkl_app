@@ -4,16 +4,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
-import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
-import 'package:sirkl/common/constants.dart' as con;
 
 import '../../config/s_colors.dart';
 import '../../controllers/home_controller.dart';
@@ -34,7 +34,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
   CommonController get _commonController => Get.find<CommonController>();
   GroupsController get _groupController => Get.find<GroupsController>();
   final nicknameController = TextEditingController();
-  bool autofocus  = false;
+  bool autofocus = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,12 +68,15 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       child: TypeAheadField(
                         hideOnLoading: true,
                         hideOnError: true,
-                        emptyBuilder: (context){
+                        emptyBuilder: (context) {
                           return const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
-                            child: Text("No user found for this search..", style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Gilroy", fontSize: 16)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 16),
+                            child: Text("No user found for this search..",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: "Gilroy",
+                                    fontSize: 16)),
                           );
                         },
                         builder: (context, controller, node) => TextField(
@@ -83,7 +87,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                             autofocus: true,
                             decoration: InputDecoration(
                                 hintText:
-                                "Paste a wallet, an ENS or a username",
+                                    "Paste a wallet, an ENS or a username",
                                 hintStyle:
                                     const TextStyle(fontFamily: "Gilroy"),
                                 border: const OutlineInputBorder(),
@@ -97,7 +101,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                       width: 1.5),
                                   borderRadius: BorderRadius.circular(5.0),
                                 ))),
-                        suggestionsCallback: (pattern) => _callController.retrieveUsers(pattern, 0),
+                        suggestionsCallback: (pattern) =>
+                            _callController.retrieveUsers(pattern, 0),
                         itemBuilder: (context, UserDTO suggestion) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -117,11 +122,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                           color: Colors.white.withOpacity(0.0),
                                           fit: BoxFit.cover,
                                           colorBlendMode: BlendMode.difference,
-                                          placeholder: (context, url) =>
-                                              Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                          color: SColors.activeColor)),
+                                          placeholder: (context, url) => Center(
+                                              child: CircularProgressIndicator(
+                                                  color: SColors.activeColor)),
                                           errorWidget: (context, url, error) =>
                                               Image.asset(
                                                   "assets/images/app_icon_rounded.png")),
@@ -135,7 +138,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                               ),
                               subtitle: suggestion.userName.isNullOrBlank!
                                   ? const SizedBox()
-                                  : Text("${suggestion.wallet!.substring(0, 6)}...${suggestion.wallet!.substring(suggestion.wallet!.length - 4)}",
+                                  : Text(
+                                      "${suggestion.wallet!.substring(0, 6)}...${suggestion.wallet!.substring(suggestion.wallet!.length - 4)}",
                                       style: const TextStyle(
                                           fontFamily: "Gilroy")),
                             ),
@@ -144,7 +148,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         onSelected: (UserDTO value) {
                           _chatController.contactAddIsEmpty.value = false;
                           _homeController.userAdded.value = value;
-                      },
+                        },
                       ))
                   : ListTile(
                       leading: _homeController.userAdded.value.picture == null
@@ -166,7 +170,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                   width: 56,
                                   height: 56,
                                   fit: BoxFit.cover,
-                                  placeholder: (context, url) =>  Center(
+                                  placeholder: (context, url) => Center(
                                       child: CircularProgressIndicator(
                                           color: SColors.activeColor)),
                                   errorWidget: (context, url, error) =>
@@ -184,7 +188,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       title: Transform.translate(
                           offset: const Offset(-8, 0),
                           child: Text(
-                              displayName(_homeController.userAdded.value, _homeController),
+                              displayName(_homeController.userAdded.value,
+                                  _homeController),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -235,7 +240,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
                   controller: nicknameController,
                   decoration: InputDecoration(
                       hintText: 'Only you will see it',
-
                       hintStyle: const TextStyle(fontFamily: "Gilroy"),
                       border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
@@ -314,36 +318,58 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 onPressed: () async {
                   if (_chatController.contactAddIsEmpty.value) {
                     showToast(context, "Please enter a user");
-                  }
-                  else {
-                    if(nicknameController.text.isNotEmpty){
-                      await _profileController.updateMe(UpdateMeDto(nicknames: {_homeController.userAdded.value.wallet! : nicknameController.text}), StreamChat.of(context).client);
-                      _homeController.updateNickname(_homeController.userAdded.value.wallet!, nicknameController.text);
+                  } else {
+                    if (nicknameController.text.isNotEmpty) {
+                      await _profileController.updateMe(
+                          UpdateMeDto(nicknames: {
+                            _homeController.userAdded.value.wallet!:
+                                nicknameController.text
+                          }),
+                          StreamChat.of(context).client);
+                      _homeController.updateNickname(
+                          _homeController.userAdded.value.wallet!,
+                          nicknameController.text);
                     }
-                    if(await _commonController.addUserToSirkl(_homeController.userAdded.value.id!, StreamChat.of(context).client, _homeController.id.value)){
-                        showToast(context, con.userAddedToSirklRes.trParams({"user": _homeController.userAdded.value.userName.isNullOrBlank! ? "${_homeController.userAdded.value.wallet!.substring(0, 6)}...${_homeController.userAdded.value.wallet!.substring(_homeController.userAdded.value.wallet!.length - 4)}" : _homeController.userAdded.value.userName!}));
-                        nicknameController.clear();
-                        _chatController.contactAddIsEmpty.value = true;
-                        _homeController.userAdded.value = UserDTO();
-                        _groupController.refreshGroups.value = true;
-                        Navigator.pop(context);
-                    }
-                    else {
+                    if (await _commonController.addUserToSirkl(
+                        _homeController.userAdded.value.id!,
+                        StreamChat.of(context).client,
+                        _homeController.id.value)) {
+                      showToast(
+                          context,
+                          con.userAddedToSirklRes.trParams({
+                            "user": _homeController
+                                    .userAdded.value.userName.isNullOrBlank!
+                                ? "${_homeController.userAdded.value.wallet!.substring(0, 6)}...${_homeController.userAdded.value.wallet!.substring(_homeController.userAdded.value.wallet!.length - 4)}"
+                                : _homeController.userAdded.value.userName!
+                          }));
+                      nicknameController.clear();
+                      _chatController.contactAddIsEmpty.value = true;
+                      _homeController.userAdded.value = UserDTO();
+                      _groupController.refreshGroups.value = true;
+                      Navigator.pop(context);
+                    } else {
                       _commonController.contactAddLoading.value = false;
                       showToast(context, "This user is already in your SIRKL");
                     }
                   }
                 },
-                child: _commonController.contactAddLoading.value ?  SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: SColors.activeColor,)) : Text(
-                  "Add",
-                  style: TextStyle(
-                    color: _chatController.contactAddIsEmpty.value
-                        ? Colors.grey
-                        : SColors.activeColor,
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                child: _commonController.contactAddLoading.value
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: SColors.activeColor,
+                        ))
+                    : Text(
+                        "Add",
+                        style: TextStyle(
+                          color: _chatController.contactAddIsEmpty.value
+                              ? Colors.grey
+                              : SColors.activeColor,
+                          fontFamily: "Gilroy",
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
               ),
             ],
           ),

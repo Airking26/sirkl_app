@@ -20,16 +20,16 @@ class TokenDto {
   });
 
   factory TokenDto.fromJson(Map<String, dynamic> json) => TokenDto(
-    jsonrpc: json["jsonrpc"],
-    id: json["id"],
-    result: json["result"] == null ? null : Result.fromJson(json["result"]),
-  );
+        jsonrpc: json["jsonrpc"],
+        id: json["id"],
+        result: json["result"] == null ? null : Result.fromJson(json["result"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "jsonrpc": jsonrpc,
-    "id": id,
-    "result": result?.toJson(),
-  };
+        "jsonrpc": jsonrpc,
+        "id": id,
+        "result": result?.toJson(),
+      };
 }
 
 class Result {
@@ -42,14 +42,19 @@ class Result {
   });
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
-    address: json["address"],
-    tokenBalances: json["tokenBalances"] == null ? [] : List<TokenBalance>.from(json["tokenBalances"]!.map((x) => TokenBalance.fromJson(x))),
-  );
+        address: json["address"],
+        tokenBalances: json["tokenBalances"] == null
+            ? []
+            : List<TokenBalance>.from(
+                json["tokenBalances"]!.map((x) => TokenBalance.fromJson(x))),
+      );
 
   Map<String, dynamic> toJson() => {
-    "address": address,
-    "tokenBalances": tokenBalances == null ? [] : List<dynamic>.from(tokenBalances!.map((x) => x.toJson())),
-  };
+        "address": address,
+        "tokenBalances": tokenBalances == null
+            ? []
+            : List<dynamic>.from(tokenBalances!.map((x) => x.toJson())),
+      };
 }
 
 class TokenBalance {
@@ -62,12 +67,12 @@ class TokenBalance {
   });
 
   factory TokenBalance.fromJson(Map<String, dynamic> json) => TokenBalance(
-    contractAddress: json["contractAddress"],
-    tokenBalance: json["tokenBalance"],
-  );
+        contractAddress: json["contractAddress"],
+        tokenBalance: json["tokenBalance"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "contractAddress": contractAddress,
-    "tokenBalance": tokenBalance,
-  };
+        "contractAddress": contractAddress,
+        "tokenBalance": tokenBalance,
+      };
 }

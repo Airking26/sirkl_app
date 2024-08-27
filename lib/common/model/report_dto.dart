@@ -1,7 +1,6 @@
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
-ReportDto reportDtoFromJson(String str) => ReportDto.fromJson(json.decode(str));
+reportDtoFromJson(String str) => ReportDto.fromJson(json.decode(str));
 
 String reportDtoToJson(ReportDto data) => json.encode(data.toJson());
 
@@ -19,16 +18,16 @@ class ReportDto {
   });
 
   factory ReportDto.fromJson(Map<String, dynamic> json) => ReportDto(
-    createdBy: json["createdBy"],
-    idSignaled: json["idSignaled"],
-    description: json["description"],
-    type: json["type"],
-  );
+        createdBy: json["createdBy"],
+        idSignaled: json["idSignaled"],
+        description: json["description"],
+        type: json["type"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "createdBy": createdBy,
-    "idSignaled": idSignaled,
-    "description": description,
-    "type": type,
-  };
+        "createdBy": createdBy,
+        "idSignaled": idSignaled,
+        "description": description,
+        "type": type,
+      };
 }

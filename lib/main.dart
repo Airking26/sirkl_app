@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -15,37 +16,35 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/enums/app_theme.dart';
-import 'package:sirkl/common/model/notification_register_dto.dart';
-import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
-
-import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/common/language.dart';
 import 'package:sirkl/common/local_notification_initialize.dart';
+import 'package:sirkl/common/model/notification_register_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/controllers/profile_controller.dart';
 import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'package:sirkl/repo/home_repo.dart';
-import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/repo/profile_repo.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/chats/settings_group_screen.dart';
 import 'package:sirkl/views/profile/profile_else_screen.dart';
-
 import 'package:stream_chat_persistence/stream_chat_persistence.dart';
 import 'package:web3modal_flutter/theme/w3m_theme.dart';
 
-import 'config/s_colors.dart';
 import 'common/save_pref_keys.dart';
+import 'config/s_colors.dart';
 import 'controllers/dependency_manager.dart';
 import 'controllers/home_controller.dart';
 import 'navigation/ui/navigation_screen.dart';
-import 'package:sirkl/common/constants.dart' as con;
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -55,6 +54,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (notificationActive) {
     debugPrint("ENTERING NOTIFICATION ACTIVE");
     if (message.data['type'] == "2") {
+      debugPrint("Call kit type 2");
       await FlutterCallkitIncoming.endAllCalls();
     } else if (message.data['type'] == "4") {
       try {
@@ -62,7 +62,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         (notificationSaved as List<dynamic>).add(message.data["body"]);
         await GetStorage().write(con.notificationSaved, notificationSaved);
       } catch (e) {
-        throw e;
+        rethrow;
       }
     } else if (message.data['type'] == "8") {
       debugPrint("ENTERING 8 MODE");
@@ -72,16 +72,17 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
-AppsflyerSdk appsflyerSdk = AppsflyerSdk(AppsFlyerOptions(afDevKey: "KdGKBY4Q3u3ooKjm4KT5am", appId: "1668076042", showDebug: true));
+AppsflyerSdk appsflyerSdk = AppsflyerSdk(AppsFlyerOptions(
+    afDevKey: "KdGKBY4Q3u3ooKjm4KT5am", appId: "1668076042", showDebug: true));
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await appsflyerSdk.initSdk(
+  /*await appsflyerSdk.initSdk(
       registerConversionDataCallback: true,
       registerOnAppOpenAttributionCallback: true,
       registerOnDeepLinkingCallback: true
   );
-  Get.put<AppsflyerSdk>(appsflyerSdk);
+  Get.put<AppsflyerSdk>(appsflyerSdk);*/
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark));
@@ -106,10 +107,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Web3ModalTheme(
-      themeData: Web3ModalThemeData(darkColors: Web3ModalColors.darkMode.copyWith(
+      themeData: Web3ModalThemeData(
+          darkColors: Web3ModalColors.darkMode.copyWith(
         background125: const Color(0xFF102437),
       )),
-      isDarkMode: MediaQuery.of(context).platformBrightness == Brightness.dark ? true : false,
+      isDarkMode: MediaQuery.of(context).platformBrightness == Brightness.dark
+          ? true
+          : false,
       child: DynamicTheme(
           defaultBrightness: Brightness.light,
           data: (Brightness brightness) {
@@ -130,7 +134,8 @@ class MyApp extends StatelessWidget {
                 return StreamChat(
                   client: client,
                   child: MediaQuery(
-                      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                      data:
+                          MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                       child: child!),
                 );
               },
@@ -138,21 +143,31 @@ class MyApp extends StatelessWidget {
                   colorSchemeSeed: SColors.activeColor,
                   inputDecorationTheme: InputDecorationTheme(
                     focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
+                      borderSide:
+                          BorderSide(color: SColors.activeColor, width: 1.0),
                     ),
                   ),
-                  textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor, selectionHandleColor: SColors.activeColor,),
-                  brightness: Brightness.dark, dividerColor: Colors.transparent),
+                  textSelectionTheme: TextSelectionThemeData(
+                    cursorColor: SColors.activeColor,
+                    selectionHandleColor: SColors.activeColor,
+                  ),
+                  brightness: Brightness.dark,
+                  dividerColor: Colors.transparent),
               themeMode: ThemeMode.system,
               theme: ThemeData(
-                colorSchemeSeed: SColors.activeColor,
+                  colorSchemeSeed: SColors.activeColor,
                   inputDecorationTheme: InputDecorationTheme(
                     focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: SColors.activeColor, width: 1.0),
+                      borderSide:
+                          BorderSide(color: SColors.activeColor, width: 1.0),
                     ),
                   ),
-                  textSelectionTheme: TextSelectionThemeData(cursorColor: SColors.activeColor, selectionHandleColor: SColors.activeColor,),
-                  brightness: Brightness.light, dividerColor: Colors.transparent),
+                  textSelectionTheme: TextSelectionThemeData(
+                    cursorColor: SColors.activeColor,
+                    selectionHandleColor: SColors.activeColor,
+                  ),
+                  brightness: Brightness.light,
+                  dividerColor: Colors.transparent),
               debugShowCheckedModeBanner: false,
               home: const MyHomePage(),
               initialBinding: GlobalDependencyManager(),
@@ -170,14 +185,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   HomeController get _homeController => Get.find<HomeController>();
   CallsController get _callController => Get.find<CallsController>();
   ChatsController get _chatController => Get.find<ChatsController>();
   CommonController get _commonController => Get.find<CommonController>();
   GroupsController get _groupController => Get.find<GroupsController>();
   ProfileController get _profileController => Get.find<ProfileController>();
-  WalletConnectModalController get _walletConnectModalController => Get.find<WalletConnectModalController>();
+  WalletConnectModalController get _walletConnectModalController =>
+      Get.find<WalletConnectModalController>();
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -227,30 +242,25 @@ class _MyHomePageState extends State<MyHomePage> {
               title: message.data["title"],
               body: message.data["body"],
               flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-        }
-        else if (message.data['type'] == "2") {
+        } else if (message.data['type'] == "2") {
           await FlutterCallkitIncoming.endAllCalls();
           await _callController.leaveChannel();
-        }
-        else if (message.data['type'] == "3") {
+        } else if (message.data['type'] == "3") {
           await FlutterCallkitIncoming.endAllCalls();
           LocalNotificationInitialize.showBigTextNotification(
               title: message.data["title"],
               body: message.data["body"],
               flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-        }
-        else if (message.data['type'] == "4") {
+        } else if (message.data['type'] == "4") {
           LocalNotificationInitialize.showBigTextNotification(
               title: message.data["title"],
               body: message.data["body"],
               flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
           await HomeRepo.registerNotification(
               NotificationRegisterDto(message: message.data["body"]));
-        }
-        else if((message.data['type'] == "8")){
+        } else if ((message.data['type'] == "8")) {
           showCallNotification(message.data);
-        }
-        else if((message.data["type"] == "9")){
+        } else if ((message.data["type"] == "9")) {
           await _profileController.retrieveMe();
           _profileController.pagingController.refresh();
           _groupController.refreshGroups.value = true;
@@ -258,8 +268,7 @@ class _MyHomePageState extends State<MyHomePage> {
               title: message.data["title"],
               body: message.data["body"],
               flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-        }
-        else if (message.data['type'] == "message.new" &&
+        } else if (message.data['type'] == "message.new" &&
             message.data['channel_id'] != _chatController.channel.value?.id) {
           final client = StreamChat.of(context).client;
           final response = await client.getMessage(message.data['id']);
@@ -477,5 +486,3 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
 
   await FlutterCallkitIncoming.showCallkitIncoming(params);
 }
-
-

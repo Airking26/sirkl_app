@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-NftAlchemyDto nftAlchemyDtoFromJson(String str) => NftAlchemyDto.fromJson(json.decode(str));
+NftAlchemyDto nftAlchemyDtoFromJson(String str) =>
+    NftAlchemyDto.fromJson(json.decode(str));
 
 String nftAlchemyDtoToJson(NftAlchemyDto data) => json.encode(data.toJson());
 
@@ -18,18 +19,23 @@ class NftAlchemyDto {
   String? blockHash;
 
   factory NftAlchemyDto.fromJson(Map<String, dynamic> json) => NftAlchemyDto(
-    ownedNfts: json["ownedNfts"] == null ? null : List<OwnedNft>.from(json["ownedNfts"].map((x) => OwnedNft.fromJson(x))),
-    pageKey: json["pageKey"],
-    totalCount: json["totalCount"],
-    blockHash: json["blockHash"],
-  );
+        ownedNfts: json["ownedNfts"] == null
+            ? null
+            : List<OwnedNft>.from(
+                json["ownedNfts"].map((x) => OwnedNft.fromJson(x))),
+        pageKey: json["pageKey"],
+        totalCount: json["totalCount"],
+        blockHash: json["blockHash"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "ownedNfts": ownedNfts == null ? null : List<dynamic>.from(ownedNfts!.map((x) => x.toJson())),
-    "pageKey": pageKey,
-    "totalCount": totalCount,
-    "blockHash": blockHash,
-  };
+        "ownedNfts": ownedNfts == null
+            ? null
+            : List<dynamic>.from(ownedNfts!.map((x) => x.toJson())),
+        "pageKey": pageKey,
+        "totalCount": totalCount,
+        "blockHash": blockHash,
+      };
 }
 
 class OwnedNft {
@@ -60,32 +66,46 @@ class OwnedNft {
   String? error;
 
   factory OwnedNft.fromJson(Map<String, dynamic> json) => OwnedNft(
-    contract: json["contract"] == null ? null : Contract.fromJson(json["contract"]),
-    id: json["id"] == null ? null : Id.fromJson(json["id"]),
-    balance: json["balance"],
-    title: json["title"],
-    description: json["description"],
-    tokenUri: json["tokenUri"] == null ? null : TokenUri.fromJson(json["tokenUri"]),
-    media: json["media"] == null ? null : List<Media>.from(json["media"].map((x) => Media.fromJson(x))),
-    metadata: null,
-    timeLastUpdated: json["timeLastUpdated"] == null ? null : DateTime.parse(json["timeLastUpdated"]),
-    contractMetadata: json["contractMetadata"] == null ? null : ContractMetadata.fromJson(json["contractMetadata"]),
-    error: json["error"],
-  );
+        contract: json["contract"] == null
+            ? null
+            : Contract.fromJson(json["contract"]),
+        id: json["id"] == null ? null : Id.fromJson(json["id"]),
+        balance: json["balance"],
+        title: json["title"],
+        description: json["description"],
+        tokenUri: json["tokenUri"] == null
+            ? null
+            : TokenUri.fromJson(json["tokenUri"]),
+        media: json["media"] == null
+            ? null
+            : List<Media>.from(json["media"].map((x) => Media.fromJson(x))),
+        metadata: null,
+        timeLastUpdated: json["timeLastUpdated"] == null
+            ? null
+            : DateTime.parse(json["timeLastUpdated"]),
+        contractMetadata: json["contractMetadata"] == null
+            ? null
+            : ContractMetadata.fromJson(json["contractMetadata"]),
+        error: json["error"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "contract": contract == null ? null : contract?.toJson(),
-    "id": id == null ? null : id?.toJson(),
-    "balance": balance,
-    "title": title,
-    "description": description,
-    "tokenUri": tokenUri == null ? null : tokenUri?.toJson(),
-    "media": media == null ? null : List<dynamic>.from(media!.map((x) => x.toJson())),
-    "metadata": metadata == null ? null : metadata?.toJson(),
-    "timeLastUpdated": timeLastUpdated == null ? null : timeLastUpdated?.toIso8601String(),
-    "contractMetadata": contractMetadata == null ? null : contractMetadata?.toJson(),
-    "error": error,
-  };
+        "contract": contract == null ? null : contract?.toJson(),
+        "id": id == null ? null : id?.toJson(),
+        "balance": balance,
+        "title": title,
+        "description": description,
+        "tokenUri": tokenUri == null ? null : tokenUri?.toJson(),
+        "media": media == null
+            ? null
+            : List<dynamic>.from(media!.map((x) => x.toJson())),
+        "metadata": metadata == null ? null : metadata?.toJson(),
+        "timeLastUpdated":
+            timeLastUpdated == null ? null : timeLastUpdated?.toIso8601String(),
+        "contractMetadata":
+            contractMetadata == null ? null : contractMetadata?.toJson(),
+        "error": error,
+      };
 }
 
 class Contract {
@@ -96,12 +116,12 @@ class Contract {
   String? address;
 
   factory Contract.fromJson(Map<String, dynamic> json) => Contract(
-    address: json["address"],
-  );
+        address: json["address"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "address": address,
-  };
+        "address": address,
+      };
 }
 
 class ContractMetadata {
@@ -123,25 +143,30 @@ class ContractMetadata {
   OpenSea? openSea;
   String? totalSupply;
 
-  factory ContractMetadata.fromJson(Map<String, dynamic> json) => ContractMetadata(
-    name: json["name"],
-    symbol: json["symbol"],
-    tokenType: json["tokenType"] == null ? null : tokenTypeValues.map[json["tokenType"]],
-    contractDeployer: json["contractDeployer"],
-    deployedBlockNumber: json["deployedBlockNumber"],
-    openSea: json["openSea"] == null ? null : OpenSea.fromJson(json["openSea"]),
-    totalSupply: json["totalSupply"],
-  );
+  factory ContractMetadata.fromJson(Map<String, dynamic> json) =>
+      ContractMetadata(
+        name: json["name"],
+        symbol: json["symbol"],
+        tokenType: json["tokenType"] == null
+            ? null
+            : tokenTypeValues.map[json["tokenType"]],
+        contractDeployer: json["contractDeployer"],
+        deployedBlockNumber: json["deployedBlockNumber"],
+        openSea:
+            json["openSea"] == null ? null : OpenSea.fromJson(json["openSea"]),
+        totalSupply: json["totalSupply"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "name": name,
-    "symbol": symbol,
-    "tokenType": tokenType == null ? null : tokenTypeValues.reverse[tokenType],
-    "contractDeployer": contractDeployer,
-    "deployedBlockNumber": deployedBlockNumber,
-    "openSea": openSea == null ? null : openSea?.toJson(),
-    "totalSupply": totalSupply,
-  };
+        "name": name,
+        "symbol": symbol,
+        "tokenType":
+            tokenType == null ? null : tokenTypeValues.reverse[tokenType],
+        "contractDeployer": contractDeployer,
+        "deployedBlockNumber": deployedBlockNumber,
+        "openSea": openSea == null ? null : openSea?.toJson(),
+        "totalSupply": totalSupply,
+      };
 }
 
 class OpenSea {
@@ -168,28 +193,36 @@ class OpenSea {
   String? twitterUsername;
 
   factory OpenSea.fromJson(Map<String, dynamic> json) => OpenSea(
-    collectionName: json["collectionName"],
-    safelistRequestStatus: json["safelistRequestStatus"] == null ? null : safelistRequestStatusValues.map[json["safelistRequestStatus"]],
-    imageUrl: json["imageUrl"],
-    description: json["description"],
-    externalUrl: json["externalUrl"],
-    lastIngestedAt: json["lastIngestedAt"] == null ? null : DateTime.parse(json["lastIngestedAt"]),
-    discordUrl: json["discordUrl"],
-    floorPrice: json["floorPrice"] == null ? null : json["floorPrice"].toDouble(),
-    twitterUsername: json["twitterUsername"],
-  );
+        collectionName: json["collectionName"],
+        safelistRequestStatus: json["safelistRequestStatus"] == null
+            ? null
+            : safelistRequestStatusValues.map[json["safelistRequestStatus"]],
+        imageUrl: json["imageUrl"],
+        description: json["description"],
+        externalUrl: json["externalUrl"],
+        lastIngestedAt: json["lastIngestedAt"] == null
+            ? null
+            : DateTime.parse(json["lastIngestedAt"]),
+        discordUrl: json["discordUrl"],
+        floorPrice:
+            json["floorPrice"] == null ? null : json["floorPrice"].toDouble(),
+        twitterUsername: json["twitterUsername"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "collectionName": collectionName,
-    "safelistRequestStatus": safelistRequestStatus == null ? null : safelistRequestStatusValues.reverse[safelistRequestStatus],
-    "imageUrl": imageUrl,
-    "description": description,
-    "externalUrl": externalUrl,
-    "lastIngestedAt": lastIngestedAt == null ? null : lastIngestedAt?.toIso8601String(),
-    "discordUrl": discordUrl,
-    "floorPrice": floorPrice,
-    "twitterUsername": twitterUsername,
-  };
+        "collectionName": collectionName,
+        "safelistRequestStatus": safelistRequestStatus == null
+            ? null
+            : safelistRequestStatusValues.reverse[safelistRequestStatus],
+        "imageUrl": imageUrl,
+        "description": description,
+        "externalUrl": externalUrl,
+        "lastIngestedAt":
+            lastIngestedAt == null ? null : lastIngestedAt?.toIso8601String(),
+        "discordUrl": discordUrl,
+        "floorPrice": floorPrice,
+        "twitterUsername": twitterUsername,
+      };
 }
 
 enum SafelistRequestStatus { NOT_REQUESTED, APPROVED, VERIFIED }
@@ -218,14 +251,16 @@ class Id {
   TokenMetadata? tokenMetadata;
 
   factory Id.fromJson(Map<String, dynamic> json) => Id(
-    tokenId: json["tokenId"],
-    tokenMetadata: json["tokenMetadata"] == null ? null : TokenMetadata.fromJson(json["tokenMetadata"]),
-  );
+        tokenId: json["tokenId"],
+        tokenMetadata: json["tokenMetadata"] == null
+            ? null
+            : TokenMetadata.fromJson(json["tokenMetadata"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "tokenId": tokenId,
-    "tokenMetadata": tokenMetadata == null ? null : tokenMetadata?.toJson(),
-  };
+        "tokenId": tokenId,
+        "tokenMetadata": tokenMetadata == null ? null : tokenMetadata?.toJson(),
+      };
 }
 
 class TokenMetadata {
@@ -236,12 +271,15 @@ class TokenMetadata {
   TokenType? tokenType;
 
   factory TokenMetadata.fromJson(Map<String, dynamic> json) => TokenMetadata(
-    tokenType: json["tokenType"] == null ? null : tokenTypeValues.map[json["tokenType"]],
-  );
+        tokenType: json["tokenType"] == null
+            ? null
+            : tokenTypeValues.map[json["tokenType"]],
+      );
 
   Map<String, dynamic> toJson() => {
-    "tokenType": tokenType == null ? null : tokenTypeValues.reverse[tokenType],
-  };
+        "tokenType":
+            tokenType == null ? null : tokenTypeValues.reverse[tokenType],
+      };
 }
 
 class Media {
@@ -260,20 +298,21 @@ class Media {
   int? bytes;
 
   factory Media.fromJson(Map<String, dynamic> json) => Media(
-    raw: json["raw"],
-    gateway: json["gateway"],
-    thumbnail: json["thumbnail"],
-    format: json["format"] == null ? null : formatValues.map[json["format"]],
-    bytes: json["bytes"],
-  );
+        raw: json["raw"],
+        gateway: json["gateway"],
+        thumbnail: json["thumbnail"],
+        format:
+            json["format"] == null ? null : formatValues.map[json["format"]],
+        bytes: json["bytes"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "raw": raw,
-    "gateway": gateway,
-    "thumbnail": thumbnail,
-    "format": format == null ? null : formatValues.reverse[format],
-    "bytes": bytes,
-  };
+        "raw": raw,
+        "gateway": gateway,
+        "thumbnail": thumbnail,
+        "format": format == null ? null : formatValues.reverse[format],
+        "bytes": bytes,
+      };
 }
 
 enum Format { PNG, JPEG, SVG_XML, WEBP, GIF, MP4 }
@@ -349,66 +388,75 @@ class Metadata {
   String? youtubeUrl;
 
   factory Metadata.fromJson(Map<String, dynamic> json) => Metadata(
-    name: json["name"],
-    description: json["description"],
-    image: json["image"],
-    attributes: json["attributes"] == null ? null : List<Attribute>.from(json["attributes"].map((x) => Attribute.fromJson(x))),
-    externalLink: json["external_link"],
-    externalUrl: json["external_url"],
-    dna: json["dna"],
-    edition: json["edition"],
-    compiler: json["compiler"],
-    metadata: json["metadata"] == null ? null : List<dynamic>.from(json["metadata"].map((x) => x)),
-    date: json["date"],
-    id: json["id"],
-    collection: json["collection"],
-    objectId: json["objectID"],
-    animationUrl: json["animation_url"],
-    contract: json["contract"],
-    symbol: json["symbol"],
-    backgroundColor: json["background_color"],
-    backgroundImage: json["background_image"],
-    isNormalized: json["is_normalized"],
-    segmentLength: json["segment_length"],
-    imageUrl: json["image_url"],
-    nameLength: json["name_length"],
-    version: json["version"],
-    url: json["url"],
-    sellerFeeBasisPoints: json["seller_fee_basis_points"],
-    feeRecipient: json["fee_recipient"],
-    youtubeUrl: json["youtube_url"],
-  );
+        name: json["name"],
+        description: json["description"],
+        image: json["image"],
+        attributes: json["attributes"] == null
+            ? null
+            : List<Attribute>.from(
+                json["attributes"].map((x) => Attribute.fromJson(x))),
+        externalLink: json["external_link"],
+        externalUrl: json["external_url"],
+        dna: json["dna"],
+        edition: json["edition"],
+        compiler: json["compiler"],
+        metadata: json["metadata"] == null
+            ? null
+            : List<dynamic>.from(json["metadata"].map((x) => x)),
+        date: json["date"],
+        id: json["id"],
+        collection: json["collection"],
+        objectId: json["objectID"],
+        animationUrl: json["animation_url"],
+        contract: json["contract"],
+        symbol: json["symbol"],
+        backgroundColor: json["background_color"],
+        backgroundImage: json["background_image"],
+        isNormalized: json["is_normalized"],
+        segmentLength: json["segment_length"],
+        imageUrl: json["image_url"],
+        nameLength: json["name_length"],
+        version: json["version"],
+        url: json["url"],
+        sellerFeeBasisPoints: json["seller_fee_basis_points"],
+        feeRecipient: json["fee_recipient"],
+        youtubeUrl: json["youtube_url"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "name": name,
-    "description": description,
-    "image": image,
-    "attributes": attributes == null ? null : List<dynamic>.from(attributes!.map((x) => x.toJson())),
-    "external_link": externalLink,
-    "external_url": externalUrl,
-    "dna": dna,
-    "edition": edition,
-    "compiler": compiler,
-    "metadata": metadata == null ? null : List<dynamic>.from(metadata!.map((x) => x)),
-    "date": date,
-    "id": id,
-    "collection": collection,
-    "objectID": objectId,
-    "animation_url": animationUrl,
-    "contract": contract,
-    "symbol": symbol,
-    "background_color": backgroundColor,
-    "background_image": backgroundImage,
-    "is_normalized": isNormalized,
-    "segment_length": segmentLength,
-    "image_url": imageUrl,
-    "name_length": nameLength,
-    "version": version,
-    "url": url,
-    "seller_fee_basis_points": sellerFeeBasisPoints,
-    "fee_recipient": feeRecipient,
-    "youtube_url": youtubeUrl,
-  };
+        "name": name,
+        "description": description,
+        "image": image,
+        "attributes": attributes == null
+            ? null
+            : List<dynamic>.from(attributes!.map((x) => x.toJson())),
+        "external_link": externalLink,
+        "external_url": externalUrl,
+        "dna": dna,
+        "edition": edition,
+        "compiler": compiler,
+        "metadata": metadata == null
+            ? null
+            : List<dynamic>.from(metadata!.map((x) => x)),
+        "date": date,
+        "id": id,
+        "collection": collection,
+        "objectID": objectId,
+        "animation_url": animationUrl,
+        "contract": contract,
+        "symbol": symbol,
+        "background_color": backgroundColor,
+        "background_image": backgroundImage,
+        "is_normalized": isNormalized,
+        "segment_length": segmentLength,
+        "image_url": imageUrl,
+        "name_length": nameLength,
+        "version": version,
+        "url": url,
+        "seller_fee_basis_points": sellerFeeBasisPoints,
+        "fee_recipient": feeRecipient,
+        "youtube_url": youtubeUrl,
+      };
 }
 
 class Attribute {
@@ -423,16 +471,19 @@ class Attribute {
   DisplayType? displayType;
 
   factory Attribute.fromJson(Map<String, dynamic> json) => Attribute(
-    value: json["value"],
-    traitType: json["trait_type"],
-    displayType: json["display_type"] == null ? null : displayTypeValues.map[json["display_type"]],
-  );
+        value: json["value"],
+        traitType: json["trait_type"],
+        displayType: json["display_type"] == null
+            ? null
+            : displayTypeValues.map[json["display_type"]],
+      );
 
   Map<String, dynamic> toJson() => {
-    "value": value,
-    "trait_type": traitType,
-    "display_type": displayType == null ? null : displayTypeValues.reverse[displayType],
-  };
+        "value": value,
+        "trait_type": traitType,
+        "display_type":
+            displayType == null ? null : displayTypeValues.reverse[displayType],
+      };
 }
 
 enum DisplayType { NUMBER, DATE, STRING }
@@ -453,14 +504,14 @@ class TokenUri {
   String? gateway;
 
   factory TokenUri.fromJson(Map<String, dynamic> json) => TokenUri(
-    raw: json["raw"],
-    gateway: json["gateway"],
-  );
+        raw: json["raw"],
+        gateway: json["gateway"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "raw": raw,
-    "gateway": gateway,
-  };
+        "raw": raw,
+        "gateway": gateway,
+      };
 }
 
 class EnumValues<T> {

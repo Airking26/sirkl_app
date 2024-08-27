@@ -94,16 +94,16 @@ class HomeRepo {
   }
   static Future<void> deleteStory({required String createdBy, required String id}) async {
     SRequests req = SRequests(SUrls.baseURL);
-    Response res = await req.delete(url: '${SUrls.storyMine}/$createdBy/$id');
+    await req.delete(url: '${SUrls.storyMine}/$createdBy/$id');
   }
 
   static Future<void> updateNicknames({required String wallet, required NicknameCreationDto nickNameDto}) async {
     SRequests req = SRequests(SUrls.baseURL);
-    Response res = await req.put(url: '${SUrls.nicknames}/$wallet', body: nickNameDto.toJson());
+    await req.put(url: '${SUrls.nicknames}/$wallet', body: nickNameDto.toJson());
   }
   static Future<void> receiveWelcomeMessage() async {
     SRequests req = SRequests(SUrls.baseURL);
-    Response res = await req.get(SUrls.userMeWelcomeMessage);
+    await req.get(SUrls.userMeWelcomeMessage);
   }
   static Future<Map<String, dynamic>> retrieveNicknames() async {
     SRequests req = SRequests(SUrls.baseURL);
@@ -120,13 +120,12 @@ class HomeRepo {
 
   static Future<void> registerNotification(NotificationRegisterDto notification) async {
        SRequests req = SRequests(SUrls.baseURL);
-       Response res = await req.post(url: SUrls.notificationRegister, body: notification.toJson());
+       await req.post(url: SUrls.notificationRegister, body: notification.toJson());
   }
 
   static Future<void> updateNFTStatus(NftModificationDto nftModi) async {
     SRequests req = SRequests(SUrls.baseURL);
-    Response res = await req.patch(url: SUrls.nftUpdate, body: nftModi.toJson());
-    var yu = "";
+    await req.patch(url: SUrls.nftUpdate, body: nftModi.toJson());
   }
 
 

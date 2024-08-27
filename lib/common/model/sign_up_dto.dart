@@ -16,14 +16,14 @@ class SignUpDto {
   String? password;
 
   factory SignUpDto.fromJson(Map<String, dynamic> json) => SignUpDto(
-    wallet: json["wallet"],
-    recoverySentence: json["recoverySentence"],
-    password: json["password"],
-  );
+        wallet: json["wallet"],
+        recoverySentence: json["recoverySentence"],
+        password: json["password"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "wallet": wallet,
-    "recoverySentence": recoverySentence,
-    "password": password,
-  };
+        "wallet": wallet,
+        "recoverySentence": recoverySentence,
+        "password": password,
+      };
 }

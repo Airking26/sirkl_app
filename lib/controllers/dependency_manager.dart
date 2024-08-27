@@ -11,7 +11,6 @@ import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'web3_controller.dart';
 
 class GlobalDependencyManager extends Bindings {
-
   final bool _permanent = true;
 
   @override

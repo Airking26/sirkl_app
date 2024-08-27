@@ -1,9 +1,10 @@
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
-CallCreationDto callCreationDtoFromJson(String str) => CallCreationDto.fromJson(json.decode(str));
+CallCreationDto callCreationDtoFromJson(String str) =>
+    CallCreationDto.fromJson(json.decode(str));
 
-String callCreationDtoToJson(CallCreationDto data) => json.encode(data.toJson());
+String callCreationDtoToJson(CallCreationDto data) =>
+    json.encode(data.toJson());
 
 class CallCreationDto {
   CallCreationDto({
@@ -18,17 +19,18 @@ class CallCreationDto {
   int status;
   String channel;
 
-  factory CallCreationDto.fromJson(Map<String, dynamic> json) => CallCreationDto(
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    called: json["called"],
-    status: json["status"],
-    channel: json["channel"],
-  );
+  factory CallCreationDto.fromJson(Map<String, dynamic> json) =>
+      CallCreationDto(
+        updatedAt: DateTime.parse(json["updatedAt"]),
+        called: json["called"],
+        status: json["status"],
+        channel: json["channel"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "updatedAt": updatedAt.toIso8601String(),
-    "called": called,
-    "status": status,
-    "channel": channel,
-  };
+        "updatedAt": updatedAt.toIso8601String(),
+        "called": called,
+        "status": status,
+        "channel": channel,
+      };
 }

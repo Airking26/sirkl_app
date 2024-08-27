@@ -1,8 +1,10 @@
 import 'dart:convert';
 
-NicknameCreationDto nicknameCreationDtoFromJson(String str) => NicknameCreationDto.fromJson(json.decode(str));
+NicknameCreationDto nicknameCreationDtoFromJson(String str) =>
+    NicknameCreationDto.fromJson(json.decode(str));
 
-String nicknameCreationDtoToJson(NicknameCreationDto data) => json.encode(data.toJson());
+String nicknameCreationDtoToJson(NicknameCreationDto data) =>
+    json.encode(data.toJson());
 
 class NicknameCreationDto {
   NicknameCreationDto({
@@ -11,11 +13,12 @@ class NicknameCreationDto {
 
   String nickname;
 
-  factory NicknameCreationDto.fromJson(Map<String, dynamic> json) => NicknameCreationDto(
-    nickname: json["name"],
-  );
+  factory NicknameCreationDto.fromJson(Map<String, dynamic> json) =>
+      NicknameCreationDto(
+        nickname: json["name"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "nickname": nickname,
-  };
+        "nickname": nickname,
+      };
 }

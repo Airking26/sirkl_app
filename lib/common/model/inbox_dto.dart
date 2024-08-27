@@ -1,8 +1,6 @@
 // To parse this JSON data, do
 //
 //     final inboxDto = inboxDtoFromJson(jsonString);
-
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
@@ -29,21 +27,21 @@ class InboxDto {
   List<UserDTO>? ownedBy;
 
   factory InboxDto.fromJson(Map<String, dynamic> json) => InboxDto(
-    id: json["id"],
-    lastMessage: json["lastMessage"],
-    lastSender: json["lastSender"],
-    unreadMessages: json["unreadMessages"],
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    ownedBy: List<UserDTO>.from(json["ownedBy"].map((x) => UserDTO.fromJson(x))),
-  );
+        id: json["id"],
+        lastMessage: json["lastMessage"],
+        lastSender: json["lastSender"],
+        unreadMessages: json["unreadMessages"],
+        updatedAt: DateTime.parse(json["updatedAt"]),
+        ownedBy:
+            List<UserDTO>.from(json["ownedBy"].map((x) => UserDTO.fromJson(x))),
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "lastMessage": lastMessage,
-    "lastSender": lastSender,
-    "unreadMessages": unreadMessages,
-    "updatedAt": updatedAt!.toIso8601String(),
-    "ownedBy": List<dynamic>.from(ownedBy!.map((x) => x.toJson())),
-  };
+        "id": id,
+        "lastMessage": lastMessage,
+        "lastSender": lastSender,
+        "unreadMessages": unreadMessages,
+        "updatedAt": updatedAt!.toIso8601String(),
+        "ownedBy": List<dynamic>.from(ownedBy!.map((x) => x.toJson())),
+      };
 }
-

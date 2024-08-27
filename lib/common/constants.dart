@@ -101,8 +101,8 @@ const String welcomeBackRes = "welcome_back";
 const String passwordRes = "password";
 const String forgotPasswordRes = "forgot_password";
 const String recoverPasswordRes = "recover_password";
-const String loginRes= "login";
-const String enterSeedPhraseRes ="enter_seed_phrase";
+const String loginRes = "login";
+const String enterSeedPhraseRes = "enter_seed_phrase";
 const String seedPhraseGivenAtCreationRes = "seed_phrase_given_at_creation";
 const String seedPhraseCopiedRes = "seed_phrase_copied";
 const String walletCopiedRes = "wallet_copied";
@@ -111,4 +111,3 @@ const String walletCopiedRes = "wallet_copied";
 const String messageSuccessfullySentRes = "message_successfully_sent";
 const String profileMenuTabRes = "profile_menu";
 const String maxUserSelectedRes = "max_user_selected";
-

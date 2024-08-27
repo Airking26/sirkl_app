@@ -1,9 +1,10 @@
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
-NotificationRegisterDto notificationRegisterDtoFromJson(String str) => NotificationRegisterDto.fromJson(json.decode(str));
+NotificationRegisterDto notificationRegisterDtoFromJson(String str) =>
+    NotificationRegisterDto.fromJson(json.decode(str));
 
-String notificationRegisterDtoToJson(NotificationRegisterDto data) => json.encode(data.toJson());
+String notificationRegisterDtoToJson(NotificationRegisterDto data) =>
+    json.encode(data.toJson());
 
 class NotificationRegisterDto {
   NotificationRegisterDto({
@@ -12,11 +13,12 @@ class NotificationRegisterDto {
 
   String message;
 
-  factory NotificationRegisterDto.fromJson(Map<String, dynamic> json) => NotificationRegisterDto(
-    message: json["message"],
-  );
+  factory NotificationRegisterDto.fromJson(Map<String, dynamic> json) =>
+      NotificationRegisterDto(
+        message: json["message"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "message": message,
-  };
+        "message": message,
+      };
 }

@@ -2,14 +2,15 @@
 //
 //     final callDto = callDtoFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 
-List<CallDto> callDtoFromJson(String str) => List<CallDto>.from(json.decode(str).map((x) => CallDto.fromJson(x)));
+List<CallDto> callDtoFromJson(String str) =>
+    List<CallDto>.from(json.decode(str).map((x) => CallDto.fromJson(x)));
 
-String callDtoToJson(List<CallDto> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String callDtoToJson(List<CallDto> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class CallDto {
   CallDto({
@@ -25,16 +26,16 @@ class CallDto {
   int status;
 
   factory CallDto.fromJson(Map<String, dynamic> json) => CallDto(
-    id: json["id"],
-    called: UserDTO.fromJson(json["called"]),
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    status: json["status"],
-  );
+        id: json["id"],
+        called: UserDTO.fromJson(json["called"]),
+        updatedAt: DateTime.parse(json["updatedAt"]),
+        status: json["status"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "called": called.toJson(),
-    "updatedAt": updatedAt.toIso8601String(),
-    "status": status,
-  };
+        "id": id,
+        "called": called.toJson(),
+        "updatedAt": updatedAt.toIso8601String(),
+        "status": status,
+      };
 }

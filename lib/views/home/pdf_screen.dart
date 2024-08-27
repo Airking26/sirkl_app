@@ -3,7 +3,7 @@ import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class PDFScreen extends StatefulWidget {
-  const PDFScreen({Key? key, required  this.pdfType}) : super(key: key);
+  const PDFScreen({Key? key, required this.pdfType}) : super(key: key);
   final PDFType pdfType;
 
   @override
@@ -11,34 +11,32 @@ class PDFScreen extends StatefulWidget {
 }
 
 class _PDFScreenState extends State<PDFScreen> {
-    String get toRead  {
-      switch(widget.pdfType) {
- 
-    
-        case PDFType.tc:
-               return "assets/pdf/tc.pdf";
-          // TODO: Handle this case.
+  String get toRead {
+    switch (widget.pdfType) {
+      case PDFType.tc:
+        return "assets/pdf/tc.pdf";
+      // TODO: Handle this case.
 
-        case PDFType.pp:
-        return "assets/pdf/pp.pdf";;
-       
-        case PDFType.all:
+      case PDFType.pp:
+        return "assets/pdf/pp.pdf";
+
+      case PDFType.all:
         return "assets/pdf/all.pdf";
-      
-      }
-      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // String toRead;
-    
+
     // if(widget.isTermsAndConditions == 0) {
     //   toRead = ;
     // } else if(widget.isTermsAndConditions == 1) {
-    //   toRead = 
+    //   toRead =
     // } else {
-    //   toRead = 
+    //   toRead =
     // }
-  
+
     return Scaffold(
       body: Column(
         children: [
@@ -66,8 +64,12 @@ class _PDFScreenState extends State<PDFScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF113751) : Colors.white,
-              MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color(0xFF1E2032) : Colors.white
+              MediaQuery.of(context).platformBrightness == Brightness.dark
+                  ? const Color(0xFF113751)
+                  : Colors.white,
+              MediaQuery.of(context).platformBrightness == Brightness.dark
+                  ? const Color(0xFF1E2032)
+                  : Colors.white
             ]),
       ),
       child: Padding(
@@ -81,15 +83,25 @@ class _PDFScreenState extends State<PDFScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 4.0),
                 child: InkWell(
-                  onTap: (){Navigator.pop(context);},
-                  child: Icon(Icons.keyboard_arrow_left_rounded,size: 42,color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black,
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(
+                    Icons.keyboard_arrow_left_rounded,
+                    size: 42,
+                    color: MediaQuery.of(context).platformBrightness ==
+                            Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
                   ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 0.0),
                 child: Image.asset(
-                  MediaQuery.of(context).platformBrightness == Brightness.dark ? "assets/images/logo_dark_theme.png" : "assets/images/logo_light_theme.png",
+                  MediaQuery.of(context).platformBrightness == Brightness.dark
+                      ? "assets/images/logo_dark_theme.png"
+                      : "assets/images/logo_light_theme.png",
                   height: 25,
                 ),
               ),
@@ -97,7 +109,8 @@ class _PDFScreenState extends State<PDFScreen> {
                   onPressed: () {},
                   icon: Image.asset(
                     "assets/images/edit.png",
-                    color:MediaQuery.of(context).platformBrightness == Brightness.dark
+                    color: MediaQuery.of(context).platformBrightness ==
+                            Brightness.dark
                         ? Colors.transparent
                         : Colors.transparent,
                   )),
@@ -107,5 +120,4 @@ class _PDFScreenState extends State<PDFScreen> {
       ),
     );
   }
-
 }

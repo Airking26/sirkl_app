@@ -1,8 +1,10 @@
 import 'dart:convert';
 
-SignInSeedPhraseDto signInSeedPhraseDtoFromJson(String str) => SignInSeedPhraseDto.fromJson(json.decode(str));
+SignInSeedPhraseDto signInSeedPhraseDtoFromJson(String str) =>
+    SignInSeedPhraseDto.fromJson(json.decode(str));
 
-String signInSeedPhraseDtoToJson(SignInSeedPhraseDto data) => json.encode(data.toJson());
+String signInSeedPhraseDtoToJson(SignInSeedPhraseDto data) =>
+    json.encode(data.toJson());
 
 class SignInSeedPhraseDto {
   SignInSeedPhraseDto({
@@ -13,13 +15,14 @@ class SignInSeedPhraseDto {
   String? wallet;
   String? seedPhrase;
 
-  factory SignInSeedPhraseDto.fromJson(Map<String, dynamic> json) => SignInSeedPhraseDto(
-    wallet: json["wallet"],
-    seedPhrase: json["seedPhrase"],
-  );
+  factory SignInSeedPhraseDto.fromJson(Map<String, dynamic> json) =>
+      SignInSeedPhraseDto(
+        wallet: json["wallet"],
+        seedPhrase: json["seedPhrase"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "wallet": wallet,
-    "seedPhrase": seedPhrase,
-  };
+        "wallet": wallet,
+        "seedPhrase": seedPhrase,
+      };
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-TokenMetadataDTO tokenMetadataFromJson(String str) => TokenMetadataDTO.fromJson(json.decode(str));
+TokenMetadataDTO tokenMetadataFromJson(String str) =>
+    TokenMetadataDTO.fromJson(json.decode(str));
 
 String tokenMetadataToJson(TokenMetadataDTO data) => json.encode(data.toJson());
 
@@ -15,17 +16,18 @@ class TokenMetadataDTO {
     this.result,
   });
 
-  factory TokenMetadataDTO.fromJson(Map<String, dynamic> json) => TokenMetadataDTO(
-    jsonrpc: json["jsonrpc"],
-    id: json["id"],
-    result: json["result"] == null ? null : Result.fromJson(json["result"]),
-  );
+  factory TokenMetadataDTO.fromJson(Map<String, dynamic> json) =>
+      TokenMetadataDTO(
+        jsonrpc: json["jsonrpc"],
+        id: json["id"],
+        result: json["result"] == null ? null : Result.fromJson(json["result"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "jsonrpc": jsonrpc,
-    "id": id,
-    "result": result?.toJson(),
-  };
+        "jsonrpc": jsonrpc,
+        "id": id,
+        "result": result?.toJson(),
+      };
 }
 
 class Result {
@@ -42,16 +44,16 @@ class Result {
   });
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
-    decimals: json["decimals"],
-    logo: json["logo"],
-    name: json["name"],
-    symbol: json["symbol"],
-  );
+        decimals: json["decimals"],
+        logo: json["logo"],
+        name: json["name"],
+        symbol: json["symbol"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "decimals": decimals,
-    "logo": logo,
-    "name": name,
-    "symbol": symbol,
-  };
+        "decimals": decimals,
+        "logo": logo,
+        "name": name,
+        "symbol": symbol,
+      };
 }

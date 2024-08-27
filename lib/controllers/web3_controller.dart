@@ -1,12 +1,12 @@
 // ignore_for_file: use_build_context_synchronously, depend_on_referenced_packages
 
 import 'dart:async';
+
 import 'package:convert/convert.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:ndialog/ndialog.dart';
 import 'package:sirkl/common/model/admin_dto.dart';
 import 'package:sirkl/common/model/eth_transaction_dto.dart';
 import 'package:sirkl/common/model/notification_added_admin_dto.dart';
@@ -23,18 +23,15 @@ import 'package:sirkl/controllers/profile_controller.dart';
 import 'package:sirkl/main.dart';
 import 'package:sirkl/networks/request.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
-import 'package:sirkl/views/profile/profile_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
-import 'package:web3dart/web3dart.dart';
-import 'package:http/http.dart' as htp;
 
 class Web3Controller extends GetxController {
-
   var loadingToJoinGroup = false.obs;
   var loadingToCreateGroup = false.obs;
-  var client = Web3Client("https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
+  var client = Web3Client(
+      "https://goerli.infura.io/v3/c193b412278e451ea6725b674de75ef2", Client());
 
   CommonController get _commonController => Get.find<CommonController>();
   GroupsController get _groupController => Get.find<GroupsController>();
@@ -104,7 +101,8 @@ class Web3Controller extends GetxController {
     _uri = res.uri!;
     var encode = Uri.encodeComponent('${res.uri}');
 
-    await launchUrlString("metamask://wc?uri=$encode", mode: LaunchMode.externalApplication);
+    await launchUrlString("metamask://wc?uri=$encode",
+        mode: LaunchMode.externalApplication);
     return connector;
   }
 
@@ -131,13 +129,13 @@ class Web3Controller extends GetxController {
 
     var encode = Uri.encodeComponent('${res.uri}');
 
-    await launchUrlString("metamask://wc?uri=$encode", mode: LaunchMode.externalApplication);
+    await launchUrlString("metamask://wc?uri=$encode",
+        mode: LaunchMode.externalApplication);
     return connector;
   }
 
-  Future<dynamic> queryMint(
-      BuildContext context, Web3App connector, SessionConnect? sessionConnect, String wallet) async {
-
+  Future<dynamic> queryMint(BuildContext context, Web3App connector,
+      SessionConnect? sessionConnect, String wallet) async {
     DeployedContract contract = await getContractMint();
     ContractFunction function = contract.function("mint");
     String contractAddress = "0x944a7A6833074122E9c2a7A5882392224C345807";
@@ -149,21 +147,23 @@ class Web3Controller extends GetxController {
         from: EthereumAddress.fromHex(wallet));
 
     EthereumTransaction ethereumTransaction = EthereumTransaction(
-      from: wallet,
-      to: contractAddress,
-      data: hex.encode(List<int>.from(transaction.data!)),
-      gas: "0x${(BigInt.parse("${100000}0")).toRadixString(16)}"
-    );
-
+        from: wallet,
+        to: contractAddress,
+        data: hex.encode(List<int>.from(transaction.data!)),
+        gas: "0x${(BigInt.parse("${100000}0")).toRadixString(16)}");
 
     /// IF USER IS NOT ON THE SKALE NETWORK
-    if (sessionConnect!.session.namespaces['eip155']!.accounts.last.split(":0x")[0] == "eip155:1564830818") {
+    if (sessionConnect!.session.namespaces['eip155']!.accounts.last
+            .split(":0x")[0] ==
+        "eip155:1564830818") {
       var canLaunch = await canLaunchUrl(_uri!);
       if (canLaunch) {
-        launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
+        launchUrlString("metamask://wc?uri=$_uri",
+            mode: LaunchMode.externalApplication);
       } else {
         Future.delayed(const Duration(seconds: 2), () {
-          launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
+          launchUrlString("metamask://wc?uri=$_uri",
+              mode: LaunchMode.externalApplication);
         });
       }
 
@@ -190,7 +190,8 @@ class Web3Controller extends GetxController {
       con.onSessionConnect.subscribe((args) async {
         var canLaunch = await canLaunchUrl(_uri!);
         if (canLaunch) {
-          launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
+          launchUrlString("metamask://wc?uri=$_uri",
+              mode: LaunchMode.externalApplication);
           await con
               .request(
             topic: args!.session.topic,
@@ -204,22 +205,36 @@ class Web3Controller extends GetxController {
             await updateUserAddToGroupAndRefresh(context);
             Get.back();
 
-            showCupertinoDialog(context: navigatorKey.currentContext!, barrierDismissible: false, builder: (context) {
-              return CupertinoAlertDialog(
-                title: const Text("SBT Minted Successfully"), content: const Padding(
-                padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
-                child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
-                  style: TextStyle(fontSize: 15),),
-              ), actions: [TextButton(onPressed: () async {
-                Get.back();
-              }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
-              ],);
-            });
-
+            showCupertinoDialog(
+                context: navigatorKey.currentContext!,
+                barrierDismissible: false,
+                builder: (context) {
+                  return CupertinoAlertDialog(
+                    title: const Text("SBT Minted Successfully"),
+                    content: const Padding(
+                      padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+                      child: Text(
+                        "Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                          onPressed: () async {
+                            Get.back();
+                          },
+                          child: Text(
+                            "OK",
+                            style: TextStyle(color: SColors.activeColor),
+                          ))
+                    ],
+                  );
+                });
           });
         } else {
           Future.delayed(const Duration(seconds: 2), () async {
-            launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
+            launchUrlString("metamask://wc?uri=$_uri",
+                mode: LaunchMode.externalApplication);
             await con
                 .request(
               topic: args!.session.topic,
@@ -233,28 +248,43 @@ class Web3Controller extends GetxController {
               await updateUserAddToGroupAndRefresh(context);
               Get.back();
 
-              showCupertinoDialog(context: navigatorKey.currentContext!, barrierDismissible: false, builder: (context) {
-                return CupertinoAlertDialog(
-                  title: const Text("SBT Minted Successfully"), content: const Padding(
-                  padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
-                  child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
-                    style: TextStyle(fontSize: 15),),
-                ), actions: [TextButton(onPressed: () async {
-                  Get.back();
-                }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
-                ],);
-              });
-
+              showCupertinoDialog(
+                  context: navigatorKey.currentContext!,
+                  barrierDismissible: false,
+                  builder: (context) {
+                    return CupertinoAlertDialog(
+                      title: const Text("SBT Minted Successfully"),
+                      content: const Padding(
+                        padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+                        child: Text(
+                          "Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                            onPressed: () async {
+                              Get.back();
+                            },
+                            child: Text(
+                              "OK",
+                              style: TextStyle(color: SColors.activeColor),
+                            ))
+                      ],
+                    );
+                  });
             });
           });
         }
       });
     }
+
     /// IF USER IS ON THE SKALE NETWORK
     else {
       var canLaunch = await canLaunchUrl(_uri!);
       if (canLaunch) {
-        launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
+        launchUrlString("metamask://wc?uri=$_uri",
+            mode: LaunchMode.externalApplication);
         await connector
             .request(
           topic: sessionConnect.session.topic,
@@ -273,21 +303,31 @@ class Web3Controller extends GetxController {
               barrierDismissible: false,
               builder: (context) {
                 return CupertinoAlertDialog(
-                  title: const Text("SBT Minted Successfully"), content: const Padding(
-                  padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
-                  child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
-                    style: TextStyle(fontSize: 15),),
-                ), actions: [
-                  TextButton(onPressed: () async {
-                    Get.back();
-                  }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
-                ],);
+                  title: const Text("SBT Minted Successfully"),
+                  content: const Padding(
+                    padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+                    child: Text(
+                      "Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () async {
+                          Get.back();
+                        },
+                        child: Text(
+                          "OK",
+                          style: TextStyle(color: SColors.activeColor),
+                        ))
+                  ],
+                );
               });
-
         });
       } else {
         Future.delayed(const Duration(seconds: 2), () async {
-          launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
+          launchUrlString("metamask://wc?uri=$_uri",
+              mode: LaunchMode.externalApplication);
           await connector
               .request(
             topic: sessionConnect.session.topic,
@@ -306,21 +346,29 @@ class Web3Controller extends GetxController {
                 barrierDismissible: false,
                 builder: (context) {
                   return CupertinoAlertDialog(
-                    title: const Text("SBT Minted Successfully"), content: const Padding(
-                    padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
-                    child: Text("Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
-                      style: TextStyle(fontSize: 15),),
-                  ), actions: [
-                    TextButton(onPressed: () async {
-                      Get.back();
-                    }, child: Text("OK", style: TextStyle(color: SColors.activeColor),))
-                  ],);
+                    title: const Text("SBT Minted Successfully"),
+                    content: const Padding(
+                      padding: EdgeInsets.only(top: 8.0, left: 24, right: 24),
+                      child: Text(
+                        "Your SBT will appear in your NFT Collection, and you also have joined the Sirkl Club Community",
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                          onPressed: () async {
+                            Get.back();
+                          },
+                          child: Text(
+                            "OK",
+                            style: TextStyle(color: SColors.activeColor),
+                          ))
+                    ],
+                  );
                 });
-
           });
         });
       }
-
     }
   }
 
@@ -338,8 +386,7 @@ class Web3Controller extends GetxController {
       List<dynamic> arg,
       bool hasFee,
       double? fee,
-      String? wallet)
-  async {
+      String? wallet) async {
     DeployedContract contract = await getContract();
     ContractFunction function = contract.function(functionName);
 
@@ -357,7 +404,8 @@ class Web3Controller extends GetxController {
             ? EtherAmount.inWei(BigInt.from(fee! * 1e18))
             : EtherAmount.zero());
 
-    launchUrlString("metamask://wc?uri=$_uri", mode: LaunchMode.externalApplication);
+    launchUrlString("metamask://wc?uri=$_uri",
+        mode: LaunchMode.externalApplication);
 
     EthereumTransaction ethereumTransaction = EthereumTransaction(
         from: wallet,
@@ -378,8 +426,8 @@ class Web3Controller extends GetxController {
     return transactionId;
   }
 
-  Future<String?> mint(
-      BuildContext context, Web3App connector, SessionConnect? sessionConnect, String wallet) async {
+  Future<String?> mint(BuildContext context, Web3App connector,
+      SessionConnect? sessionConnect, String wallet) async {
     return await queryMint(context, connector, sessionConnect, wallet);
   }
 
@@ -447,7 +495,8 @@ class Web3Controller extends GetxController {
         false, null, wallet);
   }
 
-  mintMethod(BuildContext context, Web3App connector, SessionConnect? args, String wallet) async {
+  mintMethod(BuildContext context, Web3App connector, SessionConnect? args,
+      String wallet) async {
     await mint(context, connector, args, wallet);
   }
 

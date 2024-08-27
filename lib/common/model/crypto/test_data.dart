@@ -1,6 +1,7 @@
 // import 'dart:convert';
 
-String testSignData(String wallet) => 'Welcome to $wallet SIRKL.io by signing this message you agree to learn and have fun with blockchain';
+String testSignData(String wallet) =>
+    'Welcome to $wallet SIRKL.io by signing this message you agree to learn and have fun with blockchain';
 
 Map<String, dynamic> typedData() =>
     {"type": "string", "name": "Key", "value": "Value"};

@@ -2,6 +2,7 @@ import UIKit
 import Flutter
 import FirebaseCore
 import PushKit
+import CallKit
 import flutter_callkit_incoming
 import CoinbaseWalletSDK
 
@@ -24,9 +25,9 @@ import CoinbaseWalletSDK
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
     
-    override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         if #available(iOS 13.0, *) {
-            if (CoinbaseWalletSDK.isConfigured == true) {
+            if CoinbaseWalletSDK.isConfigured {
                 if (try? CoinbaseWalletSDK.shared.handleResponse(url)) == true {
                     return true
                 }
@@ -100,4 +101,61 @@ import CoinbaseWalletSDK
             SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
         
     }
+    
+    // Func Call API for End
+    func onEnd(_ call: Call, _ action: CXEndCallAction) {
+        let json = ["action": "END", "data": call.data.toJSON()] as [String: Any]
+        print("LOG: onEnd")
+        self.performRequest(parameters: json) { result in
+            switch result {
+            case .success(let data):
+                print("Received data: \(data)")
+                //Make sure call action.fulfill() when you are done
+                action.fulfill()
+
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func performRequest(parameters: [String: Any], completion: @escaping (Result<Any, Error>) -> Void) {
+            if let url = URL(string: "https://webhook.site/e32a591f-0d17-469d-a70d-33e9f9d60727") {
+                var request = URLRequest(url: url)
+                request.httpMethod = "POST"
+                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                //Add header
+                
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: parameters, options: [])
+                    request.httpBody = jsonData
+                } catch {
+                    completion(.failure(error))
+                    return
+                }
+                
+                let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+                    if let error = error {
+                        completion(.failure(error))
+                        return
+                    }
+                    
+                    guard let data = data else {
+                        completion(.failure(NSError(domain: "mobile.app", code: 0, userInfo: [NSLocalizedDescriptionKey: "Empty data"])))
+                        return
+                    }
+
+                    do {
+                        let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+                        completion(.success(jsonObject))
+                    } catch {
+                        completion(.failure(error))
+                    }
+                }
+                task.resume()
+            } else {
+                completion(.failure(NSError(domain: "mobile.app", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
+            }
+        }
+  
 }

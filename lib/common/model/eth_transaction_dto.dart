@@ -4,9 +4,11 @@
 
 import 'dart:convert';
 
-EthereumTransaction ethereumTransactionFromJson(String str) => EthereumTransaction.fromJson(json.decode(str));
+EthereumTransaction ethereumTransactionFromJson(String str) =>
+    EthereumTransaction.fromJson(json.decode(str));
 
-String ethereumTransactionToJson(EthereumTransaction data) => json.encode(data.toJson());
+String ethereumTransactionToJson(EthereumTransaction data) =>
+    json.encode(data.toJson());
 
 class EthereumTransaction {
   String? from;
@@ -33,29 +35,30 @@ class EthereumTransaction {
     this.data,
   });
 
-  factory EthereumTransaction.fromJson(Map<String, dynamic> json) => EthereumTransaction(
-    from: json["from"],
-    to: json["to"],
-    value: json["value"],
-    nonce: json["nonce"],
-    gasPrice: json["gasPrice"],
-    maxFeePerGas: json["maxFeePerGas"],
-    maxPriorityFeePerGas: json["maxPriorityFeePerGas"],
-    gas: json["gas"],
-    gasLimit: json["gasLimit"],
-    data: json["data"],
-  );
+  factory EthereumTransaction.fromJson(Map<String, dynamic> json) =>
+      EthereumTransaction(
+        from: json["from"],
+        to: json["to"],
+        value: json["value"],
+        nonce: json["nonce"],
+        gasPrice: json["gasPrice"],
+        maxFeePerGas: json["maxFeePerGas"],
+        maxPriorityFeePerGas: json["maxPriorityFeePerGas"],
+        gas: json["gas"],
+        gasLimit: json["gasLimit"],
+        data: json["data"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "from": from,
-    "to": to,
-    "value": value,
-    "nonce": nonce,
-    "gasPrice": gasPrice,
-    "maxFeePerGas": maxFeePerGas,
-    "maxPriorityFeePerGas": maxPriorityFeePerGas,
-    "gas": gas,
-    "gasLimit": gasLimit,
-    "data": data,
-  };
+        "from": from,
+        "to": to,
+        "value": value,
+        "nonce": nonce,
+        "gasPrice": gasPrice,
+        "maxFeePerGas": maxFeePerGas,
+        "maxPriorityFeePerGas": maxPriorityFeePerGas,
+        "gas": gas,
+        "gasLimit": gasLimit,
+        "data": data,
+      };
 }

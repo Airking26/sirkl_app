@@ -1,23 +1,16 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use, prefer_typing_uninitialized_variables
 
 import 'dart:io';
-import 'package:appsflyer_sdk/appsflyer_sdk.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as htp;
+
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:sirkl/config/s_config.dart';
-import 'package:sirkl/networks/urls.dart';
-import 'package:sirkl/repo/chats_repo.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
-import 'package:sirkl/controllers/common_controller.dart';
-import 'package:sirkl/common/model/contract_address_dto.dart';
-import 'package:sirkl/common/model/nft_alchemy_dto.dart';
+import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/model/nft_dto.dart';
 import 'package:sirkl/common/model/nickname_creation_dto.dart';
 import 'package:sirkl/common/model/notification_register_dto.dart';
@@ -27,19 +20,21 @@ import 'package:sirkl/common/model/story_modification_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/model/wallet_connect_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/repo/home_repo.dart';
+import 'package:sirkl/config/s_config.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
+import 'package:sirkl/repo/chats_repo.dart';
+import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/repo/profile_repo.dart';
-import 'package:sirkl/common/constants.dart' as con;
-import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 
 import '../common/model/update_fcm_dto.dart';
 import '../common/save_pref_keys.dart';
 import '../repo/auth_repo.dart';
 
 class HomeController extends GetxController {
-
-  NavigationController get _navigationController => Get.find<NavigationController>();
+  NavigationController get _navigationController =>
+      Get.find<NavigationController>();
   CommonController get _commonController => Get.find<CommonController>();
   ChatsController get _chatController => Get.find<ChatsController>();
 
@@ -76,7 +71,8 @@ class HomeController extends GetxController {
   var isStoryLoading = false.obs;
 
   var isCheckingBetaCode = false.obs;
-  Future<bool> checkBetaCode(String code) async => await AuthRepo.checkBetaCode(code);
+  Future<bool> checkBetaCode(String code) async =>
+      await AuthRepo.checkBetaCode(code);
 
   retrieveAccessToken() {
     var accessTok = box.read(SharedPref.ACCESS_TOKEN);
@@ -116,8 +112,8 @@ class HomeController extends GetxController {
                 ? "android"
                 : "iOS"));
 
-    AppsflyerSdk appsflyerSdk = Get.find<AppsflyerSdk>();
-    bool? result = await appsflyerSdk.logEvent("af_login", {});
+    //AppsflyerSdk appsflyerSdk = Get.find<AppsflyerSdk>();
+    //bool? result = await appsflyerSdk.logEvent("af_login", {});
     box.write(SharedPref.USER, signSuccess.user!.toJson());
     userMe.value = signSuccess.user!;
 
@@ -171,7 +167,8 @@ class HomeController extends GetxController {
   getAllNftConfig() async => await HomeRepo.getAllNFTConfig();
   updateAllNftConfig() async => await HomeRepo.updateAllNFTConfig();
 
-  Future<List<NftDto>> getNFT(String id, bool isFav, int offset, UserDTO? user) async {
+  Future<List<NftDto>> getNFT(
+      String id, bool isFav, int offset, UserDTO? user) async {
     if (offset == 0 && id == this.id.value) isInFav.clear();
     List<NftDto> nfts = await HomeRepo.retrieveNFTs(
         id: id, isFav: isFav, offset: offset.toString());
@@ -196,7 +193,6 @@ class HomeController extends GetxController {
           .where((element) => element.isFav!)
           .map((e) => e.contractAddress!)
           .toList());
-
     } else {
       if (user != null && (user.hasSBT ?? false) && offset == 0) {
         nfts.add(NftDto(
@@ -255,7 +251,6 @@ class HomeController extends GetxController {
     if (accessToken.value.isNotEmpty) {
       // Vérifie si le client n'est pas déjà connecté
       if (client.wsConnectionStatus != ConnectionStatus.connected) {
-
         // Si le jeton de Stream Chat n'est pas défini
         if (streamChatToken.value.isNullOrBlank!) {
           await _handleNewUser(client);
@@ -296,7 +291,8 @@ class HomeController extends GetxController {
         token,
       );
 
-      if (DateTime.now().difference(userMe.value.createdAt!) < const Duration(minutes: 1)) {
+      if (DateTime.now().difference(userMe.value.createdAt!) <
+          const Duration(minutes: 1)) {
         await _commonController.addUserToSirkl(
             SConfig.SIRKL_ID, client, userMe.value.id!);
         await getWelcomeMessage();
@@ -304,11 +300,9 @@ class HomeController extends GetxController {
 
       await box.write(SharedPref.STREAM_CHAT_TOKEN, token);
       streamChatToken.value = token;
-    } catch (e){
+    } catch (e) {
       debugPrint("ERROR_CONNECTION");
     }
-
-
   }
 
   Future<void> _handleExistingUser(StreamChatClient client) async {
@@ -331,7 +325,7 @@ class HomeController extends GetxController {
   Future<List<List<StoryDto>>> retrieveStories(int offset) async {
     if (offset == 0) {
       stories.value?.clear();
-      pageKey.value =0;
+      pageKey.value = 0;
     }
 
     List<List<StoryDto>> retrivedStories =
@@ -420,8 +414,6 @@ class HomeController extends GetxController {
       }
     });
   }
-
 }
 
 isNumeric(string) => num.tryParse(string) != null;
-

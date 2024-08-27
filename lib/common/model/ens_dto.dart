@@ -12,12 +12,12 @@ class EnsDto {
   final Data data;
 
   factory EnsDto.fromJson(Map<String, dynamic> json) => EnsDto(
-    data: Data.fromJson(json["data"]),
-  );
+        data: Data.fromJson(json["data"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "data": data.toJson(),
-  };
+        "data": data.toJson(),
+      };
 }
 
 class Data {
@@ -28,12 +28,13 @@ class Data {
   final List<Domain> domains;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-    domains: List<Domain>.from(json["domains"].map((x) => Domain.fromJson(x))),
-  );
+        domains:
+            List<Domain>.from(json["domains"].map((x) => Domain.fromJson(x))),
+      );
 
   Map<String, dynamic> toJson() => {
-    "domains": List<dynamic>.from(domains.map((x) => x.toJson())),
-  };
+        "domains": List<dynamic>.from(domains.map((x) => x.toJson())),
+      };
 }
 
 class Domain {
@@ -46,14 +47,14 @@ class Domain {
   final Owner owner;
 
   factory Domain.fromJson(Map<String, dynamic> json) => Domain(
-    name: json["name"],
-    owner: Owner.fromJson(json["owner"]),
-  );
+        name: json["name"],
+        owner: Owner.fromJson(json["owner"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "name": name,
-    "owner": owner.toJson(),
-  };
+        "name": name,
+        "owner": owner.toJson(),
+      };
 }
 
 class Owner {
@@ -64,10 +65,10 @@ class Owner {
   final String id;
 
   factory Owner.fromJson(Map<String, dynamic> json) => Owner(
-    id: json["id"],
-  );
+        id: json["id"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-  };
+        "id": id,
+      };
 }
