@@ -9,7 +9,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
@@ -29,7 +29,7 @@ class AddContactScreen extends StatefulWidget {
 class _AddContactScreenState extends State<AddContactScreen> {
   ProfileController get _profileController => Get.find<ProfileController>();
   ChatsController get _chatController => Get.find<ChatsController>();
-  CallsController get _callController => Get.find<CallsController>();
+  CallController get _callController => Get.find<CallController>();
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   GroupsController get _groupController => Get.find<GroupsController>();
@@ -102,7 +102,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                   borderRadius: BorderRadius.circular(5.0),
                                 ))),
                         suggestionsCallback: (pattern) =>
-                            _callController.retrieveUsers(pattern, 0),
+                            _callController.searchUser(pattern, 0),
                         itemBuilder: (context, UserDTO suggestion) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -345,7 +345,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       nicknameController.clear();
                       _chatController.contactAddIsEmpty.value = true;
                       _homeController.userAdded.value = UserDTO();
-                      _groupController.refreshGroups.value = true;
+                      _groupController.refreshCommunity.value = true;
                       Navigator.pop(context);
                     } else {
                       _commonController.contactAddLoading.value = false;

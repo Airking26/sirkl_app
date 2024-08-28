@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/config/s_colors.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 
@@ -25,7 +25,7 @@ class NavigationScreen extends StatefulWidget {
 class _NavigationScreenState extends State<NavigationScreen> {
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
-  CallsController get _callController => Get.find<CallsController>();
+  CallController get _callController => Get.find<CallController>();
   CommonController get _commonController => Get.find<CommonController>();
   HomeController get _homeController => Get.find<HomeController>();
   ProfileController get _profileController => Get.find<ProfileController>();

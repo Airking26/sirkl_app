@@ -44,18 +44,12 @@ class ChatsController extends GetxController {
   var groupVisibilityCollapsed = true.obs;
   var groupPayingCollapsed = true.obs;
 
-  Future<String> createInbox(InboxCreationDto inboxCreationDto) async {
-    String inboxResponse = await ChatRepo.createInbox(inboxCreationDto);
+  Future<String> createInbox(InboxCreationDto inboxCreationDto) async =>
+      await ChatRepo.createInbox(inboxCreationDto);
 
-    return inboxResponse;
-  }
+  resetChannel() => channel = (null as Channel?).obs;
 
-  resetChannel() {
-    channel = (null as Channel?).obs;
-    ;
-  }
-
-  checkOrCreateChannel(
+  Future<void> checkOrCreateChannel(
       String himId, StreamChatClient client, String myId) async {
     channel.value = client.channel(
       'try',
@@ -71,7 +65,8 @@ class ChatsController extends GetxController {
     await channel.value!.watch();
   }
 
-  checkOrCreateChannelWithId(StreamChatClient client, String channelId) async {
+  Future<void> checkOrCreateChannelWithId(
+      StreamChatClient client, String channelId) async {
     channel.value =
         client.channel('try', id: channelId, extraData: {"isConv": true});
     await channel.value!.watch();
@@ -95,7 +90,6 @@ class ChatsController extends GetxController {
     try {
       await ChatRepo.requestToJoinGroup(requestToJoinDTO);
       return true;
-      // ignore: empty_catches
     } catch (err) {}
     return false;
   }
@@ -104,12 +98,11 @@ class ChatsController extends GetxController {
     try {
       await ChatRepo.acceptDeclineRequest(requestToJoinDto);
       return true;
-      // ignore: empty_catches
     } catch (err) {}
     return false;
   }
 
-  retrieveRequestsWaiting(String channelId) async {
+  Future<void> retrieveRequestsWaiting(String channelId) async {
     requestsWaiting.value = await ChatRepo.getRequestsWaiting(channelId);
   }
 }

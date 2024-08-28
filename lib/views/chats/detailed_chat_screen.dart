@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/view/circular_indicator/my_circular_indicator.dart';
-import 'package:sirkl/common/view/dialog/custom_dial.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_colors.dart';
@@ -28,7 +27,6 @@ class DetailedChatScreen extends StatefulWidget {
 }
 
 class _DetailedChatScreenState extends State<DetailedChatScreen> {
-  YYDialog dialogMenu = YYDialog();
   CommonController get _commonController => Get.find<CommonController>();
   ChatsController get _chatController => Get.find<ChatsController>();
   HomeController get _homeController => Get.find<HomeController>();

@@ -19,7 +19,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/model/story_dto.dart';
 import 'package:sirkl/common/model/web_wallet_connect_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
@@ -49,7 +49,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
-  CallsController get _callController => Get.find<CallsController>();
+  CallController get _callController => Get.find<CallController>();
   WalletConnectModalController get _walletConnectModalController =>
       Get.find<WalletConnectModalController>();
   NavigationController get _navigationController =>
@@ -628,7 +628,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () async {
                           _callController.userCalled.value =
                               _commonController.users[index];
-                          await _callController.inviteCall(
+                          await _callController.inviteToJoinCall(
                               _commonController.users[index],
                               DateTime.now().toString(),
                               _homeController.id.value);

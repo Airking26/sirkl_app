@@ -12,7 +12,7 @@ import 'package:sirkl/common/view/material_floating_search_bar/floating_search_b
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_actions.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_transition.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -32,7 +32,7 @@ class CallsScreen extends StatefulWidget {
 }
 
 class _CallsScreenState extends State<CallsScreen> {
-  CallsController get _callController => Get.find<CallsController>();
+  CallController get _callController => Get.find<CallController>();
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   NavigationController get _navigationController =>
@@ -43,7 +43,7 @@ class _CallsScreenState extends State<CallsScreen> {
   Future<void> fetchPageCallDTO() async {
     try {
       List<CallDto> newItems = await _callController
-          .retrieveCalls(_callController.pageKey.value.toString());
+          .retrieveCallHistoric(_callController.pageKey.value.toString());
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
         _callController.pagingController.value.appendLastPage(newItems);
@@ -59,7 +59,8 @@ class _CallsScreenState extends State<CallsScreen> {
 
   Future<void> fetchPageSearchCallDTO(String query) async {
     try {
-      List<CallDto> newItems = await _callController.searchInCalls(query);
+      List<CallDto> newItems =
+          await _callController.searchInCallHistoric(query);
       pagingSearchController.appendLastPage(newItems);
     } catch (error) {
       pagingSearchController.error = error;
@@ -372,7 +373,7 @@ class _CallsScreenState extends State<CallsScreen> {
                   children: [
                     InkWell(
                         onTap: () async {
-                          await _callController.inviteCall(
+                          await _callController.inviteToJoinCall(
                               callDto.called,
                               DateTime.now().toString(),
                               _homeController.id.value);

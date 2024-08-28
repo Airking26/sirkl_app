@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
 
 import '../../../config/s_colors.dart';
 
@@ -27,7 +26,11 @@ class YYDialog {
   bool useRootNavigator = true;
 
   Decoration? decoration; //弹窗内的装饰，与backgroundColor和borderRadius互斥
-  Color backgroundColor = SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark ? Color(0xFF1E3244).withOpacity(0.7) : Colors.white; //弹窗内的背景色
+  Color backgroundColor =
+      SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+              Brightness.dark
+          ? Color(0xFF1E3244).withOpacity(0.7)
+          : Colors.white; //弹窗内的背景色
   double borderRadius = 0.0; //弹窗圆角
 
   Function()? showCallBack; //展示的回调
@@ -57,16 +60,16 @@ class YYDialog {
 
   YYDialog text(
       {padding,
-        text,
-        color,
-        fontSize,
-        alignment,
-        textAlign,
-        maxLines,
-        textDirection,
-        overflow,
-        fontWeight,
-        fontFamily}) {
+      text,
+      color,
+      fontSize,
+      alignment,
+      textAlign,
+      maxLines,
+      textDirection,
+      overflow,
+      fontWeight,
+      fontFamily}) {
     return this.widget(
       Padding(
         padding: padding ?? EdgeInsets.all(0.0),
@@ -130,8 +133,7 @@ class YYDialog {
                     fontSize: fontSize1 ?? 18.0,
                     fontWeight: fontWeight1,
                     fontFamily: fontFamily1,
-                  )
-              ),
+                  )),
               child: Text(
                 text1 ?? "",
               ),
@@ -661,7 +663,7 @@ class YYRadioListTileState extends State<YYRadioListTile> {
               style: TextStyle(
                   fontSize: widget.items?[index].fontSize ?? 14,
                   fontWeight:
-                  widget.items?[index].fontWeight ?? FontWeight.normal,
+                      widget.items?[index].fontWeight ?? FontWeight.normal,
                   color: widget.items?[index].color ?? Colors.black),
             ),
             value: index,

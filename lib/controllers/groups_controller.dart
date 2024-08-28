@@ -8,6 +8,7 @@ import 'package:sirkl/common/model/group_creation_dto.dart';
 import 'package:sirkl/common/model/group_dto.dart';
 import 'package:sirkl/common/model/token_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/repo/group_repo.dart';
 import 'package:sirkl/repo/home_repo.dart';
@@ -16,17 +17,31 @@ class GroupsController extends GetxController {
   final box = GetStorage();
 
   ChatsController get _chatController => Get.find<ChatsController>();
-  var nftAndTokenAvailableToCreateGroup = <CollectionDbDto>[].obs;
+  var assetAvailableToCreateCommunity = <CollectionDbDto>[].obs;
 
-  var query = "".obs;
-  var index = 0.obs;
-  var addAGroup = false.obs;
-  var searchIsActive = false.obs;
-  var isLoadingAvailableNFT = true.obs;
-  var refreshGroups = false.obs;
+  var queryCommunity = "".obs;
+  var indexCommunity = 0.obs;
+  var isAddingCommunity = false.obs;
+  var isSearchActiveInCommunity = false.obs;
+  var isLoadingAvailableAssets = true.obs;
+  var refreshCommunity = false.obs;
   var retryProgress = false.obs;
 
-  createChannel(
+  /// Function to create a community
+  createCommunity(StreamChatClient streamChatClient,
+      GroupCreationDto groupCreationDto) async {
+    await GroupRepo.createGroup(groupCreationDto);
+    await _createChannelCommunity(
+        streamChatClient,
+        GroupDto(
+            name: groupCreationDto.name,
+            image: groupCreationDto.picture,
+            contractAddress: groupCreationDto.contractAddress),
+        groupCreationDto.picture);
+  }
+
+  /// Private function to create a community channel
+  Future<void> _createChannelCommunity(
       StreamChatClient streamChatClient, GroupDto groupDto, String pic) async {
     _chatController.channel.value = streamChatClient
         .channel("try", id: groupDto.contractAddress.toLowerCase(), extraData: {
@@ -40,8 +55,47 @@ class GroupsController extends GetxController {
         .addMembers([streamChatClient.state.currentUser!.id]);
   }
 
-  getNFTsToCreateGroup(
-      String wallet, List<dynamic> nfts, List<GroupDto> groups) async {
+  /// Function to retrieve assets owned by the user for which no community
+  ///exist yet in order to choose from to create one
+  retrieveAssetsAvailableToCreateCommunity(String wallet) async {
+    List<GroupDto> groups = await GroupRepo.retrieveGroups();
+    var tokens = await _retrieveTokenToCreateCommunity(wallet, groups);
+    assetAvailableToCreateCommunity.value =
+        tokens.toList().cast<CollectionDbDto>();
+    isLoadingAvailableAssets.value = false;
+  }
+
+  /// Private function to retrieve token owned by the user for which no community
+  ///exist yet in order to choose from to create one
+  _retrieveTokenToCreateCommunity(String wallet, List<GroupDto> groups) async {
+    var tokens = [];
+    var tokenContractAddress =
+        await HomeRepo.getTokenContractAddressesWithAlchemy(wallet: wallet);
+
+    for (TokenBalance element in tokenContractAddress.result!.tokenBalances!) {
+      if (element.tokenBalance != SConfig.emptyHexBalance &&
+          !groups
+              .map((e) => e.contractAddress.toLowerCase())
+              .contains(element.contractAddress?.toLowerCase())) {
+        var tokenDetails = await HomeRepo.getTokenMetadataWithAlchemy(
+            token: element.contractAddress!);
+        //if(tokenDetails.result != null && tokenDetails.result!.logo != null) {
+        tokens.add(CollectionDbDto(
+            collectionName: tokenDetails.result!.name!,
+            contractAddress: element.contractAddress!,
+            collectionImage: tokenDetails.result?.logo ?? SConfig.wIcon,
+            collectionImages: [tokenDetails.result?.logo ?? SConfig.wIcon]));
+        //}
+      }
+    }
+
+    return await _retrieveNFTToCreateCommunity(wallet, tokens, groups);
+  }
+
+  /// Private function to retrieve nft owned by the user for which no community
+  ///exist yet in order to choose from to create one
+  _retrieveNFTToCreateCommunity(
+      String wallet, List<dynamic> assets, List<GroupDto> groups) async {
     var cursor = "";
     var cursorInitialized = true;
     while (cursorInitialized || cursor.isNotEmpty) {
@@ -64,7 +118,7 @@ class GroupsController extends GetxController {
           element.opensea!.collectionName == null ||
           element.opensea!.collectionName!.isEmpty);
       for (var element in contractAddress.contracts) {
-        nfts.add(CollectionDbDto(
+        assets.add(CollectionDbDto(
             collectionName: element.opensea!.collectionName!,
             contractAddress: element.address!,
             collectionImage: element.opensea!.imageUrl!,
@@ -75,54 +129,26 @@ class GroupsController extends GetxController {
       cursorInitialized = false;
     }
 
-    return nfts;
+    return assets;
   }
 
-  getTokenToCreateGroup(String wallet, List<GroupDto> groups) async {
-    var tokens = [];
-    var tokenContractAddress =
-        await HomeRepo.getTokenContractAddressesWithAlchemy(wallet: wallet);
-
-    for (TokenBalance element in tokenContractAddress.result!.tokenBalances!) {
-      if (element.tokenBalance !=
-              "0x0000000000000000000000000000000000000000000000000000000000000000" &&
-          !groups
-              .map((e) => e.contractAddress.toLowerCase())
-              .contains(element.contractAddress?.toLowerCase())) {
-        var tokenDetails = await HomeRepo.getTokenMetadataWithAlchemy(
-            token: element.contractAddress!);
-        //if(tokenDetails.result != null && tokenDetails.result!.logo != null) {
-        tokens.add(CollectionDbDto(
-            collectionName: tokenDetails.result!.name!,
-            contractAddress: element.contractAddress!,
-            collectionImage: tokenDetails.result?.logo ??
-                "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png",
-            collectionImages: [
-              tokenDetails.result?.logo ??
-                  "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png"
-            ]));
-        //}
-      }
-    }
-
-    return await getNFTsToCreateGroup(wallet, tokens, groups);
-  }
-
-  retrieveNFTAvailableForCreation(String wallet) async {
-    List<GroupDto> groups = await GroupRepo.retrieveGroups();
-    var tokens = await getTokenToCreateGroup(wallet, groups);
-    nftAndTokenAvailableToCreateGroup.value =
-        tokens.toList().cast<CollectionDbDto>();
-    isLoadingAvailableNFT.value = false;
-  }
-
-  Future<String?> retrieveCreatorGroup(String contract) async {
+  /// Function to retrieve the community owner in order to make him admin role
+  Future<String?> retrieveCommunityOwner(String contract) async {
     ContractCreatorDto? contractCreator =
         await GroupRepo.retrieveCreatorGroup(contract);
     return contractCreator?.result?.first?.contractCreator;
   }
 
-  retrieveGroupsToCreate(StreamChatClient streamChatClient) async {
+  /// Function to make a user admin or the opposite
+  Future<void> changeAdminRole(AdminDto adminDTO) async =>
+      await GroupRepo.changeAdminRole(adminDTO);
+
+  // TODO : Deprecated since mint will be made from server
+  Future<void> addUserToSirklClub(String id) async =>
+      await GroupRepo.addUserToSirklClub(id);
+}
+
+/*retrieveGroupsToCreate(StreamChatClient streamChatClient) async {
     //List<GroupDto> groups = await GroupRepo.retrieveGroups();
     //groups = groups.sublist(2172);
 
@@ -147,29 +173,4 @@ class GroupsController extends GetxController {
 
     //}
     //}
-  }
-
-  createGroup(StreamChatClient streamChatClient,
-      GroupCreationDto groupCreationDto) async {
-    await GroupRepo.createGroup(groupCreationDto);
-    await createChannel(
-        streamChatClient,
-        GroupDto(
-            name: groupCreationDto.name,
-            image: groupCreationDto.picture,
-            contractAddress: groupCreationDto.contractAddress),
-        groupCreationDto.picture);
-  }
-
-  Future<void> changeAdminRole(AdminDto adminDTO) async =>
-      await GroupRepo.changeAdminRole(adminDTO);
-  Future<void> addUserToSirklClub(String id) async =>
-      await GroupRepo.addUserToSirklClub(id);
-}
-
-extension Iterables<E> on Iterable<E> {
-  Map<K, List<E>> groupBy<K>(K Function(E) keyFunction) => fold(
-      <K, List<E>>{},
-      (Map<K, List<E>> map, E element) =>
-          map..putIfAbsent(keyFunction(element), () => <E>[]).add(element));
-}
+  }*/

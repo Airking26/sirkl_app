@@ -17,14 +17,13 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/story_insta/drishya_picker.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
+import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/views/profile/settings_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
-import '../../common/view/dialog/custom_dial.dart';
-import '../../config/s_colors.dart';
-import '../../controllers/home_controller.dart';
 import '../../controllers/profile_controller.dart';
 import 'my_story_viewer_screen.dart';
 import 'notifications_screen.dart';
@@ -48,7 +47,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   FocusNode focusNode = FocusNode();
   String hintText = '';
 
-  YYDialog dialogMenu = YYDialog();
   static var pageKey = 0;
 
   @override
@@ -565,50 +563,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 10,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 24.0, right: 24),
-                  child: _homeController.iHaveNft.value
-                      ? Row(
-                          children: [
-                            Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  con.myNFTCollectionRes.tr,
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontFamily: "Gilroy",
-                                      fontWeight: FontWeight.w600,
-                                      color: MediaQuery.of(context)
-                                                  .platformBrightness ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : Colors.black),
-                                )),
-                            const Spacer(),
-                            IconButton(
-                              icon: Icon(
-                                _homeController.isFavNftSelected.value
-                                    ? Icons.favorite_rounded
-                                    : Icons.favorite_border_rounded,
-                                color: _homeController.isFavNftSelected.value
-                                    ? SColors.activeColor
-                                    : MediaQuery.of(context)
-                                                .platformBrightness ==
-                                            Brightness.dark
-                                        ? Colors.white.withOpacity(0.5)
-                                        : Colors.black.withOpacity(0.5),
-                              ),
-                              onPressed: () {
-                                pageKey = 0;
-                                _homeController.isFavNftSelected.value =
-                                    !_homeController.isFavNftSelected.value;
-                                _profileController.pagingController.refresh();
-                              },
-                            )
-                          ],
+                    padding: const EdgeInsets.only(left: 24.0, right: 24),
+                    child: Row(
+                      children: [
+                        Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              con.myNFTCollectionRes.tr,
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontFamily: "Gilroy",
+                                  fontWeight: FontWeight.w600,
+                                  color: MediaQuery.of(context)
+                                              .platformBrightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black),
+                            )),
+                        const Spacer(),
+                        IconButton(
+                          icon: Icon(
+                            _homeController.isFavNftSelected.value
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
+                            color: _homeController.isFavNftSelected.value
+                                ? SColors.activeColor
+                                : MediaQuery.of(context).platformBrightness ==
+                                        Brightness.dark
+                                    ? Colors.white.withOpacity(0.5)
+                                    : Colors.black.withOpacity(0.5),
+                          ),
+                          onPressed: () {
+                            pageKey = 0;
+                            _homeController.isFavNftSelected.value =
+                                !_homeController.isFavNftSelected.value;
+                            _profileController.pagingController.refresh();
+                          },
                         )
-                      : Container(),
-                ),
+                      ],
+                    )),
                 MediaQuery.removePadding(
                   context: context,
                   removeTop: true,
@@ -774,7 +768,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                                 "${homeController.id.value}_favorite"
                               ]);
                         }
-                        _groupController.refreshGroups.value = true;
+                        _groupController.refreshCommunity.value = true;
                       }
                     },
                   )),

@@ -14,14 +14,13 @@ import 'package:sirkl/common/view/material_floating_search_bar/floating_search_b
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_actions.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/config/s_colors.dart';
+import 'package:sirkl/controllers/call_controller.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
-import '../../common/view/dialog/custom_dial.dart';
-import '../../config/s_colors.dart';
-import '../../controllers/chats_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/profile_controller.dart';
 import 'add_contact_screen.dart';
@@ -40,10 +39,9 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   ProfileController get _profileController => Get.find<ProfileController>();
   CommonController get _commonController => Get.find<CommonController>();
-  CallsController get _callController => Get.find<CallsController>();
+  CallController get _callController => Get.find<CallController>();
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
-  YYDialog dialogMenu = YYDialog();
   final PagingController<int, UserDTO> pagingController =
       PagingController(firstPageKey: 0);
   final StreamMessageInputController _messageInputController =
@@ -67,7 +65,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     try {
       List<UserDTO> newItems;
       if (pageKey == 0) newItems = [];
-      newItems = await _callController.retrieveUsers(
+      newItems = await _callController.searchUser(
           _commonController.query.value, pageKey);
       final isLastPage = newItems.length < 12;
       if (isLastPage) {

@@ -7,7 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/controllers/profile_controller.dart';
@@ -31,7 +31,7 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
       Get.find<NavigationController>();
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get _homeController => Get.find<HomeController>();
-  CallsController get _callController => Get.find<CallsController>();
+  CallController get _callController => Get.find<CallController>();
 
   var controller = StoryController();
   List<StoryItem> storyItems = [];
@@ -327,7 +327,7 @@ class _MyStoryViewerScreenState extends State<MyStoryViewerScreen> {
                       onTap: () async {
                         _callController.userCalled.value =
                             _profileController.readers.value![index];
-                        await _callController.inviteCall(
+                        await _callController.inviteToJoinCall(
                             _profileController.readers.value![index],
                             DateTime.now().toString(),
                             _homeController.id.value);

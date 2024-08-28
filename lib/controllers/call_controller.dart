@@ -15,6 +15,7 @@ import 'package:sirkl/common/model/call_dto.dart';
 import 'package:sirkl/common/model/call_modification_dto.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/repo/calls_repo.dart';
 import 'package:sirkl/repo/profile_repo.dart';
@@ -22,7 +23,7 @@ import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../views/calls/call_invite_sending_screen.dart';
 
-class CallsController extends GetxController {
+class CallController extends GetxController {
   final box = GetStorage();
 
   NavigationController get _navigationController =>
@@ -49,8 +50,9 @@ class CallsController extends GetxController {
   var isSearchIsActive = false.obs;
   var userJoinedCall = false.obs;
 
+  /// Function to initialize and setup Agora
   Future<void> setupVoiceSDKEngine(BuildContext context) async {
-    rtcEngine = await RtcEngine.create("13d8acd177bf4c35a0d07bdd18c8e84e");
+    rtcEngine = await RtcEngine.create(SConfig.agoraId);
     await rtcEngine?.enableAudio();
     await rtcEngine?.leaveChannel();
 
@@ -58,7 +60,7 @@ class CallsController extends GetxController {
       RtcEngineEventHandler(
         joinChannelSuccess: (String x, int y, int elapsed) {
           [Permission.microphone].request();
-          playRingback(1);
+          playRingtone(1);
           pushNewScreen(context,
                   screen: const CallInviteSendingScreen(), withNavBar: false)
               .then((value) {
@@ -70,65 +72,92 @@ class CallsController extends GetxController {
         },
         userJoined: (int remoteUid, int elapsed) {
           [Permission.microphone].request();
-          playRingback(50);
+          playRingtone(50);
           timer.value = StopWatchTimer();
           timer.value.onStartTimer();
           userJoinedCall.value = true;
         },
         userOffline: (int remoteUid, UserOfflineReason reason) async {
-          await leaveChannel();
+          await leaveCallChanel();
         },
       ),
     );
   }
 
-  void playRingback(int soundToPlay) {
-    if (Platform.isAndroid) {
-      FlutterBeep.playSysSound(soundToPlay == 50 ? 50 : 35);
-    } else {
-      FlutterBeep.playSysSound(soundToPlay == 50 ? 50 : 37).then((value) {
-        if (soundToPlay != 50) {
-          timerRing = Timer.periodic(const Duration(seconds: 4), (timer) {
-            FlutterBeep.playSysSound(37);
-          });
-        } else {
-          timerRing?.cancel();
-        }
-      });
-    }
+  /// Function to invite user to join a call
+  Future<void> inviteToJoinCall(
+      UserDTO user, String channel, String myID) async {
+    userCalled.value = user;
+    currentCallID = channel;
+    await CallRepo.createCall(CallCreationDto(
+        updatedAt: DateTime.now(),
+        called: user.id!,
+        status: 0,
+        channel: channel));
+    await _retrieveTokenAgoraRTC(channel, "publisher", "userAccount", myID);
+    await rtcEngine?.joinChannelWithUserAccount(tokenAgoraRTC, channel, myID);
   }
 
-  leaveChannel() async {
-    userJoinedCall.value = false;
-    await rtcEngine?.leaveChannel();
-    Get.back();
+  /// Function for user to join a call
+  Future<void> joinCall(
+      String channelName, String id, String userCallingId) async {
+    userCalled.value = await ProfileRepo.getUserByID(userCallingId);
+    await _retrieveTokenAgoraRTC(channelName, "audience", "userAccount", id);
+    await rtcEngine?.joinChannelWithUserAccount(tokenAgoraRTC, channelName, id);
   }
 
-  retrieveTokenAgoraRTC(
+  /// Private function to assign Agora token
+  Future<void> _retrieveTokenAgoraRTC(
       String channel, String role, String tokenType, String id) async {
     tokenAgoraRTC =
         await ProfileRepo.retrieveTokenAgoraRTC(channel, role, tokenType, id);
   }
 
-  inviteCall(UserDTO user, String channel, String myID) async {
-    userCalled.value = user;
-    currentCallID = channel;
-    await createCall(CallCreationDto(
-        updatedAt: DateTime.now(),
-        called: user.id!,
-        status: 0,
-        channel: channel));
-    await retrieveTokenAgoraRTC(channel, "publisher", "userAccount", myID);
-    await rtcEngine?.joinChannelWithUserAccount(tokenAgoraRTC, channel, myID);
+  /// Function to leave a channel (call channel)
+  Future<void> leaveCallChanel() async {
+    userJoinedCall.value = false;
+    await rtcEngine?.leaveChannel();
+    Get.back();
   }
 
-  join(String channelName, String id, String userCallingId) async {
-    await getUserById(userCallingId);
-    await retrieveTokenAgoraRTC(channelName, "audience", "userAccount", id);
-    await rtcEngine?.joinChannelWithUserAccount(tokenAgoraRTC, channelName, id);
+  /// Function to end a call
+  Future<void> endCall(String id, String channel) async =>
+      await CallRepo.endCall(id, channel);
+
+  /// Function to notify user receiving call : Missed call
+  Future<void> missedCallNotification(String id) async {
+    await CallRepo.missedCallNotification(id);
   }
 
-  listenCall() {
+  /// Function to retrieve call historic
+  Future<List<CallDto>> retrieveCallHistoric(String offset) async {
+    List<CallDto> calls = await CallRepo.retrieveCalls(offset);
+    callList.value ??= [];
+    callList.value!.addAll(calls);
+    return calls;
+  }
+
+  /// Function to search a specific call in call historic
+  Future<List<CallDto>> searchInCallHistoric(String search) async {
+    try {
+      return await CallRepo.searchCalls(search);
+    } catch (err) {
+      return [];
+    }
+  }
+
+  /// Function to search user
+  // TODO : Remove from here and place into a searchController
+  Future<List<UserDTO>> searchUser(String substring, int offset) async {
+    try {
+      return await CallRepo.searchUser(substring, offset.toString());
+    } on Error {}
+
+    return [];
+  }
+
+  /// Function for listening call events
+  void listenCallEvents() {
     FlutterCallkitIncoming.onEvent.listen((event) async {
       switch (event!.event) {
         case Event.actionCallIncoming:
@@ -137,24 +166,24 @@ class CallsController extends GetxController {
         case Event.actionCallStart:
           break;
         case Event.actionCallAccept:
-          playRingback(50);
-          await join(
+          playRingtone(50);
+          await joinCall(
               event.body['extra']["channel"] ?? event.body['id'],
               event.body['extra']['userCalled'],
               event.body['extra']['userCalling']);
           break;
         case Event.actionCallDecline:
-          playRingback(50);
+          playRingtone(50);
           await FlutterCallkitIncoming.endAllCalls();
           await endCall(event.body["extra"]["userCalling"], event.body["id"]);
           break;
         case Event.actionCallEnded:
-          playRingback(50);
+          playRingtone(50);
           await FlutterCallkitIncoming.endAllCalls();
           break;
         case Event.actionCallTimeout:
-          playRingback(50);
-          await updateCall(CallModificationDto(
+          playRingtone(50);
+          await CallRepo.updateCall(CallModificationDto(
               id: event.body["extra"]["callId"],
               status: 2,
               updatedAt: DateTime.now()));
@@ -187,53 +216,20 @@ class CallsController extends GetxController {
     });
   }
 
-  Future<void> createCall(CallCreationDto callCreationDto) async {
-    await CallRepo.createCall(callCreationDto);
-  }
-
-  updateCall(CallModificationDto callModificationDto) async {
-    await CallRepo.updateCall(callModificationDto);
-  }
-
-  Future<List<CallDto>> retrieveCalls(String offset) async {
-    List<CallDto> calls = await CallRepo.retrieveCalls(offset);
-    callList.value ??= [];
-    callList.value!.addAll(calls);
-    return calls;
-  }
-
-  Future<List<UserDTO>> retrieveUsers(String substring, int offset) async {
-    try {
-      return await CallRepo.searchUser(substring, offset.toString());
-    } on Error {}
-
-    return [];
-  }
-
-  Future<void> endCall(String id, String channel) async {
-    await CallRepo.endCall(id, channel);
-  }
-
-  missedCallNotification(String id) async {
-    await CallRepo.missedCallNotification(id);
-  }
-
-  getUserById(String id) async {
-    userCalled.value = await ProfileRepo.getUserByID(id);
-  }
-
-  Future<List<CallDto>> searchInCalls(String search) async {
-    try {
-      return await CallRepo.searchCalls(search);
-    } catch (err) {
-      return [];
+  /// Function to play ringtone while waiting for action
+  void playRingtone(int soundToPlay) {
+    if (Platform.isAndroid) {
+      FlutterBeep.playSysSound(soundToPlay == 50 ? 50 : 35);
+    } else {
+      FlutterBeep.playSysSound(soundToPlay == 50 ? 50 : 37).then((value) {
+        if (soundToPlay != 50) {
+          timerRing = Timer.periodic(const Duration(seconds: 4), (timer) {
+            FlutterBeep.playSysSound(37);
+          });
+        } else {
+          timerRing?.cancel();
+        }
+      });
     }
   }
-}
-
-class Call {
-  Call(this.number);
-  String number;
-  bool held = false;
-  bool muted = false;
 }

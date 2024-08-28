@@ -15,13 +15,12 @@ import 'package:sirkl/common/view/material_floating_search_bar/floating_search_b
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
+import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 
-import '../../common/view/dialog/custom_dial.dart';
-import '../../config/s_colors.dart';
-import '../../controllers/home_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../chats/detailed_chat_screen.dart';
 
@@ -34,7 +33,6 @@ class GroupsScreen extends StatefulWidget {
 
 class _GroupsScreenState extends State<GroupsScreen>
     with TickerProviderStateMixin {
-  YYDialog dialogMenu = YYDialog();
   late TabController tabController;
   GroupsController get _groupController => Get.find<GroupsController>();
   HomeController get _homeController => Get.find<HomeController>();
@@ -90,20 +88,20 @@ class _GroupsScreenState extends State<GroupsScreen>
 
   @override
   void initState() {
-    _groupController.index.value = _homeController.userMe.value.hasSBT!
+    _groupController.indexCommunity.value = _homeController.userMe.value.hasSBT!
         ? 0
         : _homeController.isInFav.isEmpty
             ? 1
             : 0;
     tabController = TabController(length: 2, vsync: this);
-    tabController.index = _groupController.index.value;
+    tabController.index = _groupController.indexCommunity.value;
     tabController.addListener(indexChangingListener);
     super.initState();
   }
 
   void indexChangingListener() {
     if (tabController.indexIsChanging) {
-      _groupController.index.value = tabController.index;
+      _groupController.indexCommunity.value = tabController.index;
     }
   }
 
@@ -116,15 +114,15 @@ class _GroupsScreenState extends State<GroupsScreen>
                 ? const Color(0xFF102437)
                 : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() {
-          if (_groupController.refreshGroups.value) {
+          if (_groupController.refreshCommunity.value) {
             _controllerCommunitiesFav.refresh();
             _controllerCommunitiesOther.refresh();
-            _groupController.refreshGroups.value = false;
+            _groupController.refreshCommunity.value = false;
           }
           return Column(children: [
             buildAppbar(context, tabController),
-            _groupController.nftAndTokenAvailableToCreateGroup.isNotEmpty &&
-                    _groupController.addAGroup.value
+            _groupController.assetAvailableToCreateCommunity.isNotEmpty &&
+                    _groupController.isAddingCommunity.value
                 ? const Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
@@ -141,7 +139,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                     height: 0,
                     width: 0,
                   ),
-            _groupController.addAGroup.value
+            _groupController.isAddingCommunity.value
                 ? buildSelectNFT()
                 : MediaQuery.removePadding(
                     context: context,
@@ -172,7 +170,8 @@ class _GroupsScreenState extends State<GroupsScreen>
                                           contractAddress: channel.id!,
                                           id: _homeController.id.value,
                                           isFav: false));
-                                  _groupController.refreshGroups.value = true;
+                                  _groupController.refreshCommunity.value =
+                                      true;
                                   _homeController.isInFav.remove(channel.id);
                                   _homeController.isInFav.refresh();
                                 },
@@ -181,21 +180,25 @@ class _GroupsScreenState extends State<GroupsScreen>
                                 channelFav: true,
                                 emptyBuilder: (context) {
                                   return _groupController
-                                              .searchIsActive.value &&
+                                              .isSearchActiveInCommunity
+                                              .value &&
                                           _groupController
-                                              .query.value.isNotEmpty
+                                              .queryCommunity.value.isNotEmpty
                                       ? SingleChildScrollView(
                                           child: noGroupFoundUI())
                                       : noGroupUI();
                                 },
                                 controller: _groupController
-                                            .searchIsActive.value &&
-                                        _groupController.query.value.isNotEmpty
+                                            .isSearchActiveInCommunity.value &&
+                                        _groupController
+                                            .queryCommunity.value.isNotEmpty
                                     ? StreamChannelListController(
                                         client: StreamChat.of(context).client,
                                         filter: Filter.and([
-                                          Filter.autoComplete('name',
-                                              _groupController.query.value),
+                                          Filter.autoComplete(
+                                              'name',
+                                              _groupController
+                                                  .queryCommunity.value),
                                           Filter.notExists('isConv'),
                                         ]),
                                         limit: 10,
@@ -234,10 +237,13 @@ class _GroupsScreenState extends State<GroupsScreen>
                                         "This is a private chat for holders of ${channel.name}");
                                   }
 
-                                  if (_groupController.searchIsActive.value) {
-                                    _groupController.searchIsActive.value =
-                                        !_groupController.searchIsActive.value;
-                                    _groupController.query.value = "";
+                                  if (_groupController
+                                      .isSearchActiveInCommunity.value) {
+                                    _groupController
+                                            .isSearchActiveInCommunity.value =
+                                        !_groupController
+                                            .isSearchActiveInCommunity.value;
+                                    _groupController.queryCommunity.value = "";
                                     _floatingSearchBarController.clear();
                                   }
                                 },
@@ -267,27 +273,32 @@ class _GroupsScreenState extends State<GroupsScreen>
                                           contractAddress: channel.id!,
                                           id: _homeController.id.value,
                                           isFav: true));
-                                  _groupController.refreshGroups.value = true;
+                                  _groupController.refreshCommunity.value =
+                                      true;
                                   _homeController.isInFav.add(channel.id!);
                                   _homeController.isInFav.refresh();
                                 },
                                 emptyBuilder: (context) {
                                   return _groupController
-                                              .searchIsActive.value &&
+                                              .isSearchActiveInCommunity
+                                              .value &&
                                           _groupController
-                                              .query.value.isNotEmpty
+                                              .queryCommunity.value.isNotEmpty
                                       ? SingleChildScrollView(
                                           child: noGroupFoundUI())
                                       : noGroupUI();
                                 },
                                 controller: _groupController
-                                            .searchIsActive.value &&
-                                        _groupController.query.value.isNotEmpty
+                                            .isSearchActiveInCommunity.value &&
+                                        _groupController
+                                            .queryCommunity.value.isNotEmpty
                                     ? StreamChannelListController(
                                         client: StreamChat.of(context).client,
                                         filter: Filter.and([
-                                          Filter.autoComplete('name',
-                                              _groupController.query.value),
+                                          Filter.autoComplete(
+                                              'name',
+                                              _groupController
+                                                  .queryCommunity.value),
                                           Filter.notExists("isConv"),
                                         ]),
                                         limit: 10,
@@ -307,9 +318,10 @@ class _GroupsScreenState extends State<GroupsScreen>
                                             filter: Filter.equal(
                                                 "id", _homeController.id.value))
                                         .then((value) {
-                                      if (value.members.isEmpty)
+                                      if (value.members.isEmpty) {
                                         channel.addMembers(
                                             [_homeController.id.value]);
+                                      }
                                     });
                                     pushNewScreen(context,
                                             screen: StreamChannel(
@@ -344,7 +356,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         fit: StackFit.loose,
         children: [
           Container(
-            height: _groupController.addAGroup.value ? 115 : 140,
+            height: _groupController.isAddingCommunity.value ? 115 : 140,
             margin: const EdgeInsets.only(bottom: 0.25),
             decoration: BoxDecoration(
               boxShadow: const [
@@ -378,20 +390,22 @@ class _GroupsScreenState extends State<GroupsScreen>
                   children: [
                     Obx(() => IconButton(
                         onPressed: () async {
-                          if (!_groupController.addAGroup.value) {
-                            _groupController.searchIsActive.value =
-                                !_groupController.searchIsActive.value;
-                            if (_groupController.searchIsActive.value) {
-                              _groupController.query.value = "";
+                          if (!_groupController.isAddingCommunity.value) {
+                            _groupController.isSearchActiveInCommunity.value =
+                                !_groupController
+                                    .isSearchActiveInCommunity.value;
+                            if (_groupController
+                                .isSearchActiveInCommunity.value) {
+                              _groupController.queryCommunity.value = "";
                               _floatingSearchBarController.clear();
                             }
                           }
                         },
                         icon: Image.asset(
-                          _groupController.searchIsActive.value
+                          _groupController.isSearchActiveInCommunity.value
                               ? "assets/images/close_big.png"
                               : "assets/images/search.png",
-                          color: _groupController.addAGroup.value
+                          color: _groupController.isAddingCommunity.value
                               ? Colors.transparent
                               : MediaQuery.of(context).platformBrightness ==
                                       Brightness.dark
@@ -403,10 +417,11 @@ class _GroupsScreenState extends State<GroupsScreen>
                     Padding(
                       padding: const EdgeInsets.only(top: 12.0),
                       child: Obx(() => Text(
-                            _groupController.addAGroup.value
+                            _groupController.isAddingCommunity.value
                                 ? "Add a community"
-                                : _groupController.searchIsActive.value
-                                    ? _groupController.index.value == 0
+                                : _groupController
+                                        .isSearchActiveInCommunity.value
+                                    ? _groupController.indexCommunity.value == 0
                                         ? "Favorites"
                                         : "Others"
                                     : con.groupsTabRes.tr,
@@ -423,18 +438,23 @@ class _GroupsScreenState extends State<GroupsScreen>
                     ),
                     IconButton(
                         onPressed: () {
-                          if (_groupController.addAGroup.value == false)
-                            _groupController.searchIsActive.value = false;
-                          if (!_groupController.addAGroup.value &&
+                          if (_groupController.isAddingCommunity.value ==
+                              false) {
+                            _groupController.isSearchActiveInCommunity.value =
+                                false;
+                          }
+                          if (!_groupController.isAddingCommunity.value &&
                               _groupController
-                                  .nftAndTokenAvailableToCreateGroup.isEmpty)
-                            _groupController.retrieveNFTAvailableForCreation(
-                                _homeController.userMe.value.wallet!);
-                          _groupController.addAGroup.value =
-                              !_groupController.addAGroup.value;
+                                  .assetAvailableToCreateCommunity.isEmpty) {
+                            _groupController
+                                .retrieveAssetsAvailableToCreateCommunity(
+                                    _homeController.userMe.value.wallet!);
+                          }
+                          _groupController.isAddingCommunity.value =
+                              !_groupController.isAddingCommunity.value;
                         },
                         icon: Image.asset(
-                          _groupController.addAGroup.value
+                          _groupController.isAddingCommunity.value
                               ? "assets/images/close_big.png"
                               : "assets/images/plus.png",
                           color: MediaQuery.of(context).platformBrightness ==
@@ -451,14 +471,14 @@ class _GroupsScreenState extends State<GroupsScreen>
           ),
           Obx(() => Positioned(
               top: 110,
-              child: _groupController.searchIsActive.value
+              child: _groupController.isSearchActiveInCommunity.value
                   ? DeferPointer(
                       child: SizedBox(
                           height: 48,
                           width: MediaQuery.of(context).size.width,
                           child: buildFloatingSearchBar()),
                     )
-                  : _groupController.addAGroup.value
+                  : _groupController.isAddingCommunity.value
                       ? Container()
                       : Material(
                           elevation: 2,
@@ -493,7 +513,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           gradient: _groupController
-                                                      .index.value ==
+                                                      .indexCommunity.value ==
                                                   0
                                               ? const LinearGradient(
                                                   begin: Alignment.centerLeft,
@@ -534,7 +554,8 @@ class _GroupsScreenState extends State<GroupsScreen>
                                                   fontFamily: "Gilroy",
                                                   fontWeight: FontWeight.w700,
                                                   color: _groupController
-                                                              .index.value ==
+                                                              .indexCommunity
+                                                              .value ==
                                                           0
                                                       ? Colors.white
                                                       : MediaQuery.of(context)
@@ -553,7 +574,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           gradient: _groupController
-                                                      .index.value ==
+                                                      .indexCommunity.value ==
                                                   1
                                               ? const LinearGradient(
                                                   begin: Alignment.centerLeft,
@@ -594,7 +615,8 @@ class _GroupsScreenState extends State<GroupsScreen>
                                                   fontFamily: "Gilroy",
                                                   fontWeight: FontWeight.w700,
                                                   color: _groupController
-                                                              .index.value ==
+                                                              .indexCommunity
+                                                              .value ==
                                                           1
                                                       ? Colors.white
                                                       : MediaQuery.of(context)
@@ -658,7 +680,7 @@ class _GroupsScreenState extends State<GroupsScreen>
               : Colors.white,
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async {
-        if (query.isNotEmpty) _groupController.query.value = query;
+        if (query.isNotEmpty) _groupController.queryCommunity.value = query;
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
@@ -837,7 +859,7 @@ class _GroupsScreenState extends State<GroupsScreen>
             endColor: const Color(0xff0063FB),
             gradientOrientation: GradientOrientation.Horizontal,
             onTap: (finish) {
-              _groupController.addAGroup.value = true;
+              _groupController.isAddingCommunity.value = true;
             },
             child: Text(
               con.addGroupRes.tr,
@@ -852,7 +874,7 @@ class _GroupsScreenState extends State<GroupsScreen>
   }
 
   Widget buildSelectNFT() {
-    return _groupController.isLoadingAvailableNFT.value
+    return _groupController.isLoadingAvailableAssets.value
         ? Padding(
             padding: const EdgeInsets.only(top: 24.0, left: 24, right: 24),
             child: Column(
@@ -876,7 +898,7 @@ class _GroupsScreenState extends State<GroupsScreen>
               ],
             ),
           )
-        : _groupController.nftAndTokenAvailableToCreateGroup.isEmpty
+        : _groupController.assetAvailableToCreateCommunity.isEmpty
             ? noNFTFound()
             : MediaQuery.removePadding(
                 context: context,
@@ -887,7 +909,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                     child: SafeArea(
                       child: ListView.builder(
                         itemCount: _groupController
-                            .nftAndTokenAvailableToCreateGroup.length,
+                            .assetAvailableToCreateCommunity.length,
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(
@@ -911,19 +933,19 @@ class _GroupsScreenState extends State<GroupsScreen>
                               ),
                               child: ListTile(
                                 onTap: () async {
-                                  await _groupController.createGroup(
+                                  await _groupController.createCommunity(
                                       StreamChat.of(context).client,
                                       GroupCreationDto(
                                           name: _groupController
-                                              .nftAndTokenAvailableToCreateGroup[
+                                              .assetAvailableToCreateCommunity[
                                                   index]
                                               .collectionName,
                                           picture: _groupController
-                                              .nftAndTokenAvailableToCreateGroup[
+                                              .assetAvailableToCreateCommunity[
                                                   index]
                                               .collectionImage,
                                           contractAddress: _groupController
-                                              .nftAndTokenAvailableToCreateGroup[
+                                              .assetAvailableToCreateCommunity[
                                                   index]
                                               .contractAddress));
                                   pushNewScreen(context,
@@ -935,14 +957,15 @@ class _GroupsScreenState extends State<GroupsScreen>
                                       .then((value) {
                                     _navigationController.hideNavBar.value =
                                         false;
-                                    _groupController.addAGroup.value = false;
+                                    _groupController.isAddingCommunity.value =
+                                        false;
                                   });
                                 },
                                 leading: ClipRRect(
                                   borderRadius: BorderRadius.circular(90),
                                   child: CachedNetworkImage(
                                       imageUrl: _groupController
-                                          .nftAndTokenAvailableToCreateGroup[
+                                          .assetAvailableToCreateCommunity[
                                               index]
                                           .collectionImage,
                                       width: 50,
@@ -959,8 +982,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                                 ),
                                 title: Text(
                                     _groupController
-                                        .nftAndTokenAvailableToCreateGroup[
-                                            index]
+                                        .assetAvailableToCreateCommunity[index]
                                         .collectionName,
                                     style: TextStyle(
                                         fontSize: 16,
@@ -1054,7 +1076,7 @@ class _GroupsScreenState extends State<GroupsScreen>
   void dispose() {
     _controllerCommunitiesOther.dispose();
     _controllerCommunitiesFav.dispose();
-    _groupController.index.value = 0;
+    _groupController.indexCommunity.value = 0;
     tabController.removeListener(indexChangingListener);
     super.dispose();
   }

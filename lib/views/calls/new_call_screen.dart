@@ -10,7 +10,7 @@ import 'package:sirkl/common/view/material_floating_search_bar/floating_search_b
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_actions.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_transition.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
@@ -26,7 +26,7 @@ class NewCallScreen extends StatefulWidget {
 }
 
 class _NewCallScreenState extends State<NewCallScreen> {
-  CallsController get _callController => Get.find<CallsController>();
+  CallController get _callController => Get.find<CallController>();
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   final PagingController<int, UserDTO> pagingController =
@@ -49,7 +49,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
     try {
       List<UserDTO> newItems;
       if (pageKey == 0) newItems = [];
-      newItems = await _callController.retrieveUsers(
+      newItems = await _callController.searchUser(
           _callController.callQuery.value, pageKey);
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
@@ -323,7 +323,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
         trailing: InkWell(
           onTap: () async {
             _callController.userCalled.value = item;
-            await _callController.inviteCall(
+            await _callController.inviteToJoinCall(
                 item, DateTime.now().toString(), _homeController.id.value);
           },
           child: Padding(

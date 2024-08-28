@@ -15,7 +15,7 @@ import 'package:sirkl/common/view/material_floating_search_bar/floating_search_b
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_transition.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
@@ -33,7 +33,7 @@ class AddUserToGroupScreen extends StatefulWidget {
 }
 
 class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
-  CallsController get _callController => Get.find<CallsController>();
+  CallController get _callController => Get.find<CallController>();
   ChatsController get _chatController => Get.find<ChatsController>();
   CommonController get _commonController => Get.find<CommonController>();
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
@@ -59,7 +59,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
     try {
       List<UserDTO> newItems;
       if (pageKey == 0) newItems = [];
-      newItems = await _callController.retrieveUsers(
+      newItems = await _callController.searchUser(
           _chatController.addUserQuery.value, pageKey);
       final isLastPage = newItems.length < 12;
       if (isLastPage) {

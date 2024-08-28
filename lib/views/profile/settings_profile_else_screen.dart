@@ -12,7 +12,7 @@ import 'package:sirkl/common/model/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
@@ -38,7 +38,7 @@ class SettingsProfileElseScreen extends StatefulWidget {
 class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get _homeController => Get.find<HomeController>();
-  CallsController get _callController => Get.find<CallsController>();
+  CallController get _callController => Get.find<CallController>();
   CommonController get _commonController => Get.find<CommonController>();
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
@@ -160,7 +160,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                       onTap: () async {
                         _callController.userCalled.value =
                             _commonController.userClicked.value!;
-                        await _callController.inviteCall(
+                        await _callController.inviteToJoinCall(
                             _commonController.userClicked.value!,
                             DateTime.now().toString(),
                             _homeController.id.value);

@@ -59,8 +59,6 @@ class HomeController extends GetxController {
   var pageKey = 0.obs;
   var nicknames = {}.obs;
   var userBlocked = [].obs;
-  var iHaveNft = false.obs;
-  var heHasNft = false.obs;
   var isInFav = <String>[].obs;
   var isFavNftSelected = false.obs;
   var qrActive = false.obs;
@@ -164,7 +162,7 @@ class HomeController extends GetxController {
     }
   }
 
-  /// Function to retrieve the contract addresses own by the user and store them
+  /// Function to retrieve the contract addresses of the assets own by the user and store them
   retrieveContractAddress() async {
     contractAddresses.value = await HomeRepo.retrieveContactAddress();
     box.write(con.contractAddresses, contractAddresses);
@@ -180,12 +178,12 @@ class HomeController extends GetxController {
   Future<List<NftDto>> getAssets(
       String id, bool isFav, int offset, UserDTO? user) async {
     if (offset == 0 && id == this.id.value) isInFav.clear();
-    List<NftDto> nfts = await HomeRepo.retrieveNFTs(
+    List<NftDto> assets = await HomeRepo.retrieveNFTs(
         id: id, isFav: isFav, offset: offset.toString());
 
     if (id == this.id.value) {
       if (userMe.value.hasSBT! && offset == 0) {
-        nfts.add(NftDto(
+        assets.add(NftDto(
             id: this.id.value,
             title: "SIRKL Club",
             collectionImage:
@@ -197,15 +195,14 @@ class HomeController extends GetxController {
                 "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase(),
             isFav: false));
       }
-      iHaveNft.value = true;
 
-      isInFav.addAll(nfts
+      isInFav.addAll(assets
           .where((element) => element.isFav!)
           .map((e) => e.contractAddress!)
           .toList());
     } else {
       if (user != null && (user.hasSBT ?? false) && offset == 0) {
-        nfts.add(NftDto(
+        assets.add(NftDto(
             id: id,
             title: "SIRKL Club",
             collectionImage:
@@ -217,9 +214,8 @@ class HomeController extends GetxController {
                 "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase(),
             isFav: false));
       }
-      heHasNft.value = true;
     }
-    return nfts;
+    return assets;
   }
 
   /// Function to update the user

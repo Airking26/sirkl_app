@@ -24,7 +24,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
@@ -182,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appId: "1668076042",
       showDebug: true));
   HomeController get _homeController => Get.find<HomeController>();
-  CallsController get _callController => Get.find<CallsController>();
+  CallController get _callController => Get.find<CallController>();
   ChatsController get _chatController => Get.find<ChatsController>();
   CommonController get _commonController => Get.find<CommonController>();
   GroupsController get _groupController => Get.find<GroupsController>();
@@ -229,7 +229,7 @@ class _MyHomePageState extends State<MyHomePage> {
               flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
         } else if (message.data['type'] == "2") {
           await FlutterCallkitIncoming.endAllCalls();
-          await _callController.leaveChannel();
+          await _callController.leaveCallChanel();
         } else if (message.data['type'] == "3") {
           await FlutterCallkitIncoming.endAllCalls();
           LocalNotificationInitialize.showBigTextNotification(
@@ -248,7 +248,7 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if ((message.data["type"] == "9")) {
           await _profileController.retrieveMe();
           _profileController.pagingController.refresh();
-          _groupController.refreshGroups.value = true;
+          _groupController.refreshCommunity.value = true;
           LocalNotificationInitialize.showBigTextNotification(
               title: message.data["title"],
               body: message.data["body"],
@@ -420,7 +420,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
 
-    _callController.listenCall();
+    _callController.listenCallEvents();
   }
 
   /// Function to retrieve current call and join (used from background mode)
@@ -429,7 +429,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (calls is List) {
       if (calls.isNotEmpty) {
         if (calls[0]['id'] != null && calls[0]['id'] != '') {
-          await _callController.join(
+          await _callController.joinCall(
               calls[0]['extra']['channel'],
               calls[0]["extra"]["userCalled"],
               calls[0]['extra']['userCalling']);

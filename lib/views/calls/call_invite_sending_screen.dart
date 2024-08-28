@@ -6,7 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/config/size_config.dart';
-import 'package:sirkl/controllers/calls_controller.dart';
+import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
@@ -19,7 +19,7 @@ class CallInviteSendingScreen extends StatefulWidget {
 }
 
 class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
-  CallsController get _callController => Get.find<CallsController>();
+  CallController get _callController => Get.find<CallController>();
   HomeController get _homeController => Get.find<HomeController>();
   late Timer timer;
 
@@ -28,10 +28,10 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
     FocusManager.instance.primaryFocus?.unfocus();
     timer = Timer(const Duration(seconds: 30), () async {
       if (!_callController.userJoinedCall.value) {
-        _callController.playRingback(50);
+        _callController.playRingtone(50);
         await _callController
             .missedCallNotification(_callController.userCalled.value.id!);
-        await _callController.leaveChannel();
+        await _callController.leaveCallChanel();
       }
     });
     super.initState();
@@ -42,7 +42,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
     timer.cancel();
     _callController.isCallOnSpeaker.value = false;
     _callController.isCallMuted.value = false;
-    _callController.playRingback(50);
+    _callController.playRingtone(50);
     super.dispose();
   }
 
@@ -164,10 +164,10 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                             ),
                             InkWell(
                               onTap: () async {
-                                _callController.playRingback(50);
+                                _callController.playRingtone(50);
                                 if (_callController.userJoinedCall.value) {
                                   await FlutterCallkitIncoming.endAllCalls();
-                                  await _callController.leaveChannel();
+                                  await _callController.leaveCallChanel();
                                 } else {
                                   await _callController.missedCallNotification(
                                       _callController.userCalled.value.id!);
@@ -175,7 +175,7 @@ class _CallInviteSendingScreenState extends State<CallInviteSendingScreen> {
                                   await _callController.endCall(
                                       _callController.userCalled.value.id!,
                                       _callController.currentCallID ?? '');
-                                  await _callController.leaveChannel();
+                                  await _callController.leaveCallChanel();
                                 }
                               },
                               child: Container(

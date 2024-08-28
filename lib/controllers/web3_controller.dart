@@ -376,7 +376,7 @@ class Web3Controller extends GetxController {
     await _homeController.updateMe(UpdateMeDto(hasSBT: true));
     await _groupController.addUserToSirklClub(_homeController.id.value);
     _profileController.pagingController.refresh();
-    _groupController.refreshGroups.value = true;
+    _groupController.refreshCommunity.value = true;
   }
 
   Future<dynamic> query(

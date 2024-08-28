@@ -162,7 +162,7 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                                   .channel.value!.extraData["owner"] ==
                               null) {
                             var creator =
-                                await _groupController.retrieveCreatorGroup(
+                                await _groupController.retrieveCommunityOwner(
                                     _chatController.channel.value!.id!);
                             if (!creator.isNullOrBlank!) {
                               if (creator ==

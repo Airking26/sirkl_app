@@ -352,25 +352,22 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                   height: 10,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 24.0),
-                  child: _homeController.heHasNft.value
-                      ? Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            con.nFTCollectionRes.tr,
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontFamily: "Gilroy",
-                                fontWeight: FontWeight.w600,
-                                color:
-                                    MediaQuery.of(context).platformBrightness ==
-                                            Brightness.dark
-                                        ? Colors.white
-                                        : Colors.black),
-                          ))
-                      : Container(),
-                ),
+                    padding: const EdgeInsets.only(left: 24.0),
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          con.nFTCollectionRes.tr,
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontFamily: "Gilroy",
+                              fontWeight: FontWeight.w600,
+                              color:
+                                  MediaQuery.of(context).platformBrightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black),
+                        ))),
                 MediaQuery.removePadding(
                   context: context,
                   removeTop: true,
