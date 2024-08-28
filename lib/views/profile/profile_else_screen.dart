@@ -55,7 +55,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
 
   Future<void> fetchNFTs() async {
     try {
-      List<NftDto> newItems = await _homeController.getNFT(
+      List<NftDto> newItems = await _homeController.getAssets(
           _commonController.userClicked.value!.id!,
           false,
           pageKey,

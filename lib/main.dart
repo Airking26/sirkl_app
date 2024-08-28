@@ -202,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     _walletConnectModalController.initializeService(context);
     FirebaseMessaging.instance.requestPermission();
-    _homeController.connectUser(StreamChat.of(context).client);
+    _homeController.connectUserToStream(StreamChat.of(context).client);
     _homeController.putFCMToken(context, StreamChat.of(context).client, true);
     initFirebase();
     _callController.setupVoiceSDKEngine(context);
@@ -409,9 +409,10 @@ class _MyHomePageState extends State<MyHomePage> {
             pushNewScreen(context,
                 screen: const ProfileElseScreen(fromConversation: false));
           } else if (path == "/joinGroup") {
-            _homeController.retrieveAccessToken();
+            _homeController.retrieveStoredValues();
             try {
-              await _homeController.connectUser(StreamChat.of(context).client);
+              await _homeController
+                  .connectUserToStream(StreamChat.of(context).client);
             } catch (e) {
               var stream = StreamChat.of(context)
                   .client

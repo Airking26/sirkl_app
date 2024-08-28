@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -71,10 +72,13 @@ class HomeController extends GetxController {
   var isStoryLoading = false.obs;
 
   var isCheckingBetaCode = false.obs;
+
+  /// Function to check if the Beta code is correct
   Future<bool> checkBetaCode(String code) async =>
       await AuthRepo.checkBetaCode(code);
 
-  retrieveAccessToken() {
+  /// Function to retrieve stored values (as basic values in init)
+  retrieveStoredValues() {
     var accessTok = box.read(SharedPref.ACCESS_TOKEN);
     accessToken.value = accessTok ?? '';
     streamChatToken.value = box.read(SharedPref.STREAM_CHAT_TOKEN) ?? "";
@@ -96,11 +100,13 @@ class HomeController extends GetxController {
     userBlocked.value = box.read(con.USER_BLOCKED) ?? [];
   }
 
+  /// Function to switch on/off notification
   switchActiveNotification(bool active) async {
     await box.write(con.NOTIFICATION_ACTIVE, active);
     notificationActive.value = active;
   }
 
+  /// Function to login with wallet
   loginWithWallet(BuildContext context, String wallet, String message,
       String signature) async {
     SignInSuccessDto signSuccess = await AuthRepo.verifySignature(
@@ -112,8 +118,8 @@ class HomeController extends GetxController {
                 ? "android"
                 : "iOS"));
 
-    //AppsflyerSdk appsflyerSdk = Get.find<AppsflyerSdk>();
-    //bool? result = await appsflyerSdk.logEvent("af_login", {});
+    AppsflyerSdk appsflyerSdk = Get.find<AppsflyerSdk>();
+    await appsflyerSdk.logEvent("af_login", {});
     box.write(SharedPref.USER, signSuccess.user!.toJson());
     userMe.value = signSuccess.user!;
 
@@ -130,11 +136,12 @@ class HomeController extends GetxController {
 
     isLoading.value = false;
     await getAllNftConfig();
-    await connectUser(StreamChat.of(context).client);
+    await connectUserToStream(StreamChat.of(context).client);
     putFCMToken(context, StreamChat.of(context).client, false);
     retrieveInboxes();
   }
 
+  /// Function to store and/or update FCM Token
   putFCMToken(
       BuildContext context, StreamChatClient client, bool isLogged) async {
     if (accessToken.value.isNotEmpty) {
@@ -159,15 +166,20 @@ class HomeController extends GetxController {
     }
   }
 
+  /// Function to retrieve the contract addresses own by the user and store them
   retrieveContractAddress() async {
     contractAddresses.value = await HomeRepo.retrieveContactAddress();
     box.write(con.contractAddresses, contractAddresses);
   }
 
+  /// Function called only server side to get and store assets of the user (at login only)
   getAllNftConfig() async => await HomeRepo.getAllNFTConfig();
+
+  /// Function called only server side to update assets of the user
   updateAllNftConfig() async => await HomeRepo.updateAllNFTConfig();
 
-  Future<List<NftDto>> getNFT(
+  /// Function to retrieve assets of a given user
+  Future<List<NftDto>> getAssets(
       String id, bool isFav, int offset, UserDTO? user) async {
     if (offset == 0 && id == this.id.value) isInFav.clear();
     List<NftDto> nfts = await HomeRepo.retrieveNFTs(
@@ -212,12 +224,15 @@ class HomeController extends GetxController {
     return nfts;
   }
 
+  /// Function to update the user
+  // TODO : Check if not duplicate and delete in that case
   updateMe(UpdateMeDto updateMeDto) async {
     UserDTO userDto = await ProfileRepo.modifyUser(updateMeDto);
     box.write(SharedPref.USER, userDto.toJson());
     userMe.value = userDto;
   }
 
+  /// Function to update a story (mainly to update users that have seen it)
   updateStory(StoryModificationDto storyModificationDto) async {
     await HomeRepo.updateStory(storyModificationDto);
     stories.value?[actualStoryIndex.value]
@@ -227,12 +242,15 @@ class HomeController extends GetxController {
     stories.refresh();
   }
 
+  /// Function to delete a story
   Future<void> deleteStory(String createdBy, String id) async =>
       await HomeRepo.deleteStory(createdBy: createdBy, id: id);
 
+  /// Function to receive the welcome message from SIRKL.io at first connexion
   Future<void> getWelcomeMessage() async =>
       await HomeRepo.receiveWelcomeMessage();
 
+  /// Function to give or update a nickname
   updateNickname(String wallet, String nickname) async {
     if (nicknames[wallet] != nickname) {
       nicknames[wallet] = nickname;
@@ -244,21 +262,18 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> connectUser(StreamChatClient client) async {
-    // Récupère le jeton d'accès depuis la méthode appropriée
-    retrieveAccessToken();
+  /// Connect user to Stream Chat
+  Future<void> connectUserToStream(StreamChatClient client) async {
+    retrieveStoredValues();
 
     if (accessToken.value.isNotEmpty) {
-      // Vérifie si le client n'est pas déjà connecté
       if (client.wsConnectionStatus != ConnectionStatus.connected) {
-        // Si le jeton de Stream Chat n'est pas défini
         if (streamChatToken.value.isNullOrBlank!) {
           await _handleNewUser(client);
         } else {
           await _handleExistingUser(client);
         }
 
-        // Effectue les actions communes après la connexion de l'utilisateur
         isConfiguring.value = false;
         isFirstConnexion.value = false;
         await checkIfHasMessage(client);
@@ -266,11 +281,10 @@ class HomeController extends GetxController {
     }
   }
 
+  /// Helper function to connect user to stream if new one
   Future<void> _handleNewUser(StreamChatClient client) async {
-    // Récupère un nouveau jeton pour Stream Chat
     String token = await ProfileRepo.retrieveTokenStreamChat();
 
-    // Crée l'objet utilisateur à passer à Stream Chat
     var userToPass = UserDTO(
       id: userMe.value.id,
       userName: userMe.value.userName,
@@ -284,7 +298,6 @@ class HomeController extends GetxController {
       isInFollowing: userMe.value.isInFollowing,
     );
 
-    // Connecte l'utilisateur avec le nouveau jeton
     try {
       await client.connectUser(
         User(id: userMe.value.id!, extraData: {"userDTO": userToPass.toJson()}),
@@ -305,51 +318,52 @@ class HomeController extends GetxController {
     }
   }
 
+  /// Helper function to connect user to stream if already existing
   Future<void> _handleExistingUser(StreamChatClient client) async {
-    // Si le jeton de Stream Chat n'est pas défini, récupère un nouveau jeton
     if (streamChatToken.value.isNullOrBlank!) {
       String token = await ProfileRepo.retrieveTokenStreamChat();
       streamChatToken.value = token;
       await box.write(SharedPref.STREAM_CHAT_TOKEN, token);
     }
 
-    // Connecte l'utilisateur avec le jeton existant
     await client.connectUser(User(id: userMe.value.id!), streamChatToken.value);
   }
 
+  /// Function to retrieve nicknames
   retrieveNicknames() async {
     Map<dynamic, dynamic> names = await HomeRepo.retrieveNicknames();
     nicknames.value = names;
   }
 
+  /// Function to retrieve stories
   Future<List<List<StoryDto>>> retrieveStories(int offset) async {
     if (offset == 0) {
       stories.value?.clear();
       pageKey.value = 0;
     }
 
-    List<List<StoryDto>> retrivedStories =
+    List<List<StoryDto>> retrievedStories =
         await HomeRepo.retrieveStories(offset.toString());
 
     loadingStories.value = false;
     if (stories.value == null) {
-      stories.value = retrivedStories;
+      stories.value = retrievedStories;
     } else {
-      stories.value = stories.value! + retrivedStories;
+      stories.value = stories.value! + retrievedStories;
     }
-    return retrivedStories;
+    return retrievedStories;
   }
 
+  /// Function to retrieve inbox (if user is new, check if someone sent him
+  /// messages on his wallet, and create stream chat)
   retrieveInboxes() async => await ChatRepo.walletsToMessages();
 
-  registerNotification(NotificationRegisterDto notificationRegisterDto) async =>
-      await HomeRepo.registerNotification(notificationRegisterDto);
-
+  /// Function to register notification
   checkOfflineNotificationAndRegister() async {
     var notifications = GetStorage().read(con.notificationSaved) ?? [];
     var notificationsToDelete = [];
     for (var notification in (notifications as List<dynamic>)) {
-      await registerNotification(
+      await HomeRepo.registerNotification(
           NotificationRegisterDto(message: notification));
       notificationsToDelete.add(notification);
     }
@@ -360,6 +374,7 @@ class HomeController extends GetxController {
     await GetStorage().write(con.notificationSaved, notificationsToSave);
   }
 
+  /// Function checking if user has unread message(s)
   checkIfHasMessage(StreamChatClient client) async {
     client
         .queryChannels(
