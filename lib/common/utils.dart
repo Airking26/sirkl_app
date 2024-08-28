@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/entities/android_params.dart';
+import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
+import 'package:flutter_callkit_incoming/entities/ios_params.dart';
+import 'package:flutter_callkit_incoming/entities/notification_params.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 
@@ -47,4 +52,49 @@ String displayName(UserDTO user, HomeController controller) {
       return user.userName!;
     }
   }
+}
+
+Future<void> showCallNotification(Map<String, dynamic> data) async {
+  var params = CallKitParams(
+      id: data['uuid'],
+      nameCaller: data["title"],
+      appName: 'Sirkl',
+      avatar: data["pic"] ??
+          'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png',
+      handle: data["body"],
+      type: 0,
+      duration: 30000,
+      textAccept: 'Accept',
+      textDecline: 'Decline',
+      missedCallNotification: const NotificationParams(showNotification: false),
+      extra: <String, dynamic>{
+        'userCalling': data["caller_id"],
+        "userCalled": data['called_id'],
+        "callId": data["call_id"],
+        "channel": data["channel"]
+      },
+      android: const AndroidParams(
+          isCustomNotification: false,
+          isCustomSmallExNotification: false,
+          isShowLogo: false,
+          ringtonePath: 'system_ringtone_default',
+          backgroundColor: '#102437',
+          actionColor: '#4CAF50'),
+      ios: const IOSParams(
+          iconName: 'CallKitLogo',
+          handleType: '',
+          supportsVideo: false,
+          maximumCallGroups: 2,
+          maximumCallsPerCallGroup: 1,
+          audioSessionMode: 'default',
+          audioSessionActive: true,
+          audioSessionPreferredSampleRate: 44100.0,
+          audioSessionPreferredIOBufferDuration: 0.005,
+          supportsDTMF: true,
+          supportsHolding: true,
+          supportsGrouping: false,
+          supportsUngrouping: false,
+          ringtonePath: 'system_ringtone_default'));
+
+  await FlutterCallkitIncoming.showCallkitIncoming(params);
 }

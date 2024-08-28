@@ -10,7 +10,6 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -41,6 +40,7 @@ import 'package:stream_chat_persistence/stream_chat_persistence.dart';
 import 'package:web3modal_flutter/theme/w3m_theme.dart';
 
 import 'common/save_pref_keys.dart';
+import 'common/utils.dart';
 import 'config/s_colors.dart';
 import 'controllers/dependency_manager.dart';
 import 'controllers/home_controller.dart';
@@ -72,17 +72,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
-AppsflyerSdk appsflyerSdk = AppsflyerSdk(AppsFlyerOptions(
-    afDevKey: "KdGKBY4Q3u3ooKjm4KT5am", appId: "1668076042", showDebug: true));
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  /*await appsflyerSdk.initSdk(
-      registerConversionDataCallback: true,
-      registerOnAppOpenAttributionCallback: true,
-      registerOnDeepLinkingCallback: true
-  );
-  Get.put<AppsflyerSdk>(appsflyerSdk);*/
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark));
@@ -185,6 +177,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  AppsflyerSdk appsflyerSdk = AppsflyerSdk(AppsFlyerOptions(
+      afDevKey: "KdGKBY4Q3u3ooKjm4KT5am",
+      appId: "1668076042",
+      showDebug: true));
   HomeController get _homeController => Get.find<HomeController>();
   CallsController get _callController => Get.find<CallsController>();
   ChatsController get _chatController => Get.find<ChatsController>();
@@ -200,6 +196,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    appsflyerSdk.initSdk(
+        registerConversionDataCallback: true,
+        registerOnAppOpenAttributionCallback: true,
+        registerOnDeepLinkingCallback: true);
+    Get.put<AppsflyerSdk>(appsflyerSdk);
     _walletConnectModalController.initializeService(context);
     FirebaseMessaging.instance.requestPermission();
     _homeController.connectUserToStream(StreamChat.of(context).client);
@@ -210,23 +211,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  getCurrentCall() async {
-    var calls = await FlutterCallkitIncoming.activeCalls();
-    if (calls is List) {
-      if (calls.isNotEmpty) {
-        if (calls[0]['id'] != null && calls[0]['id'] != '') {
-          await _callController.join(
-              calls[0]['extra']['channel'],
-              calls[0]["extra"]["userCalled"],
-              calls[0]['extra']['userCalling']);
-        }
-        return calls[0];
-      } else {
-        return null;
-      }
-    }
-  }
-
+  /// Function to init and listen firebase events
   initFirebase() async {
     await LocalNotificationInitialize()
         .initialize(flutterLocalNotificationsPlugin);
@@ -434,56 +419,28 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
     });
+
     _callController.listenCall();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return const NavigationScreen();
+  /// Function to retrieve current call and join (used from background mode)
+  getCurrentCall() async {
+    var calls = await FlutterCallkitIncoming.activeCalls();
+    if (calls is List) {
+      if (calls.isNotEmpty) {
+        if (calls[0]['id'] != null && calls[0]['id'] != '') {
+          await _callController.join(
+              calls[0]['extra']['channel'],
+              calls[0]["extra"]["userCalled"],
+              calls[0]['extra']['userCalling']);
+        }
+        return calls[0];
+      } else {
+        return null;
+      }
+    }
   }
-}
 
-Future<void> showCallNotification(Map<String, dynamic> data) async {
-  var params = CallKitParams(
-      id: data['uuid'],
-      nameCaller: data["title"],
-      appName: 'Sirkl',
-      avatar: data["pic"] ??
-          'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png',
-      handle: data["body"],
-      type: 0,
-      duration: 30000,
-      textAccept: 'Accept',
-      textDecline: 'Decline',
-      missedCallNotification: const NotificationParams(showNotification: false),
-      extra: <String, dynamic>{
-        'userCalling': data["caller_id"],
-        "userCalled": data['called_id'],
-        "callId": data["call_id"],
-        "channel": data["channel"]
-      },
-      android: const AndroidParams(
-          isCustomNotification: false,
-          isCustomSmallExNotification: false,
-          isShowLogo: false,
-          ringtonePath: 'system_ringtone_default',
-          backgroundColor: '#102437',
-          actionColor: '#4CAF50'),
-      ios: const IOSParams(
-          iconName: 'CallKitLogo',
-          handleType: '',
-          supportsVideo: false,
-          maximumCallGroups: 2,
-          maximumCallsPerCallGroup: 1,
-          audioSessionMode: 'default',
-          audioSessionActive: true,
-          audioSessionPreferredSampleRate: 44100.0,
-          audioSessionPreferredIOBufferDuration: 0.005,
-          supportsDTMF: true,
-          supportsHolding: true,
-          supportsGrouping: false,
-          supportsUngrouping: false,
-          ringtonePath: 'system_ringtone_default'));
-
-  await FlutterCallkitIncoming.showCallkitIncoming(params);
+  @override
+  Widget build(BuildContext context) => const NavigationScreen();
 }

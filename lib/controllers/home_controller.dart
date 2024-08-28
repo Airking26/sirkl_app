@@ -120,21 +120,19 @@ class HomeController extends GetxController {
 
     AppsflyerSdk appsflyerSdk = Get.find<AppsflyerSdk>();
     await appsflyerSdk.logEvent("af_login", {});
+
     box.write(SharedPref.USER, signSuccess.user!.toJson());
     userMe.value = signSuccess.user!;
-
     accessToken.value = signSuccess.accessToken;
-    debugPrint('Login with wallet ${signSuccess.user}');
 
     isConfiguring.value = true;
     isFirstConnexion.value = true;
     _navigationController.hideNavBar.value = false;
-    var checkTime = DateTime.now().difference(userMe.value.createdAt!);
-    if (checkTime.inSeconds < 60) {
+    isLoading.value = false;
+    if (DateTime.now().difference(userMe.value.createdAt!).inSeconds < 60) {
       displayPopupFirstConnection.value = true;
     }
 
-    isLoading.value = false;
     await getAllNftConfig();
     await connectUserToStream(StreamChat.of(context).client);
     putFCMToken(context, StreamChat.of(context).client, false);
