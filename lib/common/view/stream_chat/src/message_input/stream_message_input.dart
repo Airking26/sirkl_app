@@ -23,11 +23,9 @@ import 'package:sirkl/common/view/stream_chat/src/message_input/simple_safe_area
 import 'package:sirkl/common/view/stream_chat/src/message_input/tld.dart';
 import 'package:sirkl/common/view/stream_chat/src/video/video_thumbnail_image.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/web3_controller.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
-import 'package:web3dart/web3dart.dart';
-import 'package:http/http.dart' as htp;
+import 'package:sirkl/controllers/web3_controller.dart';
 
 import '../../../../../config/s_colors.dart';
 
@@ -501,18 +499,30 @@ class StreamMessageInputState extends State<StreamMessageInput>
                       ? InkWell(
                           onTap: () async {
                             FocusManager.instance.primaryFocus?.unfocus();
-                            if (channel.extraData["isGroupPrivate"] == false || (channel.extraData["users_awaiting"] != null && (channel.extraData["users_awaiting"] as List<dynamic>).contains(_homeController.id.value))) {
-                              AlertDialog alert = _web3Controller.blockchainInfo("Please, wait while the transaction is processed. This may take some time.");
+                            if (channel.extraData["isGroupPrivate"] == false ||
+                                (channel.extraData["users_awaiting"] != null &&
+                                    (channel.extraData["users_awaiting"]
+                                            as List<dynamic>)
+                                        .contains(_homeController.id.value))) {
+                              AlertDialog alert = _web3Controller.blockchainInfo(
+                                  "Please, wait while the transaction is processed. This may take some time.");
                               var connector = await _web3Controller.connect();
-                              connector.onSessionConnect.subscribe((args) async {
-                                _web3Controller.joinGroupMethod(connector, args, context, channel, _homeController.userMe.value.wallet!, alert, _homeController.id.value);
+                              connector.onSessionConnect
+                                  .subscribe((args) async {
+                                _web3Controller.joinGroupMethod(
+                                    connector,
+                                    args,
+                                    context,
+                                    channel,
+                                    _homeController.userMe.value.wallet!,
+                                    alert,
+                                    _homeController.id.value);
                               });
                             } else {
                               showDialog(
                                   context: context,
                                   barrierDismissible: true,
-                                  builder: (_) =>
-                                      CupertinoAlertDialog(
+                                  builder: (_) => CupertinoAlertDialog(
                                         title: Text(
                                           "Join",
                                           style: TextStyle(
@@ -702,8 +712,16 @@ class StreamMessageInputState extends State<StreamMessageInput>
                                     )
                                   : Center(
                                       child: Text(
-                                      channel.extraData["isGroupPrivate"]  ==
-                                              false || (channel.extraData["users_awaiting"] != null && (channel.extraData["users_awaiting"] as List<dynamic>).contains(_homeController.id.value))
+                                      channel.extraData["isGroupPrivate"] ==
+                                                  false ||
+                                              (channel.extraData[
+                                                          "users_awaiting"] !=
+                                                      null &&
+                                                  (channel.extraData[
+                                                              "users_awaiting"]
+                                                          as List<dynamic>)
+                                                      .contains(_homeController
+                                                          .id.value))
                                           ? "Join (cost : ${channel.extraData["price"] is double ? channel.extraData["price"] as double : (channel.extraData["price"] as int).toDouble()}ETH)"
                                           : "Request to join",
                                       style: const TextStyle(
@@ -910,8 +928,8 @@ class StreamMessageInputState extends State<StreamMessageInput>
                 !widget.actions.isNotEmpty
             ? const Offstage()
             : Transform.translate(
-          offset: Offset(0, -4),
-              child: Wrap(
+                offset: Offset(0, -4),
+                child: Wrap(
                   children: <Widget>[
                     if (!widget.disableAttachments &&
                         channel.ownCapabilities
@@ -927,7 +945,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
                         : [],
                   ].insertBetween(const SizedBox(width: 0)),
                 ),
-            ),
+              ),
         duration: const Duration(milliseconds: 300),
         alignment: Alignment.center,
       ),
@@ -1587,6 +1605,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
           skipEnrichUrl: skipEnrichUrl,
         );
       } else {
+        // TODO : Add appsflyer send message
         sendingFuture = channel.sendMessage(
           message,
           skipEnrichUrl: skipEnrichUrl,

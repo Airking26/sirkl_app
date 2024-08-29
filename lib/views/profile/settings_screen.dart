@@ -10,7 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:sirkl/common/save_pref_keys.dart';
-import 'package:sirkl/common/view/dialog/custom_dial.dart';
+import 'package:sirkl/common/view/dialog/positioned_dialog.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_config.dart';
@@ -38,7 +38,7 @@ class SettingScreen extends StatefulWidget {
 
 class _SettingScreenState extends State<SettingScreen> {
   final box = GetStorage();
-  YYDialog dialogMenu = YYDialog();
+  PositionedDialog dialogMenu = PositionedDialog();
 
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get _homeController => Get.find<HomeController>();
@@ -567,8 +567,8 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  YYDialog dialogPopMenu(BuildContext context) {
-    return YYDialog().build(context)
+  PositionedDialog dialogPopMenu(BuildContext context) {
+    return PositionedDialog().build(context)
       ..width = 175
       ..borderRadius = 10.0
       ..gravity = Gravity.rightTop

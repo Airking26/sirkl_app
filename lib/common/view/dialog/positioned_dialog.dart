@@ -3,62 +3,60 @@ import 'package:flutter/scheduler.dart';
 
 import '../../../config/s_colors.dart';
 
-class YYDialog {
-  //================================弹窗属性======================================
-  List<Widget> widgetList = []; //弹窗内部所有组件
-  static BuildContext? _context; //弹窗上下文
-  BuildContext? context; //弹窗上下文
+class PositionedDialog {
+  List<Widget> widgetList = [];
+  static BuildContext? _context;
+  BuildContext? context;
 
-  double? width; //弹窗宽度
-  double? height; //弹窗高度
-  Duration duration = Duration(milliseconds: 250); //弹窗动画出现的时间
-  Gravity gravity = Gravity.center; //弹窗出现的位置
-  bool gravityAnimationEnable = false; //弹窗出现的位置带有的默认动画是否可用
-  Color barrierColor = Colors.black.withOpacity(.3); //弹窗外的背景色
-  BoxConstraints? constraints; //弹窗约束
-  Function(Widget child, Animation<double> animation)? animatedFunc; //弹窗出现的动画
-  bool barrierDismissible = true; //是否点击弹出外部消失
-  EdgeInsets margin = EdgeInsets.all(0.0); //弹窗布局的外边距
+  double? width;
+  double? height;
+  Duration duration = const Duration(milliseconds: 250);
+  Gravity gravity = Gravity.center;
+  bool gravityAnimationEnable = false;
+  Color barrierColor = Colors.black.withOpacity(.3);
+  BoxConstraints? constraints;
+  Function(Widget child, Animation<double> animation)? animatedFunc;
+  bool barrierDismissible = true;
+  EdgeInsets margin = const EdgeInsets.all(0.0);
 
   /// 用于有多个navigator嵌套的情况，默认为true
   /// @params useRootNavigator=false，push是用的是当前布局的context
   /// @params useRootNavigator=true，push是用的嵌套根布局的context
   bool useRootNavigator = true;
 
-  Decoration? decoration; //弹窗内的装饰，与backgroundColor和borderRadius互斥
+  Decoration? decoration;
   Color backgroundColor =
       SchedulerBinding.instance.platformDispatcher.platformBrightness ==
               Brightness.dark
-          ? Color(0xFF1E3244).withOpacity(0.7)
-          : Colors.white; //弹窗内的背景色
-  double borderRadius = 0.0; //弹窗圆角
+          ? const Color(0xFF1E3244).withOpacity(0.7)
+          : Colors.white;
+  double borderRadius = 0.0;
 
-  Function()? showCallBack; //展示的回调
-  Function()? dismissCallBack; //消失的回调
+  Function()? showCallBack;
+  Function()? dismissCallBack;
 
-  get isShowing => _isShowing; //当前 弹窗是否可见
+  get isShowing => _isShowing;
   bool _isShowing = false;
 
-  //============================================================================
   static void init(BuildContext ctx) {
     _context = ctx;
   }
 
-  YYDialog build([BuildContext? ctx]) {
+  PositionedDialog build([BuildContext? ctx]) {
     if (ctx == null && _context != null) {
-      this.context = _context;
+      context = _context;
       return this;
     }
-    this.context = ctx;
+    context = ctx;
     return this;
   }
 
-  YYDialog widget(Widget child) {
-    this.widgetList.add(child);
+  PositionedDialog widget(Widget child) {
+    widgetList.add(child);
     return this;
   }
 
-  YYDialog text(
+  PositionedDialog text(
       {padding,
       text,
       color,
@@ -70,9 +68,9 @@ class YYDialog {
       overflow,
       fontWeight,
       fontFamily}) {
-    return this.widget(
+    return widget(
       Padding(
-        padding: padding ?? EdgeInsets.all(0.0),
+        padding: padding ?? const EdgeInsets.all(0.0),
         child: Align(
           alignment: alignment ?? Alignment.centerLeft,
           child: Text(
@@ -93,12 +91,12 @@ class YYDialog {
     );
   }
 
-  YYDialog doubleButton({
+  PositionedDialog doubleButton({
     padding,
     gravity,
     height,
-    isClickAutoDismiss = true, //点击按钮后自动关闭
-    withDivider = false, //中间分割线
+    isClickAutoDismiss = true,
+    withDivider = false,
     text1,
     color1,
     fontSize1,
@@ -114,7 +112,7 @@ class YYDialog {
     onTap2,
     buttonPadding2 = const EdgeInsets.all(0.0),
   }) {
-    return this.widget(
+    return widget(
       SizedBox(
         height: height ?? 45.0,
         child: Row(
@@ -140,7 +138,7 @@ class YYDialog {
             ),
             Visibility(
               visible: withDivider,
-              child: VerticalDivider(),
+              child: const VerticalDivider(),
             ),
             TextButton(
               onPressed: () {
@@ -167,17 +165,17 @@ class YYDialog {
     );
   }
 
-  YYDialog listViewOfListTile({
+  PositionedDialog listViewOfListTile({
     List<ListTileItem>? items,
     double? height,
     isClickAutoDismiss = true,
     Function(int)? onClickItemListener,
   }) {
     return widget(
-      Container(
+      SizedBox(
         height: height,
         child: ListView.builder(
-          padding: EdgeInsets.all(0.0),
+          padding: const EdgeInsets.all(0.0),
           shrinkWrap: true,
           itemCount: items?.length ?? 0,
           itemBuilder: (BuildContext context, int index) {
@@ -193,13 +191,14 @@ class YYDialog {
                       dismiss();
                     }
                   },
-                  contentPadding: items?[index].padding ?? EdgeInsets.all(0.0),
+                  contentPadding:
+                      items?[index].padding ?? const EdgeInsets.all(0.0),
                   leading: items?[index].leading,
                   title: Text(
                     items?[index].text ?? "",
                     style: TextStyle(
-                      color: items?[index].color ?? null,
-                      fontSize: items?[index].fontSize ?? null,
+                      color: items?[index].color,
+                      fontSize: items?[index].fontSize,
                       fontWeight: items?[index].fontWeight,
                       fontFamily: items?[index].fontFamily,
                     ),
@@ -213,16 +212,16 @@ class YYDialog {
     );
   }
 
-  YYDialog listViewOfRadioButton({
+  PositionedDialog listViewOfRadioButton({
     List<RadioItem>? items,
     double? height,
     Color? color,
     Color? activeColor,
-    int? intialValue,
+    int? initialValue,
     Function(int)? onClickItemListener,
   }) {
     Size size = MediaQuery.of(context!).size;
-    return this.widget(
+    return widget(
       Container(
         height: height,
         constraints: BoxConstraints(
@@ -232,7 +231,7 @@ class YYDialog {
         ),
         child: YYRadioListTile(
           items: items,
-          intialValue: intialValue,
+          initialValue: initialValue,
           color: color,
           activeColor: activeColor,
           onChanged: onClickItemListener,
@@ -241,9 +240,9 @@ class YYDialog {
     );
   }
 
-  YYDialog circularProgress(
+  PositionedDialog circularProgress(
       {padding, backgroundColor, valueColor, strokeWidth}) {
-    return this.widget(Padding(
+    return widget(Padding(
       padding: padding,
       child: CircularProgressIndicator(
         color: SColors.activeColor,
@@ -254,8 +253,8 @@ class YYDialog {
     ));
   }
 
-  YYDialog divider({color, height, padding}) {
-    return this.widget(
+  PositionedDialog divider({color, height, padding}) {
+    return widget(
       Padding(
         padding: EdgeInsets.symmetric(horizontal: padding),
         child: Divider(
@@ -266,8 +265,6 @@ class YYDialog {
     );
   }
 
-  ///  x坐标
-  ///  y坐标
   void show([x, y]) {
     var mainAxisAlignment = getColumnMainAxisAlignment(gravity);
     var crossAxisAlignment = getColumnCrossAxisAlignment(gravity);
@@ -295,14 +292,14 @@ class YYDialog {
               type: MaterialType.transparency,
               borderRadius: BorderRadius.circular(borderRadius),
               child: Container(
-                width: width ?? null,
-                height: height ?? null,
+                width: width,
+                height: height,
                 decoration: decoration ??
                     BoxDecoration(
                       borderRadius: BorderRadius.circular(borderRadius),
                       color: backgroundColor,
                     ),
-                constraints: constraints ?? BoxConstraints(),
+                constraints: constraints ?? const BoxConstraints(),
                 child: CustomDialogChildren(
                   widgetList: widgetList,
                   isShowingChange: (bool isShowingChange) {
@@ -404,12 +401,12 @@ class YYDialog {
   }
 }
 
-///弹窗的内容作为可变组件
 class CustomDialogChildren extends StatefulWidget {
   final List<Widget> widgetList; //弹窗内部所有组件
   final Function(bool)? isShowingChange;
 
-  CustomDialogChildren({this.widgetList = const [], this.isShowingChange});
+  const CustomDialogChildren(
+      {super.key, this.widgetList = const [], this.isShowingChange});
 
   @override
   CustomDialogChildState createState() => CustomDialogChildState();
@@ -435,17 +432,16 @@ class CustomDialogChildState extends State<CustomDialogChildren> {
   }
 }
 
-///弹窗API的封装
 class CustomDialog {
-  BuildContext _context;
-  Widget _child;
-  Duration? _duration;
+  final BuildContext _context;
+  final Widget _child;
+  final Duration? _duration;
   Color? _barrierColor;
-  RouteTransitionsBuilder? _transitionsBuilder;
-  bool? _barrierDismissible;
-  Gravity? _gravity;
-  bool _gravityAnimationEnable;
-  Function? _animatedFunc;
+  final RouteTransitionsBuilder? _transitionsBuilder;
+  final bool? _barrierDismissible;
+  final Gravity? _gravity;
+  final bool _gravityAnimationEnable;
+  final Function? _animatedFunc;
 
   CustomDialog({
     required Widget child,
@@ -466,11 +462,10 @@ class CustomDialog {
         _animatedFunc = animatedFunc,
         _transitionsBuilder = transitionsBuilder,
         _barrierDismissible = barrierDismissible {
-    this.show();
+    show();
   }
 
   show() {
-    //fix transparent error
     if (_barrierColor == Colors.transparent) {
       _barrierColor = Colors.white.withOpacity(0.0);
     }
@@ -480,7 +475,7 @@ class CustomDialog {
       barrierColor: _barrierColor ?? Colors.black.withOpacity(.3),
       barrierDismissible: _barrierDismissible ?? true,
       barrierLabel: "",
-      transitionDuration: _duration ?? Duration(milliseconds: 250),
+      transitionDuration: _duration ?? const Duration(milliseconds: 250),
       transitionBuilder: _transitionsBuilder ?? _buildMaterialDialogTransitions,
       pageBuilder: (BuildContext buildContext, Animation<double> animation,
           Animation<double> secondaryAnimation) {
@@ -504,49 +499,47 @@ class CustomDialog {
       case Gravity.leftTop:
       case Gravity.rightTop:
         custom = Tween<Offset>(
-          begin: Offset(0.0, -1.0),
-          end: Offset(0.0, 0.0),
+          begin: const Offset(0.0, -1.0),
+          end: const Offset(0.0, 0.0),
         ).animate(animation);
         break;
       case Gravity.left:
         custom = Tween<Offset>(
-          begin: Offset(-1.0, 0.0),
-          end: Offset(0.0, 0.0),
+          begin: const Offset(-1.0, 0.0),
+          end: const Offset(0.0, 0.0),
         ).animate(animation);
         break;
       case Gravity.right:
         custom = Tween<Offset>(
-          begin: Offset(1.0, 0.0),
-          end: Offset(0.0, 0.0),
+          begin: const Offset(1.0, 0.0),
+          end: const Offset(0.0, 0.0),
         ).animate(animation);
         break;
       case Gravity.bottom:
       case Gravity.leftBottom:
       case Gravity.rightBottom:
         custom = Tween<Offset>(
-          begin: Offset(0.0, 1.0),
-          end: Offset(0.0, 0.0),
+          begin: const Offset(0.0, 1.0),
+          end: const Offset(0.0, 0.0),
         ).animate(animation);
         break;
       case Gravity.center:
       default:
         custom = Tween<Offset>(
-          begin: Offset(0.0, 0.0),
-          end: Offset(0.0, 0.0),
+          begin: const Offset(0.0, 0.0),
+          end: const Offset(0.0, 0.0),
         ).animate(animation);
         break;
     }
 
-    //自定义动画
     if (_animatedFunc != null) {
       return _animatedFunc!(child, animation);
     }
 
-    //不需要默认动画
     if (!_gravityAnimationEnable) {
       custom = Tween<Offset>(
-        begin: Offset(0.0, 0.0),
-        end: Offset(0.0, 0.0),
+        begin: const Offset(0.0, 0.0),
+        end: const Offset(0.0, 0.0),
       ).animate(animation);
     }
 
@@ -557,7 +550,6 @@ class CustomDialog {
   }
 }
 
-//================================弹窗重心======================================
 enum Gravity {
   left,
   top,
@@ -570,9 +562,7 @@ enum Gravity {
   leftBottom,
   spaceEvenly,
 }
-//============================================================================
 
-//================================弹窗实体======================================
 class ListTileItem {
   ListTileItem({
     this.padding,
@@ -612,10 +602,10 @@ class RadioItem {
 }
 
 class YYRadioListTile extends StatefulWidget {
-  YYRadioListTile({
+  const YYRadioListTile({
     Key? key,
     this.items,
-    this.intialValue,
+    this.initialValue,
     this.color,
     this.activeColor,
     this.onChanged,
@@ -625,7 +615,7 @@ class YYRadioListTile extends StatefulWidget {
   final List<RadioItem>? items;
   final Color? color;
   final Color? activeColor;
-  final intialValue;
+  final initialValue;
   final Function(int)? onChanged;
 
   @override
@@ -642,7 +632,7 @@ class YYRadioListTileState extends State<YYRadioListTile> {
     //The button initializes the position.
     //If it is not filled, it is not selected.
     if (groupId == -1) {
-      groupId = widget.intialValue ?? -1;
+      groupId = widget.initialValue ?? -1;
     }
   }
 
@@ -651,7 +641,7 @@ class YYRadioListTileState extends State<YYRadioListTile> {
     intialSelectedItem();
 
     return ListView.builder(
-      padding: EdgeInsets.all(0.0),
+      padding: const EdgeInsets.all(0.0),
       shrinkWrap: true,
       itemCount: widget.items?.length ?? 0,
       itemBuilder: (BuildContext context, int index) {

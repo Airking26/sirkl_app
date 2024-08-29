@@ -37,7 +37,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
   @override
   void initState() {
     pagingController.addPageRequestListener((pageKey) {
-      if (_callController.callQuery.value.isEmpty) {
+      if (_callController.queryCall.value.isEmpty) {
         pagingController.refresh();
         pagingController.appendLastPage(_commonController.users);
       }
@@ -50,7 +50,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
       List<UserDTO> newItems;
       if (pageKey == 0) newItems = [];
       newItems = await _callController.searchUser(
-          _callController.callQuery.value, pageKey);
+          _callController.queryCall.value, pageKey);
       final isLastPage = newItems.length < 12;
       if (isLastPage) {
         pagingController.appendLastPage(newItems);
@@ -257,7 +257,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async {
         pageKey = 0;
-        _callController.callQuery.value = query;
+        _callController.queryCall.value = query;
         if (query.isNotEmpty) {
           pagingController.itemList = [];
           fetchPageUsers();
@@ -372,7 +372,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
   @override
   void dispose() {
     pagingController.dispose();
-    _callController.callQuery.value = "";
+    _callController.queryCall.value = "";
     super.dispose();
   }
 }

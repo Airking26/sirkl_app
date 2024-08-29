@@ -1,3 +1,4 @@
+import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
@@ -196,6 +197,12 @@ class _NavigationScreenState extends State<NavigationScreen> {
                     }, child: _web3Controller.isMintingInProgress.value ? Center(child: SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: SColors.activeColor)),) : Text("MINT", style: TextStyle(color: SColors.activeColor),))
                   ],));
                 });*/
+              } else {
+                AppsflyerSdk appsflyerSdk = Get.find<AppsflyerSdk>();
+                appsflyerSdk.logEvent("click_profile", {
+                  "user_id": _homeController.id.value,
+                  "user_wallet": _homeController.userMe.value.wallet
+                });
               }
             }
           },

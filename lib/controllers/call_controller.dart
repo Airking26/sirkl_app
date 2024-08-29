@@ -36,12 +36,12 @@ class CallController extends GetxController {
   late Timer? timerRing;
   late String? currentCallID;
 
-  var callList = (null as List<CallDto>?).obs;
+  var callHistoric = (null as List<CallDto>?).obs;
 
   var userCalled = UserDTO().obs;
   var timer = StopWatchTimer().obs;
 
-  var callQuery = "".obs;
+  var queryCall = "".obs;
   var pageKey = 0.obs;
 
   var isFromConv = false.obs;
@@ -132,8 +132,8 @@ class CallController extends GetxController {
   /// Function to retrieve call historic
   Future<List<CallDto>> retrieveCallHistoric(String offset) async {
     List<CallDto> calls = await CallRepo.retrieveCalls(offset);
-    callList.value ??= [];
-    callList.value!.addAll(calls);
+    callHistoric.value ??= [];
+    callHistoric.value!.addAll(calls);
     return calls;
   }
 

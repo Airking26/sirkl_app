@@ -99,8 +99,8 @@ class _CallsScreenState extends State<CallsScreen> {
         fit: StackFit.loose,
         children: [
           Container(
-            height: _callController.callList.value == null ||
-                    _callController.callList.value!.isEmpty
+            height: _callController.callHistoric.value == null ||
+                    _callController.callHistoric.value!.isEmpty
                 ? 115
                 : 140,
             margin: const EdgeInsets.only(bottom: 0.25),
@@ -170,8 +170,8 @@ class _CallsScreenState extends State<CallsScreen> {
               ),
             ),
           ),
-          _callController.callList.value == null ||
-                  _callController.callList.value!.isEmpty
+          _callController.callHistoric.value == null ||
+                  _callController.callHistoric.value!.isEmpty
               ? Container()
               : Positioned(
                   top: 110,
