@@ -42,6 +42,8 @@ class StreamMessagePreviewText extends StatelessWidget {
           return '🎬';
         } else if (it.type == 'giphy') {
           return '[GIF]';
+        } else if (it.type == 'voicenote') {
+          return '🔉';
         }
         return it == message.attachments.last
             ? (it.title ?? 'File')
@@ -58,7 +60,8 @@ class StreamMessagePreviewText extends StatelessWidget {
         ? FontStyle.italic
         : FontStyle.normal;
 
-    final regularTextStyle = textStyle?.copyWith(fontStyle: fontStyle, fontWeight: FontWeight.w500, fontSize: 15);
+    final regularTextStyle = textStyle?.copyWith(
+        fontStyle: fontStyle, fontWeight: FontWeight.w500, fontSize: 15);
 
     final mentionsTextStyle = textStyle?.copyWith(
       fontStyle: fontStyle,
