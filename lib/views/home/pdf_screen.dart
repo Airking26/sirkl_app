@@ -15,11 +15,8 @@ class _PDFScreenState extends State<PDFScreen> {
     switch (widget.pdfType) {
       case PDFType.tc:
         return "assets/pdf/tc.pdf";
-      // TODO: Handle this case.
-
       case PDFType.pp:
         return "assets/pdf/pp.pdf";
-
       case PDFType.all:
         return "assets/pdf/all.pdf";
     }

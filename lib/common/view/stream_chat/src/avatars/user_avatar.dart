@@ -33,7 +33,7 @@ class StreamUserAvatar extends StatelessWidget {
     this.channel,
   });
 
- HomeController get _homeController => Get.find<HomeController>();
+  HomeController get _homeController => Get.find<HomeController>();
 
   final bool memberPage;
 
@@ -85,7 +85,6 @@ class StreamUserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     var userDTO = userFromJson(json.encode(user.extraData["userDTO"]));
     final userHavePicture = !userDTO.picture.isNullOrBlank!;
     final notYetUser = userDTO.id == _homeController.id.value;
@@ -99,34 +98,62 @@ class StreamUserAvatar extends StatelessWidget {
       child: streamChatConfig.defaultUserImage(context, user),
     );
 
-    //TODO : Removed memberPage with userHavePicture to display picture of user
+    // Removed memberPage with userHavePicture to display picture of user
     Widget avatar = FittedBox(
       fit: BoxFit.cover,
       child: Container(
-        constraints: const BoxConstraints(minWidth: 56, maxHeight: 56, maxWidth: 56, minHeight: 56),
-        child: notYetUser && isGroup != null && isGroup as bool ?
-        Image.asset("assets/images/app_icon_rounded.png", width: 56, height: 56, fit: BoxFit.cover,) :
-        (userHavePicture && isGroup != null && (isGroup as bool))
-            || (isGroup != null && picOfGroup != null && !(isGroup as bool))
-            || userHavePicture
-            ? CachedNetworkImage(
+        constraints: const BoxConstraints(
+            minWidth: 56, maxHeight: 56, maxWidth: 56, minHeight: 56),
+        child: notYetUser && isGroup != null && isGroup as bool
+            ? Image.asset(
+                "assets/images/app_icon_rounded.png",
+                width: 56,
+                height: 56,
                 fit: BoxFit.cover,
-                filterQuality: FilterQuality.high,
-                imageUrl: picOfGroup != null ? picOfGroup as String :userDTO.picture!,
-                errorWidget: (context, __, ___) => backupGradientAvatar,
-                placeholder:(context, _) =>  Center(child: CircularProgressIndicator(color: SColors.activeColor)),
-                imageBuilder: (context, imageProvider) => DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(90),
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
               )
-            : TinyAvatar(baseString: isGroup != null && picOfGroup != null &&  !(isGroup as bool) ? picOfGroup as String : (channel?.extraData["isGroupPaying"] != null && (channel?.extraData["isGroupPaying"]) as bool) || (channel?.extraData["isConv"] != null && channel?.extraData["isConv"] == false) ?
-        channel?.extraData["nameOfGroup"] as String : userFromJson(json.encode(user.extraData["userDTO"])).wallet!, dimension: 52, circular: true, colourScheme: TinyAvatarColourScheme.seascape,),
+            : (userHavePicture && isGroup != null && (isGroup as bool)) ||
+                    (isGroup != null &&
+                        picOfGroup != null &&
+                        !(isGroup as bool)) ||
+                    userHavePicture
+                ? CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    filterQuality: FilterQuality.high,
+                    imageUrl: picOfGroup != null
+                        ? picOfGroup as String
+                        : userDTO.picture!,
+                    errorWidget: (context, __, ___) => backupGradientAvatar,
+                    placeholder: (context, _) => Center(
+                        child: CircularProgressIndicator(
+                            color: SColors.activeColor)),
+                    imageBuilder: (context, imageProvider) => DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(90),
+                        image: DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  )
+                : TinyAvatar(
+                    baseString: isGroup != null &&
+                            picOfGroup != null &&
+                            !(isGroup as bool)
+                        ? picOfGroup as String
+                        : (channel?.extraData["isGroupPaying"] != null &&
+                                    (channel?.extraData["isGroupPaying"])
+                                        as bool) ||
+                                (channel?.extraData["isConv"] != null &&
+                                    channel?.extraData["isConv"] == false)
+                            ? channel?.extraData["nameOfGroup"] as String
+                            : userFromJson(
+                                    json.encode(user.extraData["userDTO"]))
+                                .wallet!,
+                    dimension: 52,
+                    circular: true,
+                    colourScheme: TinyAvatarColourScheme.seascape,
+                  ),
       ),
     );
 
@@ -179,5 +206,4 @@ class StreamUserAvatar extends StatelessWidget {
       ),
     );
   }
-
 }

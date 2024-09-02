@@ -12,4 +12,7 @@ class SConfig {
 
   static const String emptyHexBalance =
       "0x0000000000000000000000000000000000000000000000000000000000000000";
+
+  static const String afDevKey = "KdGKBY4Q3u3ooKjm4KT5am";
+  static const String iosAppId = "1668076042";
 }

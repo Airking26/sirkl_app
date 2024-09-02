@@ -1145,6 +1145,9 @@ Future<void> promptCopySeedPhrase(BuildContext context) async =>
                                 )));
                           }),
                     ),
+                    const SizedBox(
+                      height: 16,
+                    ),
                     InkWell(
                       onTap: () async {
                         await Clipboard.setData(ClipboardData(
@@ -1175,9 +1178,6 @@ Future<void> promptCopySeedPhrase(BuildContext context) async =>
                         ],
                       ),
                     ),
-                    const SizedBox(
-                      height: 16,
-                    )
                   ],
                 ),
                 actions: <Widget>[

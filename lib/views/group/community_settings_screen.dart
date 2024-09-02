@@ -133,7 +133,6 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                         pushNewScreen(context,
                             screen: const GroupParticipantScreen());
                       },
-                      //TODO : check -3
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Text(

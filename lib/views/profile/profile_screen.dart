@@ -468,12 +468,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 48.0),
                   child: InkWell(
+                    hoverColor: Colors.transparent,
+                    splashFactory: NoSplash.splashFactory,
                     onTap: () async {
                       await Clipboard.setData(ClipboardData(
                           text: _homeController.userMe.value.wallet!));
                       showToast(context, con.walletCopiedRes.tr);
                     },
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(

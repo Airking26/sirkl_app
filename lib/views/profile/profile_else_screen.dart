@@ -284,6 +284,8 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 48.0),
                   child: InkWell(
+                    hoverColor: Colors.transparent,
+                    splashFactory: NoSplash.splashFactory,
                     onTap: () async {
                       await Clipboard.setData(ClipboardData(
                           text: _commonController.userClicked.value!.wallet!));
@@ -291,6 +293,7 @@ class _ProfileElseScreenState extends State<ProfileElseScreen> {
                       showToast(context, con.walletCopiedRes.tr);
                     },
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(

@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:cached_network_image/cached_network_image.dart'
     hide ErrorListener;
 import 'package:desktop_drop/desktop_drop.dart';
@@ -1605,7 +1606,10 @@ class StreamMessageInputState extends State<StreamMessageInput>
           skipEnrichUrl: skipEnrichUrl,
         );
       } else {
-        // TODO : Add appsflyer send message
+        AppsflyerSdk appsflyerSdk = Get.find<AppsflyerSdk>();
+        appsflyerSdk.logEvent("message_sent", {
+          "channel_id": channel.id,
+        });
         sendingFuture = channel.sendMessage(
           message,
           skipEnrichUrl: skipEnrichUrl,

@@ -35,8 +35,9 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
   void initState() {
     if (widget.resetChannel) _chatController.resetChannel();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (_commonController.userClicked.value != null)
+      if (_commonController.userClicked.value != null) {
         _commonController.checkUserIsInFollowing();
+      }
       if (widget.create) {
         _chatController.checkOrCreateChannel(
             _commonController.userClicked.value!.id!,
@@ -72,7 +73,6 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
 
   @override
   void dispose() {
-    //TODO : Check if not break
     _chatController.resetChannel();
     super.dispose();
   }

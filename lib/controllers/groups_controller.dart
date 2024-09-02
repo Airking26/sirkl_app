@@ -143,7 +143,7 @@ class GroupsController extends GetxController {
   Future<void> changeAdminRole(AdminDto adminDTO) async =>
       await GroupRepo.changeAdminRole(adminDTO);
 
-  // TODO : Deprecated since mint will be made from server
+  // TODO : Deprecate since mint will be made from server
   Future<void> addUserToSirklClub(String id) async =>
       await GroupRepo.addUserToSirklClub(id);
 }

@@ -219,7 +219,6 @@ class StreamChannelHeader extends StatelessWidget
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    //TODO : Check if not break
                                     Navigator.pop(context);
                                     _chatController.resetChannel();
                                   },
@@ -390,7 +389,6 @@ class StreamChannelHeader extends StatelessWidget
                                                           : Colors.black),
                                                 ),
                                               ),
-                                        //TODO : check -3
                                         (channel.extraData['isConv'] == null) ||
                                                 (channel.extraData["isConv"] !=
                                                         null &&

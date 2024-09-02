@@ -24,6 +24,7 @@ import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
@@ -178,8 +179,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   AppsflyerSdk appsflyerSdk = AppsflyerSdk(AppsFlyerOptions(
-      afDevKey: "KdGKBY4Q3u3ooKjm4KT5am",
-      appId: "1668076042",
+      afDevKey: SConfig.afDevKey,
+      appId: SConfig.iosAppId,
+      timeToWaitForATTUserAuthorization: 50,
       showDebug: true));
   HomeController get _homeController => Get.find<HomeController>();
   CallController get _callController => Get.find<CallController>();
