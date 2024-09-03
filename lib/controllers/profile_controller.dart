@@ -365,6 +365,7 @@ class ProfileController extends GetxController {
                                       .checkIsUsernameAvailable(value)) {
                                     _isUsernameValid.value = true;
                                   } else {
+                                    _isUsernameValid.value = false;
                                     _errorMessage.value =
                                         "Username already taken";
                                   }
