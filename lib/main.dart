@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -49,13 +50,10 @@ import 'navigation/ui/navigation_screen.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  debugPrint("OnDebugSirkl : Background Handler");
   await GetStorage().initStorage;
   var notificationActive = GetStorage().read(con.NOTIFICATION_ACTIVE) ?? true;
   if (notificationActive) {
-    debugPrint("ENTERING NOTIFICATION ACTIVE");
     if (message.data['type'] == "2") {
-      debugPrint("Call kit type 2");
       await FlutterCallkitIncoming.endAllCalls();
     } else if (message.data['type'] == "4") {
       try {
@@ -66,7 +64,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         rethrow;
       }
     } else if (message.data['type'] == "8") {
-      debugPrint("ENTERING 8 MODE");
       showCallNotification(message.data);
     }
   }
@@ -177,7 +174,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   AppsflyerSdk appsflyerSdk = AppsflyerSdk(AppsFlyerOptions(
       afDevKey: SConfig.afDevKey,
       appId: SConfig.iosAppId,
@@ -210,7 +207,28 @@ class _MyHomePageState extends State<MyHomePage> {
     initFirebase();
     _callController.setupVoiceSDKEngine(context);
     getCurrentCall();
+    WidgetsBinding.instance.addObserver(this);
+    _resetBadgeCount();
     super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Reset the badge when the app comes to the foreground
+      _resetBadgeCount();
+    }
+  }
+
+  void _resetBadgeCount() {
+    AppBadgePlus.updateBadge(0);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   /// Function to init and listen firebase events
@@ -219,6 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
         .initialize(flutterLocalNotificationsPlugin);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       debugPrint("onMessage: $message");
+      _resetBadgeCount();
       if (_homeController.notificationActive.value) {
         if (message.data["type"] == "0" ||
             message.data["type"] == "1" ||
@@ -282,6 +301,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     FirebaseMessaging.onMessageOpenedApp.listen((event) async {
       debugPrint("OnMessageOpenedApp");
+      _resetBadgeCount();
       if (event.data["cid"] != null) {
         final response = await StreamChat.of(context).client.queryChannel("try",
             channelId: (event.data["cid"] as String).replaceFirst('try:', ''));
@@ -307,7 +327,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     FirebaseMessaging.instance.getInitialMessage().then((event) async {
-      debugPrint("OnDebugSirkl : Initial Message");
+      _resetBadgeCount();
       if (event != null) {
         debugPrint("Event not null");
         if (event.data['cid'] != null) {

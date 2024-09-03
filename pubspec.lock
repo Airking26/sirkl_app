@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.11"
+  app_badge_plus:
+    dependency: "direct main"
+    description:
+      name: app_badge_plus
+      sha256: "241324ae34c0c2e2a092d2aa231b0ce1220ff6d3f195a3216bf0db220c12acc6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.4"
   appcheck:
     dependency: transitive
     description:
