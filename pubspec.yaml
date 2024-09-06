@@ -108,11 +108,13 @@ dependencies:
   flutter_phoenix: ^1.1.1
   appsflyer_sdk: ^6.14.3
   app_badge_plus: ^1.1.2
+  solana_wallet_provider: ^0.1.9
 
 dependency_overrides:
   flutter_svg: ^2.0.9
   http: ^1.1.0
   audio_video_progress_bar: ^2.0.3
+  pinenacl: ^0.6.0
 
 dev_dependencies:
   flutter_lints: ^2.0.0

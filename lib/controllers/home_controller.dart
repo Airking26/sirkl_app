@@ -158,7 +158,9 @@ class HomeController extends GetxController {
         var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
         await HomeRepo.uploadAPNToken(token);
       }
-      await retrieveContractAddress();
+      try {
+        await retrieveContractAddress();
+      } catch (e) {}
     }
   }
 

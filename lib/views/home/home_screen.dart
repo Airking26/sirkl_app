@@ -1253,8 +1253,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 alignLabel: const Alignment(0.3, 0),
                 action: () async {
                   _homeController.isSigning.value = true;
-                  await _walletConnectModalController
-                      .signMessageWithWC(context);
+                  if (isEthereumAddress(_homeController.address.value)) {
+                    await _walletConnectModalController
+                        .signMessageWithWC(context);
+                  } else if (isSolanaAddress(_homeController.address.value)) {
+                    await _walletConnectModalController.signMessageSolana(
+                        context,
+                        _walletConnectModalController.solanaProvider!,
+                        1);
+                  } else {
+                    await _walletConnectModalController
+                        .signMessageWithWC(context);
+                  }
                   _homeController.isSigning.value = false;
                   return _homeController.isSigning.value;
                 },

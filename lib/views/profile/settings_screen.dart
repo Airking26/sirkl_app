@@ -10,22 +10,23 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:sirkl/common/save_pref_keys.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/dialog/positioned_dialog.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'package:sirkl/main.dart';
 import 'package:sirkl/repo/google_repo.dart';
+import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
-import '../../config/s_colors.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../../views/home/pdf_screen.dart';
-import '../chats/detailed_chat_screen.dart';
 import 'my_communities_screen.dart';
 import 'my_group_screen.dart';
 
@@ -453,6 +454,13 @@ class _SettingScreenState extends State<SettingScreen> {
                                           _walletConnectModalController
                                               .w3mService.value
                                               ?.disconnect();
+                                          if (isSolanaAddress(_homeController
+                                                  .userMe.value.wallet ??
+                                              "")) {
+                                            await _walletConnectModalController
+                                                .solanaProvider
+                                                ?.disconnect(context);
+                                          }
                                           Get.deleteAll(force: true);
                                           Phoenix.rebirth(Get.context!);
                                           Get.offAll(() => const MyHomePage(),

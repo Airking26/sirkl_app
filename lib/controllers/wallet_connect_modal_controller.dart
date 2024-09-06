@@ -14,6 +14,7 @@ import 'package:sirkl/common/save_pref_keys.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/repo/auth_repo.dart';
 import 'package:sirkl/repo/google_repo.dart';
+import 'package:solana_wallet_provider/solana_wallet_provider.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 import 'package:web3modal_flutter/widgets/lists/list_items/wallet_list_item.dart';
 
@@ -36,6 +37,8 @@ class WalletConnectModalController extends GetxController {
 
   final box = GetStorage();
 
+  SolanaWalletProvider? solanaProvider;
+
   void initializeService(BuildContext context) async {
     w3mService.value = W3MService(
       includedWalletIds: {
@@ -49,15 +52,46 @@ class WalletConnectModalController extends GetxController {
       context: context,
       projectId: projectID,
       logLevel: LogLevel.error,
-      loginWithoutWalletWidget: WalletListItem(
-        title: "Connect without wallet",
-        imageUrl:
-            "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/no_wallet.png",
-        onTap: () async {
-          Get.back();
-          _homeController.isLoading.value = true;
-          await createWallet(context);
-        },
+      loginWithoutWalletWidget: Column(
+        children: [
+          SolanaWalletProvider.create(
+            identity: AppIdentity(
+                uri: Uri.parse('https://sirkl.io'),
+                icon: Uri.parse("logo.png"),
+                name: 'SIRKL.io'),
+            child: FutureBuilder(
+                future: SolanaWalletProvider.initialize(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState != ConnectionState.done) {
+                    return const CircularProgressIndicator();
+                  }
+
+                  return WalletListItem(
+                    title: "Phantom",
+                    imageUrl:
+                        "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/channels4_profile.jpg",
+                    onTap: () async {
+                      solanaProvider = SolanaWalletProvider.of(context);
+                      await _connectSolana(
+                          context, SolanaWalletProvider.of(context));
+                    },
+                  );
+                }),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          WalletListItem(
+            title: "Connect without wallet",
+            imageUrl:
+                "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/no_wallet.png",
+            onTap: () async {
+              Get.back();
+              _homeController.isLoading.value = true;
+              await createWallet(context);
+            },
+          ),
+        ],
       ),
       metadata: PairingMetadata(
         name: name,
@@ -242,6 +276,60 @@ class WalletConnectModalController extends GetxController {
       }
     } else {
       errorTextRetrieving.value = true;
+    }
+  }
+
+  Future<void> _connectSolana(
+    final BuildContext context,
+    final SolanaWalletProvider provider,
+  ) async {
+    if (!provider.adapter.isAuthorized) {
+      await provider.connect(context);
+      Get.back();
+      Get.back();
+      _homeController.address.value = base58Encode(
+          base64Decode(provider.adapter.connectedAccount!.address));
+    } else {
+      await provider.disconnect(context);
+      Get.back();
+    }
+  }
+
+  Future<void> signMessageSolana(
+    final BuildContext context,
+    final SolanaWalletProvider provider,
+    final int count,
+  ) async {
+    final String description = "Sign Messages ($count)";
+    try {
+      final SignMessagesResult result = await provider.signMessages(
+        context,
+        messages: [
+          testSignData(base58Encode(
+              base64Decode(provider.adapter.connectedAccount!.address)))
+        ],
+        addresses: [
+          provider.adapter.encodeAccount(provider.adapter.connectedAccount!)
+        ],
+      );
+
+      Navigator.of(context).pop();
+
+      var wallet = base58Encode(
+          base64Decode(provider.adapter.connectedAccount!.address));
+      var message = testSignData(base58Encode(
+          base64Decode(provider.adapter.connectedAccount!.address)));
+      var signature = result.signedPayloads.join('\n');
+      await _homeController.loginWithWallet(
+          context, wallet, message, signature);
+      /*setState(() {
+        _status = "Signed Messages ${result.signedPayloads.join('\n')}";
+        Get.back();
+      });*/
+    } catch (error, stack) {
+      debugPrint('$description Error: $error');
+      debugPrint('$description Stack: $stack');
+      // setState(() => _status = error.toString());
     }
   }
 }

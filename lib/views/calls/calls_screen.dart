@@ -537,7 +537,7 @@ class _CallsScreenState extends State<CallsScreen> {
   @override
   void dispose() {
     pagingSearchController.dispose();
-    _callController.pagingController.value.dispose();
+    //_callController.pagingController.value.dispose();
     super.dispose();
   }
 }

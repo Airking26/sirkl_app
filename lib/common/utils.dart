@@ -98,3 +98,15 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
 
   await FlutterCallkitIncoming.showCallkitIncoming(params);
 }
+
+bool isSolanaAddress(String address) {
+  // Check if the address is a valid base58 string and length is typical for Solana
+  final solanaAddressRegex = RegExp(r'^[A-HJ-NP-Za-km-z1-9]{32,48}$');
+  return solanaAddressRegex.hasMatch(address);
+}
+
+bool isEthereumAddress(String address) {
+  // Check if the address starts with "0x" and is 42 characters long
+  final ethAddressRegex = RegExp(r'^0x[a-fA-F0-9]{40}$');
+  return ethAddressRegex.hasMatch(address);
+}
