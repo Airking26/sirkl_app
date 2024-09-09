@@ -346,7 +346,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     _homeController.stories.value![index]!.first!.createdBy,
                     _homeController)
                 : "Unknown",
-            maxLines: 2,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: TextStyle(
                 fontFamily: "Gilroy",
