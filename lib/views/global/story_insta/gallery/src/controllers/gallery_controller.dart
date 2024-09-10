@@ -7,7 +7,7 @@ import 'package:sirkl/views/global/story_insta/animations/animations.dart';
 import 'package:sirkl/views/global/story_insta/camera/src/widgets/ui_handler.dart';
 import 'package:sirkl/views/global/story_insta/drishya_picker.dart';
 import 'package:sirkl/views/global/story_insta/gallery/src/repo/gallery_repository.dart';
-import 'package:sirkl/views/global/trimmer/trimmer_view.dart';
+import 'package:sirkl/views/global/story_insta/trimmer/trimmer_view.dart';
 
 ///
 /// Gallery controller

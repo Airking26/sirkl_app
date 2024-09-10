@@ -1,9 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:sirkl/config/s_colors.dart';
 import 'package:video_trimmer/video_trimmer.dart';
-
-import '../../../config/s_colors.dart';
 
 class TrimmerView extends StatefulWidget {
   final File file;
@@ -28,9 +27,7 @@ class TrimmerViewState extends State<TrimmerView> {
       _progressVisibility = true;
     });
 
-
-    await _trimmer
-        .saveTrimmedVideo(
+    await _trimmer.saveTrimmedVideo(
         startValue: _startValue,
         endValue: _endValue,
         onSave: (String? value) {
@@ -38,9 +35,7 @@ class TrimmerViewState extends State<TrimmerView> {
             _progressVisibility = false;
             Navigator.of(context).pop([File(value!)]);
           });
-
-    });
-
+        });
   }
 
   void _loadVideo() {
@@ -60,45 +55,69 @@ class TrimmerViewState extends State<TrimmerView> {
       appBar: AppBar(
         toolbarHeight: 90,
         leading: IconButton(
-          onPressed: (){
+          onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(Icons.arrow_back, size: 34,), color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.75) : Colors.black.withOpacity(0.75),),
-        title: Text("Video Trimmer", style: TextStyle(fontFamily: "Gilroy", fontSize: 24, fontWeight: FontWeight.w600, color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white.withOpacity(0.75) : Colors.black.withOpacity(0.75)),),
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 34,
+          ),
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark
+              ? Colors.white.withOpacity(0.75)
+              : Colors.black.withOpacity(0.75),
+        ),
+        title: Text(
+          "Video Trimmer",
+          style: TextStyle(
+              fontFamily: "Gilroy",
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              color:
+                  MediaQuery.of(context).platformBrightness == Brightness.dark
+                      ? Colors.white.withOpacity(0.75)
+                      : Colors.black.withOpacity(0.75)),
+        ),
         backgroundColor:
-        MediaQuery.of(context).platformBrightness == Brightness.dark ?
-        const Color(0xFF102437)
-            : Colors.white,
+            MediaQuery.of(context).platformBrightness == Brightness.dark
+                ? const Color(0xFF102437)
+                : Colors.white,
       ),
       body: Builder(
         builder: (context) => Center(
           child: Container(
             padding: const EdgeInsets.only(bottom: 12.0),
-            color:
-            MediaQuery.of(context).platformBrightness == Brightness.dark ?
-            const Color(0xFF102437) :
-            const Color.fromARGB(255, 247, 253, 255),
+            color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                ? const Color(0xFF102437)
+                : const Color.fromARGB(255, 247, 253, 255),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 Visibility(
                   visible: _progressVisibility,
-                  child:  LinearProgressIndicator(
+                  child: LinearProgressIndicator(
                     backgroundColor: SColors.activeColor,
                   ),
                 ),
-                const SizedBox(height: 24,),
+                const SizedBox(
+                  height: 24,
+                ),
                 Expanded(
                   child: VideoViewer(trimmer: _trimmer),
                 ),
-                const SizedBox(height: 12,),
+                const SizedBox(
+                  height: 12,
+                ),
                 Center(
                   child: TrimViewer(
                     trimmer: _trimmer,
                     viewerHeight: 50.0,
                     type: ViewerType.fixed,
-                    durationTextStyle: TextStyle(color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Colors.black),
+                    durationTextStyle: TextStyle(
+                        color: MediaQuery.of(context).platformBrightness ==
+                                Brightness.dark
+                            ? Colors.white
+                            : Colors.black),
                     viewerWidth: MediaQuery.of(context).size.width,
                     onChangeStart: (value) => _startValue = value,
                     onChangeEnd: (value) => _endValue = value,
@@ -108,7 +127,8 @@ class TrimmerViewState extends State<TrimmerView> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -127,18 +147,27 @@ class TrimmerViewState extends State<TrimmerView> {
                       ),
                       TextButton(
                         child: _isPlaying
-                            ?  Icon(
-                          Icons.pause,
-                          size: 50.0,
-                          color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color.fromARGB(255, 247, 253, 255) : const Color(0xFF102437),
-                        )
+                            ? Icon(
+                                Icons.pause,
+                                size: 50.0,
+                                color: MediaQuery.of(context)
+                                            .platformBrightness ==
+                                        Brightness.dark
+                                    ? const Color.fromARGB(255, 247, 253, 255)
+                                    : const Color(0xFF102437),
+                              )
                             : Icon(
-                          Icons.play_arrow,
-                          size: 50.0,
-                          color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color.fromARGB(255, 247, 253, 255) :const Color(0xFF102437) ,
-                        ),
+                                Icons.play_arrow,
+                                size: 50.0,
+                                color: MediaQuery.of(context)
+                                            .platformBrightness ==
+                                        Brightness.dark
+                                    ? const Color.fromARGB(255, 247, 253, 255)
+                                    : const Color(0xFF102437),
+                              ),
                         onPressed: () async {
-                          bool playbackState = await _trimmer.videoPlaybackControl(
+                          bool playbackState =
+                              await _trimmer.videoPlaybackControl(
                             startValue: _startValue,
                             endValue: _endValue,
                           );
@@ -148,18 +177,26 @@ class TrimmerViewState extends State<TrimmerView> {
                         },
                       ),
                       InkWell(
-                        onTap: _progressVisibility ? null : () async {
-                            await _saveVideo();
-                        },
+                        onTap: _progressVisibility
+                            ? null
+                            : () async {
+                                await _saveVideo();
+                              },
                         child: Container(
                           width: 56,
                           height: 56,
                           padding: const EdgeInsets.only(left: 4),
-                          decoration:  BoxDecoration(
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: MediaQuery.of(context).platformBrightness == Brightness.dark ? const Color.fromARGB(255, 247, 253, 255) : const Color(0xFF102437) ,
+                            color: MediaQuery.of(context).platformBrightness ==
+                                    Brightness.dark
+                                ? const Color.fromARGB(255, 247, 253, 255)
+                                : const Color(0xFF102437),
                           ),
-                          child:  Icon(Icons.send_rounded, color: SColors.activeColor,),
+                          child: Icon(
+                            Icons.send_rounded,
+                            color: SColors.activeColor,
+                          ),
                         ),
                       ),
                     ],

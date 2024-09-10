@@ -8,7 +8,7 @@ import 'package:path/path.dart' as path;
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/views/global/story_insta/animations/src/route_transition.dart';
 import 'package:sirkl/views/global/story_insta/drishya_picker.dart';
-import 'package:sirkl/views/global/trimmer/trimmer_view.dart';
+import 'package:sirkl/views/global/story_insta/trimmer/trimmer_view.dart';
 
 /// Camera controller
 

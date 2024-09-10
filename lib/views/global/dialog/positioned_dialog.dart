@@ -19,9 +19,6 @@ class PositionedDialog {
   bool barrierDismissible = true;
   EdgeInsets margin = const EdgeInsets.all(0.0);
 
-  /// 用于有多个navigator嵌套的情况，默认为true
-  /// @params useRootNavigator=false，push是用的是当前布局的context
-  /// @params useRootNavigator=true，push是用的嵌套根布局的context
   bool useRootNavigator = true;
 
   Decoration? decoration;

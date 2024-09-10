@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/views/global/circular_indicator/my_circular_indicator.dart';
-import 'package:sirkl/views/global/stream_chat/src/channel/channel_page.dart';
-import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/views/global/stream_chat/src/channel/channel_page.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 import '../../controllers/home_controller.dart';
 
@@ -60,8 +59,12 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
                 : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() {
           return _chatController.channel.value == null
-              ? MyCircularLoader(
-                  color: SColors.activeColor,
+              ? Center(
+                  child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                          color: SColors.activeColor)),
                 )
               : StreamChat(
                   client: StreamChat.of(context).client,

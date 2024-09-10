@@ -463,7 +463,9 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                               ),
                             ),
                           ),
-                    _chatController.channel.value!.extraData["owner"] ==
+
+                    /// Removed leave group for a member of the community
+                    /*_chatController.channel.value!.extraData["owner"] ==
                             _homeController.userMe.value.wallet!
                         ? const SizedBox()
                         : Divider(
@@ -558,7 +560,7 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                                     fontWeight: FontWeight.w500),
                               ),
                             ),
-                          ),
+                          ),*/
                   ],
                 ),
               )
