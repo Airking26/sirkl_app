@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:sirkl/common/model/nft_alchemy_dto.dart';
+import 'package:sirkl/models/nft_alchemy_dto.dart';
 
 ContractAddressDto contractAddressDtoFromJson(String str) =>
     ContractAddressDto.fromJson(json.decode(str));

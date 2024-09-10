@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sirkl/common/model/crypto/chain_data_wrapper.dart';
-import 'package:sirkl/common/model/crypto/chain_metadata.dart';
+import 'package:sirkl/models/crypto/chain_data_wrapper.dart';
+import 'package:sirkl/models/crypto/chain_metadata.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 String getChainName(String chain) {

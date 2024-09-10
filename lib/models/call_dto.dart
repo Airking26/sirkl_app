@@ -4,7 +4,8 @@
 
 import 'dart:convert';
 
-import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
+
 
 List<CallDto> callDtoFromJson(String str) =>
     List<CallDto>.from(json.decode(str).map((x) => CallDto.fromJson(x)));

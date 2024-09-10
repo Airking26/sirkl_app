@@ -1,10 +1,10 @@
 import 'package:sirkl/networks/request.dart';
 import 'package:sirkl/networks/urls.dart';
 
-import '../common/model/call_creation_dto.dart';
-import '../common/model/call_dto.dart';
-import '../common/model/call_modification_dto.dart';
-import '../common/model/sign_in_success_dto.dart';
+import '../models/call_creation_dto.dart';
+import '../models/call_dto.dart';
+import '../models/call_modification_dto.dart';
+import '../models/sign_in_success_dto.dart';
 
 class CallRepo {
   static Future<void> createCall(CallCreationDto callCreationDto) async {

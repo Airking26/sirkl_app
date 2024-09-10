@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
 
 List<List<StoryDto>> storyDtoFromJson(String str) =>
     List<List<StoryDto>>.from(json

@@ -22,6 +22,7 @@ import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'package:sirkl/main.dart';
 import 'package:sirkl/repo/google_repo.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
+import 'package:solana_wallet_provider/solana_wallet_provider.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../controllers/home_controller.dart';
@@ -40,6 +41,12 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   final box = GetStorage();
   PositionedDialog dialogMenu = PositionedDialog();
+  final SolanaWalletAdapter solanaWalletAdapter = SolanaWalletAdapter(
+      AppIdentity(
+          uri: Uri.parse('https://sirkl.io'),
+          icon: Uri.parse("logo.png"),
+          name: 'SIRKL.io'),
+      cluster: Cluster.mainnet);
 
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get _homeController => Get.find<HomeController>();
@@ -457,9 +464,8 @@ class _SettingScreenState extends State<SettingScreen> {
                                           if (isSolanaAddress(_homeController
                                                   .userMe.value.wallet ??
                                               "")) {
-                                            await _walletConnectModalController
-                                                .solanaProvider
-                                                ?.disconnect(context);
+                                            await solanaWalletAdapter.clear();
+                                            //await solanaWalletAdapter.dispose();
                                           }
                                           Get.deleteAll(force: true);
                                           Phoenix.rebirth(Get.context!);

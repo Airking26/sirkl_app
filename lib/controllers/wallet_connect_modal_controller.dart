@@ -6,10 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pointycastle/digests/sha256.dart';
-import 'package:sirkl/common/model/crypto/chain_metadata.dart';
-import 'package:sirkl/common/model/crypto/eip155.dart';
-import 'package:sirkl/common/model/crypto/helpers.dart';
-import 'package:sirkl/common/model/crypto/test_data.dart';
+import 'package:sirkl/models/crypto/chain_metadata.dart';
+import 'package:sirkl/models/crypto/eip155.dart';
+import 'package:sirkl/models/crypto/helpers.dart';
+import 'package:sirkl/models/crypto/test_data.dart';
 import 'package:sirkl/common/save_pref_keys.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/repo/auth_repo.dart';
@@ -39,6 +39,13 @@ class WalletConnectModalController extends GetxController {
 
   SolanaWalletProvider? solanaProvider;
 
+  final SolanaWalletAdapter solanaWalletAdapter = SolanaWalletAdapter(
+      AppIdentity(
+          uri: Uri.parse('https://sirkl.io'),
+          icon: Uri.parse("logo.png"),
+          name: 'SIRKL.io'),
+      cluster: Cluster.mainnet);
+
   void initializeService(BuildContext context) async {
     w3mService.value = W3MService(
       includedWalletIds: {
@@ -52,8 +59,56 @@ class WalletConnectModalController extends GetxController {
       context: context,
       projectId: projectID,
       logLevel: LogLevel.error,
-      loginWithoutWalletWidget: Column(
+      loginWithoutWalletWidget: WalletListItem(
+        title: "Connect without wallet",
+        imageUrl:
+            "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/no_wallet.png",
+        onTap: () async {
+          Get.back();
+          _homeController.isLoading.value = true;
+          await createWallet(context);
+        },
+      ),
+      /*Column(
         children: [
+          WalletListItem(
+            title: "Phantom",
+            imageUrl:
+                "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/channels4_profile.jpg",
+            onTap: () async {
+              /* if (solanaWalletAdapter.isAuthorized) {
+                await solanaWalletAdapter.deauthorize();
+                var authorizeResult = await solanaWalletAdapter.authorize();
+                _homeController.address.value = base58Encode(
+                    base64Decode(authorizeResult.accounts.first.address));
+                Get.back();
+              } else {
+                var authorizeResult = await solanaWalletAdapter.authorize();
+                _homeController.address.value = base58Encode(
+                    base64Decode(authorizeResult.accounts.first.address));
+                Get.back();
+              }*/
+            },
+          ),
+          WalletListItem(
+            title: "Phantom",
+            imageUrl:
+                "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/channels4_profile.jpg",
+            onTap: () async {
+              if (solanaWalletAdapter.isAuthorized) {
+                await solanaWalletAdapter.deauthorize();
+                var authorizeResult = await solanaWalletAdapter.authorize();
+                _homeController.address.value = base58Encode(
+                    base64Decode(authorizeResult.accounts.first.address));
+                Get.back();
+              } else {
+                var authorizeResult = await solanaWalletAdapter.authorize();
+                _homeController.address.value = base58Encode(
+                    base64Decode(authorizeResult.accounts.first.address));
+                Get.back();
+              }
+            },
+          ),
           SolanaWalletProvider.create(
             identity: AppIdentity(
                 uri: Uri.parse('https://sirkl.io'),
@@ -65,6 +120,9 @@ class WalletConnectModalController extends GetxController {
                   if (snapshot.connectionState != ConnectionState.done) {
                     return const CircularProgressIndicator();
                   }
+
+                  solanaProvider?.adapter.clear();
+                  solanaProvider?.adapter.dispose();
 
                   return WalletListItem(
                     title: "Phantom",
@@ -92,7 +150,7 @@ class WalletConnectModalController extends GetxController {
             },
           ),
         ],
-      ),
+      ),*/
       metadata: PairingMetadata(
         name: name,
         description: desc,
@@ -330,6 +388,31 @@ class WalletConnectModalController extends GetxController {
       debugPrint('$description Error: $error');
       debugPrint('$description Stack: $stack');
       // setState(() => _status = error.toString());
+    }
+  }
+
+  Future<void> signMessageSolanaWithAdapter(
+    final BuildContext context,
+  ) async {
+    try {
+      var address = solanaWalletAdapter
+          .encodeAccount(solanaWalletAdapter.connectedAccount!);
+
+      final SignMessagesResult result = await solanaWalletAdapter.signMessages(
+        [
+          solanaWalletAdapter
+              .encodeMessage(testSignData(base58Encode(base64Decode(address))))
+        ],
+        addresses: [address],
+      );
+
+      var wallet = base58Encode(base64Decode(address));
+      var message = testSignData(base58Encode(base64Decode(address)));
+      var signature = result.signedPayloads.join('\n');
+      await _homeController.loginWithWallet(
+          context, wallet, message, signature);
+    } catch (error, stack) {
+      debugPrint(error.toString());
     }
   }
 }

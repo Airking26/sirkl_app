@@ -6,7 +6,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/model/call_dto.dart';
+import 'package:sirkl/models/call_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar.dart';
 import 'package:sirkl/common/view/material_floating_search_bar/floating_search_bar_actions.dart';

@@ -13,7 +13,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart' hide debounce;
 import 'package:photo_manager/photo_manager.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:sirkl/common/model/request_to_join_dto.dart';
+import 'package:sirkl/models/request_to_join_dto.dart';
 import 'package:sirkl/common/view/stream_chat/platform_widget_builder/src/platform_widget_builder.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/attachment_button.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_input/command_button.dart';

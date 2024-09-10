@@ -6,6 +6,7 @@ import CallKit
 import flutter_callkit_incoming
 import CoinbaseWalletSDK
 
+
 @main
 @objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate {
   override func application(

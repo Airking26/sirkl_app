@@ -1,11 +1,10 @@
+import 'package:sirkl/models/notification_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
+import 'package:sirkl/models/story_creation_dto.dart';
+import 'package:sirkl/models/story_dto.dart';
+import 'package:sirkl/models/update_me_dto.dart';
 import 'package:sirkl/networks/request.dart';
 import 'package:sirkl/networks/urls.dart';
-
-import '../common/model/notification_dto.dart';
-import '../common/model/sign_in_success_dto.dart';
-import '../common/model/story_creation_dto.dart';
-import '../common/model/story_dto.dart';
-import '../common/model/update_me_dto.dart';
 
 class ProfileRepo {
   static Future<String> retrieveTokenStreamChat() async {

@@ -108,9 +108,15 @@ dependencies:
   flutter_phoenix: ^1.1.1
   appsflyer_sdk: ^6.14.3
   app_badge_plus: ^1.1.2
+  solana_wallet_adapter: ^0.1.5
   solana_wallet_provider: ^0.1.9
+  solana_mobile_client: ^0.1.1+1
+  flutter_bloc: ^8.0.1
+  freezed_annotation: ^2.1.0
+  phantom_wallet: ^0.0.2
 
 dependency_overrides:
+  solana: ^0.31.0
   flutter_svg: ^2.0.9
   http: ^1.1.0
   audio_video_progress_bar: ^2.0.3

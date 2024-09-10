@@ -1,9 +1,9 @@
+import 'package:sirkl/models/admin_dto.dart';
+import 'package:sirkl/models/contract_creator_dto.dart';
+import 'package:sirkl/models/group_creation_dto.dart';
+import 'package:sirkl/models/group_dto.dart';
 import 'package:sirkl/networks/request.dart';
 
-import '../common/model/admin_dto.dart';
-import '../common/model/contract_creator_dto.dart';
-import '../common/model/group_creation_dto.dart';
-import '../common/model/group_dto.dart';
 import '../config/s_config.dart';
 import '../networks/urls.dart';
 

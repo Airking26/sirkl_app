@@ -1,5 +1,5 @@
-import 'package:sirkl/common/model/sign_in_success_dto.dart';
-import 'package:sirkl/common/model/wallet_connect_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
+import 'package:sirkl/models/wallet_connect_dto.dart';
 import 'package:sirkl/networks/request.dart';
 
 import '../networks/urls.dart';

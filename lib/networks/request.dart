@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:sirkl/common/model/refresh_token_dto.dart';
+import 'package:sirkl/models/refresh_token_dto.dart';
 import 'package:sirkl/networks/urls.dart';
 
 import '../common/save_pref_keys.dart';

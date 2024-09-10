@@ -4,7 +4,7 @@ import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
 import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/entities/notification_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
-import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 
 void showToast(BuildContext context, String message) {

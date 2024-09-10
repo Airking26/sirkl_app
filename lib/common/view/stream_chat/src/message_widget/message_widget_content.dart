@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/controllers/common_controller.dart';
-import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/bottom_row.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/message_card.dart';

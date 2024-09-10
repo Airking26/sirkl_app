@@ -15,9 +15,9 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/enums/pdf_type.dart';
-import 'package:sirkl/common/model/sign_in_success_dto.dart';
-import 'package:sirkl/common/model/story_dto.dart';
-import 'package:sirkl/common/model/web_wallet_connect_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
+import 'package:sirkl/models/story_dto.dart';
+import 'package:sirkl/models/web_wallet_connect_dto.dart';
 import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
@@ -1258,10 +1258,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     await _walletConnectModalController
                         .signMessageWithWC(context);
                   } else if (isSolanaAddress(_homeController.address.value)) {
-                    await _walletConnectModalController.signMessageSolana(
+                    /*await _walletConnectModalController
+                        .signMessageSolanaWithAdapter(context);
+                   await _walletConnectModalController.signMessageSolana(
                         context,
                         _walletConnectModalController.solanaProvider!,
-                        1);
+                        1);*/
                   } else {
                     await _walletConnectModalController
                         .signMessageWithWC(context);

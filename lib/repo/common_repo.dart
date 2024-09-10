@@ -1,9 +1,8 @@
-import 'package:sirkl/common/model/report_dto.dart';
+import 'package:sirkl/models/notification_added_admin_dto.dart';
+import 'package:sirkl/models/report_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/networks/request.dart';
 import 'package:sirkl/networks/urls.dart';
-
-import '../common/model/notification_added_admin_dto.dart';
-import '../common/model/sign_in_success_dto.dart';
 
 class CommonRepo {
   static Future<UserDTO> addUserToSirkl(String id) async {

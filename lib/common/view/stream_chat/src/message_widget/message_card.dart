@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'
     hide GetStringUtils;
-import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/bottom_row.dart';
 import 'package:sirkl/common/view/stream_chat/src/message_widget/parse_attachments.dart';

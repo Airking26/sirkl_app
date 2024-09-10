@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/common/model/sign_in_success_dto.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
 
 import '../../../../../config/s_colors.dart';
 import '../../../../../controllers/home_controller.dart';
@@ -34,7 +34,7 @@ class StreamChannelName extends StatelessWidget {
   /// How visual overflow should be handled.
   final TextOverflow textOverflow;
 
- HomeController get _homeController => Get.find<HomeController>();
+  HomeController get _homeController => Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) => BetterStreamBuilder<String>(
@@ -46,38 +46,38 @@ class StreamChannelName extends StatelessWidget {
           overflow: textOverflow,
         ),
         noDataBuilder: (context) => _generateName(
-          channel.client.state.currentUser!,
-          channel.state!.members),
+            channel.client.state.currentUser!, channel.state!.members),
       );
 
-  Widget _generateName(
-    User currentUser,
-    List<Member> members
-  ) =>
-      LayoutBuilder(
+  Widget _generateName(User currentUser, List<Member> members) => LayoutBuilder(
         builder: (context, constraints) {
           var channelName = context.translations.noTitleText;
-          final otherMembers = members.where((member) => member.userId != _homeController.id.value,);
-
+          final otherMembers = members.where(
+            (member) => member.userId != _homeController.id.value,
+          );
 
           if (otherMembers.isNotEmpty) {
             if (otherMembers.length == 1) {
               final user = otherMembers.first.user;
-              if(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true){
+              if (channel.extraData["isGroupPaying"] != null &&
+                  channel.extraData["isGroupPaying"] == true) {
                 channelName = channel.extraData["nameOfGroup"] as String;
-              }
-              else if (user != null) {
-                channelName = displayName(userFromJson(json.encode(user.extraData["userDTO"])), _homeController);
+              } else if (user != null) {
+                channelName = displayName(
+                    userFromJson(json.encode(user.extraData["userDTO"])),
+                    _homeController);
               }
             } else {
               channelName = channel.extraData['nameOfGroup'] as String? ?? "";
             }
           } else {
-            if(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true){
+            if (channel.extraData["isGroupPaying"] != null &&
+                channel.extraData["isGroupPaying"] == true) {
               channelName = channel.extraData["nameOfGroup"] as String;
-            }
-             else if(channel.extraData['ens'] == null || channel.extraData['ens'] == "0") {
-              channelName = "${(channel.extraData['wallet'] as String).substring(0, 6)}...${(channel.extraData['wallet'] as String).substring((channel.extraData['wallet'] as String).length - 4)}";
+            } else if (channel.extraData['ens'] == null ||
+                channel.extraData['ens'] == "0") {
+              channelName =
+                  "${(channel.extraData['wallet'] as String).substring(0, 6)}...${(channel.extraData['wallet'] as String).substring((channel.extraData['wallet'] as String).length - 4)}";
             } else {
               channelName = channel.extraData["ens"] as String;
             }
@@ -86,12 +86,41 @@ class StreamChannelName extends StatelessWidget {
           return Row(
             children: [
               Text(
-                channelName ,
-                style: textStyle!.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+                channelName,
+                style: textStyle!
+                    .copyWith(fontSize: 16, fontWeight: FontWeight.w600),
                 overflow: textOverflow,
               ),
-              channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true ? Transform.translate(offset: const Offset(-2, 0), child: IconButton(padding : EdgeInsets.zero,constraints: BoxConstraints(), icon: Image.asset("assets/images/ethereum.png", color: SColors.activeColor, width: 16,), onPressed: (){},)) : const SizedBox(),
-              channel.extraData["isGroupPrivate"] != null && channel.extraData["isGroupPrivate"] == true ? Transform.translate(offset: Offset(channel.extraData["isGroupPaying"] != null && channel.extraData["isGroupPaying"] == true ? -4 : 4, 0), child: Icon(Icons.lock_outline_rounded, size: 14, color: SColors.activeColor.withOpacity(0.7),)) : const SizedBox(),
+              channel.extraData["isGroupPaying"] != null &&
+                      channel.extraData["isGroupPaying"] == true
+                  ? Transform.translate(
+                      offset: const Offset(-2, 0),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
+                        icon: Image.asset(
+                          "assets/images/ethereum.png",
+                          color: SColors.activeColor,
+                          width: 16,
+                        ),
+                        onPressed: () {},
+                      ))
+                  : const SizedBox(),
+              channel.extraData["isGroupPrivate"] != null &&
+                      channel.extraData["isGroupPrivate"] == true
+                  ? Transform.translate(
+                      offset: Offset(
+                          channel.extraData["isGroupPaying"] != null &&
+                                  channel.extraData["isGroupPaying"] == true
+                              ? -4
+                              : 4,
+                          0),
+                      child: Icon(
+                        Icons.lock_outline_rounded,
+                        size: 14,
+                        color: SColors.activeColor.withOpacity(0.7),
+                      ))
+                  : const SizedBox(),
             ],
           );
         },

@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
-import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 
 import '../../../../../../config/s_colors.dart';

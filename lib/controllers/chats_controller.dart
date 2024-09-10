@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:sirkl/common/model/inbox_creation_dto.dart';
-import 'package:sirkl/common/model/request_to_join_dto.dart';
-import 'package:sirkl/common/model/sign_in_success_dto.dart';
+import 'package:sirkl/models/inbox_creation_dto.dart';
+import 'package:sirkl/models/request_to_join_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/repo/chats_repo.dart';
 
