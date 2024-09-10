@@ -10,7 +10,6 @@ import 'package:sirkl/models/group_creation_dto.dart';
 import 'package:sirkl/models/group_dto.dart';
 import 'package:sirkl/models/token_dto.dart';
 import 'package:sirkl/repositories/group_repo.dart';
-import 'package:sirkl/repositories/home_repo.dart';
 import 'package:sirkl/repositories/user_repo.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
@@ -71,14 +70,14 @@ class GroupsController extends GetxController {
   _retrieveTokenToCreateCommunity(String wallet, List<GroupDto> groups) async {
     var tokens = [];
     var tokenContractAddress =
-        await HomeRepo.getTokenContractAddressesWithAlchemy(wallet: wallet);
+        await GroupRepo.getTokenContractAddressesWithAlchemy(wallet: wallet);
 
     for (TokenBalance element in tokenContractAddress.result!.tokenBalances!) {
       if (element.tokenBalance != SConfig.emptyHexBalance &&
           !groups
               .map((e) => e.contractAddress.toLowerCase())
               .contains(element.contractAddress?.toLowerCase())) {
-        var tokenDetails = await HomeRepo.getTokenMetadataWithAlchemy(
+        var tokenDetails = await GroupRepo.getTokenMetadataWithAlchemy(
             token: element.contractAddress!);
         //if(tokenDetails.result != null && tokenDetails.result!.logo != null) {
         tokens.add(CollectionDbDto(
@@ -101,7 +100,7 @@ class GroupsController extends GetxController {
     var cursorInitialized = true;
     while (cursorInitialized || cursor.isNotEmpty) {
       ContractAddressDto contractAddress =
-          await HomeRepo.getContractAddressesWithAlchemy(
+          await GroupRepo.getContractAddressesWithAlchemy(
               wallet: wallet, cursor: cursor);
 
       contractAddress.pageKey == null || contractAddress.pageKey!.isEmpty

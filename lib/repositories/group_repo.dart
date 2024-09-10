@@ -1,6 +1,9 @@
+import 'package:sirkl/models/contract_address_dto.dart';
 import 'package:sirkl/models/contract_creator_dto.dart';
 import 'package:sirkl/models/group_creation_dto.dart';
 import 'package:sirkl/models/group_dto.dart';
+import 'package:sirkl/models/token_dto.dart';
+import 'package:sirkl/models/token_metadata_details_dto.dart';
 import 'package:sirkl/networks/request.dart';
 
 import '../config/s_config.dart';
@@ -30,5 +33,41 @@ class GroupRepo {
     } catch (err) {
       return null;
     }
+  }
+
+  static Future<TokenDto> getTokenContractAddressesWithAlchemy(
+      {required String wallet}) async {
+    SRequests req = SRequests(SUrls.ethMainNetBaseUrl);
+    Response res = await req.post(url: "v2/${SConfig.ALCHEMY_API_KEY}", body: {
+      'jsonrpc': '2.0',
+      'id': 1,
+      'method': 'alchemy_getTokenBalances',
+      'params': [
+        wallet,
+      ],
+    });
+    return TokenDto.fromJson(res.jsonBody());
+  }
+
+  static Future<TokenMetadataDetailsDto> getTokenMetadataWithAlchemy(
+      {required String token}) async {
+    SRequests req = SRequests(SUrls.ethMainNetBaseUrl);
+    Response res = await req.post(url: "v2/${SConfig.ALCHEMY_API_KEY}", body: {
+      'jsonrpc': '2.0',
+      'id': 1,
+      'method': 'alchemy_getTokenMetadata',
+      'params': [
+        token,
+      ],
+    });
+    return TokenMetadataDetailsDto.fromJson(res.jsonBody());
+  }
+
+  static Future<ContractAddressDto> getContractAddressesWithAlchemy(
+      {required wallet, String? cursor}) async {
+    SRequests req = SRequests(SUrls.ethMainNetBaseUrl);
+    Response res = await req.get(
+        "nft/v2/${SConfig.ALCHEMY_API_KEY}/getContractsForOwner?owner=$wallet&pageSize=100&withMetadata=true&filters[]=AIRDROPS&filters[]=SPAM$cursor");
+    return ContractAddressDto.fromJson(res.jsonBody());
   }
 }
