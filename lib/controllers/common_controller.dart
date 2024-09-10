@@ -3,13 +3,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/models/notification_added_admin_dto.dart';
 import 'package:sirkl/models/report_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/repo/common_repo.dart';
 import 'package:sirkl/repo/profile_repo.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 class CommonController extends GetxController {
   final box = GetStorage();

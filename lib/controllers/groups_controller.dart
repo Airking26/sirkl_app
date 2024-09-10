@@ -7,7 +7,7 @@ import 'package:sirkl/models/contract_creator_dto.dart';
 import 'package:sirkl/models/group_creation_dto.dart';
 import 'package:sirkl/models/group_dto.dart';
 import 'package:sirkl/models/token_dto.dart';
-import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/repo/group_repo.dart';

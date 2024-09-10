@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 
 import '../../config/s_colors.dart';

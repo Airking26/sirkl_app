@@ -8,7 +8,7 @@ import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/models/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';

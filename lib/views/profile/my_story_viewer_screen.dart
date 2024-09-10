@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';

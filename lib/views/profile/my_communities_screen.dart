@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/views/global/stream_chat/src/channel/channel_page.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
-import '../../common/view/nav_bar/persistent-tab-view.dart';
-import '../../common/view/stream_chat/src/channel/channel_page.dart';
 import '../../controllers/home_controller.dart';
 
 class MyCommunityScreen extends StatefulWidget {

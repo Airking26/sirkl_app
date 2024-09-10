@@ -8,13 +8,13 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/models/nft_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/common/view/stream_chat/src/stream_chat.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
+import 'package:sirkl/models/nft_dto.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
+import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/views/global/stream_chat/src/stream_chat.dart';
 import 'package:sirkl/views/profile/settings_profile_else_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 

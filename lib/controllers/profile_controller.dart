@@ -17,7 +17,7 @@ import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/models/story_creation_dto.dart';
 import 'package:sirkl/models/story_dto.dart';
 import 'package:sirkl/models/update_me_dto.dart';
-import 'package:sirkl/common/view/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/repo/home_repo.dart';
 import 'package:sirkl/repo/profile_repo.dart';

@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/models/story_dto.dart';
-import 'package:sirkl/models/story_modification_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
+import 'package:sirkl/models/story_dto.dart';
+import 'package:sirkl/models/story_modification_dto.dart';
+import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:story_view/story_view.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:tiny_avatar/tiny_avatar.dart';

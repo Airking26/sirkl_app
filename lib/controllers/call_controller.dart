@@ -14,7 +14,7 @@ import 'package:sirkl/models/call_creation_dto.dart';
 import 'package:sirkl/models/call_dto.dart';
 import 'package:sirkl/models/call_modification_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/repo/calls_repo.dart';

@@ -2,7 +2,7 @@ import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/common/view/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
