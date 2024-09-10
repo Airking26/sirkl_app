@@ -18,8 +18,10 @@ import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/models/story_creation_dto.dart';
 import 'package:sirkl/models/story_dto.dart';
 import 'package:sirkl/models/update_me_dto.dart';
-import 'package:sirkl/repositories/home_repo.dart';
-import 'package:sirkl/repositories/profile_repo.dart';
+import 'package:sirkl/repositories/asset_repo.dart';
+import 'package:sirkl/repositories/notification_repo.dart';
+import 'package:sirkl/repositories/story_repo.dart';
+import 'package:sirkl/repositories/user_repo.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 import '../common/save_pref_keys.dart';
@@ -53,14 +55,14 @@ class ProfileController extends GetxController {
   final _errorMessage = ''.obs;
 
   retrieveMe() async {
-    _homeController.userMe.value = await ProfileRepo.retrieveUser();
+    _homeController.userMe.value = await UserRepo.retrieveUser();
     box.write(SharedPref.USER, _homeController.userMe.value.toJson());
   }
 
   updateMe(UpdateMeDto updateMeDto, StreamChatClient streamChatClient) async {
     isLoadingPicture.value = true;
 
-    UserDTO userDto = await ProfileRepo.modifyUser(updateMeDto);
+    UserDTO userDto = await UserRepo.modifyUser(updateMeDto);
     _homeController.userMe.value = userDto;
     box.write(SharedPref.USER, userDto.toJson());
     if (!updateMeDto.userName.isNullOrBlank! ||
@@ -76,7 +78,7 @@ class ProfileController extends GetxController {
 
   Future<UserDTO?> getUserByWallet(String wallet) async {
     try {
-      UserDTO userDto = await ProfileRepo.getUserByWallet(wallet);
+      UserDTO userDto = await UserRepo.getUserByWallet(wallet);
       return userDto;
     } catch (err) {
       return null;
@@ -109,7 +111,7 @@ class ProfileController extends GetxController {
     StoryCreationDto storyCreationDto = StoryCreationDto(url: uri, type: type);
 
     try {
-      await ProfileRepo.postStory(storyCreationDto);
+      await StoryRepo.postStory(storyCreationDto);
       return true;
     } catch (err) {
       return false;
@@ -159,25 +161,26 @@ class ProfileController extends GetxController {
   }
 
   Future<void> checkIfHasUnreadNotification(String id) async {
-    bool hasNotification = await ProfileRepo.retrieveHasUnreadNotif(id);
+    bool hasNotification =
+        await NotificationRepo.retrieveHasUnreadNotification(id);
     hasUnreadNotification.value = hasNotification;
   }
 
   Future<List<NotificationDto>> retrieveNotifications(
           String id, int offset) async =>
-      await ProfileRepo.retrieveNotifications(
+      await NotificationRepo.retrieveNotifications(
           id: id, offset: offset.toString());
   Future<void> updateNft(NftModificationDto nftModificationDto) async =>
-      await HomeRepo.updateNFTStatus(nftModificationDto);
+      await AssetRepo.updateNFTStatus(nftModificationDto);
   retrieveMyStories() async =>
-      myStories.value = await ProfileRepo.retrieveMyStories();
+      myStories.value = await StoryRepo.retrieveMyStories();
 
   Future<void> retrieveUsersForAStory(String id) async {
-    List<UserDTO> users = await ProfileRepo.retrieveReadersForAStory(id);
+    List<UserDTO> users = await StoryRepo.retrieveReadersForAStory(id);
     readers.value = users;
   }
 
-  deleteUser(String id) async => await ProfileRepo.deleteUser(id);
+  deleteUser(String id) async => await UserRepo.deleteUser(id);
 
   Future<Uri> createDynamicLink(String link) async {
     FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
@@ -192,7 +195,7 @@ class ProfileController extends GetxController {
   }
 
   Future<void> deleteNotification(String id) async =>
-      await ProfileRepo.deleteNotification(id);
+      await NotificationRepo.deleteNotification(id);
 
   Future<void> promptClaimUsername(BuildContext context) async =>
       await showDialog(
@@ -361,8 +364,8 @@ class ProfileController extends GetxController {
                                   _errorMessage.value = "Username too long";
                                 } else {
                                   _isCheckingUsernameValidity.value = true;
-                                  if (await ProfileRepo
-                                      .checkIsUsernameAvailable(value)) {
+                                  if (await UserRepo.checkIsUsernameAvailable(
+                                      value)) {
                                     _isUsernameValid.value = true;
                                   } else {
                                     _isUsernameValid.value = false;

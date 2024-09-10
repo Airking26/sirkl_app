@@ -4,7 +4,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/models/inbox_creation_dto.dart';
 import 'package:sirkl/models/request_to_join_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/repositories/chats_repo.dart';
+import 'package:sirkl/repositories/inbox_repo.dart';
+import 'package:sirkl/repositories/join_repo.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 import 'profile_controller.dart';
@@ -45,7 +46,7 @@ class ChatsController extends GetxController {
   var groupPayingCollapsed = true.obs;
 
   Future<String> createInbox(InboxCreationDto inboxCreationDto) async =>
-      await ChatRepo.createInbox(inboxCreationDto);
+      await InboxRepo.createInbox(inboxCreationDto);
 
   resetChannel() => channel = (null as Channel?).obs;
 
@@ -73,7 +74,7 @@ class ChatsController extends GetxController {
   }
 
   Future<String?> getEthFromEns(String ens, String wallet) async {
-    String? eth = await ChatRepo.ethFromEns(ens);
+    String? eth = await InboxRepo.ethFromEns(ens);
 
     if (eth != '0' && eth != "" && eth?.toLowerCase() != wallet.toLowerCase()) {
       _profileController.isUserExists.value =
@@ -83,12 +84,12 @@ class ChatsController extends GetxController {
   }
 
   Future<void> deleteInbox(String id) async {
-    await ChatRepo.deleteInbox(id);
+    await InboxRepo.deleteInbox(id);
   }
 
   Future<bool> requestToJoinGroup(RequestToJoinDto requestToJoinDTO) async {
     try {
-      await ChatRepo.requestToJoinGroup(requestToJoinDTO);
+      await JoinRepo.requestToJoinGroup(requestToJoinDTO);
       return true;
     } catch (err) {}
     return false;
@@ -96,13 +97,13 @@ class ChatsController extends GetxController {
 
   Future<bool> acceptDeclineRequest(RequestToJoinDto requestToJoinDto) async {
     try {
-      await ChatRepo.acceptDeclineRequest(requestToJoinDto);
+      await JoinRepo.acceptDeclineRequest(requestToJoinDto);
       return true;
     } catch (err) {}
     return false;
   }
 
   Future<void> retrieveRequestsWaiting(String channelId) async {
-    requestsWaiting.value = await ChatRepo.getRequestsWaiting(channelId);
+    requestsWaiting.value = await JoinRepo.getRequestsWaiting(channelId);
   }
 }

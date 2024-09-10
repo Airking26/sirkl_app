@@ -4,8 +4,6 @@
 //const String STREAM_CHAT_TOKEN = "stream_chat_token";
 
 // const String USER = "user";
-const String NOTIFICATION_ACTIVE = "notification_active";
-const String USER_BLOCKED = "user_blocked";
 const String errorRes = "error";
 const String nicknames = "nicknames";
 const String contractAddresses = "contract_addresses";

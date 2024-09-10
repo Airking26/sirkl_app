@@ -7,13 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:sirkl/models/admin_dto.dart';
-import 'package:sirkl/models/eth_transaction_dto.dart';
-import 'package:sirkl/models/notification_added_admin_dto.dart';
-import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/models/update_me_dto.dart';
-import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
@@ -21,8 +14,16 @@ import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/profile_controller.dart';
 import 'package:sirkl/main.dart';
+import 'package:sirkl/models/admin_dto.dart';
+import 'package:sirkl/models/eth_transaction_dto.dart';
+import 'package:sirkl/models/notification_added_admin_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
+import 'package:sirkl/models/update_me_dto.dart';
 import 'package:sirkl/networks/request.dart';
+import 'package:sirkl/repositories/notification_repo.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
+import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
@@ -606,17 +607,22 @@ class Web3Controller extends GetxController {
         final inviteId = contract
             .event("InvitationCreated")
             .decodeResults(event.topics!, event.data!)[4];
-        await _commonController.notifyUserInvitedToJoinPayingGroup(
-            NotificationAddedAdminDto(
-                idUser: item.id!,
-                idChannel: channel.id!,
-                channelName: channel.extraData['nameOfGroup'] as String,
-                channelPrice: fee.toString(),
-                channelPrivate: channel.extraData["isGroupPrivate"] as bool,
-                inviteId: inviteId.toString()));
+        await notifyUserInvitedToJoinPayingGroup(NotificationAddedAdminDto(
+            idUser: item.id!,
+            idChannel: channel.id!,
+            channelName: channel.extraData['nameOfGroup'] as String,
+            channelPrice: fee.toString(),
+            channelPrivate: channel.extraData["isGroupPrivate"] as bool,
+            inviteId: inviteId.toString()));
         Get.back();
       }
     });
+  }
+
+  notifyUserInvitedToJoinPayingGroup(
+      NotificationAddedAdminDto notificationAddedAdminDto) async {
+    await NotificationRepo.notifyUserInvitedToJoinPayingGroup(
+        notificationAddedAdminDto);
   }
 
   acceptInvitationMethod(

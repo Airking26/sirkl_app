@@ -11,6 +11,7 @@ import 'package:sirkl/models/group_dto.dart';
 import 'package:sirkl/models/token_dto.dart';
 import 'package:sirkl/repositories/group_repo.dart';
 import 'package:sirkl/repositories/home_repo.dart';
+import 'package:sirkl/repositories/user_repo.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 class GroupsController extends GetxController {
@@ -141,11 +142,11 @@ class GroupsController extends GetxController {
 
   /// Function to make a user admin or the opposite
   Future<void> changeAdminRole(AdminDto adminDTO) async =>
-      await GroupRepo.changeAdminRole(adminDTO);
+      await UserRepo.changeAdminRole(adminDTO);
 
   // TODO : Deprecate since mint will be made from server
   Future<void> addUserToSirklClub(String id) async =>
-      await GroupRepo.addUserToSirklClub(id);
+      await UserRepo.addUserToSirklClub(id);
 }
 
 /*retrieveGroupsToCreate(StreamChatClient streamChatClient) async {

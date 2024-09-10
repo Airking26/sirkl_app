@@ -30,6 +30,8 @@ import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'package:sirkl/models/notification_register_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/navigation_root/navigation_root_screen.dart';
+import 'package:sirkl/repositories/notification_repo.dart';
+import 'package:sirkl/repositories/user_repo.dart';
 import 'package:sirkl/translations/language.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/chats/settings_group_screen.dart';
@@ -45,13 +47,12 @@ import 'common/utils.dart';
 import 'config/s_colors.dart';
 import 'controllers/dependency_manager.dart';
 import 'controllers/home_controller.dart';
-import 'repositories/home_repo.dart';
-import 'repositories/profile_repo.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await GetStorage().initStorage;
-  var notificationActive = GetStorage().read(con.NOTIFICATION_ACTIVE) ?? true;
+  var notificationActive =
+      GetStorage().read(SharedPref.NOTIFICATION_ACTIVE) ?? true;
   if (notificationActive) {
     if (message.data['type'] == "2") {
       await FlutterCallkitIncoming.endAllCalls();
@@ -176,8 +177,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   AppsflyerSdk appsflyerSdk = AppsflyerSdk(AppsFlyerOptions(
-      afDevKey: SConfig.afDevKey,
-      appId: SConfig.iosAppId,
+      afDevKey: SConfig.APPSFLYER_DEV_KEY,
+      appId: SConfig.IOS_APP_ID,
       timeToWaitForATTUserAuthorization: 50,
       showDebug: true));
   HomeController get _homeController => Get.find<HomeController>();
@@ -262,7 +263,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               title: message.data["title"],
               body: message.data["body"],
               flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
-          await HomeRepo.registerNotification(
+          await NotificationRepo.registerNotification(
               NotificationRegisterDto(message: message.data["body"]));
         } else if ((message.data['type'] == "8")) {
           showCallNotification(message.data);
@@ -335,7 +336,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           final client = StreamChatClient("mhgk84t9jfnt");
           final box = GetStorage();
 
-          String chatToken = await ProfileRepo.retrieveTokenStreamChat();
+          String chatToken = await UserRepo.retrieveTokenStreamChat();
           String? id = UserDTO.fromJson(box.read(SharedPref.USER)).id;
 
           await client.connectUser(

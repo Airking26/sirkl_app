@@ -7,8 +7,10 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/models/notification_added_admin_dto.dart';
 import 'package:sirkl/models/report_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/repositories/common_repo.dart';
-import 'package:sirkl/repositories/profile_repo.dart';
+import 'package:sirkl/repositories/follow_repo.dart';
+import 'package:sirkl/repositories/notification_repo.dart';
+import 'package:sirkl/repositories/report_repo.dart';
+import 'package:sirkl/repositories/user_repo.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 class CommonController extends GetxController {
@@ -45,7 +47,7 @@ class CommonController extends GetxController {
         set: {"${myId}_follow_channel": meFollow});
 
     try {
-      UserDTO newUser = await CommonRepo.addUserToSirkl(id);
+      UserDTO newUser = await FollowRepo.addUserToSirkl(id);
       contactAddLoading.value = false;
       refreshAllInbox();
       if (!users.map((element) => element.id).contains(newUser.id)) {
@@ -71,7 +73,7 @@ class CommonController extends GetxController {
     await streamChatClient.updateChannelPartial(channel.channel!.id, "try",
         set: {"${value}_follow_channel": meFollow});
     try {
-      UserDTO removedUser = await CommonRepo.removeUserToSirkl(id);
+      UserDTO removedUser = await FollowRepo.removeUserToSirkl(id);
 
       refreshAllInbox();
       if (users.map((element) => element.id).contains(removedUser.id)) {
@@ -88,7 +90,7 @@ class CommonController extends GetxController {
     gettingStoryAndContacts.value = true;
 
     try {
-      List<UserDTO> following = await CommonRepo.getSirklUsers(id);
+      List<UserDTO> following = await FollowRepo.getSirklUsers(id);
 
       users.clear();
       users.value = following;
@@ -103,32 +105,26 @@ class CommonController extends GetxController {
 
   checkUserIsInFollowing() async {
     userClickedFollowStatus.value =
-        await CommonRepo.checkUserIsInFollowing(userClicked.value!.id!);
+        await FollowRepo.checkUserIsInFollowing(userClicked.value!.id!);
   }
 
   getUserById(String id) async {
-    UserDTO userDto = await ProfileRepo.getUserByID(id);
+    UserDTO userDto = await UserRepo.getUserByID(id);
 
     userClicked.value = userDto;
   }
 
   Future<void> notifyAddedInGroup(
       NotificationAddedAdminDto notificationAddedAdminDto) async {
-    await CommonRepo.notifyAddedInGroup(notificationAddedAdminDto);
+    await NotificationRepo.notifyAddedInGroup(notificationAddedAdminDto);
   }
 
   notifyUserAsAdmin(NotificationAddedAdminDto notificationAddedAdminDto) async {
-    await CommonRepo.notifyUserAsAdmin(notificationAddedAdminDto);
-  }
-
-  notifyUserInvitedToJoinPayingGroup(
-      NotificationAddedAdminDto notificationAddedAdminDto) async {
-    await CommonRepo.notifyUserInvitedToJoinPayingGroup(
-        notificationAddedAdminDto);
+    await NotificationRepo.notifyUserAsAdmin(notificationAddedAdminDto);
   }
 
   report(BuildContext context, ReportDto reportDTO) async {
-    await CommonRepo.report(reportDTO);
+    await ReportRepo.report(reportDTO);
     showToast(context, "Thank you! Your report has been correctly sent.");
   }
 }

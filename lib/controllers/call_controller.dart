@@ -17,7 +17,8 @@ import 'package:sirkl/models/call_dto.dart';
 import 'package:sirkl/models/call_modification_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/repositories/calls_repo.dart';
-import 'package:sirkl/repositories/profile_repo.dart';
+import 'package:sirkl/repositories/search_repo.dart';
+import 'package:sirkl/repositories/user_repo.dart';
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
@@ -52,7 +53,7 @@ class CallController extends GetxController {
 
   /// Function to initialize and setup Agora
   Future<void> setupVoiceSDKEngine(BuildContext context) async {
-    rtcEngine = await RtcEngine.create(SConfig.agoraId);
+    rtcEngine = await RtcEngine.create(SConfig.AGORA_APP_ID);
     await rtcEngine?.enableAudio();
     await rtcEngine?.leaveChannel();
 
@@ -101,7 +102,7 @@ class CallController extends GetxController {
   /// Function for user to join a call
   Future<void> joinCall(
       String channelName, String id, String userCallingId) async {
-    userCalled.value = await ProfileRepo.getUserByID(userCallingId);
+    userCalled.value = await UserRepo.getUserByID(userCallingId);
     await _retrieveTokenAgoraRTC(channelName, "audience", "userAccount", id);
     await rtcEngine?.joinChannelWithUserAccount(tokenAgoraRTC, channelName, id);
   }
@@ -110,7 +111,7 @@ class CallController extends GetxController {
   Future<void> _retrieveTokenAgoraRTC(
       String channel, String role, String tokenType, String id) async {
     tokenAgoraRTC =
-        await ProfileRepo.retrieveTokenAgoraRTC(channel, role, tokenType, id);
+        await UserRepo.retrieveTokenAgoraRTC(channel, role, tokenType, id);
   }
 
   /// Function to leave a channel (call channel)
@@ -150,7 +151,7 @@ class CallController extends GetxController {
   // TODO : Remove from here and place into a searchController
   Future<List<UserDTO>> searchUser(String substring, int offset) async {
     try {
-      return await CallRepo.searchUser(substring, offset.toString());
+      return await SearchRepo.searchUser(substring, offset.toString());
     } on Error {}
 
     return [];

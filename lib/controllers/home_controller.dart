@@ -25,10 +25,13 @@ import 'package:sirkl/models/story_modification_dto.dart';
 import 'package:sirkl/models/update_fcm_dto.dart';
 import 'package:sirkl/models/update_me_dto.dart';
 import 'package:sirkl/models/wallet_connect_dto.dart';
+import 'package:sirkl/repositories/asset_repo.dart';
 import 'package:sirkl/repositories/auth_repo.dart';
-import 'package:sirkl/repositories/chats_repo.dart';
-import 'package:sirkl/repositories/home_repo.dart';
-import 'package:sirkl/repositories/profile_repo.dart';
+import 'package:sirkl/repositories/inbox_repo.dart';
+import 'package:sirkl/repositories/nickname_repo.dart';
+import 'package:sirkl/repositories/notification_repo.dart';
+import 'package:sirkl/repositories/story_repo.dart';
+import 'package:sirkl/repositories/user_repo.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 import '../common/save_pref_keys.dart';
@@ -81,7 +84,7 @@ class HomeController extends GetxController {
     accessToken.value = accessTok ?? '';
     streamChatToken.value = box.read(SharedPref.STREAM_CHAT_TOKEN) ?? "";
     var checkBoxRead = box.read(con.contractAddresses);
-    notificationActive.value = box.read(con.NOTIFICATION_ACTIVE) ?? true;
+    notificationActive.value = box.read(SharedPref.NOTIFICATION_ACTIVE) ?? true;
     if (checkBoxRead != null) {
       contractAddresses.value =
           box.read(con.contractAddresses).cast<String>() ?? [];
@@ -95,12 +98,12 @@ class HomeController extends GetxController {
 
     userMe.value = user;
     id.value = user.id ?? '';
-    userBlocked.value = box.read(con.USER_BLOCKED) ?? [];
+    userBlocked.value = box.read(SharedPref.USER_BLOCKED) ?? [];
   }
 
   /// Function to switch on/off notification
   switchActiveNotification(bool active) async {
-    await box.write(con.NOTIFICATION_ACTIVE, active);
+    await box.write(SharedPref.NOTIFICATION_ACTIVE, active);
     notificationActive.value = active;
   }
 
@@ -142,7 +145,7 @@ class HomeController extends GetxController {
       BuildContext context, StreamChatClient client, bool isLogged) async {
     if (accessToken.value.isNotEmpty) {
       final String? fcmToken = await FirebaseMessaging.instance.getToken();
-      UserDTO userDTO = await HomeRepo.uploadFCMToken(UpdateFcmdto(
+      UserDTO userDTO = await UserRepo.uploadFCMToken(UpdateFcmdto(
           token: fcmToken,
           platform: defaultTargetPlatform == TargetPlatform.android
               ? 'android'
@@ -156,7 +159,7 @@ class HomeController extends GetxController {
       if (isLogged) updateAllNftConfig();
       if (Platform.isIOS) {
         var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
-        await HomeRepo.uploadAPNToken(token);
+        await UserRepo.uploadAPNToken(token);
       }
       try {
         await retrieveContractAddress();
@@ -166,21 +169,21 @@ class HomeController extends GetxController {
 
   /// Function to retrieve the contract addresses of the assets own by the user and store them
   retrieveContractAddress() async {
-    contractAddresses.value = await HomeRepo.retrieveContactAddress();
+    contractAddresses.value = await AssetRepo.retrieveContactAddress();
     box.write(con.contractAddresses, contractAddresses);
   }
 
   /// Function called only server side to get and store assets of the user (at login only)
-  getAllNftConfig() async => await HomeRepo.getAllNFTConfig();
+  getAllNftConfig() async => await AssetRepo.getAllNFTConfig();
 
   /// Function called only server side to update assets of the user
-  updateAllNftConfig() async => await HomeRepo.updateAllNFTConfig();
+  updateAllNftConfig() async => await AssetRepo.updateAllNFTConfig();
 
   /// Function to retrieve assets of a given user
   Future<List<NftDto>> getAssets(
       String id, bool isFav, int offset, UserDTO? user) async {
     if (offset == 0 && id == this.id.value) isInFav.clear();
-    List<NftDto> assets = await HomeRepo.retrieveNFTs(
+    List<NftDto> assets = await AssetRepo.retrieveNFTs(
         id: id, isFav: isFav, offset: offset.toString());
 
     if (id == this.id.value) {
@@ -223,14 +226,14 @@ class HomeController extends GetxController {
   /// Function to update the user
   // TODO : Check if not duplicate and delete in that case
   updateMe(UpdateMeDto updateMeDto) async {
-    UserDTO userDto = await ProfileRepo.modifyUser(updateMeDto);
+    UserDTO userDto = await UserRepo.modifyUser(updateMeDto);
     box.write(SharedPref.USER, userDto.toJson());
     userMe.value = userDto;
   }
 
   /// Function to update a story (mainly to update users that have seen it)
   updateStory(StoryModificationDto storyModificationDto) async {
-    await HomeRepo.updateStory(storyModificationDto);
+    await StoryRepo.updateStory(storyModificationDto);
     stories.value?[actualStoryIndex.value]
         ?.where((element) => element?.id == storyModificationDto.id)
         .first
@@ -240,11 +243,11 @@ class HomeController extends GetxController {
 
   /// Function to delete a story
   Future<void> deleteStory(String createdBy, String id) async =>
-      await HomeRepo.deleteStory(createdBy: createdBy, id: id);
+      await StoryRepo.deleteStory(createdBy: createdBy, id: id);
 
   /// Function to receive the welcome message from SIRKL.io at first connexion
   Future<void> getWelcomeMessage() async =>
-      await HomeRepo.receiveWelcomeMessage();
+      await UserRepo.receiveWelcomeMessage();
 
   /// Function to give or update a nickname
   updateNickname(String wallet, String nickname) async {
@@ -253,7 +256,7 @@ class HomeController extends GetxController {
       nicknames.refresh();
       _commonController.users.refresh();
 
-      await HomeRepo.updateNicknames(
+      await NicknameRepo.updateNicknames(
           wallet: wallet, nickNameDto: NicknameCreationDto(nickname: nickname));
     }
   }
@@ -279,7 +282,7 @@ class HomeController extends GetxController {
 
   /// Helper function to connect user to stream if new one
   Future<void> _handleNewUser(StreamChatClient client) async {
-    String token = await ProfileRepo.retrieveTokenStreamChat();
+    String token = await UserRepo.retrieveTokenStreamChat();
 
     var userToPass = UserDTO(
       id: userMe.value.id,
@@ -317,7 +320,7 @@ class HomeController extends GetxController {
   /// Helper function to connect user to stream if already existing
   Future<void> _handleExistingUser(StreamChatClient client) async {
     if (streamChatToken.value.isNullOrBlank!) {
-      String token = await ProfileRepo.retrieveTokenStreamChat();
+      String token = await UserRepo.retrieveTokenStreamChat();
       streamChatToken.value = token;
       await box.write(SharedPref.STREAM_CHAT_TOKEN, token);
     }
@@ -327,7 +330,7 @@ class HomeController extends GetxController {
 
   /// Function to retrieve nicknames
   retrieveNicknames() async {
-    Map<dynamic, dynamic> names = await HomeRepo.retrieveNicknames();
+    Map<dynamic, dynamic> names = await NicknameRepo.retrieveNicknames();
     nicknames.value = names;
   }
 
@@ -339,7 +342,7 @@ class HomeController extends GetxController {
     }
 
     List<List<StoryDto>> retrievedStories =
-        await HomeRepo.retrieveStories(offset.toString());
+        await StoryRepo.retrieveStories(offset.toString());
 
     loadingStories.value = false;
     if (stories.value == null) {
@@ -352,14 +355,14 @@ class HomeController extends GetxController {
 
   /// Function to retrieve inbox (if user is new, check if someone sent him
   /// messages on his wallet, and create stream chat)
-  retrieveInboxes() async => await ChatRepo.walletsToMessages();
+  retrieveInboxes() async => await InboxRepo.updateInbox();
 
   /// Function to register notification
   checkOfflineNotificationAndRegister() async {
     var notifications = GetStorage().read(con.notificationSaved) ?? [];
     var notificationsToDelete = [];
     for (var notification in (notifications as List<dynamic>)) {
-      await HomeRepo.registerNotification(
+      await NotificationRepo.registerNotification(
           NotificationRegisterDto(message: notification));
       notificationsToDelete.add(notification);
     }

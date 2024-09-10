@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/save_pref_keys.dart';
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
@@ -390,7 +391,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                                                     .userClicked.value!.id!);
                                           }
                                           await GetStorage().write(
-                                              con.USER_BLOCKED,
+                                              SharedPref.USER_BLOCKED,
                                               _homeController.userBlocked);
                                           await StreamChat.of(context)
                                               .client
@@ -403,7 +404,7 @@ class _SettingsProfileElseScreenState extends State<SettingsProfileElseScreen> {
                                           _homeController.refresh();
                                           _homeController.userBlocked.refresh();
                                           await GetStorage().write(
-                                              con.USER_BLOCKED,
+                                              SharedPref.USER_BLOCKED,
                                               _homeController.userBlocked);
                                           await StreamChat.of(context)
                                               .client

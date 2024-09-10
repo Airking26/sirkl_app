@@ -6,4 +6,6 @@ class SharedPref {
 
   static const String USER = "user";
   static const String STREAM_CHAT_TOKEN = "stream_chat_token";
+  static const String NOTIFICATION_ACTIVE = "notification_active";
+  static const String USER_BLOCKED = "user_blocked";
 }

@@ -4,8 +4,8 @@ import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
 import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/entities/notification_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
-import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/controllers/home_controller.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
 
 void showToast(BuildContext context, String message) {
   final scaffold = ScaffoldMessenger.of(context);
@@ -100,13 +100,11 @@ Future<void> showCallNotification(Map<String, dynamic> data) async {
 }
 
 bool isSolanaAddress(String address) {
-  // Check if the address is a valid base58 string and length is typical for Solana
   final solanaAddressRegex = RegExp(r'^[A-HJ-NP-Za-km-z1-9]{32,48}$');
   return solanaAddressRegex.hasMatch(address);
 }
 
 bool isEthereumAddress(String address) {
-  // Check if the address starts with "0x" and is 42 characters long
   final ethAddressRegex = RegExp(r'^0x[a-fA-F0-9]{40}$');
   return ethAddressRegex.hasMatch(address);
 }

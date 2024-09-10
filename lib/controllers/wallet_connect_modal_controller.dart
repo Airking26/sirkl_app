@@ -340,14 +340,16 @@ class WalletConnectModalController extends GetxController {
   Future<void> _connectSolana(
     final BuildContext context,
     final SolanaWalletProvider provider,
-  ) async {
+  )
+  async {
     if (!provider.adapter.isAuthorized) {
       await provider.connect(context);
       Get.back();
       Get.back();
       _homeController.address.value = base58Encode(
           base64Decode(provider.adapter.connectedAccount!.address));
-    } else {
+    }
+    else {
       await provider.disconnect(context);
       Get.back();
     }
@@ -357,7 +359,8 @@ class WalletConnectModalController extends GetxController {
     final BuildContext context,
     final SolanaWalletProvider provider,
     final int count,
-  ) async {
+  )
+  async {
     final String description = "Sign Messages ($count)";
     try {
       final SignMessagesResult result = await provider.signMessages(
@@ -393,7 +396,8 @@ class WalletConnectModalController extends GetxController {
 
   Future<void> signMessageSolanaWithAdapter(
     final BuildContext context,
-  ) async {
+  )
+  async {
     try {
       var address = solanaWalletAdapter
           .encodeAccount(solanaWalletAdapter.connectedAccount!);
