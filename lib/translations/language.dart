@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import 'constants.dart' as c;
+import '../common/constants.dart' as c;
 
 class Language extends Translations {
   @override

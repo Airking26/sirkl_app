@@ -4,7 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/models/inbox_creation_dto.dart';
 import 'package:sirkl/models/request_to_join_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/repo/chats_repo.dart';
+import 'package:sirkl/repositories/chats_repo.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 import 'profile_controller.dart';

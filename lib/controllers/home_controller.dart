@@ -12,7 +12,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
@@ -26,12 +25,13 @@ import 'package:sirkl/models/story_modification_dto.dart';
 import 'package:sirkl/models/update_fcm_dto.dart';
 import 'package:sirkl/models/update_me_dto.dart';
 import 'package:sirkl/models/wallet_connect_dto.dart';
-import 'package:sirkl/repo/chats_repo.dart';
-import 'package:sirkl/repo/home_repo.dart';
-import 'package:sirkl/repo/profile_repo.dart';
+import 'package:sirkl/repositories/auth_repo.dart';
+import 'package:sirkl/repositories/chats_repo.dart';
+import 'package:sirkl/repositories/home_repo.dart';
+import 'package:sirkl/repositories/profile_repo.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 import '../common/save_pref_keys.dart';
-import '../repo/auth_repo.dart';
 
 class HomeController extends GetxController {
   NavigationController get _navigationController =>

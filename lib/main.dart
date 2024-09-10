@@ -18,13 +18,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/enums/app_theme.dart';
-import 'package:sirkl/common/language.dart';
 import 'package:sirkl/common/local_notification_initialize.dart';
-import 'package:sirkl/models/notification_register_dto.dart';
-import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/views/global/stream_chat/src/channel/channel_page.dart';
-import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/chats_controller.dart';
@@ -33,10 +27,15 @@ import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/controllers/profile_controller.dart';
 import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
-import 'package:sirkl/repo/home_repo.dart';
-import 'package:sirkl/repo/profile_repo.dart';
+import 'package:sirkl/models/notification_register_dto.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
+import 'package:sirkl/navigation_root/navigation_root_screen.dart';
+import 'package:sirkl/translations/language.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/chats/settings_group_screen.dart';
+import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/views/global/stream_chat/src/channel/channel_page.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/views/profile/profile_else_screen.dart';
 import 'package:stream_chat_persistence/stream_chat_persistence.dart';
 import 'package:web3modal_flutter/theme/w3m_theme.dart';
@@ -46,7 +45,8 @@ import 'common/utils.dart';
 import 'config/s_colors.dart';
 import 'controllers/dependency_manager.dart';
 import 'controllers/home_controller.dart';
-import 'navigation/ui/navigation_screen.dart';
+import 'repositories/home_repo.dart';
+import 'repositories/profile_repo.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -464,5 +464,5 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   @override
-  Widget build(BuildContext context) => const NavigationScreen();
+  Widget build(BuildContext context) => const NavigationRootScreen();
 }

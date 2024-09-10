@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sirkl/config/s_config.dart';
+import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/models/admin_dto.dart';
 import 'package:sirkl/models/collection_dto.dart';
 import 'package:sirkl/models/contract_address_dto.dart';
@@ -7,11 +9,9 @@ import 'package:sirkl/models/contract_creator_dto.dart';
 import 'package:sirkl/models/group_creation_dto.dart';
 import 'package:sirkl/models/group_dto.dart';
 import 'package:sirkl/models/token_dto.dart';
+import 'package:sirkl/repositories/group_repo.dart';
+import 'package:sirkl/repositories/home_repo.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/config/s_config.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
-import 'package:sirkl/repo/group_repo.dart';
-import 'package:sirkl/repo/home_repo.dart';
 
 class GroupsController extends GetxController {
   final box = GetStorage();

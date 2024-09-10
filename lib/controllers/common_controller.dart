@@ -7,8 +7,8 @@ import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/models/notification_added_admin_dto.dart';
 import 'package:sirkl/models/report_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/repo/common_repo.dart';
-import 'package:sirkl/repo/profile_repo.dart';
+import 'package:sirkl/repositories/common_repo.dart';
+import 'package:sirkl/repositories/profile_repo.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 class CommonController extends GetxController {

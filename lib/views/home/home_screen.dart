@@ -22,7 +22,7 @@ import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/models/story_dto.dart';
 import 'package:sirkl/models/web_wallet_connect_dto.dart';
-import 'package:sirkl/repo/google_repo.dart';
+import 'package:sirkl/repositories/google_repo.dart';
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/views/home/pdf_screen.dart';
 import 'package:sirkl/views/home/story_viewer_screen.dart';

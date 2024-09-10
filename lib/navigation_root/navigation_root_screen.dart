@@ -2,28 +2,28 @@ import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
+import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 
-import '../../controllers/navigation_controller.dart';
-import '../../controllers/profile_controller.dart';
-import '../../views/calls/calls_screen.dart';
-import '../../views/chats/chat_screen.dart';
-import '../../views/group/groups_screen.dart';
-import '../../views/home/home_screen.dart';
-import '../../views/profile/profile_screen.dart';
+import '../controllers/navigation_controller.dart';
+import '../controllers/profile_controller.dart';
+import '../views/calls/calls_screen.dart';
+import '../views/chats/chat_screen.dart';
+import '../views/group/groups_screen.dart';
+import '../views/home/home_screen.dart';
+import '../views/profile/profile_screen.dart';
 
-class NavigationScreen extends StatefulWidget {
-  const NavigationScreen({Key? key}) : super(key: key);
+class NavigationRootScreen extends StatefulWidget {
+  const NavigationRootScreen({Key? key}) : super(key: key);
 
   @override
-  State<NavigationScreen> createState() => _NavigationScreenState();
+  State<NavigationRootScreen> createState() => _NavigationRootScreenState();
 }
 
-class _NavigationScreenState extends State<NavigationScreen> {
+class _NavigationRootScreenState extends State<NavigationRootScreen> {
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
   CallController get _callController => Get.find<CallController>();
