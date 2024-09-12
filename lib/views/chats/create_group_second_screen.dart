@@ -8,8 +8,8 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/models/inbox_creation_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
@@ -36,7 +36,7 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
   final _searchController = FloatingSearchBarController();
   final PagingController<int, UserDTO> pagingController =
       PagingController(firstPageKey: 0);
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   CommonController get _commonController => Get.find<CommonController>();
   NavigationController get _navigationController =>
       Get.find<NavigationController>();

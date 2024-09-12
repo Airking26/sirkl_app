@@ -9,9 +9,9 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/controllers/call_controller.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/web3_controller.dart';
 import 'package:sirkl/models/notification_added_admin_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
@@ -34,7 +34,7 @@ class AddUserToGroupScreen extends StatefulWidget {
 
 class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
   CallController get _callController => Get.find<CallController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   CommonController get _commonController => Get.find<CommonController>();
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
   HomeController get _homeController => Get.find<HomeController>();

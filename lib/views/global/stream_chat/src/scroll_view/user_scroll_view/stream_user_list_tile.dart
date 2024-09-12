@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
@@ -112,7 +112,7 @@ class StreamUserListTile extends StatelessWidget {
   final EdgeInsetsGeometry contentPadding;
 
   HomeController get _homeController => Get.find<HomeController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
 
   /// Creates a copy of this tile but with the given fields replaced with
   /// the new values.

@@ -10,7 +10,7 @@ import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 import 'profile_controller.dart';
 
-class ChatsController extends GetxController {
+class InboxController extends GetxController {
   final box = GetStorage();
 
   ProfileController get _profileController => Get.find<ProfileController>();
@@ -45,12 +45,15 @@ class ChatsController extends GetxController {
   var groupVisibilityCollapsed = true.obs;
   var groupPayingCollapsed = true.obs;
 
+  /// Function to create an Inbox
   Future<String> createInbox(InboxCreationDto inboxCreationDto) async =>
       await InboxRepo.createInbox(inboxCreationDto);
 
+  /// Function to reset a channel
   resetChannel() => channel = (null as Channel?).obs;
 
-  Future<void> checkOrCreateChannel(
+  /// Function to return a channel (or create if it does not exist) based on members
+  Future<void> watchChannelWithMembers(
       String himId, StreamChatClient client, String myId) async {
     channel.value = client.channel(
       'try',
@@ -66,13 +69,15 @@ class ChatsController extends GetxController {
     await channel.value!.watch();
   }
 
-  Future<void> checkOrCreateChannelWithId(
+  /// Function to return a channel (or create if it does not exist) based on ID
+  Future<void> watchChannelWithId(
       StreamChatClient client, String channelId) async {
     channel.value =
         client.channel('try', id: channelId, extraData: {"isConv": true});
     await channel.value!.watch();
   }
 
+  /// Function to retrieve a ETH address from a ENS
   Future<String?> getEthFromEns(String ens, String wallet) async {
     String? eth = await InboxRepo.ethFromEns(ens);
 
@@ -83,10 +88,12 @@ class ChatsController extends GetxController {
     return eth;
   }
 
+  /// Function to delete an inbox
   Future<void> deleteInbox(String id) async {
     await InboxRepo.deleteInbox(id);
   }
 
+  /// Function to create a request to join
   Future<bool> requestToJoinGroup(RequestToJoinDto requestToJoinDTO) async {
     try {
       await JoinRepo.requestToJoinGroup(requestToJoinDTO);
@@ -95,6 +102,7 @@ class ChatsController extends GetxController {
     return false;
   }
 
+  /// Function to accept or decline a request to join
   Future<bool> acceptDeclineRequest(RequestToJoinDto requestToJoinDto) async {
     try {
       await JoinRepo.acceptDeclineRequest(requestToJoinDto);
@@ -103,6 +111,7 @@ class ChatsController extends GetxController {
     return false;
   }
 
+  /// Function to retrieve request waiting to join to be accepted (by admin)
   Future<void> retrieveRequestsWaiting(String channelId) async {
     requestsWaiting.value = await JoinRepo.getRequestsWaiting(channelId);
   }

@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/models/report_dto.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
@@ -33,7 +33,7 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   GroupsController get _groupController => Get.find<GroupsController>();
   CommonController get _commonController => Get.find<CommonController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
 
   @override
   Widget build(BuildContext context) {

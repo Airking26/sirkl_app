@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/config/s_config.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/models/admin_dto.dart';
 import 'package:sirkl/models/collection_dto.dart';
 import 'package:sirkl/models/contract_address_dto.dart';
@@ -16,7 +16,7 @@ import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 class GroupsController extends GetxController {
   final box = GetStorage();
 
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   var assetAvailableToCreateCommunity = <CollectionDbDto>[].obs;
 
   var queryCommunity = "".obs;

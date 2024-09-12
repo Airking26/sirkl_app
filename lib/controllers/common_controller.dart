@@ -110,7 +110,6 @@ class CommonController extends GetxController {
 
   getUserById(String id) async {
     UserDTO userDto = await UserRepo.getUserByID(id);
-
     userClicked.value = userDto;
   }
 

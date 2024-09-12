@@ -7,18 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/config/s_colors.dart';
+import 'package:sirkl/controllers/call_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/models/inbox_creation_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/views/global/material_floating_search_bar/floating_search_bar.dart';
 import 'package:sirkl/views/global/material_floating_search_bar/floating_search_bar_actions.dart';
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/config/s_colors.dart';
-import 'package:sirkl/controllers/call_controller.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
-import 'package:sirkl/controllers/common_controller.dart';
-import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../controllers/home_controller.dart';
@@ -35,7 +35,7 @@ class NewMessageScreen extends StatefulWidget {
 }
 
 class _NewMessageScreenState extends State<NewMessageScreen> {
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   HomeController get _homeController => Get.find<HomeController>();
   ProfileController get _profileController => Get.find<ProfileController>();
   CommonController get _commonController => Get.find<CommonController>();

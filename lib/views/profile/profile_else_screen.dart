@@ -472,17 +472,31 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                             Brightness.dark
                         ? Colors.white
                         : Colors.black)),
-            subtitle: Text(
-                widget.nftDto.isNft ?? false
-                    ? "${widget.nftDto.images!.length} available"
-                    : widget.nftDto.subtitle == null
-                        ? ""
-                        : "Currency : ${widget.nftDto.subtitle?.toUpperCase()}",
-                style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: "Gilroy",
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF828282))),
+            subtitle: Row(
+              children: [
+                Image.asset(
+                  widget.nftDto.chain == "Polygon"
+                      ? "assets/images/polygon.png"
+                      : "assets/images/ethereum-logo.png",
+                  width: 12,
+                  height: 12,
+                ),
+                SizedBox(
+                  width: 6,
+                ),
+                Text(
+                    widget.nftDto.isNft ?? false
+                        ? "${widget.nftDto.images!.length} available"
+                        : widget.nftDto.subtitle == null
+                            ? ""
+                            : "Currency : ${widget.nftDto.subtitle?.toUpperCase()}",
+                    style: const TextStyle(
+                        fontSize: 12,
+                        fontFamily: "Gilroy",
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF828282))),
+              ],
+            ),
             onExpansionChanged: (expanded) {
               if (expanded) {
                 widget.commonController.isCardExpandedList.assign(widget.index);

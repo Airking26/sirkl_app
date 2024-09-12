@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 
 import '../../config/s_colors.dart';
 
@@ -13,7 +13,7 @@ class PinnedMessageScreen extends StatefulWidget {
 }
 
 class _PinnedMessageScreenState extends State<PinnedMessageScreen> {
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
 
   @override
   Widget build(BuildContext context) {

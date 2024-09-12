@@ -1,11 +1,8 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
-import 'package:dart_vlc/channel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/views/global/stream_chat/src/scroll_view/stream_scroll_view_error_widget.dart';
 import 'package:sirkl/views/global/stream_chat/src/scroll_view/stream_scroll_view_load_more_error.dart';
 import 'package:sirkl/views/global/stream_chat/src/scroll_view/stream_scroll_view_load_more_indicator.dart';
@@ -291,7 +288,6 @@ class StreamMemberListView extends StatelessWidget {
   /// Defaults to [Clip.hardEdge].
   final Clip clipBehavior;
 
-
   @override
   Widget build(BuildContext context) => PagedValueListView<int, Member>(
         scrollDirection: scrollDirection,
@@ -323,10 +319,25 @@ class StreamMemberListView extends StatelessWidget {
           final streamUserListTile = StreamMemberListTile(
             memberPage: memberPage,
             slidableEnabled: userSlidableEnabledBool,
-            onDeletePressed: onUserDeletedPressed == null ? null : (context) => onUserDeletedPressed(context, member.userId!, UserDTO.fromJson(member.user!.extraData["userDTO"] as Map<String, dynamic>).wallet!),
-            onAdminPressed:  onAdminPressed == null ? null : (context) => onAdminPressed(context, member.userId!, member.channelRole == "channel_moderator", UserDTO.fromJson(member.user!.extraData["userDTO"] as Map<String, dynamic>).wallet!),
+            onDeletePressed: onUserDeletedPressed == null
+                ? null
+                : (context) => onUserDeletedPressed(
+                    context,
+                    member.userId!,
+                    UserDTO.fromJson(member.user!.extraData["userDTO"]
+                            as Map<String, dynamic>)
+                        .wallet!),
+            onAdminPressed: onAdminPressed == null
+                ? null
+                : (context) => onAdminPressed(
+                    context,
+                    member.userId!,
+                    member.channelRole == "channel_moderator",
+                    UserDTO.fromJson(member.user!.extraData["userDTO"]
+                            as Map<String, dynamic>)
+                        .wallet!),
             user: member.user!,
-            channelRole : member.channelRole,
+            channelRole: member.channelRole,
             onTap: onTap == null ? null : () => onTap(member),
             onLongPress: onLongPress == null ? null : () => onLongPress(member),
           );

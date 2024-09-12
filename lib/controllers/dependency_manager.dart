@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import 'package:sirkl/controllers/call_controller.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/controllers/profile_controller.dart';
 import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
@@ -19,16 +19,26 @@ class GlobalDependencyManager extends Bindings {
   }
 
   globalPut() {
-    //Get.put(PaidGroupContract(SConfig.paidGroupContract), permanent: _permanent);
-    //Get.put(SWalletConnectController(chainId: 5), permanent: _permanent);
     Get.put(NavigationController(), permanent: _permanent);
     Get.put(HomeController(), permanent: _permanent);
-    Get.put(ChatsController(), permanent: _permanent);
+    Get.put(InboxController(), permanent: _permanent);
     Get.put(ProfileController(), permanent: _permanent);
     Get.put(GroupsController(), permanent: _permanent);
     Get.put(CallController(), permanent: _permanent);
     Get.put(CommonController(), permanent: _permanent);
     Get.put(Web3Controller(), permanent: _permanent);
     Get.put(WalletConnectModalController(), permanent: _permanent);
+  }
+
+  globalPutLazy() {
+    Get.lazyPut(() => NavigationController(), fenix: _permanent);
+    Get.lazyPut(() => HomeController(), fenix: _permanent);
+    Get.lazyPut(() => InboxController(), fenix: _permanent);
+    Get.lazyPut(() => ProfileController(), fenix: _permanent);
+    Get.lazyPut(() => GroupsController(), fenix: _permanent);
+    Get.lazyPut(() => CallController(), fenix: _permanent);
+    Get.lazyPut(() => CommonController(), fenix: _permanent);
+    Get.lazyPut(() => Web3Controller(), fenix: _permanent);
+    Get.lazyPut(() => WalletConnectModalController(), fenix: _permanent);
   }
 }

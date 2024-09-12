@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/models/request_to_join_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../config/s_colors.dart';
@@ -21,7 +21,7 @@ class RequestWaitingForApprovalScreen extends StatefulWidget {
 class _RequestWaitingForApprovalScreenState
     extends State<RequestWaitingForApprovalScreen> {
   HomeController get _homeController => Get.find<HomeController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
 
   @override
   Widget build(BuildContext context) {

@@ -14,7 +14,6 @@ import 'package:sirkl/models/crypto/helpers.dart';
 import 'package:sirkl/models/crypto/test_data.dart';
 import 'package:sirkl/repositories/auth_repo.dart';
 import 'package:sirkl/repositories/google_repo.dart';
-import 'package:solana_wallet_provider/solana_wallet_provider.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 import 'package:web3modal_flutter/widgets/lists/list_items/wallet_list_item.dart';
 
@@ -30,35 +29,38 @@ class WalletConnectModalController extends GetxController {
   ];
   var nativeUrl = "sirkl://";
   var universalUrl =
-      'http://www.sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com';
+      'http://sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com';
   var projectID = "bdfe4b74c44308ffb46fa4e6198605af";
 
   var errorTextRetrieving = false.obs;
 
   final box = GetStorage();
 
-  SolanaWalletProvider? solanaProvider;
-
-  final SolanaWalletAdapter solanaWalletAdapter = SolanaWalletAdapter(
-      AppIdentity(
-          uri: Uri.parse('https://sirkl.io'),
-          icon: Uri.parse("logo.png"),
-          name: 'SIRKL.io'),
-      cluster: Cluster.mainnet);
-
   void initializeService(BuildContext context) async {
+    W3MChainPresets.chains.addAll(W3MChainPresets.extraChains);
+    W3MChainPresets.chains.addAll(W3MChainPresets.testChains);
+
     w3mService.value = W3MService(
+      metadata: PairingMetadata(
+        name: name,
+        description: desc,
+        url: url,
+        icons: icons,
+        redirect: Redirect(
+          native: nativeUrl,
+          universal: universalUrl,
+        ),
+      ),
       includedWalletIds: {
         'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
         '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust
         'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa', // Coinbase
         '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
-        'a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393', // Phantom
         '19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927' // Ledger
       },
       context: context,
       projectId: projectID,
-      logLevel: LogLevel.error,
+      logLevel: LogLevel.debug,
       loginWithoutWalletWidget: WalletListItem(
         title: "Connect without wallet",
         imageUrl:
@@ -71,25 +73,6 @@ class WalletConnectModalController extends GetxController {
       ),
       /*Column(
         children: [
-          WalletListItem(
-            title: "Phantom",
-            imageUrl:
-                "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/channels4_profile.jpg",
-            onTap: () async {
-              /* if (solanaWalletAdapter.isAuthorized) {
-                await solanaWalletAdapter.deauthorize();
-                var authorizeResult = await solanaWalletAdapter.authorize();
-                _homeController.address.value = base58Encode(
-                    base64Decode(authorizeResult.accounts.first.address));
-                Get.back();
-              } else {
-                var authorizeResult = await solanaWalletAdapter.authorize();
-                _homeController.address.value = base58Encode(
-                    base64Decode(authorizeResult.accounts.first.address));
-                Get.back();
-              }*/
-            },
-          ),
           WalletListItem(
             title: "Phantom",
             imageUrl:
@@ -109,33 +92,6 @@ class WalletConnectModalController extends GetxController {
               }
             },
           ),
-          SolanaWalletProvider.create(
-            identity: AppIdentity(
-                uri: Uri.parse('https://sirkl.io'),
-                icon: Uri.parse("logo.png"),
-                name: 'SIRKL.io'),
-            child: FutureBuilder(
-                future: SolanaWalletProvider.initialize(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState != ConnectionState.done) {
-                    return const CircularProgressIndicator();
-                  }
-
-                  solanaProvider?.adapter.clear();
-                  solanaProvider?.adapter.dispose();
-
-                  return WalletListItem(
-                    title: "Phantom",
-                    imageUrl:
-                        "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/channels4_profile.jpg",
-                    onTap: () async {
-                      solanaProvider = SolanaWalletProvider.of(context);
-                      await _connectSolana(
-                          context, SolanaWalletProvider.of(context));
-                    },
-                  );
-                }),
-          ),
           const SizedBox(
             height: 8,
           ),
@@ -151,16 +107,6 @@ class WalletConnectModalController extends GetxController {
           ),
         ],
       ),*/
-      metadata: PairingMetadata(
-        name: name,
-        description: desc,
-        url: url,
-        icons: icons,
-        redirect: Redirect(
-          native: nativeUrl,
-          universal: universalUrl,
-        ),
-      ),
     );
 
     w3mService.value?.onModalConnect.subscribe(_onModalConnect);
@@ -337,7 +283,14 @@ class WalletConnectModalController extends GetxController {
     }
   }
 
-  Future<void> _connectSolana(
+/*SolanaWalletProvider? solanaProvider;
+  final SolanaWalletAdapter solanaWalletAdapter = SolanaWalletAdapter(
+      AppIdentity(
+          uri: Uri.parse('https://sirkl.io'),
+          icon: Uri.parse("logo.png"),
+          name: 'SIRKL.io'),
+      cluster: Cluster.mainnet);*/
+/*Future<void> _connectSolana(
     final BuildContext context,
     final SolanaWalletProvider provider,
   )
@@ -418,5 +371,5 @@ class WalletConnectModalController extends GetxController {
     } catch (error, stack) {
       debugPrint(error.toString());
     }
-  }
+  }*/
 }

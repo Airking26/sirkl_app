@@ -5,15 +5,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sirkl/models/report_dto.dart';
-import 'package:sirkl/models/request_to_join_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/controllers/web3_controller.dart';
+import 'package:sirkl/models/report_dto.dart';
+import 'package:sirkl/models/request_to_join_dto.dart';
+import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../config/s_colors.dart';
@@ -37,7 +37,7 @@ class _SettingsGroupScreenState extends State<SettingsGroupScreen> {
   ProfileController get _profileController => Get.find<ProfileController>();  
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
   NavigationController get _navigationController => Get.find<NavigationController>();
 

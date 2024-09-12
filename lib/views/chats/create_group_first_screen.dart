@@ -4,9 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/web3_controller.dart';
 import 'package:sirkl/models/inbox_creation_dto.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
@@ -27,7 +27,7 @@ class CreateGroupFirstScreen extends StatefulWidget {
 
 class _CreateGroupFirstScreenState extends State<CreateGroupFirstScreen> {
   ProfileController get _profileController => Get.find<ProfileController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   HomeController get _homeController => Get.find<HomeController>();
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
   CommonController get _commonController => Get.find<CommonController>();

@@ -4,14 +4,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/controllers/call_controller.dart';
+import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/models/update_me_dto.dart';
-import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/call_controller.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
-import 'package:sirkl/controllers/common_controller.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../../../../config/s_colors.dart';
@@ -146,7 +146,7 @@ class StreamChannelHeader extends StatelessWidget
 
   CommonController get _commonController => Get.find<CommonController>();
   HomeController get _homeController => Get.find<HomeController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   ProfileController get _profileController => Get.find<ProfileController>();
   CallController get _callController => Get.find<CallController>();
 

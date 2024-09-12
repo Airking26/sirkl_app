@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/models/sign_in_success_dto.dart';
-import 'package:sirkl/models/update_me_dto.dart';
 import 'package:sirkl/common/utils.dart';
-import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/controllers/call_controller.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
+import 'package:sirkl/models/sign_in_success_dto.dart';
+import 'package:sirkl/models/update_me_dto.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../config/s_colors.dart';
@@ -28,7 +28,7 @@ class AddContactScreen extends StatefulWidget {
 
 class _AddContactScreenState extends State<AddContactScreen> {
   ProfileController get _profileController => Get.find<ProfileController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   CallController get _callController => Get.find<CallController>();
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();

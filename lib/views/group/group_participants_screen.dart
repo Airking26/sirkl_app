@@ -4,9 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/config/s_colors.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/web3_controller.dart';
 import 'package:sirkl/models/admin_dto.dart';
 import 'package:sirkl/models/notification_added_admin_dto.dart';
@@ -27,7 +27,7 @@ class GroupParticipantScreen extends StatefulWidget {
 }
 
 class _GroupParticipantScreenState extends State<GroupParticipantScreen> {
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   GroupsController get _groupController => Get.find<GroupsController>();
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();

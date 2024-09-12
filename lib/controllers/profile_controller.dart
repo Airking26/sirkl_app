@@ -170,8 +170,10 @@ class ProfileController extends GetxController {
           String id, int offset) async =>
       await NotificationRepo.retrieveNotifications(
           id: id, offset: offset.toString());
+
   Future<void> updateNft(NftModificationDto nftModificationDto) async =>
       await AssetRepo.updateNFTStatus(nftModificationDto);
+
   retrieveMyStories() async =>
       myStories.value = await StoryRepo.retrieveMyStories();
 

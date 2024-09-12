@@ -6,20 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/config/s_colors.dart';
+import 'package:sirkl/controllers/groups_controller.dart';
+import 'package:sirkl/controllers/home_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/models/group_creation_dto.dart';
 import 'package:sirkl/models/nft_modification_dto.dart';
-import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/views/global/material_floating_search_bar/floating_search_bar.dart';
 import 'package:sirkl/views/global/material_floating_search_bar/floating_search_bar_actions.dart';
 import 'package:sirkl/views/global/material_floating_search_bar/floating_search_bar_transition.dart';
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/views/global/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/config/s_colors.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
-import 'package:sirkl/controllers/groups_controller.dart';
-import 'package:sirkl/controllers/home_controller.dart';
-import 'package:sirkl/controllers/navigation_controller.dart';
 
 import '../../controllers/profile_controller.dart';
 import '../chats/detailed_chat_screen.dart';
@@ -36,7 +36,7 @@ class _GroupsScreenState extends State<GroupsScreen>
   late TabController tabController;
   GroupsController get _groupController => Get.find<GroupsController>();
   HomeController get _homeController => Get.find<HomeController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
   final _floatingSearchBarController = FloatingSearchBarController();

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/config/s_colors.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/views/global/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
@@ -27,7 +27,7 @@ class DetailedChatScreen extends StatefulWidget {
 
 class _DetailedChatScreenState extends State<DetailedChatScreen> {
   CommonController get _commonController => Get.find<CommonController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   HomeController get _homeController => Get.find<HomeController>();
 
   @override
@@ -38,12 +38,12 @@ class _DetailedChatScreenState extends State<DetailedChatScreen> {
         _commonController.checkUserIsInFollowing();
       }
       if (widget.create) {
-        _chatController.checkOrCreateChannel(
+        _chatController.watchChannelWithMembers(
             _commonController.userClicked.value!.id!,
             StreamChat.of(context).client,
             _homeController.id.value);
       } else if (widget.channelId != null) {
-        _chatController.checkOrCreateChannelWithId(
+        _chatController.watchChannelWithId(
             StreamChat.of(context).client, widget.channelId!);
       }
     });

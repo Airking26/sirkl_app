@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
+import 'package:sirkl/controllers/web3_controller.dart';
+import 'package:sirkl/views/chats/settings_group_screen.dart';
 import 'package:sirkl/views/global/material_floating_search_bar/floating_search_bar.dart';
 import 'package:sirkl/views/global/material_floating_search_bar/floating_search_bar_actions.dart';
 import 'package:sirkl/views/global/material_floating_search_bar/floating_search_bar_transition.dart';
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/views/global/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
-import 'package:sirkl/controllers/common_controller.dart';
-import 'package:sirkl/controllers/navigation_controller.dart';
-import 'package:sirkl/controllers/web3_controller.dart';
-import 'package:sirkl/views/chats/settings_group_screen.dart';
 
 import '../../controllers/home_controller.dart';
 import 'new_message_screen.dart';
@@ -27,7 +27,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   NavigationController get _navigationController =>

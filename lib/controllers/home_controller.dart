@@ -13,8 +13,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/config/s_config.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/models/nft_dto.dart';
 import 'package:sirkl/models/nickname_creation_dto.dart';
@@ -40,7 +40,7 @@ class HomeController extends GetxController {
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
   CommonController get _commonController => Get.find<CommonController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
 
   final box = GetStorage();
 

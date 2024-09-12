@@ -33,9 +33,6 @@
         <string>rainbow</string>
         <string>metamask</string>
         <string>cbwallet</string>
-        <string>phantom</string> <!-- Solana Wallet -->
-        <string>sollet</string> <!-- Solana Wallet -->
-        <string>solana</string> <!-- Solana Wallet -->
     </array>
 
     <key>LSRequiresIPhoneOS</key>
@@ -95,24 +92,6 @@
             <key>CFBundleURLSchemes</key>
             <array>
                 <string>com.googleusercontent.apps.970958813193-lf30v4u7t3lj1utlcgdvks5voqa1ld23</string>
-            </array>
-        </dict>
-
-        <!-- Add Solana-specific custom URL scheme -->
-        <dict>
-            <key>CFBundleURLName</key>
-            <string>solana</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>solana</string>
-            </array>
-        </dict>
-        <dict>
-            <key>CFBundleURLName</key>
-            <string>phantom</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>phantom</string>
             </array>
         </dict>
     </array>

@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/constants.dart' as con;
-import 'package:sirkl/models/notification_dto.dart';
-import 'package:sirkl/models/request_to_join_dto.dart';
-import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
-import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/chats_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/controllers/web3_controller.dart';
+import 'package:sirkl/models/notification_dto.dart';
+import 'package:sirkl/models/request_to_join_dto.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
+import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:sirkl/views/profile/profile_else_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:tiny_avatar/tiny_avatar.dart';
@@ -33,7 +33,7 @@ class _NotificationScreenState extends State<NotificationScreen>
     with TickerProviderStateMixin {
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get _homeController => Get.find<HomeController>();
-  ChatsController get _chatController => Get.find<ChatsController>();
+  InboxController get _chatController => Get.find<InboxController>();
   CommonController get _commonController => Get.find<CommonController>();
   NavigationController get _navigationController =>
       Get.find<NavigationController>();

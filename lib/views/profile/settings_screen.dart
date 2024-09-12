@@ -10,7 +10,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:sirkl/common/save_pref_keys.dart';
-import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/common_controller.dart';
@@ -22,7 +21,6 @@ import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/global/dialog/positioned_dialog.dart';
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
-import 'package:solana_wallet_provider/solana_wallet_provider.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../controllers/home_controller.dart';
@@ -41,12 +39,12 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   final box = GetStorage();
   PositionedDialog dialogMenu = PositionedDialog();
-  final SolanaWalletAdapter solanaWalletAdapter = SolanaWalletAdapter(
+  /*final SolanaWalletAdapter solanaWalletAdapter = SolanaWalletAdapter(
       AppIdentity(
           uri: Uri.parse('https://sirkl.io'),
           icon: Uri.parse("logo.png"),
           name: 'SIRKL.io'),
-      cluster: Cluster.mainnet);
+      cluster: Cluster.mainnet);*/
 
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get _homeController => Get.find<HomeController>();
@@ -461,12 +459,11 @@ class _SettingScreenState extends State<SettingScreen> {
                                           _walletConnectModalController
                                               .w3mService.value
                                               ?.disconnect();
-                                          if (isSolanaAddress(_homeController
+                                          /*if (isSolanaAddress(_homeController
                                                   .userMe.value.wallet ??
                                               "")) {
                                             await solanaWalletAdapter.clear();
-                                            //await solanaWalletAdapter.dispose();
-                                          }
+                                          }*/
                                           Get.deleteAll(force: true);
                                           Phoenix.rebirth(Get.context!);
                                           Get.offAll(() => const MyHomePage(),
