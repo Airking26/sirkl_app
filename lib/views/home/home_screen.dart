@@ -562,38 +562,35 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget buildSirklTile(
       BuildContext context, int index, bool isShowSuspension) {
-    return Padding(
-      padding: EdgeInsets.only(
-          right: _commonController.users.length > 20 ? 36.0 : 0),
-      child: Column(
-        children: [
-          !isShowSuspension
-              ? Divider(
+    return InkWell(
+      onTap: () {
+        _commonController.userClicked.value = _commonController.users[index];
+        pushNewScreen(context,
+            screen: const ProfileElseScreen(
+              fromConversation: false,
+              fromNested: true,
+            )).then((value) => _commonController.users.refresh());
+      },
+      child: Padding(
+        padding: EdgeInsets.only(
+            right: _commonController.users.length > 20 ? 36.0 : 0),
+        child: Column(
+          children: [
+            if (!isShowSuspension)
+              Divider(
                   color: MediaQuery.of(context).platformBrightness ==
                           Brightness.dark
                       ? const Color(0xFF9BA0A5)
                       : const Color(0xFF828282),
                   indent: 84,
                   endIndent: 24,
-                  thickness: 0.2)
-              : Container(),
-          isShowSuspension
-              ? const SizedBox(
-                  height: 8,
-                )
-              : Container(),
-          ListTile(
-            leading: InkWell(
-              onTap: () {
-                _commonController.userClicked.value =
-                    _commonController.users[index];
-                pushNewScreen(context,
-                    screen: const ProfileElseScreen(
-                      fromConversation: false,
-                      fromNested: true,
-                    ));
-              },
-              child: _commonController.users[index].picture == null
+                  thickness: 0.2),
+            if (isShowSuspension)
+              const SizedBox(
+                height: 8,
+              ),
+            ListTile(
+              leading: _commonController.users[index].picture == null
                   ? SizedBox(
                       width: 56,
                       height: 56,
@@ -615,121 +612,83 @@ class _HomeScreenState extends State<HomeScreen> {
                                   color: SColors.activeColor)),
                           errorWidget: (context, url, error) => Image.asset(
                               "assets/images/app_icon_rounded.png"))),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    width: 100,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                            onPressed: () async {
+                              _callController.userCalled.value =
+                                  _commonController.users[index];
+                              await _callController.inviteToJoinCall(
+                                  _commonController.users[index],
+                                  DateTime.now().toString(),
+                                  _homeController.id.value);
+                            },
+                            icon: Image.asset(
+                              "assets/images/call_tab.png",
+                              color: SColors.activeColor,
+                              width: 20,
+                              height: 20,
+                            )),
+                        IconButton(
+                            onPressed: () {
+                              _commonController.userClicked.value =
+                                  _commonController.users[index];
+                              pushNewScreen(context,
+                                      screen: const DetailedChatScreen(
+                                          create: true),
+                                      withNavBar: false)
+                                  .then((value) => _navigationController
+                                      .hideNavBar.value = false);
+                            },
+                            icon: Image.asset(
+                              "assets/images/chat_tab.png",
+                              width: 20,
+                              height: 20,
+                            )),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              title: Text(
+                  displayName(_commonController.users[index], _homeController),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: "Gilroy",
+                      fontWeight: FontWeight.w600,
+                      color: MediaQuery.of(context).platformBrightness ==
+                              Brightness.dark
+                          ? Colors.white
+                          : Colors.black)),
+              subtitle: !_commonController.users[index].userName.isNullOrBlank!
+                  ? Text(
+                      "${_commonController.users[index].wallet!.substring(0, 6)}...${_commonController.users[index].wallet!.substring(_commonController.users[index].wallet!.length - 4)}",
+                      //maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontFamily: "Gilroy",
+                          fontWeight: FontWeight.w500,
+                          color: MediaQuery.of(context).platformBrightness ==
+                                  Brightness.dark
+                              ? const Color(0xFF9BA0A5)
+                              : const Color(0xFF828282)))
+                  : null,
             ),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 100,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      InkWell(
-                        onTap: () async {
-                          _callController.userCalled.value =
-                              _commonController.users[index];
-                          await _callController.inviteToJoinCall(
-                              _commonController.users[index],
-                              DateTime.now().toString(),
-                              _homeController.id.value);
-                        },
-                        child: Image.asset(
-                          "assets/images/call_tab.png",
-                          color: SColors.activeColor,
-                          width: 20,
-                          height: 20,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      InkWell(
-                          onTap: () {
-                            _commonController.userClicked.value =
-                                _commonController.users[index];
-                            pushNewScreen(context,
-                                    screen:
-                                        const DetailedChatScreen(create: true),
-                                    withNavBar: false)
-                                .then((value) => _navigationController
-                                    .hideNavBar.value = false);
-                          },
-                          child: Image.asset(
-                            "assets/images/chat_tab.png",
-                            width: 20,
-                            height: 20,
-                            color: const Color(0xFF9BA0A5),
-                          )),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                    ],
-                  ),
-                )
-              ],
+            const SizedBox(
+              height: 8,
             ),
-            title: InkWell(
-                onTap: () {
-                  _commonController.userClicked.value =
-                      _commonController.users[index];
-                  pushNewScreen(context,
-                      screen: const ProfileElseScreen(
-                        fromConversation: false,
-                        fromNested: true,
-                      )).then((value) => _commonController.users.refresh());
-                },
-                child: Transform.translate(
-                    offset: const Offset(-8, 0),
-                    child: Text(
-                        displayName(
-                            _commonController.users[index], _homeController),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: "Gilroy",
-                            fontWeight: FontWeight.w600,
-                            color: MediaQuery.of(context).platformBrightness ==
-                                    Brightness.dark
-                                ? Colors.white
-                                : Colors.black)))),
-            subtitle: !_commonController.users[index].userName.isNullOrBlank!
-                ? InkWell(
-                    onTap: () {
-                      _commonController.userClicked.value =
-                          _commonController.users[index];
-                      pushNewScreen(context,
-                          screen: const ProfileElseScreen(
-                            fromConversation: false,
-                            fromNested: true,
-                          )).then((value) => _commonController.users.refresh());
-                    },
-                    child: Transform.translate(
-                        offset: const Offset(-8, 0),
-                        child: Text(
-                            "${_commonController.users[index].wallet!.substring(0, 6)}...${_commonController.users[index].wallet!.substring(_commonController.users[index].wallet!.length - 4)}",
-                            //maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontFamily: "Gilroy",
-                                fontWeight: FontWeight.w500,
-                                color:
-                                    MediaQuery.of(context).platformBrightness ==
-                                            Brightness.dark
-                                        ? const Color(0xFF9BA0A5)
-                                        : const Color(0xFF828282)))))
-                : null,
-          ),
-          !isShowSuspension
-              ? const SizedBox(
-                  height: 8,
-                )
-              : const SizedBox(
-                  height: 8,
-                ),
-        ],
+          ],
+        ),
       ),
     );
   }

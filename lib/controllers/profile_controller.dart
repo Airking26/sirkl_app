@@ -361,7 +361,7 @@ class ProfileController extends GetxController {
                                 } else if (value.length < 3) {
                                   _isUsernameValid.value = false;
                                   _errorMessage.value = "Username too short";
-                                } else if (value.length > 8) {
+                                } else if (value.length > 12) {
                                   _isUsernameValid.value = false;
                                   _errorMessage.value = "Username too long";
                                 } else {
@@ -444,7 +444,7 @@ class ProfileController extends GetxController {
                             onPressed: () async {
                               if (_usernameController.text.isNotEmpty &&
                                   _usernameController.text.length > 2 &&
-                                  _usernameController.text.length < 9 &&
+                                  _usernameController.text.length < 13 &&
                                   _isUsernameValid.value &&
                                   !_isCheckingUsernameValidity.value) {
                                 await updateMe(
@@ -456,14 +456,14 @@ class ProfileController extends GetxController {
                             },
                             style: TextButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 12),
-                              backgroundColor:
-                                  _usernameController.text.isNotEmpty &&
-                                          _usernameController.text.length > 2 &&
-                                          _usernameController.text.length < 9 &&
-                                          _isUsernameValid.value &&
-                                          !_isCheckingUsernameValidity.value
-                                      ? SColors.activeColor
-                                      : Colors.grey,
+                              backgroundColor: _usernameController
+                                          .text.isNotEmpty &&
+                                      _usernameController.text.length > 2 &&
+                                      _usernameController.text.length < 13 &&
+                                      _isUsernameValid.value &&
+                                      !_isCheckingUsernameValidity.value
+                                  ? SColors.activeColor
+                                  : Colors.grey,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),

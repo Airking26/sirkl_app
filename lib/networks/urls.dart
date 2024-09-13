@@ -98,6 +98,8 @@ class SUrls {
       'nft/retrieve/$id/$isFav/$offset';
   static const String nftUpdate = 'nft/update';
   static const String retrieveContractAddress = 'nft/retrieve_contract_address';
+  static String retrieveAssetToCreateNewCommunity(String offset) =>
+      "nft/retrieve/group_to_create/$offset";
 
   /// Report repo
   static const String signalmentReport = 'signalment/report';

@@ -1,14 +1,11 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/models/admin_dto.dart';
-import 'package:sirkl/models/collection_dto.dart';
-import 'package:sirkl/models/contract_address_dto.dart';
 import 'package:sirkl/models/contract_creator_dto.dart';
 import 'package:sirkl/models/group_creation_dto.dart';
 import 'package:sirkl/models/group_dto.dart';
-import 'package:sirkl/models/token_dto.dart';
+import 'package:sirkl/repositories/asset_repo.dart';
 import 'package:sirkl/repositories/group_repo.dart';
 import 'package:sirkl/repositories/user_repo.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
@@ -17,7 +14,7 @@ class GroupsController extends GetxController {
   final box = GetStorage();
 
   InboxController get _chatController => Get.find<InboxController>();
-  var assetAvailableToCreateCommunity = <CollectionDbDto>[].obs;
+  var assetAvailableToCreateCommunity = <GroupCreationDto>[].obs;
 
   var queryCommunity = "".obs;
   var indexCommunity = 0.obs;
@@ -57,7 +54,13 @@ class GroupsController extends GetxController {
 
   /// Function to retrieve assets owned by the user for which no community
   ///exist yet in order to choose from to create one
-  retrieveAssetsAvailableToCreateCommunity(String wallet) async {
+  Future<void> retrieveAssetsAvailableToCreateCommunity() async {
+    assetAvailableToCreateCommunity.value =
+        await AssetRepo.retrieveAssetsAvailableToCommunityCreation();
+    isLoadingAvailableAssets.value = false;
+  }
+
+  /*retrieveAssetsAvailableToCreateCommunity(String wallet) async {
     List<GroupDto> groups = await GroupRepo.retrieveGroups();
     var tokens = await _retrieveTokenToCreateCommunity(wallet, groups);
     assetAvailableToCreateCommunity.value =
@@ -130,7 +133,7 @@ class GroupsController extends GetxController {
     }
 
     return assets;
-  }
+  }*/
 
   /// Function to retrieve the community owner in order to make him admin role
   Future<String?> retrieveCommunityOwner(String contract) async {

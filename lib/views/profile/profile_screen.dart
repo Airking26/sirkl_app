@@ -799,7 +799,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                   width: 6,
                 ),
                 Text(
-                    widget.nftDto.isNft ?? false
+                    widget.nftDto.isNft ?? true
                         ? "${widget.nftDto.images!.length} available"
                         : widget.nftDto.subtitle == null
                             ? ""

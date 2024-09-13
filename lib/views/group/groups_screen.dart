@@ -12,7 +12,6 @@ import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
-import 'package:sirkl/models/group_creation_dto.dart';
 import 'package:sirkl/models/nft_modification_dto.dart';
 import 'package:sirkl/views/global/material_floating_search_bar/floating_search_bar.dart';
 import 'package:sirkl/views/global/material_floating_search_bar/floating_search_bar_actions.dart';
@@ -447,8 +446,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                               _groupController
                                   .assetAvailableToCreateCommunity.isEmpty) {
                             _groupController
-                                .retrieveAssetsAvailableToCreateCommunity(
-                                    _homeController.userMe.value.wallet!);
+                                .retrieveAssetsAvailableToCreateCommunity();
                           }
                           _groupController.isAddingCommunity.value =
                               !_groupController.isAddingCommunity.value;
@@ -935,19 +933,9 @@ class _GroupsScreenState extends State<GroupsScreen>
                                 onTap: () async {
                                   await _groupController.createCommunity(
                                       StreamChat.of(context).client,
-                                      GroupCreationDto(
-                                          name: _groupController
+                                      _groupController
                                               .assetAvailableToCreateCommunity[
-                                                  index]
-                                              .collectionName,
-                                          picture: _groupController
-                                              .assetAvailableToCreateCommunity[
-                                                  index]
-                                              .collectionImage,
-                                          contractAddress: _groupController
-                                              .assetAvailableToCreateCommunity[
-                                                  index]
-                                              .contractAddress));
+                                          index]);
                                   pushNewScreen(context,
                                           screen: const DetailedChatScreen(
                                             create: false,
@@ -967,7 +955,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                                       imageUrl: _groupController
                                           .assetAvailableToCreateCommunity[
                                               index]
-                                          .collectionImage,
+                                          .picture,
                                       width: 50,
                                       height: 50,
                                       fit: BoxFit.cover,
@@ -983,7 +971,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                                 title: Text(
                                     _groupController
                                         .assetAvailableToCreateCommunity[index]
-                                        .collectionName,
+                                        .name,
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontFamily: "Gilroy",

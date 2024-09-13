@@ -71,6 +71,7 @@ class HomeController extends GetxController {
   var displayPopupFirstConnection = false.obs;
   var isLoading = false.obs;
   var isStoryLoading = false.obs;
+  var fetchingAssets = false.obs;
 
   var isCheckingBetaCode = false.obs;
 
@@ -134,6 +135,7 @@ class HomeController extends GetxController {
       displayPopupFirstConnection.value = true;
     }
 
+    retrieveContractAddress();
     await getAllNftConfig();
     await connectUserToStream(StreamChat.of(context).client);
     putFCMToken(context, StreamChat.of(context).client, false);
@@ -162,8 +164,10 @@ class HomeController extends GetxController {
         await UserRepo.uploadAPNToken(token);
       }
       try {
-        await retrieveContractAddress();
-      } catch (e) {}
+        retrieveContractAddress();
+      } catch (e) {
+        var k = e;
+      }
     }
   }
 
@@ -174,7 +178,11 @@ class HomeController extends GetxController {
   }
 
   /// Function called only server side to get and store assets of the user (at login only)
-  getAllNftConfig() async => await AssetRepo.getAllNFTConfig();
+  getAllNftConfig() async {
+    fetchingAssets.value = true;
+    await AssetRepo.getAllNFTConfig();
+    fetchingAssets.value = false;
+  }
 
   /// Function called only server side to update assets of the user
   updateAllNftConfig() async => await AssetRepo.updateAllNFTConfig();

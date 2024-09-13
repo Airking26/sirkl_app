@@ -81,7 +81,7 @@ void main() async {
     logLevel: Level.INFO,
     connectionMode: ConnectionMode.background,
   );
-  final client = StreamChatClient("mhgk84t9jfnt", logLevel: Level.WARNING)
+  final client = StreamChatClient("mhgk84t9jfnt", logLevel: Level.OFF)
     ..chatPersistenceClient = chatPersistentClient;
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -203,6 +203,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     Get.put<AppsflyerSdk>(appsflyerSdk);
     _walletConnectModalController.initializeService(context);
     FirebaseMessaging.instance.requestPermission();
+    //_homeController.retrieveContractAddress();
     _homeController.connectUserToStream(StreamChat.of(context).client);
     _homeController.putFCMToken(context, StreamChat.of(context).client, true);
     initFirebase();

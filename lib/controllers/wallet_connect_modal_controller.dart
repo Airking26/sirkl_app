@@ -60,7 +60,7 @@ class WalletConnectModalController extends GetxController {
       },
       context: context,
       projectId: projectID,
-      logLevel: LogLevel.debug,
+      logLevel: LogLevel.error,
       loginWithoutWalletWidget: WalletListItem(
         title: "Connect without wallet",
         imageUrl:

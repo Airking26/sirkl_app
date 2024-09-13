@@ -1,3 +1,4 @@
+import 'package:sirkl/models/group_creation_dto.dart';
 import 'package:sirkl/models/nft_dto.dart';
 import 'package:sirkl/models/nft_modification_dto.dart';
 import 'package:sirkl/networks/request.dart';
@@ -33,5 +34,13 @@ class AssetRepo {
     Response res = await req.get(SUrls.retrieveContractAddress);
     List<dynamic> list = res.jsonBody();
     return list.cast<String>();
+  }
+
+  static Future<List<GroupCreationDto>>
+      retrieveAssetsAvailableToCommunityCreation() async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.get(SUrls.retrieveAssetToCreateNewCommunity("0"));
+    List<dynamic> list = res.jsonBody();
+    return list.map((e) => GroupCreationDto.fromJson(e)).toList();
   }
 }

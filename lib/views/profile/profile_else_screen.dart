@@ -449,6 +449,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
             splashColor: Colors.transparent,
           ),
           child: ExpansionTile(
+            showTrailingIcon: widget.nftDto.isNft ?? true,
             enabled: widget.nftDto.isNft ?? true,
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(90),
@@ -485,7 +486,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                   width: 6,
                 ),
                 Text(
-                    widget.nftDto.isNft ?? false
+                    widget.nftDto.isNft ?? true
                         ? "${widget.nftDto.images!.length} available"
                         : widget.nftDto.subtitle == null
                             ? ""
