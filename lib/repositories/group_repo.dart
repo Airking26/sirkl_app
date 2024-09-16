@@ -1,5 +1,4 @@
 import 'package:sirkl/models/contract_address_dto.dart';
-import 'package:sirkl/models/contract_creator_dto.dart';
 import 'package:sirkl/models/group_creation_dto.dart';
 import 'package:sirkl/models/group_dto.dart';
 import 'package:sirkl/models/token_dto.dart';
@@ -23,7 +22,7 @@ class GroupRepo {
         .toList();
   }
 
-  static Future<ContractCreatorDto?> retrieveCreatorGroup(
+  /*static Future<ContractCreatorDto?> retrieveCreatorGroup(
       String contract) async {
     SRequests req = SRequests(SUrls.etherscanBaseUrl);
     Response res = await req.get(
@@ -33,7 +32,7 @@ class GroupRepo {
     } catch (err) {
       return null;
     }
-  }
+  }*/
 
   static Future<TokenDto> getTokenContractAddressesWithAlchemy(
       {required String wallet}) async {

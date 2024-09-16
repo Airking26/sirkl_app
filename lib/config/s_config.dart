@@ -4,7 +4,7 @@ class SConfig {
       'https://sirkl-bucket.s3.eu-central-1.amazonaws.com/app_icon_rounded.png';
 
   static const String ALCHEMY_API_KEY = "ELrNU9K6I9RNfXbIkJqq6H6NeoXNbF10";
-  static const String ETHERSCAN_API_KEY = "V3EVCZS2JV1WG9SSB14171DEFDQYQ63QFU";
+  //static const String ETHERSCAN_API_KEY = "V3EVCZS2JV1WG9SSB14171DEFDQYQ63QFU";
   static const AGORA_APP_ID = "13d8acd177bf4c35a0d07bdd18c8e84e";
   static const String SIRKL_ID = "63f78a6188f7d4001f68699a";
 

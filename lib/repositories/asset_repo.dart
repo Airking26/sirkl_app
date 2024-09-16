@@ -43,4 +43,10 @@ class AssetRepo {
     List<dynamic> list = res.jsonBody();
     return list.map((e) => GroupCreationDto.fromJson(e)).toList();
   }
+
+  static Future<bool> isCommunityCreator(String wallet, String contract) async {
+    SRequests req = SRequests(SUrls.baseURL);
+    Response res = await req.get(SUrls.isCommunityCreator(wallet, contract));
+    return res.jsonBody();
+  }
 }

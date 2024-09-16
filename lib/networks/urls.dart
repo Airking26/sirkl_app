@@ -100,6 +100,8 @@ class SUrls {
   static const String retrieveContractAddress = 'nft/retrieve_contract_address';
   static String retrieveAssetToCreateNewCommunity(String offset) =>
       "nft/retrieve/group_to_create/$offset";
+  static String isCommunityCreator(String wallet, String contract) =>
+      "nft/check_wallet_is_contract_owner/$wallet/$contract";
 
   /// Report repo
   static const String signalmentReport = 'signalment/report';

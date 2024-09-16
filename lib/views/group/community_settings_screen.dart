@@ -160,28 +160,21 @@ class _CommunitySettingScreenState extends State<CommunitySettingScreen> {
                           if (_chatController
                                   .channel.value!.extraData["owner"] ==
                               null) {
-                            var creator =
-                                await _groupController.retrieveCommunityOwner(
-                                    _chatController.channel.value!.id!);
-                            if (!creator.isNullOrBlank!) {
-                              if (creator ==
-                                  _homeController.userMe.value.wallet!) {
-                                await _chatController.channel.value!.client
-                                    .updateChannelPartial(
-                                        _chatController.channel.value!.id!,
-                                        'try',
-                                        set: {
-                                      "owner":
-                                          _homeController.userMe.value.wallet!
-                                    });
-                                showToast(context,
-                                    "You are now the owner of the group");
-                              } else {
-                                showToast(context,
-                                    'You are not the owner of the group');
-                              }
+                            if (await _groupController.isCommunityCreator(
+                                _homeController.userMe.value.wallet!,
+                                _chatController.channel.value!.id!)) {
+                              await _chatController.channel.value!.client
+                                  .updateChannelPartial(
+                                      _chatController.channel.value!.id!, 'try',
+                                      set: {
+                                    "owner":
+                                        _homeController.userMe.value.wallet!
+                                  });
+                              showToast(context,
+                                  "You are now the owner of the group");
                             } else {
-                              showToast(context, 'Error. Try again later');
+                              showToast(context,
+                                  'You are not the owner of the group');
                             }
                           } else {
                             _commonController.userClicked.value =

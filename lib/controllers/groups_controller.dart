@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/models/admin_dto.dart';
-import 'package:sirkl/models/contract_creator_dto.dart';
 import 'package:sirkl/models/group_creation_dto.dart';
 import 'package:sirkl/models/group_dto.dart';
 import 'package:sirkl/repositories/asset_repo.dart';
@@ -60,86 +59,9 @@ class GroupsController extends GetxController {
     isLoadingAvailableAssets.value = false;
   }
 
-  /*retrieveAssetsAvailableToCreateCommunity(String wallet) async {
-    List<GroupDto> groups = await GroupRepo.retrieveGroups();
-    var tokens = await _retrieveTokenToCreateCommunity(wallet, groups);
-    assetAvailableToCreateCommunity.value =
-        tokens.toList().cast<CollectionDbDto>();
-    isLoadingAvailableAssets.value = false;
-  }
-
-  /// Private function to retrieve token owned by the user for which no community
-  ///exist yet in order to choose from to create one
-  _retrieveTokenToCreateCommunity(String wallet, List<GroupDto> groups) async {
-    var tokens = [];
-    var tokenContractAddress =
-        await GroupRepo.getTokenContractAddressesWithAlchemy(wallet: wallet);
-
-    for (TokenBalance element in tokenContractAddress.result!.tokenBalances!) {
-      if (element.tokenBalance != SConfig.emptyHexBalance &&
-          !groups
-              .map((e) => e.contractAddress.toLowerCase())
-              .contains(element.contractAddress?.toLowerCase())) {
-        var tokenDetails = await GroupRepo.getTokenMetadataWithAlchemy(
-            token: element.contractAddress!);
-        //if(tokenDetails.result != null && tokenDetails.result!.logo != null) {
-        tokens.add(CollectionDbDto(
-            collectionName: tokenDetails.result!.name!,
-            contractAddress: element.contractAddress!,
-            collectionImage: tokenDetails.result?.logo ?? SConfig.wIcon,
-            collectionImages: [tokenDetails.result?.logo ?? SConfig.wIcon]));
-        //}
-      }
-    }
-
-    return await _retrieveNFTToCreateCommunity(wallet, tokens, groups);
-  }
-
-  /// Private function to retrieve nft owned by the user for which no community
-  ///exist yet in order to choose from to create one
-  _retrieveNFTToCreateCommunity(
-      String wallet, List<dynamic> assets, List<GroupDto> groups) async {
-    var cursor = "";
-    var cursorInitialized = true;
-    while (cursorInitialized || cursor.isNotEmpty) {
-      ContractAddressDto contractAddress =
-          await GroupRepo.getContractAddressesWithAlchemy(
-              wallet: wallet, cursor: cursor);
-
-      contractAddress.pageKey == null || contractAddress.pageKey!.isEmpty
-          ? cursor = ""
-          : cursor = "&pageKey=${contractAddress.pageKey}";
-      contractAddress.contracts.removeWhere((element) =>
-          groups
-              .map((e) => e.contractAddress.toLowerCase())
-              .contains(element.address?.toLowerCase()) ||
-          element.title == null ||
-          element.title!.isEmpty ||
-          element.opensea == null ||
-          element.opensea!.imageUrl == null ||
-          element.opensea!.imageUrl!.isEmpty ||
-          element.opensea!.collectionName == null ||
-          element.opensea!.collectionName!.isEmpty);
-      for (var element in contractAddress.contracts) {
-        assets.add(CollectionDbDto(
-            collectionName: element.opensea!.collectionName!,
-            contractAddress: element.address!,
-            collectionImage: element.opensea!.imageUrl!,
-            collectionImages: element.media?.first.thumbnail == null
-                ? [element.media!.first.gateway!]
-                : [element.media!.first.thumbnail!]));
-      }
-      cursorInitialized = false;
-    }
-
-    return assets;
-  }*/
-
   /// Function to retrieve the community owner in order to make him admin role
-  Future<String?> retrieveCommunityOwner(String contract) async {
-    ContractCreatorDto? contractCreator =
-        await GroupRepo.retrieveCreatorGroup(contract);
-    return contractCreator?.result?.first?.contractCreator;
+  Future<bool> isCommunityCreator(String wallet, String contract) async {
+    return await AssetRepo.isCommunityCreator(wallet, contract);
   }
 
   /// Function to make a user admin or the opposite
