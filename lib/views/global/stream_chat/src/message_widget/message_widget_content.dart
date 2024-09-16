@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/views/global/stream_chat/src/message_widget/bottom_row.dart';
@@ -15,10 +16,8 @@ import 'package:sirkl/views/global/stream_chat/src/message_widget/reactions/reac
 import 'package:sirkl/views/global/stream_chat/src/message_widget/reactions/reaction_indicator.dart';
 import 'package:sirkl/views/global/stream_chat/src/message_widget/user_avatar_transform.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
-import 'package:sirkl/controllers/navigation_controller.dart';
 
 import '../../../../../views/profile/profile_else_screen.dart';
-
 
 /// {@template messageWidgetContent}
 /// The main content of a [StreamMessageWidget].
@@ -204,7 +203,8 @@ class MessageWidgetContent extends StatelessWidget {
   final Widget Function(BuildContext, Message)? usernameBuilder;
 
   CommonController get _commonController => Get.find<CommonController>();
-  NavigationController get _navigationController => Get.find<NavigationController>();
+  NavigationController get _navigationController =>
+      Get.find<NavigationController>();
 
   @override
   Widget build(BuildContext context) {
@@ -256,10 +256,14 @@ class MessageWidgetContent extends StatelessWidget {
                 bottom: isPinned && showPinHighlight ? 8.0 : 0.0,
               ),
               child: Column(
-                crossAxisAlignment: reverse ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    reverse ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (message.pinned && message.pinnedBy != null && showPinHighlight) PinnedMessage(
+                  if (message.pinned &&
+                      message.pinnedBy != null &&
+                      showPinHighlight)
+                    PinnedMessage(
                       pinnedBy: message.pinnedBy!,
                       currentUser: streamChat.currentUser!,
                     ),
@@ -267,16 +271,25 @@ class MessageWidgetContent extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (!reverse && showUserAvatar == DisplayWidget.show && message.user != null) ...[
+                      if (!reverse &&
+                          showUserAvatar == DisplayWidget.show &&
+                          message.user != null) ...[
                         Padding(
                           padding: const EdgeInsets.only(top: 2.0),
                           child: SizedBox(
                             width: 35,
                             height: 35,
                             child: UserAvatarTransform(
-                              onUserAvatarTap:(user){
-                                _commonController.userClicked.value = userFromJson(json.encode(user.extraData["userDTO"]));
-                                pushNewScreen(context, screen: const ProfileElseScreen(fromConversation: true), withNavBar: true).then((value) => _navigationController.hideNavBar.value = true);
+                              onUserAvatarTap: (user) {
+                                _commonController.userClicked.value =
+                                    userFromJson(
+                                        json.encode(user.extraData["userDTO"]));
+                                pushNewScreen(context,
+                                        screen: const ProfileElseScreen(
+                                            fromConversation: true),
+                                        withNavBar: true)
+                                    .then((value) => _navigationController
+                                        .hideNavBar.value = true);
                               },
                               userAvatarBuilder: userAvatarBuilder,
                               translateUserAvatar: translateUserAvatar,
@@ -287,7 +300,8 @@ class MessageWidgetContent extends StatelessWidget {
                         ),
                         const SizedBox(width: 9),
                       ],
-                      if (showUserAvatar == DisplayWidget.hide) SizedBox(width: avatarWidth + 24),
+                      if (showUserAvatar == DisplayWidget.hide)
+                        SizedBox(width: avatarWidth + 4),
                       Flexible(
                         child: PortalTarget(
                           visible: isMobileDevice && showReactions,
@@ -348,13 +362,16 @@ class MessageWidgetContent extends StatelessWidget {
                                       )
                                     : MessageCard(
                                         message: message,
-                                        deletedBottomRowBuilder: deletedBottomRowBuilder,
+                                        deletedBottomRowBuilder:
+                                            deletedBottomRowBuilder,
                                         usernameBuilder: usernameBuilder,
                                         onThreadTap: onThreadTap,
                                         streamChat: streamChat,
                                         showInChannel: showInChannel,
-                                        showSendingIndicator: showSendingIndicator,
-                                        showThreadReplyIndicator: showThreadReplyIndicator,
+                                        showSendingIndicator:
+                                            showSendingIndicator,
+                                        showThreadReplyIndicator:
+                                            showThreadReplyIndicator,
                                         showTimeStamp: showTimeStamp,
                                         showUsername: showUsername,
                                         streamChatTheme: streamChatTheme,
@@ -417,7 +434,8 @@ class MessageWidgetContent extends StatelessWidget {
                         SizedBox(width: avatarWidth + 4),
                     ],
                   ),
-                  if (isDesktopDeviceOrWeb && shouldShowReactions) ...[Padding(
+                  if (isDesktopDeviceOrWeb && shouldShowReactions) ...[
+                    Padding(
                       padding: showUserAvatar != DisplayWidget.gone
                           ? EdgeInsets.only(
                               left: avatarWidth + 4,
@@ -431,11 +449,12 @@ class MessageWidgetContent extends StatelessWidget {
                         borderSide: borderSide,
                         reverse: reverse,
                       ),
-                    ),],
-                  if (showBottomRow) SizedBox(
+                    ),
+                  ],
+                  if (showBottomRow)
+                    SizedBox(
                       height: 1 * 18.0,
                     ),
-
                 ],
               ),
             ),

@@ -93,6 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _homeController.storyPagingController.value.itemList = [];
       fetchPageStories();
     });
+
     //TODO : Activate beta if needed
     /*WidgetsBinding.instance.addPostFrameCallback((_){
       if(_homeController.accessToken.value.isNullOrBlank!) displayBetaPopup(context);
@@ -411,8 +412,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildRepertoireList(BuildContext context) {
-    SuspensionUtil.sortListBySuspensionTag(_commonController.users);
-    SuspensionUtil.setShowSuspensionStatus(_commonController.users);
+    //TODO : Error on ios?
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SuspensionUtil.sortListBySuspensionTag(_commonController.users);
+      SuspensionUtil.setShowSuspensionStatus(_commonController.users);
+    });
+
     return MediaQuery.removePadding(
       context: context,
       removeTop: true,
@@ -1324,15 +1329,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   ///Override
-  @override
+  /* @override
   void dispose() {
-    controller?.dispose();
-    _betaTestController.dispose();
-    _homeController.loadingStories.value = true;
-    _homeController.stories.value = [];
+    //controller?.dispose();
+    //_betaTestController.dispose();
+    //_homeController.loadingStories.value = true;
+    //_homeController.stories.value = [];
     //_homeController.storyPagingController.value.dispose();
     super.dispose();
-  }
+  }*/
 
   @override
   void reassemble() {

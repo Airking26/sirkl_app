@@ -135,7 +135,11 @@ class HomeController extends GetxController {
       displayPopupFirstConnection.value = true;
     }
 
-    retrieveContractAddress();
+    try {
+      retrieveContractAddress();
+    } catch (e) {
+      throw ErrorResponse();
+    }
     await getAllNftConfig();
     await connectUserToStream(StreamChat.of(context).client);
     putFCMToken(context, StreamChat.of(context).client, false);

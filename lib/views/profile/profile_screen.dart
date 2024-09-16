@@ -76,6 +76,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> fetchNFTs() async {
+    if (_profileController.isAssetsLoading.value) return;
+    _profileController.isAssetsLoading.value = true;
+
     try {
       List<NftDto> newItems = await _homeController.getAssets(
           _homeController.id.value,
@@ -91,6 +94,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     } catch (error) {
       _profileController.pagingController.error = error;
+    } finally {
+      _profileController.isAssetsLoading.value = false;
     }
   }
 
@@ -613,36 +618,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: SafeArea(
-                        child: RefreshIndicator(
-                          onRefresh: () async {
-                            pageKey = 0;
-                            _profileController.pagingController.refresh();
-                          },
-                          color: SColors.activeColor,
-                          child: PagedListView(
-                            pagingController:
-                                _profileController.pagingController,
-                            builderDelegate: PagedChildBuilderDelegate<NftDto>(
-                                firstPageProgressIndicatorBuilder: (context) =>
-                                    Center(
+                        child: PagedListView(
+                          pagingController: _profileController.pagingController,
+                          builderDelegate: PagedChildBuilderDelegate<NftDto>(
+                              firstPageProgressIndicatorBuilder: (context) =>
+                                  Center(
+                                    child: CircularProgressIndicator(
+                                      color: SColors.activeColor,
+                                    ),
+                                  ),
+                              newPageProgressIndicatorBuilder: (context) =>
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
                                       child: CircularProgressIndicator(
                                         color: SColors.activeColor,
                                       ),
                                     ),
-                                newPageProgressIndicatorBuilder: (context) =>
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          color: SColors.activeColor,
-                                        ),
-                                      ),
-                                    ),
-                                itemBuilder: (context, item, index) => CardNFT(
-                                    item,
-                                    index,
-                                    _profileController.pagingController)),
-                          ),
+                                  ),
+                              itemBuilder: (context, item, index) => CardNFT(
+                                  item,
+                                  index,
+                                  _profileController.pagingController)),
                         ),
                       ),
                     ),

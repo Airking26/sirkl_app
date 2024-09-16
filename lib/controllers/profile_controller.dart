@@ -49,6 +49,7 @@ class ProfileController extends GetxController {
   var hasUnreadNotification = false.obs;
   var contactUsClicked = false.obs;
   var index = 0.obs;
+  var isAssetsLoading = false.obs;
 
   final _isUsernameValid = false.obs;
   final _isCheckingUsernameValidity = false.obs;

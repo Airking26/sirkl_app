@@ -86,7 +86,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
           ),
           Container(
             padding: const EdgeInsets.only(
-              top: 64,
+              top: 84,
               left: 24,
               right: 24,
             ),

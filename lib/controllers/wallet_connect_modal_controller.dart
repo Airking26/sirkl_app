@@ -46,7 +46,7 @@ class WalletConnectModalController extends GetxController {
         icons: icons,
         redirect: Redirect(
           native: nativeUrl,
-          //universal: universalUrl,
+          universal: universalUrl,
         ),
       ),
       includedWalletIds: {
