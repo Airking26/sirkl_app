@@ -112,29 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 buildAppbar(context),
-                _homeController.accessToken.value.isNotEmpty
-                    ? _commonController.gettingStoryAndContacts.value
-                        ? Container()
-                        : _commonController.users.isNotEmpty
-                            ? buildListOfStories()
-                            : Container()
-                    : _homeController.address.value.isEmpty
-                        ? _homeController.qrActive.value
-                            ? buildQRCodeWidget()
-                            : buildConnectWalletUI()
-                        : buildSignWalletUI(),
-                _homeController.accessToken.value.isNotEmpty
-                    ? _commonController.gettingStoryAndContacts.value &&
-                            _homeController.loadingStories.value &&
-                            !_homeController.isFirstConnexion.value
-                        ? Container(
-                            margin: const EdgeInsets.only(top: 150),
-                            child: CircularProgressIndicator(
-                                color: SColors.activeColor))
-                        : _commonController.users.isNotEmpty
-                            ? buildRepertoireList(context)
-                            : buildEmptyFriends()
-                    : Container(),
+                _buildMainContent(context),
+                _buildStoryOrFriendsList(context),
               ],
             )));
   }
@@ -237,6 +216,49 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   ///Body
+  Widget _buildMainContent(BuildContext context) {
+    if (_homeController.accessToken.value.isNotEmpty) {
+      if (_commonController.gettingStoryAndContacts.value) {
+        return Container(); // Waiting for stories and contacts
+      } else if (_commonController.users.isNotEmpty) {
+        return buildListOfStories(); // Show list of stories
+      } else {
+        return Container(); // Default empty container
+      }
+    } else {
+      return _buildWalletConnectUI(); // Show wallet connect flow
+    }
+  }
+
+  Widget _buildWalletConnectUI() {
+    if (_homeController.address.value.isEmpty) {
+      return _homeController.qrActive.value
+          ? buildQRCodeWidget()
+          : buildConnectWalletUI();
+    } else {
+      return buildSignWalletUI();
+    }
+  }
+
+  Widget _buildStoryOrFriendsList(BuildContext context) {
+    if (_homeController.accessToken.value.isNotEmpty) {
+      if (_commonController.gettingStoryAndContacts.value &&
+          _homeController.loadingStories.value &&
+          !_homeController.isFirstConnexion.value) {
+        return Container(
+          margin: const EdgeInsets.only(top: 150),
+          child: CircularProgressIndicator(color: SColors.activeColor),
+        );
+      } else if (_commonController.users.isNotEmpty) {
+        return buildRepertoireList(context); // Show list of friends
+      } else {
+        return buildEmptyFriends(); // Show empty friends state
+      }
+    } else {
+      return Container(); // Default empty container
+    }
+  }
+
   Future<void> fetchPageStories() async {
     if (_homeController.isStoryLoading.value) return;
     _homeController.isStoryLoading.value = true;
@@ -948,7 +970,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(10)),
                     child: ElevatedButton(
                         onPressed: () async =>
-                            await _walletConnectModalController.w3mService.value
+                            await _walletConnectModalController.w3mService
                                 ?.openModalView(),
                         style: ElevatedButton.styleFrom(
                             elevation: 5,
@@ -1213,20 +1235,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 alignLabel: const Alignment(0.3, 0),
                 action: () async {
                   _homeController.isSigning.value = true;
-                  if (isEthereumAddress(_homeController.address.value)) {
-                    await _walletConnectModalController
-                        .signMessageWithWC(context);
-                  } else if (isSolanaAddress(_homeController.address.value)) {
-                    /*await _walletConnectModalController
-                        .signMessageSolanaWithAdapter(context);
-                   await _walletConnectModalController.signMessageSolana(
-                        context,
-                        _walletConnectModalController.solanaProvider!,
-                        1);*/
-                  } else {
-                    await _walletConnectModalController
-                        .signMessageWithWC(context);
-                  }
+                  await _walletConnectModalController
+                      .signWithWalletConnect(context);
                   _homeController.isSigning.value = false;
                   return _homeController.isSigning.value;
                 },

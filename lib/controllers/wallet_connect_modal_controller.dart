@@ -8,19 +8,15 @@ import 'package:get_storage/get_storage.dart';
 import 'package:pointycastle/digests/sha256.dart';
 import 'package:sirkl/common/save_pref_keys.dart';
 import 'package:sirkl/controllers/home_controller.dart';
-import 'package:sirkl/models/crypto/chain_metadata.dart';
-import 'package:sirkl/models/crypto/eip155.dart';
-import 'package:sirkl/models/crypto/helpers.dart';
-import 'package:sirkl/models/crypto/test_data.dart';
 import 'package:sirkl/repositories/auth_repo.dart';
 import 'package:sirkl/repositories/google_repo.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 import 'package:web3modal_flutter/widgets/lists/list_items/wallet_list_item.dart';
 
 class WalletConnectModalController extends GetxController {
-  Rx<W3MService?> w3mService = (null as W3MService?).obs;
-
   HomeController get _homeController => Get.find<HomeController>();
+  String testSignData(String wallet) =>
+      'Welcome to $wallet SIRKL.io by signing this message you agree to learn and have fun with blockchain';
   var name = "Sirkl.io";
   var desc = "Sirkl.io Login";
   var url = "https://sirkl.io/";
@@ -30,17 +26,19 @@ class WalletConnectModalController extends GetxController {
   var nativeUrl = "sirkl://";
   var universalUrl =
       'http://sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com';
-  var projectID = "bdfe4b74c44308ffb46fa4e6198605af";
+  var projectID = "8b7c50c39f39c858c492ad3970d1ca55";
 
   var errorTextRetrieving = false.obs;
 
   final box = GetStorage();
+  //late W3MSession? session;
+  late W3MService? w3mService;
 
   void initializeService(BuildContext context) async {
     W3MChainPresets.chains.addAll(W3MChainPresets.extraChains);
     W3MChainPresets.chains.addAll(W3MChainPresets.testChains);
 
-    w3mService.value = W3MService(
+    w3mService = W3MService(
       metadata: PairingMetadata(
         name: name,
         description: desc,
@@ -48,7 +46,7 @@ class WalletConnectModalController extends GetxController {
         icons: icons,
         redirect: Redirect(
           native: nativeUrl,
-          universal: universalUrl,
+          //universal: universalUrl,
         ),
       ),
       includedWalletIds: {
@@ -71,71 +69,32 @@ class WalletConnectModalController extends GetxController {
           await createWallet(context);
         },
       ),
-      /*Column(
-        children: [
-          WalletListItem(
-            title: "Phantom",
-            imageUrl:
-                "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/channels4_profile.jpg",
-            onTap: () async {
-              if (solanaWalletAdapter.isAuthorized) {
-                await solanaWalletAdapter.deauthorize();
-                var authorizeResult = await solanaWalletAdapter.authorize();
-                _homeController.address.value = base58Encode(
-                    base64Decode(authorizeResult.accounts.first.address));
-                Get.back();
-              } else {
-                var authorizeResult = await solanaWalletAdapter.authorize();
-                _homeController.address.value = base58Encode(
-                    base64Decode(authorizeResult.accounts.first.address));
-                Get.back();
-              }
-            },
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          WalletListItem(
-            title: "Connect without wallet",
-            imageUrl:
-                "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/no_wallet.png",
-            onTap: () async {
-              Get.back();
-              _homeController.isLoading.value = true;
-              await createWallet(context);
-            },
-          ),
-        ],
-      ),*/
     );
 
-    w3mService.value?.onModalConnect.subscribe(_onModalConnect);
-    w3mService.value?.onModalNetworkChange.subscribe(_onModalNetworkChange);
-    w3mService.value?.onModalDisconnect.subscribe(_onModalDisconnect);
-    w3mService.value?.onModalError.subscribe(_onModalError);
+    w3mService?.onModalConnect.subscribe(_onModalConnect);
+    w3mService?.onModalNetworkChange.subscribe(_onModalNetworkChange);
+    w3mService?.onModalDisconnect.subscribe(_onModalDisconnect);
+    w3mService?.onModalError.subscribe(_onModalError);
 
-    w3mService.value?.onSessionExpireEvent.subscribe(_onSessionExpired);
-    w3mService.value?.onSessionUpdateEvent.subscribe(_onSessionUpdate);
-    w3mService.value?.onSessionEventEvent.subscribe(_onSessionEvent);
+    w3mService?.onSessionExpireEvent.subscribe(_onSessionExpired);
+    w3mService?.onSessionUpdateEvent.subscribe(_onSessionUpdate);
+    w3mService?.onSessionEventEvent.subscribe(_onSessionEvent);
 
-    w3mService.value?.web3App!.core.relayClient.onRelayClientConnect
+    w3mService?.web3App!.core.relayClient.onRelayClientConnect
         .subscribe(_onRelayClientConnect);
-    w3mService.value?.web3App!.core.relayClient.onRelayClientError
+    w3mService?.web3App!.core.relayClient.onRelayClientError
         .subscribe(_onRelayClientError);
-    w3mService.value?.web3App!.core.relayClient.onRelayClientDisconnect
+    w3mService?.web3App!.core.relayClient.onRelayClientDisconnect
         .subscribe(_onRelayClientDisconnect);
 
-    await w3mService.value?.init();
+    await w3mService?.init();
   }
 
   void _onModalConnect(ModalConnect? event) {
+    _homeController.address.value = event?.session.address?.toLowerCase() ?? "";
+    Get.back();
+    //session = event?.session;
     debugPrint('[ExampleApp] _onModalConnect ${event?.toString()}');
-    debugPrint(
-        '[ExampleApp] _onModalConnect selectedChain ${w3mService.value?.selectedChain?.chainId}');
-    debugPrint(
-        '[ExampleApp] _onModalConnect address ${w3mService.value?.session!.address}');
-    _homeController.address.value =
-        w3mService.value!.session!.address!.toLowerCase();
   }
 
   void _onModalNetworkChange(ModalNetworkChange? event) {
@@ -148,9 +107,6 @@ class WalletConnectModalController extends GetxController {
 
   void _onModalError(ModalError? event) {
     debugPrint('[ExampleApp] _onModalError ${event?.toString()}');
-    if ((event?.message ?? '').contains('Coinbase Wallet Error')) {
-      w3mService.value?.disconnect();
-    }
   }
 
   void _onSessionExpired(SessionExpire? event) {
@@ -177,10 +133,10 @@ class WalletConnectModalController extends GetxController {
     debugPrint('[ExampleApp] _onSessionEvent ${event?.toString()}');
   }
 
-  signMessageWithWC(BuildContext context) async {
+  signWithWalletConnect(BuildContext context) async {
     String? accountNameSpace;
-    final accounts = w3mService.value!.session?.getAccounts() ?? [];
-    final currentNamespace = w3mService.value!.selectedChain?.namespace;
+    final accounts = w3mService?.session?.getAccounts() ?? [];
+    final currentNamespace = w3mService?.selectedChain?.namespace;
     final chainsNamespaces = NamespaceUtils.getChainsFromAccounts(accounts);
     if (chainsNamespaces.contains(currentNamespace)) {
       accountNameSpace = accounts.firstWhere(
@@ -189,42 +145,27 @@ class WalletConnectModalController extends GetxController {
     }
 
     final chainId = NamespaceUtils.getChainFromAccount(
-        accountNameSpace ?? w3mService.value!.selectedChain!.namespace);
-    final account = NamespaceUtils.getAccount(
-        accountNameSpace ?? w3mService.value!.selectedChain!.namespace);
-    final chainMetadata = getChainMetadataFromChain(chainId);
+        accountNameSpace ?? w3mService!.selectedChain!.namespace);
+    final address = NamespaceUtils.getAccount(
+        accountNameSpace ?? w3mService!.selectedChain!.namespace);
 
-    w3mService.value!.launchConnectedWallet();
-
-    callChainMethod(
-      ChainType.eip155,
-      EIP155UIMethods.personalSign,
-      chainMetadata,
-      account,
-    ).then((value) async {
-      await _homeController.loginWithWallet(context, account.toLowerCase(),
-          testSignData(account.toLowerCase()), value.toString());
+    w3mService?.launchConnectedWallet();
+    await w3mService
+        ?.request(
+      topic: w3mService!.session!.topic!,
+      chainId: chainId,
+      request: SessionRequestParams(
+        method: 'personal_sign',
+        params: [
+          testSignData(address.toLowerCase()),
+          address.toLowerCase(),
+        ],
+      ),
+    )
+        .then((value) async {
+      await _homeController.loginWithWallet(context, address.toLowerCase(),
+          testSignData(address.toLowerCase()), value.toString());
     });
-  }
-
-  Future<dynamic> callChainMethod(
-    ChainType type,
-    EIP155UIMethods method,
-    ChainMetadata chainMetadata,
-    String address,
-  ) {
-    switch (type) {
-      case ChainType.eip155:
-        return EIP155.callMethod(
-          w3mService: w3mService.value!,
-          topic: w3mService.value!.session!.topic ?? "",
-          method: method,
-          chainId: chainMetadata.w3mChainInfo.namespace,
-          address: address.toLowerCase(),
-        );
-      default:
-        return Future<dynamic>.value();
-    }
   }
 
   Future<void> createWallet(BuildContext context) async {
@@ -372,4 +313,112 @@ class WalletConnectModalController extends GetxController {
       debugPrint(error.toString());
     }
   }*/
+/*signMessageWithWCAlternative(BuildContext context) async {
+    final chainId =
+        NamespaceUtils.getChainFromAccount(session!.getAccounts()!.first);
+    final address = NamespaceUtils.getAccount(session!.getAccounts()!.first);
+
+    w3mService?.launchConnectedWallet();
+
+    await w3mService
+        ?.request(
+      topic: session!.topic,
+      chainId: chainId,
+      request: SessionRequestParams(
+        method: 'personal_sign',
+        params: [
+          testSignData(session!.address!.toLowerCase()),
+          session!.address!.toLowerCase(),
+        ],
+      ),
+    )
+        .then((value) async {
+      await _homeController.loginWithWallet(context, address.toLowerCase(),
+          testSignData(address.toLowerCase()), value.toString());
+    });
+  }*/
+/*signMessageWithWC(BuildContext context) async {
+    String? accountNameSpace;
+    final accounts = w3mService?.session?.getAccounts() ?? [];
+    final currentNamespace = w3mService?.selectedChain?.namespace;
+    final chainsNamespaces = NamespaceUtils.getChainsFromAccounts(accounts);
+    if (chainsNamespaces.contains(currentNamespace)) {
+      accountNameSpace = accounts.firstWhere(
+        (account) => account.contains('$currentNamespace:'),
+      );
+    }
+
+    final chainId = NamespaceUtils.getChainFromAccount(
+        accountNameSpace ?? w3mService!.selectedChain!.namespace);
+    final account = NamespaceUtils.getAccount(
+        accountNameSpace ?? w3mService!.selectedChain!.namespace);
+    final chainMetadata = getChainMetadataFromChain(chainId);
+
+    w3mService?.launchConnectedWallet();
+
+    callChainMethod(
+      ChainType.eip155,
+      EIP155UIMethods.personalSign,
+      chainMetadata,
+      account,
+    ).then((value) async {
+      await _homeController.loginWithWallet(context, account.toLowerCase(),
+          testSignData(account.toLowerCase()), value.toString());
+    });
+  }*/
+/*  Future<dynamic> callChainMethod(
+    ChainType type,
+    EIP155UIMethods method,
+    ChainMetadata chainMetadata,
+    String address,
+  ) {
+    switch (type) {
+      case ChainType.eip155:
+        return EIP155.callMethod(
+          w3mService: w3mService!,
+          topic: w3mService?.session!.topic ?? "",
+          method: method,
+          chainId: chainMetadata.w3mChainInfo.namespace,
+          address: address.toLowerCase(),
+        );
+      default:
+        return Future<dynamic>.value();
+    }
+  }*/
+/*Column(
+        children: [
+          WalletListItem(
+            title: "Phantom",
+            imageUrl:
+                "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/channels4_profile.jpg",
+            onTap: () async {
+              if (solanaWalletAdapter.isAuthorized) {
+                await solanaWalletAdapter.deauthorize();
+                var authorizeResult = await solanaWalletAdapter.authorize();
+                _homeController.address.value = base58Encode(
+                    base64Decode(authorizeResult.accounts.first.address));
+                Get.back();
+              } else {
+                var authorizeResult = await solanaWalletAdapter.authorize();
+                _homeController.address.value = base58Encode(
+                    base64Decode(authorizeResult.accounts.first.address));
+                Get.back();
+              }
+            },
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          WalletListItem(
+            title: "Connect without wallet",
+            imageUrl:
+                "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/no_wallet.png",
+            onTap: () async {
+              Get.back();
+              _homeController.isLoading.value = true;
+              await createWallet(context);
+            },
+          ),
+        ],
+      ),*/
 }

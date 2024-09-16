@@ -143,7 +143,7 @@ class HomeController extends GetxController {
   }
 
   /// Function to store and/or update FCM Token
-  putFCMToken(
+  Future<void> putFCMToken(
       BuildContext context, StreamChatClient client, bool isLogged) async {
     if (accessToken.value.isNotEmpty) {
       final String? fcmToken = await FirebaseMessaging.instance.getToken();
@@ -163,10 +163,12 @@ class HomeController extends GetxController {
         var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
         await UserRepo.uploadAPNToken(token);
       }
-      try {
-        retrieveContractAddress();
-      } catch (e) {
-        var k = e;
+      if (!isLogged) {
+        try {
+          retrieveContractAddress();
+        } catch (e) {
+          var k = e;
+        }
       }
     }
   }
@@ -178,7 +180,7 @@ class HomeController extends GetxController {
   }
 
   /// Function called only server side to get and store assets of the user (at login only)
-  getAllNftConfig() async {
+  Future<void> getAllNftConfig() async {
     fetchingAssets.value = true;
     await AssetRepo.getAllNFTConfig();
     fetchingAssets.value = false;

@@ -457,7 +457,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                           _navigationController
                                               .hideNavBar.value = true;
                                           _walletConnectModalController
-                                              .w3mService.value
+                                              .w3mService
                                               ?.disconnect();
                                           /*if (isSolanaAddress(_homeController
                                                   .userMe.value.wallet ??

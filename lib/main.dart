@@ -203,7 +203,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     Get.put<AppsflyerSdk>(appsflyerSdk);
     _walletConnectModalController.initializeService(context);
     FirebaseMessaging.instance.requestPermission();
-    //_homeController.retrieveContractAddress();
     _homeController.connectUserToStream(StreamChat.of(context).client);
     _homeController.putFCMToken(context, StreamChat.of(context).client, true);
     initFirebase();
