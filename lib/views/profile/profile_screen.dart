@@ -12,6 +12,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/config/s_colors.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
@@ -672,6 +673,7 @@ class CardNFT extends StatefulWidget {
 class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get homeController => Get.find<HomeController>();
+  CommonController get _commonController => Get.find<CommonController>();
   GroupsController get _groupController => Get.find<GroupsController>();
 
   @override
@@ -770,7 +772,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                                 "${homeController.id.value}_favorite"
                               ]);
                         }
-                        _groupController.refreshCommunity.value = true;
+                        _commonController.refreshAllInbox();
                       }
                     },
                   )),

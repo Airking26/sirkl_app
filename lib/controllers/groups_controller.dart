@@ -20,7 +20,6 @@ class GroupsController extends GetxController {
   var isAddingCommunity = false.obs;
   var isSearchActiveInCommunity = false.obs;
   var isLoadingAvailableAssets = true.obs;
-  var refreshCommunity = false.obs;
   var retryProgress = false.obs;
 
   /// Function to create a community

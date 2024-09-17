@@ -8,6 +8,7 @@ import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/config/s_colors.dart';
+import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/inbox_controller.dart';
@@ -36,6 +37,8 @@ class _GroupsScreenState extends State<GroupsScreen>
   GroupsController get _groupController => Get.find<GroupsController>();
   HomeController get _homeController => Get.find<HomeController>();
   InboxController get _chatController => Get.find<InboxController>();
+  CommonController get _commonController => Get.find<CommonController>();
+
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
   final _floatingSearchBarController = FloatingSearchBarController();
@@ -61,7 +64,6 @@ class _GroupsScreenState extends State<GroupsScreen>
     ]),
     limit: 10,
   );
-
   late final _controllerCommunitiesOther = StreamChannelListController(
     client: StreamChat.of(context).client,
     filter: Filter.and([
@@ -87,6 +89,9 @@ class _GroupsScreenState extends State<GroupsScreen>
 
   @override
   void initState() {
+    _commonController.communityFavoritesController = _controllerCommunitiesFav;
+    _commonController.communityOthersController = _controllerCommunitiesOther;
+
     _groupController.indexCommunity.value = _homeController.userMe.value.hasSBT!
         ? 0
         : _homeController.isInFav.isEmpty
@@ -113,11 +118,6 @@ class _GroupsScreenState extends State<GroupsScreen>
                 ? const Color(0xFF102437)
                 : const Color.fromARGB(255, 247, 253, 255),
         body: Obx(() {
-          if (_groupController.refreshCommunity.value) {
-            _controllerCommunitiesFav.refresh();
-            _controllerCommunitiesOther.refresh();
-            _groupController.refreshCommunity.value = false;
-          }
           return Column(children: [
             buildAppbar(context, tabController),
             _groupController.assetAvailableToCreateCommunity.isNotEmpty &&
@@ -169,8 +169,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                                           contractAddress: channel.id!,
                                           id: _homeController.id.value,
                                           isFav: false));
-                                  _groupController.refreshCommunity.value =
-                                      true;
+                                  _commonController.refreshAllInbox();
                                   _homeController.isInFav.remove(channel.id);
                                   _homeController.isInFav.refresh();
                                 },
@@ -272,8 +271,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                                           contractAddress: channel.id!,
                                           id: _homeController.id.value,
                                           isFav: true));
-                                  _groupController.refreshCommunity.value =
-                                      true;
+                                  _commonController.refreshAllInbox();
                                   _homeController.isInFav.add(channel.id!);
                                   _homeController.isInFav.refresh();
                                 },

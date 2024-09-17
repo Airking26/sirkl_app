@@ -270,7 +270,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         } else if ((message.data["type"] == "9")) {
           await _profileController.retrieveMe();
           _profileController.pagingController.refresh();
-          _groupController.refreshCommunity.value = true;
+          _commonController.refreshAllInbox();
           LocalNotificationInitialize.showBigTextNotification(
               title: message.data["title"],
               body: message.data["body"],

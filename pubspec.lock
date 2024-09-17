@@ -2450,7 +2450,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "7b65f3515bd8525f478f1a39ffbbecb8b5d3fd7f"
+      resolved-ref: d5bc65eee463bad6d59858ebbf258b77908387be
       url: "https://github.com/Airking26/Web3ModalFlutter"
     source: git
     version: "3.3.0-beta06"
