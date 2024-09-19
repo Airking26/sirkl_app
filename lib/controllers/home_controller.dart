@@ -73,6 +73,10 @@ class HomeController extends GetxController {
   var isStoryLoading = false.obs;
   var fetchingAssets = false.obs;
 
+  /// Block Initialization due to IOS back from url launcher after
+  /// login with wallet, accessToken is valid, calling initState
+  var blockInitialization = false.obs;
+
   var isCheckingBetaCode = false.obs;
 
   /// Function to check if the Beta code is correct
@@ -111,6 +115,8 @@ class HomeController extends GetxController {
   /// Function to login with wallet
   loginWithWallet(BuildContext context, String wallet, String message,
       String signature) async {
+    blockInitialization.value = true;
+
     SignInSuccessDto signSuccess = await AuthRepo.verifySignature(
         WalletConnectDto(
             wallet: wallet,
@@ -135,11 +141,7 @@ class HomeController extends GetxController {
       displayPopupFirstConnection.value = true;
     }
 
-    try {
-      retrieveContractAddress();
-    } catch (e) {
-      throw ErrorResponse();
-    }
+    await retrieveContractAddress();
     await getAllNftConfig();
     await connectUserToStream(StreamChat.of(context).client);
     putFCMToken(context, StreamChat.of(context).client, false);
@@ -167,20 +169,14 @@ class HomeController extends GetxController {
         var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
         await UserRepo.uploadAPNToken(token);
       }
-      if (!isLogged) {
-        try {
-          retrieveContractAddress();
-        } catch (e) {
-          var k = e;
-        }
-      }
+      retrieveContractAddress();
     }
   }
 
   /// Function to retrieve the contract addresses of the assets own by the user and store them
   retrieveContractAddress() async {
     contractAddresses.value = await AssetRepo.retrieveContactAddress();
-    box.write(con.contractAddresses, contractAddresses);
+    box.write(con.contractAddresses, contractAddresses.value);
   }
 
   /// Function called only server side to get and store assets of the user (at login only)

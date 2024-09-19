@@ -24,23 +24,19 @@ class CommonController extends GetxController {
   var gettingStoryAndContacts = true.obs;
   var query = "".obs;
   var contactAddLoading = false.obs;
-
   late StreamChannelListController controllerFriend;
   late StreamChannelListController controllerOthers;
   late StreamChannelListController communityFavoritesController;
   late StreamChannelListController communityOthersController;
 
   void refreshAllInbox() async {
-    try {
-      await Future.wait([
-        controllerFriend.refresh(),
-        controllerOthers.refresh(),
-        communityFavoritesController.refresh(),
-        communityOthersController.refresh()
-      ]);
-    } catch (e) {
-      throw ErrorResponse();
-    }
+    controllerFriend.refresh();
+    controllerOthers.refresh();
+  }
+
+  void refreshCommunities() async {
+    communityFavoritesController.refresh();
+    communityOthersController.refresh();
   }
 
   Future<bool> addUserToSirkl(

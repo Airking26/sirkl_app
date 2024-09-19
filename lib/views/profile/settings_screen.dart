@@ -680,7 +680,6 @@ class _SettingScreenState extends State<SettingScreen> {
                           await GetStorage().erase();
                           _homeController.accessToken.value = "";
                           _homeController.address.value = "";
-                          _navigationController.controller.value.jumpToTab(0);
                           Get.back();
                           Navigator.pop(context);
                         },

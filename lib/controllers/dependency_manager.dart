@@ -29,16 +29,4 @@ class GlobalDependencyManager extends Bindings {
     Get.put(Web3Controller(), permanent: _permanent);
     Get.put(WalletConnectModalController(), permanent: _permanent);
   }
-
-  globalPutLazy() {
-    Get.lazyPut(() => NavigationController(), fenix: _permanent);
-    Get.lazyPut(() => HomeController(), fenix: _permanent);
-    Get.lazyPut(() => InboxController(), fenix: _permanent);
-    Get.lazyPut(() => ProfileController(), fenix: _permanent);
-    Get.lazyPut(() => GroupsController(), fenix: _permanent);
-    Get.lazyPut(() => CallController(), fenix: _permanent);
-    Get.lazyPut(() => CommonController(), fenix: _permanent);
-    Get.lazyPut(() => Web3Controller(), fenix: _permanent);
-    Get.lazyPut(() => WalletConnectModalController(), fenix: _permanent);
-  }
 }

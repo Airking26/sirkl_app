@@ -22,7 +22,6 @@ import 'package:sirkl/common/local_notification_initialize.dart';
 import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
-import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/controllers/profile_controller.dart';
@@ -77,11 +76,9 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark));
-  final chatPersistentClient = StreamChatPersistenceClient(
-    logLevel: Level.INFO,
-    connectionMode: ConnectionMode.background,
-  );
-  final client = StreamChatClient("mhgk84t9jfnt", logLevel: Level.OFF)
+  final chatPersistentClient =
+      StreamChatPersistenceClient(connectionMode: ConnectionMode.background);
+  final client = StreamChatClient(SConfig.STREAM_API_KEY, logLevel: Level.OFF)
     ..chatPersistenceClient = chatPersistentClient;
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -185,7 +182,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   CallController get _callController => Get.find<CallController>();
   InboxController get _chatController => Get.find<InboxController>();
   CommonController get _commonController => Get.find<CommonController>();
-  GroupsController get _groupController => Get.find<GroupsController>();
   ProfileController get _profileController => Get.find<ProfileController>();
   WalletConnectModalController get _walletConnectModalController =>
       Get.find<WalletConnectModalController>();
@@ -196,6 +192,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     appsflyerSdk.initSdk(
         registerConversionDataCallback: true,
         registerOnAppOpenAttributionCallback: true,
@@ -203,12 +200,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     Get.put<AppsflyerSdk>(appsflyerSdk);
     _walletConnectModalController.initializeService(context);
     FirebaseMessaging.instance.requestPermission();
-    _homeController.connectUserToStream(StreamChat.of(context).client);
-    _homeController.putFCMToken(context, StreamChat.of(context).client, true);
+
+    if (!_homeController.blockInitialization.value) {
+      _homeController.connectUserToStream(StreamChat.of(context).client);
+      _homeController.putFCMToken(context, StreamChat.of(context).client, true);
+    }
     initFirebase();
     _callController.setupVoiceSDKEngine(context);
     getCurrentCall();
-    WidgetsBinding.instance.addObserver(this);
+
     _resetBadgeCount();
     super.initState();
   }
@@ -333,7 +333,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         debugPrint("Event not null");
         if (event.data['cid'] != null) {
           debugPrint("OnDebugSirkl : CID not null");
-          final client = StreamChatClient("mhgk84t9jfnt");
+          final client = StreamChatClient(SConfig.STREAM_API_KEY);
           final box = GetStorage();
 
           String chatToken = await UserRepo.retrieveTokenStreamChat();

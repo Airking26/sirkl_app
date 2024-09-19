@@ -96,8 +96,10 @@ class _NavigationRootScreenState extends State<NavigationRootScreen> {
 
   @override
   void initState() {
-    _navigationController.controller.value.index =
-        _homeController.accessToken.value.isNullOrBlank! ? 0 : 4;
+    if (!_homeController.blockInitialization.value) {
+      _navigationController.controller.value.index =
+          _homeController.accessToken.value.isNullOrBlank! ? 0 : 4;
+    }
     if (_homeController.accessToken.value.isNotEmpty) {
       _navigationController.hideNavBar.value = false;
     } else {
@@ -135,7 +137,7 @@ class _NavigationRootScreenState extends State<NavigationRootScreen> {
           popAllScreensOnTapOfSelectedTab: true,
           navBarStyle: NavBarStyle.simple,
           onItemSelected: (index) async {
-            Navigator.popUntil(context, (route) => route.isFirst);
+            //Navigator.popUntil(context, (route) => route.isFirst);
             if (index == 0) {
               _profileController.isEditingProfile.value = false;
               if (_homeController.accessToken.value.isNotEmpty) {

@@ -319,7 +319,6 @@ class _CreateGroupSecondScreenState extends State<CreateGroupSecondScreen> {
     _profileController.urlPictureGroup.value = "";
     _chatController.groupTextController.value.text = "";
     _chatController.fromGroupCreation.value = true;
-    _commonController.refreshAllInbox();
     Navigator.popUntil(context, (route) => route.isFirst);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       pushNewScreen(context,

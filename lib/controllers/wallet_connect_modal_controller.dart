@@ -92,45 +92,47 @@ class WalletConnectModalController extends GetxController {
 
   void _onModalConnect(ModalConnect? event) {
     _homeController.address.value = event?.session.address?.toLowerCase() ?? "";
-    Get.back();
-    //session = event?.session;
-    debugPrint('[ExampleApp] _onModalConnect ${event?.toString()}');
+    if (event != null &&
+        event.session.address != null &&
+        event.session.address!.isNotEmpty) {
+      w3mService?.closeModal();
+    }
   }
 
   void _onModalNetworkChange(ModalNetworkChange? event) {
-    debugPrint('[ExampleApp] _onModalNetworkChange ${event?.toString()}');
+    //debugPrint('[ExampleApp] _onModalNetworkChange ${event?.toString()}');
   }
 
   void _onModalDisconnect(ModalDisconnect? event) {
-    debugPrint('[ExampleApp] _onModalDisconnect ${event?.toString()}');
+    //debugPrint('[ExampleApp] _onModalDisconnect ${event?.toString()}');
   }
 
   void _onModalError(ModalError? event) {
-    debugPrint('[ExampleApp] _onModalError ${event?.toString()}');
+    //debugPrint('[ExampleApp] _onModalError ${event?.toString()}');
   }
 
   void _onSessionExpired(SessionExpire? event) {
-    debugPrint('[ExampleApp] _onSessionExpired ${event?.toString()}');
+    //debugPrint('[ExampleApp] _onSessionExpired ${event?.toString()}');
   }
 
   void _onSessionUpdate(SessionUpdate? event) {
-    debugPrint('[ExampleApp] _onSessionUpdate ${event?.toString()}');
+    //debugPrint('[ExampleApp] _onSessionUpdate ${event?.toString()}');
   }
 
   void _onSessionEvent(SessionEvent? event) {
-    debugPrint('[ExampleApp] _onSessionEvent ${event?.toString()}');
+    //debugPrint('[ExampleApp] _onSessionEvent ${event?.toString()}');
   }
 
   void _onRelayClientConnect(EventArgs? event) {
-    debugPrint('[ExampleApp] _onSessionEvent ${event?.toString()}');
+    //debugPrint('[ExampleApp] _onSessionEvent ${event?.toString()}');
   }
 
   void _onRelayClientError(EventArgs? event) {
-    debugPrint('[ExampleApp] _onRelayClientError ${event?.toString()}');
+    //debugPrint('[ExampleApp] _onRelayClientError ${event?.toString()}');
   }
 
   void _onRelayClientDisconnect(EventArgs? event) {
-    debugPrint('[ExampleApp] _onSessionEvent ${event?.toString()}');
+    //debugPrint('[ExampleApp] _onSessionEvent ${event?.toString()}');
   }
 
   signWithWalletConnect(BuildContext context) async {
@@ -149,23 +151,27 @@ class WalletConnectModalController extends GetxController {
     final address = NamespaceUtils.getAccount(
         accountNameSpace ?? w3mService!.selectedChain!.namespace);
 
-    w3mService?.launchConnectedWallet();
-    await w3mService
-        ?.request(
-      topic: w3mService!.session!.topic!,
-      chainId: chainId,
-      request: SessionRequestParams(
-        method: 'personal_sign',
-        params: [
-          testSignData(address.toLowerCase()),
-          address.toLowerCase(),
-        ],
-      ),
-    )
-        .then((value) async {
-      await _homeController.loginWithWallet(context, address.toLowerCase(),
-          testSignData(address.toLowerCase()), value.toString());
-    });
+    try {
+      w3mService?.launchConnectedWallet();
+      await w3mService
+          ?.request(
+        topic: w3mService!.session!.topic!,
+        chainId: chainId,
+        request: SessionRequestParams(
+          method: 'personal_sign',
+          params: [
+            testSignData(address.toLowerCase()),
+            address.toLowerCase(),
+          ],
+        ),
+      )
+          .then((value) async {
+        await _homeController.loginWithWallet(context, address.toLowerCase(),
+            testSignData(address.toLowerCase()), value.toString());
+      });
+    } catch (e) {
+      _homeController.address.value = '';
+    }
   }
 
   Future<void> createWallet(BuildContext context) async {

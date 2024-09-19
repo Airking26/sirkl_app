@@ -20,6 +20,7 @@ import 'package:sirkl/views/global/material_floating_search_bar/floating_search_
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/views/global/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/views/global/stream_chat/utils/custom_stream_channel_list_event_handler.dart';
 
 import '../../controllers/profile_controller.dart';
 import '../chats/detailed_chat_screen.dart';
@@ -45,47 +46,51 @@ class _GroupsScreenState extends State<GroupsScreen>
   ProfileController get _profileController => Get.find<ProfileController>();
 
   late final _controllerCommunitiesFav = StreamChannelListController(
-    client: StreamChat.of(context).client,
-    filter: Filter.or([
-      Filter.and([
+      eventHandler: CustomStreamChannelListEventHandler(),
+      client: StreamChat.of(context).client,
+      filter: Filter.or([
+        Filter.and([
+          Filter.notExists('isConv'),
+          if (_homeController.contractAddresses.isNotEmpty)
+            Filter.in_("contractAddress", _homeController.contractAddresses)
+          else
+            Filter.equal("contractAddress", ""),
+          Filter.exists("${_homeController.id.value}_favorite"),
+          Filter.equal("${_homeController.id.value}_favorite", true),
+        ]),
+        Filter.equal(
+            "contractAddress",
+            _homeController.userMe.value.hasSBT!
+                ? "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase()
+                : ""),
+      ]),
+      limit: 10,
+      channelStateSort: [byLastMessageAt, byUpdatedAt]);
+
+  late final _controllerCommunitiesOther = StreamChannelListController(
+      eventHandler: CustomStreamChannelListEventHandler(),
+      client: StreamChat.of(context).client,
+      filter: Filter.and([
         Filter.notExists('isConv'),
         if (_homeController.contractAddresses.isNotEmpty)
-          Filter.in_("contractAddress", _homeController.contractAddresses)
+          Filter.in_(
+              "contractAddress",
+              _homeController.contractAddresses
+                  .where((p0) =>
+                      p0 !=
+                      "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011"
+                          .toLowerCase())
+                  .toList())
         else
           Filter.equal("contractAddress", ""),
-        Filter.exists("${_homeController.id.value}_favorite"),
-        Filter.equal("${_homeController.id.value}_favorite", true),
+        Filter.or([
+          Filter.notExists("${_homeController.id.value}_favorite"),
+          Filter.equal("${_homeController.id.value}_favorite", false)
+        ]),
+        Filter.greater('member_count', 2),
       ]),
-      Filter.equal(
-          "contractAddress",
-          _homeController.userMe.value.hasSBT!
-              ? "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase()
-              : ""),
-    ]),
-    limit: 10,
-  );
-  late final _controllerCommunitiesOther = StreamChannelListController(
-    client: StreamChat.of(context).client,
-    filter: Filter.and([
-      Filter.notExists('isConv'),
-      if (_homeController.contractAddresses.isNotEmpty)
-        Filter.in_(
-            "contractAddress",
-            _homeController.contractAddresses
-                .where((p0) =>
-                    p0 !=
-                    "0x2B2535Ba07Cd144e143129DcE2dA4f21145a5011".toLowerCase())
-                .toList())
-      else
-        Filter.equal("contractAddress", ""),
-      Filter.or([
-        Filter.notExists("${_homeController.id.value}_favorite"),
-        Filter.equal("${_homeController.id.value}_favorite", false)
-      ]),
-      Filter.greater('member_count', 2),
-    ]),
-    limit: 10,
-  );
+      limit: 10,
+      channelStateSort: [byLastMessageAt, byUpdatedAt]);
 
   @override
   void initState() {
@@ -169,7 +174,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                                           contractAddress: channel.id!,
                                           id: _homeController.id.value,
                                           isFav: false));
-                                  _commonController.refreshAllInbox();
+                                  _commonController.refreshCommunities();
                                   _homeController.isInFav.remove(channel.id);
                                   _homeController.isInFav.refresh();
                                 },
@@ -271,7 +276,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                                           contractAddress: channel.id!,
                                           id: _homeController.id.value,
                                           isFav: true));
-                                  _commonController.refreshAllInbox();
+                                  _commonController.refreshCommunities();
                                   _homeController.isInFav.add(channel.id!);
                                   _homeController.isInFav.refresh();
                                 },

@@ -345,7 +345,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       nicknameController.clear();
                       _chatController.contactAddIsEmpty.value = true;
                       _homeController.userAdded.value = UserDTO();
-                      _commonController.refreshAllInbox();
+                      _commonController.refreshCommunities();
                       Navigator.pop(context);
                     } else {
                       _commonController.contactAddLoading.value = false;

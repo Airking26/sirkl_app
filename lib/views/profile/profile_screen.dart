@@ -772,7 +772,7 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                                 "${homeController.id.value}_favorite"
                               ]);
                         }
-                        _commonController.refreshAllInbox();
+                        _commonController.refreshCommunities();
                       }
                     },
                   )),

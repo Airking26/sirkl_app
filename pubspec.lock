@@ -277,18 +277,18 @@ packages:
     dependency: transitive
     description:
       name: connectivity_plus
-      sha256: "224a77051d52a11fbad53dd57827594d3bd24f945af28bd70bab376d68d437f0"
+      sha256: "2056db5241f96cdc0126bd94459fc4cdc13876753768fc7a31c425e50a7177d0"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.2"
+    version: "6.0.5"
   connectivity_plus_platform_interface:
     dependency: transitive
     description:
       name: connectivity_plus_platform_interface
-      sha256: cf1d1c28f4416f8c654d7dc3cd638ec586076255d407cef3ddbdaf178272a71a
+      sha256: "42657c1715d48b167930d5f34d00222ac100475f73d10162ddf43e714932f204"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.4"
+    version: "2.0.1"
   contextmenu:
     dependency: "direct main"
     description:
@@ -1993,26 +1993,26 @@ packages:
     dependency: transitive
     description:
       name: stream_chat
-      sha256: cf106048d051a52f86c01f365f36d10739fbb7f6330b8a32a2d0af854e42fda1
+      sha256: d3a8bd105c696afba9594c4bc45399d681a3ea2f78fd427473b9870146fffee2
       url: "https://pub.dev"
     source: hosted
-    version: "7.3.0"
+    version: "8.0.0"
   stream_chat_flutter_core:
     dependency: "direct main"
     description:
       name: stream_chat_flutter_core
-      sha256: "8af7bb9ab4ea8aafcac2637232ec02dde985c57880ac811c32f7944647a11066"
+      sha256: f6f5ff89b4bbca09ddffa0f394e855742275504d1228d8216c9dc9c640f20442
       url: "https://pub.dev"
     source: hosted
-    version: "7.3.0"
+    version: "8.0.0"
   stream_chat_persistence:
     dependency: "direct main"
     description:
       name: stream_chat_persistence
-      sha256: ec547b0858b8fc97b36034b4714960d268daae6d4655b70bfba22f7fdc7dd551
+      sha256: "10e2fd241e4f8a108b806a65b77b6c554e024c0bf1ad30f350d7885ffbe09b50"
       url: "https://pub.dev"
     source: hosted
-    version: "7.3.0"
+    version: "8.0.0"
   stream_transform:
     dependency: transitive
     description:

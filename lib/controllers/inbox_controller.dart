@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:sirkl/controllers/common_controller.dart';
-import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:sirkl/models/inbox_creation_dto.dart';
 import 'package:sirkl/models/request_to_join_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
@@ -16,8 +14,6 @@ class InboxController extends GetxController {
   final box = GetStorage();
 
   ProfileController get _profileController => Get.find<ProfileController>();
-  CommonController get _commonController => Get.find<CommonController>();
-  GroupsController get _groupController => Get.find<GroupsController>();
 
   var index = 0.obs;
   var searchIsActive = false.obs;
@@ -52,7 +48,6 @@ class InboxController extends GetxController {
   /// Function to create an Inbox
   Future<String> createInbox(InboxCreationDto inboxCreationDto) async {
     var id = await InboxRepo.createInbox(inboxCreationDto);
-    _commonController.refreshAllInbox();
     return id;
   }
 
@@ -74,7 +69,6 @@ class InboxController extends GetxController {
     );
 
     await channel.value!.watch();
-    _commonController.refreshAllInbox();
   }
 
   /// Function to return a channel (or create if it does not exist) based on ID
@@ -83,7 +77,6 @@ class InboxController extends GetxController {
     channel.value =
         client.channel('try', id: channelId, extraData: {"isConv": true});
     await channel.value!.watch();
-    _commonController.refreshAllInbox();
   }
 
   /// Function to retrieve a ETH address from a ENS

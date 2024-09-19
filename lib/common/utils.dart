@@ -6,6 +6,7 @@ import 'package:flutter_callkit_incoming/entities/notification_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
+import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 void showToast(BuildContext context, String message) {
   final scaffold = ScaffoldMessenger.of(context);
@@ -108,3 +109,18 @@ bool isEthereumAddress(String address) {
   final ethAddressRegex = RegExp(r'^0x[a-fA-F0-9]{40}$');
   return ethAddressRegex.hasMatch(address);
 }
+
+SortOption<ChannelState> get byLastMessageAt => SortOption<ChannelState>(
+      'last_message_at',
+      comparator: (a, b) =>
+          b.channel?.lastMessageAt
+              ?.compareTo(a.channel?.lastMessageAt ?? DateTime(0)) ??
+          0,
+    );
+
+SortOption<ChannelState> get byUpdatedAt => SortOption<ChannelState>(
+      'updated_at',
+      comparator: (a, b) =>
+          b.channel?.updatedAt.compareTo(a.channel?.updatedAt ?? DateTime(0)) ??
+          0,
+    );

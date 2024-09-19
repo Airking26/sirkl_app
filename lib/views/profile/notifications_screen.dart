@@ -408,7 +408,7 @@ class _NotificationScreenState extends State<NotificationScreen>
           child: ListTile(
             onTap: () {
               Navigator.pop(context);
-              _navigationController.controller.value.jumpToTab(2);
+              _navigationController.controller.value.index = 2;
             },
             titleAlignment: ListTileTitleAlignment.top,
             leading: ClipRRect(

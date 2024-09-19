@@ -32,8 +32,7 @@ class AssetRepo {
   static Future<List<String>> retrieveContactAddress() async {
     SRequests req = SRequests(SUrls.baseURL);
     Response res = await req.get(SUrls.retrieveContractAddress);
-    List<dynamic> list = res.jsonBody();
-    return list.cast<String>();
+    return res.jsonBody().cast<String>();
   }
 
   static Future<List<GroupCreationDto>>

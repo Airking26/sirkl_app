@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:sirkl/views/global/stream_chat/src/video/vlc/vlc_manager.dart';
-import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
+
+import '../stream_chat_flutter.dart';
 
 /// {@template streamChat}
 /// Widget used to provide information about the chat to the widget tree
@@ -65,7 +66,7 @@ class StreamChat extends StatefulWidget {
   /// Stream of connectivity result
   /// Visible for testing
   @visibleForTesting
-  final Stream<ConnectivityResult>? connectivityStream;
+  final Stream<List<ConnectivityResult>>? connectivityStream;
 
   @override
   StreamChatState createState() => StreamChatState();

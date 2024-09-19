@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nice_buttons/nice_buttons.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
@@ -15,6 +16,7 @@ import 'package:sirkl/views/global/material_floating_search_bar/floating_search_
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/views/global/stream_chat/src/channel/channel_page.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
+import 'package:sirkl/views/global/stream_chat/utils/custom_stream_channel_list_event_handler.dart';
 
 import '../../controllers/home_controller.dart';
 import 'new_message_screen.dart';
@@ -38,44 +40,45 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   late TabController tabController;
 
   late final _controllerFriend = StreamChannelListController(
-    client: StreamChat.of(context).client,
-    filter: Filter.and([
-      Filter.equal("type", "try"),
-      Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
-      Filter.exists('last_message_at'),
-      Filter.or([
-        Filter.in_("members", [_homeController.id.value]),
-        Filter.equal("created_by_id", _homeController.id.value),
-      ]),
-      Filter.or([
-        Filter.and([
-          Filter.exists("${_homeController.id.value}_follow_channel"),
-          Filter.equal("${_homeController.id.value}_follow_channel", true),
-          Filter.equal('isConv', true),
+      eventHandler: CustomStreamChannelListEventHandler(),
+      client: StreamChat.of(context).client,
+      filter: Filter.and([
+        Filter.equal("type", "try"),
+        Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
+        Filter.or([
+          Filter.in_("members", [_homeController.id.value]),
+          Filter.equal("created_by_id", _homeController.id.value),
         ]),
-        Filter.equal('isConv', false),
+        Filter.or([
+          Filter.and([
+            Filter.exists("${_homeController.id.value}_follow_channel"),
+            Filter.equal("${_homeController.id.value}_follow_channel", true),
+            Filter.equal('isConv', true),
+          ]),
+          Filter.equal('isConv', false),
+        ]),
       ]),
-    ]),
-    limit: 10,
-  );
+      limit: 10,
+      channelStateSort: [byLastMessageAt, byUpdatedAt]);
+
   late final _controllerOther = StreamChannelListController(
-    client: StreamChat.of(context).client,
-    filter: Filter.and([
-      Filter.equal("type", "try"),
-      Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
-      Filter.exists('last_message_at'),
-      Filter.equal('isConv', true),
-      Filter.or([
-        Filter.equal("created_by_id", _homeController.id.value),
-        Filter.in_("members", [_homeController.id.value]),
+      eventHandler: CustomStreamChannelListEventHandler(),
+      client: StreamChat.of(context).client,
+      filter: Filter.and([
+        Filter.equal("type", "try"),
+        Filter.greater("last_message_at", "2022-11-23T12:00:18.54912Z"),
+        Filter.equal('isConv', true),
+        Filter.or([
+          Filter.equal("created_by_id", _homeController.id.value),
+          Filter.in_("members", [_homeController.id.value]),
+        ]),
+        Filter.or([
+          Filter.notExists("${_homeController.id.value}_follow_channel"),
+          Filter.equal("${_homeController.id.value}_follow_channel", false)
+        ])
       ]),
-      Filter.or([
-        Filter.notExists("${_homeController.id.value}_follow_channel"),
-        Filter.equal("${_homeController.id.value}_follow_channel", false)
-      ])
-    ]),
-    limit: 10,
-  );
+      limit: 10,
+      channelStateSort: [byLastMessageAt, byUpdatedAt]);
 
   @override
   void initState() {
@@ -524,7 +527,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                         ? await channel.truncate(
                                             skipPush: false)
                                         : await channel.delete();
-                                    _commonController.refreshAllInbox();
                                     Get.back();
                                   } else {
                                     if (channel.extraData["isGroupPaying"] !=
@@ -552,7 +554,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                       await channel.removeMembers(
                                           [_homeController.id.value]);
                                     }
-                                    _commonController.refreshAllInbox();
                                     Get.back();
                                   }
                                 },
@@ -697,7 +698,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                     await _chatController
                                         .deleteInbox(channel.id!);
                                   }
-                                  _commonController.refreshAllInbox();
                                   Get.back();
                                 },
                               )
@@ -707,7 +707,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 onChannelAddPressed: (context, id, client) async {
                   await _commonController.addUserToSirkl(
                       id, client, _homeController.id.value);
-                  _commonController.refreshAllInbox();
                 },
                 channelConv: true,
                 channelFriends: false,
