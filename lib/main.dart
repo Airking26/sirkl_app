@@ -77,7 +77,7 @@ void main() async {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark));
   final chatPersistentClient =
-      StreamChatPersistenceClient(connectionMode: ConnectionMode.background);
+      StreamChatPersistenceClient(connectionMode: ConnectionMode.regular);
   final client = StreamChatClient(SConfig.STREAM_API_KEY, logLevel: Level.OFF)
     ..chatPersistenceClient = chatPersistentClient;
   await Firebase.initializeApp();

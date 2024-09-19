@@ -8,13 +8,13 @@ import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 /// {@endtemplate}
 class StreamMessageText extends StatelessWidget {
   /// {@macro streamMessageText}
-  const StreamMessageText({
-    super.key,
-    required this.message,
-    required this.messageTheme,
-    this.onMentionTap,
-    this.onLinkTap,
-  });
+  const StreamMessageText(
+      {super.key,
+      required this.message,
+      required this.messageTheme,
+      this.onMentionTap,
+      this.onLinkTap,
+      this.isQuotedMessage});
 
   /// Message whose text is to be displayed
   final Message message;
@@ -28,6 +28,8 @@ class StreamMessageText extends StatelessWidget {
   /// [StreamMessageThemeData] whose text theme is to be applied
   final StreamMessageThemeData messageTheme;
 
+  final bool? isQuotedMessage;
+
   @override
   Widget build(BuildContext context) {
     final streamChat = StreamChat.of(context);
@@ -36,15 +38,21 @@ class StreamMessageText extends StatelessWidget {
       stream: streamChat.currentUserStream.map((it) => it!.language ?? 'en'),
       initialData: streamChat.currentUser!.language ?? 'en',
       builder: (context, language) {
-        final messageText = message
-            .translate(language)
-            .replaceMentions()
-            .text
-            ?.replaceAll('\n', '\n\n')
-            .trimLeft();
+        String messageText = message
+                .translate(language)
+                .replaceMentions()
+                .text
+                ?.replaceAll('\n', '\n\n')
+                .trimLeft() ??
+            '';
+
+        String truncatedMessage = messageText != null && messageText.length > 12
+            ? '${messageText.substring(0, 12)}...' // Show first 12 characters followed by ellipsis
+            : messageText ?? '';
+
         final themeData = Theme.of(context);
         return MarkdownBody(
-          data: messageText ?? '',
+          data: isQuotedMessage ?? false ? truncatedMessage : messageText,
           selectable: isDesktopDeviceOrWeb,
           onTapLink: (
             String link,

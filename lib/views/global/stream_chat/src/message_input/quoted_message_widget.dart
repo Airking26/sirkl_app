@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:sirkl/views/global/stream_chat/platform_widget_builder/src/platform_widget_builder.dart';
 import 'package:sirkl/views/global/stream_chat/src/message_input/clear_input_item_button.dart';
 import 'package:sirkl/views/global/stream_chat/src/video/video_thumbnail_image.dart';
@@ -165,20 +164,25 @@ class _QuotedMessage extends StatelessWidget {
       if (msg.text!.isNotEmpty && !_isGiphy)
         Flexible(
           child: StreamMessageText(
+            isQuotedMessage: true,
             message: msg,
             messageTheme: isOnlyEmoji && _containsText
                 ? messageTheme.copyWith(
                     messageTextStyle: messageTheme.messageTextStyle?.copyWith(
-                      fontSize: 32,
+                      fontSize: 24,
                     ),
                   )
                 : messageTheme.copyWith(
                     messageTextStyle: messageTheme.messageTextStyle?.copyWith(
-                      fontSize: 12,
-                      color: reverse ? MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.black : Colors.white : Colors.black,
-                      fontFamily: 'Gilroy',
-                      fontWeight: FontWeight.w500
-                    ),
+                        fontSize: 12,
+                        color: reverse
+                            ? MediaQuery.of(context).platformBrightness ==
+                                    Brightness.dark
+                                ? Colors.black
+                                : Colors.white
+                            : Colors.black,
+                        fontFamily: 'Gilroy',
+                        fontWeight: FontWeight.w500),
                   ),
           ),
         ),
@@ -192,17 +196,30 @@ class _QuotedMessage extends StatelessWidget {
               )
             : null,
         borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(10),
-            bottomRight: const Radius.circular(10),
-            bottomLeft: reverse ? const Radius.circular(0)  : const Radius.circular(10),
-            topRight: const Radius.circular(10),
+          topLeft: const Radius.circular(10),
+          bottomRight: const Radius.circular(10),
+          bottomLeft:
+              reverse ? const Radius.circular(0) : const Radius.circular(10),
+          topRight: const Radius.circular(10),
         ),
         gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-               MediaQuery.of(context).platformBrightness == Brightness.light ? reverse ? Color(0xFF102437) : Colors.white : reverse ? Colors.white : Colors.white,
-                MediaQuery.of(context).platformBrightness == Brightness.light ? reverse ? Color(0xFF13171B) : Colors.white : reverse ? Colors.white : Colors.white
+              MediaQuery.of(context).platformBrightness == Brightness.light
+                  ? reverse
+                      ? Color(0xFF102437)
+                      : Colors.white
+                  : reverse
+                      ? Colors.white
+                      : Colors.white,
+              MediaQuery.of(context).platformBrightness == Brightness.light
+                  ? reverse
+                      ? Color(0xFF13171B)
+                      : Colors.white
+                  : reverse
+                      ? Colors.white
+                      : Colors.white
             ]),
       ),
       padding: const EdgeInsets.all(12),
@@ -304,7 +321,7 @@ class _ParseAttachments extends StatelessWidget {
             return SizedBox(
               width: size.width,
               height: size.height,
-              child:  Center(
+              child: Center(
                 child: CircularProgressIndicator(color: SColors.activeColor),
               ),
             );
@@ -396,7 +413,7 @@ class _VideoAttachmentThumbnailState extends State<_VideoAttachmentThumbnail> {
       width: 32,
       child: _controller.value.isInitialized
           ? VideoPlayer(_controller)
-          :  CircularProgressIndicator(color: SColors.activeColor),
+          : CircularProgressIndicator(color: SColors.activeColor),
     );
   }
 }

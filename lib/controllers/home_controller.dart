@@ -164,12 +164,14 @@ class HomeController extends GetxController {
       await _commonController.showSirklUsers(id.value);
       await client.addDevice(fcmToken!, PushProvider.firebase,
           pushProviderName: "Firebase_Config");
-      if (isLogged) updateAllNftConfig();
+      if (isLogged) {
+        retrieveContractAddress();
+        updateAllNftConfig();
+      }
       if (Platform.isIOS) {
         var token = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
         await UserRepo.uploadAPNToken(token);
       }
-      retrieveContractAddress();
     }
   }
 

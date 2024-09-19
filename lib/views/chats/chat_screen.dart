@@ -59,7 +59,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         ]),
       ]),
       limit: 10,
-      channelStateSort: [byLastMessageAt, byUpdatedAt]);
+      channelStateSort: [byLastMessageAt]);
 
   late final _controllerOther = StreamChannelListController(
       eventHandler: CustomStreamChannelListEventHandler(),
@@ -78,7 +78,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         ])
       ]),
       limit: 10,
-      channelStateSort: [byLastMessageAt, byUpdatedAt]);
+      channelStateSort: [byLastMessageAt]);
 
   @override
   void initState() {

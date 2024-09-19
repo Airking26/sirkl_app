@@ -61,6 +61,7 @@ class TextBubble extends StatelessWidget {
       child: textBuilder != null
           ? textBuilder!(context, message)
           : StreamMessageText(
+              isQuotedMessage: false,
               onLinkTap: onLinkTap,
               message: message,
               onMentionTap: onMentionTap,

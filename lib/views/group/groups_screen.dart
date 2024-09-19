@@ -65,7 +65,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                 : ""),
       ]),
       limit: 10,
-      channelStateSort: [byLastMessageAt, byUpdatedAt]);
+      channelStateSort: [byLastMessageAt]);
 
   late final _controllerCommunitiesOther = StreamChannelListController(
       eventHandler: CustomStreamChannelListEventHandler(),
@@ -90,7 +90,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         Filter.greater('member_count', 2),
       ]),
       limit: 10,
-      channelStateSort: [byLastMessageAt, byUpdatedAt]);
+      channelStateSort: [byLastMessageAt]);
 
   @override
   void initState() {

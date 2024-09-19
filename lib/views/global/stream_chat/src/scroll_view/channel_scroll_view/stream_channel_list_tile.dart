@@ -455,10 +455,22 @@ class _ChannelLastMessageTextState extends State<ChannelLastMessageText> {
             _lastMessage = lastMessage;
           }
 
+          // Get the current user ID
+          final currentUserId = widget.channel.client.state.currentUser?.id;
+
+          // Check if the current user is a member of the channel
+          bool isUserAMemberOfChannel = widget.channel.state?.members
+                  .any((member) => member.userId == currentUserId) ??
+              false;
+
           return StreamMessagePreviewText(
             message: widget.channel.extraData["isConv"] == null
-                ? _lastMessage ??
-                    Message(text: "Start conversation between holders")
+                ? isUserAMemberOfChannel && lastMessage != null
+                    ? _lastMessage!
+                    : Message(
+                        text: isUserAMemberOfChannel
+                            ? "Start conversation between holders"
+                            : "Only for holders")
                 : _lastMessage ?? Message(text: "No Message Yet"),
             textStyle: widget.textStyle,
             language: widget.channel.client.state.currentUser?.language,

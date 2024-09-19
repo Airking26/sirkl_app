@@ -267,9 +267,8 @@ class _MessageCardState extends State<MessageCard> {
                   (widget.showUserAvatar == DisplayWidget.gone ? 0 : 4.0)),
           color: Colors.transparent,
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: widthLimit ?? double.infinity,
-            ),
+            constraints:
+                BoxConstraints(maxWidth: widthLimit ?? double.infinity),
             child: IntrinsicWidth(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
