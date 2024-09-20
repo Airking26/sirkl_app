@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -181,6 +182,11 @@ class WalletConnectModalController extends GetxController {
     final seed = bip39.mnemonicToSeed(mnemonic);
     final privateKey = EthPrivateKey.fromHex(seedToPrivateKey(seed));
     final address = privateKey.address.hex;
+
+    try {
+      AppsflyerSdk appsflyerSdk = Get.find<AppsflyerSdk>();
+      await appsflyerSdk.logEvent("af_login_without_wallet", {});
+    } catch (e) {}
 
     await _signMessageLocally(
         context, bytesToHex(privateKey.privateKey), address, mnemonic);

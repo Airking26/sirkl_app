@@ -55,7 +55,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       if (_commonController.query.value.isEmpty) {
         pagingController.refresh();
         pagingController.appendLastPage(_commonController.users);
-      }
+      } else
+        fetchPageUsers();
     });
     super.initState();
   }

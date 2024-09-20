@@ -50,7 +50,8 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
       if (_chatController.addUserQuery.value.isEmpty) {
         pagingController.refresh();
         pagingController.appendLastPage(_commonController.users);
-      }
+      } else
+        fetchPageUsers();
     });
     super.initState();
   }
@@ -308,6 +309,7 @@ class _AddUserToGroupScreenState extends State<AddUserToGroupScreen> {
               : Colors.white,
       debounceDelay: const Duration(milliseconds: 200),
       onQueryChanged: (query) async {
+        pageKey = 0;
         if (query.isNotEmpty) {
           pagingController.itemList = [];
           _chatController.addUserQuery.value = query;

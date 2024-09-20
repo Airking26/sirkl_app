@@ -40,7 +40,8 @@ class _NewCallScreenState extends State<NewCallScreen> {
       if (_callController.queryCall.value.isEmpty) {
         pagingController.refresh();
         pagingController.appendLastPage(_commonController.users);
-      }
+      } else
+        fetchPageUsers();
     });
     super.initState();
   }
