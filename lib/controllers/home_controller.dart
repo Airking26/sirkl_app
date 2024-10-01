@@ -18,7 +18,6 @@ import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/models/nft_dto.dart';
 import 'package:sirkl/models/nickname_creation_dto.dart';
-import 'package:sirkl/models/notification_register_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/models/story_dto.dart';
 import 'package:sirkl/models/story_modification_dto.dart';
@@ -29,7 +28,6 @@ import 'package:sirkl/repositories/asset_repo.dart';
 import 'package:sirkl/repositories/auth_repo.dart';
 import 'package:sirkl/repositories/inbox_repo.dart';
 import 'package:sirkl/repositories/nickname_repo.dart';
-import 'package:sirkl/repositories/notification_repo.dart';
 import 'package:sirkl/repositories/story_repo.dart';
 import 'package:sirkl/repositories/user_repo.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
@@ -71,13 +69,11 @@ class HomeController extends GetxController {
   var displayPopupFirstConnection = false.obs;
   var isLoading = false.obs;
   var isStoryLoading = false.obs;
-  var fetchingAssets = false.obs;
+  var isCheckingBetaCode = false.obs;
 
   /// Block Initialization due to IOS back from url launcher after
   /// login with wallet, accessToken is valid, calling initState
   var blockInitialization = false.obs;
-
-  var isCheckingBetaCode = false.obs;
 
   /// Function to check if the Beta code is correct
   Future<bool> checkBetaCode(String code) async =>
@@ -141,8 +137,9 @@ class HomeController extends GetxController {
       displayPopupFirstConnection.value = true;
     }
 
-    await retrieveContractAddress();
-    await getAllNftConfig();
+    //TODO : Try on IOS before release
+    Future.wait([retrieveContractAddress(), getAllNftConfig()]);
+
     await connectUserToStream(StreamChat.of(context).client);
     putFCMToken(context, StreamChat.of(context).client, false);
     retrieveInboxes();
@@ -176,16 +173,18 @@ class HomeController extends GetxController {
   }
 
   /// Function to retrieve the contract addresses of the assets own by the user and store them
-  retrieveContractAddress() async {
-    contractAddresses.value = await AssetRepo.retrieveContactAddress();
-    box.write(con.contractAddresses, contractAddresses.value);
+  Future<void> retrieveContractAddress() async {
+    try {
+      contractAddresses.value = await AssetRepo.retrieveContactAddress();
+      box.write(con.contractAddresses, contractAddresses.value);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   /// Function called only server side to get and store assets of the user (at login only)
   Future<void> getAllNftConfig() async {
-    fetchingAssets.value = true;
     await AssetRepo.getAllNFTConfig();
-    fetchingAssets.value = false;
   }
 
   /// Function called only server side to update assets of the user
@@ -368,22 +367,6 @@ class HomeController extends GetxController {
   /// Function to retrieve inbox (if user is new, check if someone sent him
   /// messages on his wallet, and create stream chat)
   retrieveInboxes() async => await InboxRepo.updateInbox();
-
-  /// Function to register notification
-  checkOfflineNotificationAndRegister() async {
-    var notifications = GetStorage().read(con.notificationSaved) ?? [];
-    var notificationsToDelete = [];
-    for (var notification in (notifications as List<dynamic>)) {
-      await NotificationRepo.registerNotification(
-          NotificationRegisterDto(message: notification));
-      notificationsToDelete.add(notification);
-    }
-    var notificationsToSave = notifications
-        .toSet()
-        .difference(notificationsToDelete.toSet())
-        .toList();
-    await GetStorage().write(con.notificationSaved, notificationsToSave);
-  }
 
   /// Function checking if user has unread message(s)
   checkIfHasMessage(StreamChatClient client) async {

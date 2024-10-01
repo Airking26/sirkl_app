@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
@@ -53,13 +53,18 @@ class CallController extends GetxController {
 
   /// Function to initialize and setup Agora
   Future<void> setupVoiceSDKEngine(BuildContext context) async {
-    rtcEngine = await RtcEngine.create(SConfig.AGORA_APP_ID);
+    //rtcEngine = await RtcEngine.create(SConfig.AGORA_APP_ID);
+    rtcEngine = createAgoraRtcEngine();
+    await rtcEngine?.initialize(const RtcEngineContext(
+      appId: SConfig.AGORA_APP_ID,
+      channelProfile: ChannelProfileType.channelProfileCommunication,
+    ));
     await rtcEngine?.enableAudio();
     await rtcEngine?.leaveChannel();
 
-    rtcEngine?.setEventHandler(
+    rtcEngine?.registerEventHandler(
       RtcEngineEventHandler(
-        joinChannelSuccess: (String x, int y, int elapsed) {
+        onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
           [Permission.microphone].request();
           playRingtone(1);
           pushNewScreen(context,
@@ -71,14 +76,15 @@ class CallController extends GetxController {
             isFromConv.value = false;
           });
         },
-        userJoined: (int remoteUid, int elapsed) {
+        onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
           [Permission.microphone].request();
           playRingtone(50);
           timer.value = StopWatchTimer();
           timer.value.onStartTimer();
           userJoinedCall.value = true;
         },
-        userOffline: (int remoteUid, UserOfflineReason reason) async {
+        onUserOffline: (RtcConnection connection, int remoteUid,
+            UserOfflineReasonType reason) async {
           await leaveCallChanel();
         },
       ),
@@ -96,7 +102,8 @@ class CallController extends GetxController {
         status: 0,
         channel: channel));
     await _retrieveTokenAgoraRTC(channel, "publisher", "userAccount", myID);
-    await rtcEngine?.joinChannelWithUserAccount(tokenAgoraRTC, channel, myID);
+    await rtcEngine?.joinChannelWithUserAccount(
+        token: tokenAgoraRTC!, channelId: channel, userAccount: myID);
   }
 
   /// Function for user to join a call
@@ -104,7 +111,8 @@ class CallController extends GetxController {
       String channelName, String id, String userCallingId) async {
     userCalled.value = await UserRepo.getUserByID(userCallingId);
     await _retrieveTokenAgoraRTC(channelName, "audience", "userAccount", id);
-    await rtcEngine?.joinChannelWithUserAccount(tokenAgoraRTC, channelName, id);
+    await rtcEngine?.joinChannelWithUserAccount(
+        token: tokenAgoraRTC!, channelId: channelName, userAccount: id);
   }
 
   /// Private function to assign Agora token

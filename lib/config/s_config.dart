@@ -13,4 +13,7 @@ class SConfig {
 
   static const String emptyHexBalance =
       "0x0000000000000000000000000000000000000000000000000000000000000000";
+
+  static String messageToSign(String wallet) =>
+      'Welcome to $wallet SIRKL.io by signing this message you agree to learn and have fun with blockchain';
 }

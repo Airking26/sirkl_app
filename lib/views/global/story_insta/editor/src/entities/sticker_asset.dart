@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:sirkl/views/global/story_insta/animations/animations.dart';
 import 'package:sirkl/views/global/story_insta/editor/editor.dart';
-import 'package:flutter/material.dart';
 
 ///
 @immutable
@@ -291,19 +291,28 @@ class TextSticker extends Sticker {
     VoidCallback? onPressed,
     StickerAsset? asset,
   ) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: background ?? Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: FittedBox(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Text(
-            text,
-            textAlign: textAlign,
-            style: style,
-          ),
+    return Align(
+      alignment: Alignment.center,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: background ?? Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width *
+              0.9, // Limits the width to 80% of screen width
+        ),
+        child: Text(
+          text,
+          textAlign: textAlign ?? TextAlign.center,
+          style: style ??
+              TextStyle(
+                  fontSize: 20,
+                  fontWeight:
+                      FontWeight.bold), // Default font size if not provided
+          softWrap: true,
+          overflow: TextOverflow.visible,
         ),
       ),
     );

@@ -169,7 +169,6 @@ class _NavigationRootScreenState extends State<NavigationRootScreen> {
                 _navigationController.controller.value.index = 0;
               }
             } else if (index == 4) {
-              _homeController.checkOfflineNotificationAndRegister();
               _profileController
                   .checkIfHasUnreadNotification(_homeController.id.value);
               if (_homeController.accessToken.value.isEmpty ||

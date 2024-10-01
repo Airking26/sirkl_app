@@ -1,15 +1,9 @@
 /// Common ///
-//const String URL_SERVER = "http://sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com/";
-
-//const String STREAM_CHAT_TOKEN = "stream_chat_token";
-
-// const String USER = "user";
 const String errorRes = "error";
 const String nicknames = "nicknames";
 const String contractAddresses = "contract_addresses";
 const String errorWalletAlreadyUsedRes = "error_wallet_already_used";
 const String urlPrefix = "https://sirkl.page.link";
-const String notificationSaved = "notification_saved";
 
 /// Navigation page ///
 const String homeTabRes = "home";

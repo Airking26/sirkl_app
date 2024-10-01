@@ -15,10 +15,10 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/enums/pdf_type.dart';
+import 'package:sirkl/controllers/auth/wallet_connect_modal_controller.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
-import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
 import 'package:sirkl/models/story_dto.dart';
 import 'package:sirkl/models/web_wallet_connect_dto.dart';
@@ -1240,8 +1240,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 alignLabel: const Alignment(0.3, 0),
                 action: () async {
                   _homeController.isSigning.value = true;
-                  await _walletConnectModalController
-                      .signWithWalletConnect(context);
+                  if (isSolanaAddress(_homeController.address.value)) {
+                    await _walletConnectModalController.phantomConnectService
+                        .signMessage(_walletConnectModalController
+                            .messageToSign(_homeController.address.value));
+                  } else {
+                    await _walletConnectModalController
+                        .signWithWalletConnect(context);
+                  }
+
                   _homeController.isSigning.value = false;
                   return _homeController.isSigning.value;
                 },

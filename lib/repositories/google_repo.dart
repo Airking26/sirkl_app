@@ -15,9 +15,9 @@ import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
 import 'package:sirkl/common/save_pref_keys.dart';
 import 'package:sirkl/config/s_colors.dart';
+import 'package:sirkl/controllers/auth/wallet_connect_modal_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
-import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 
 WalletConnectModalController get _walletConnectModalController =>
     Get.find<WalletConnectModalController>();

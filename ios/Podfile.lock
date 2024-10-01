@@ -1,33 +1,47 @@
 PODS:
-  - agora_rtc_engine (5.3.1):
-    - AgoraIrisRTC_iOS (= 3.7.0.3)
-    - AgoraRtcEngine_iOS (= 3.7.0.3)
+  - agora_rtc_engine (6.3.2):
+    - AgoraIrisRTC_iOS (= 4.3.2-build.1)
+    - AgoraRtcEngine_iOS (= 4.3.2)
     - Flutter
-  - AgoraIrisRTC_iOS (3.7.0.3)
-  - AgoraRtcEngine_iOS (3.7.0.3):
-    - AgoraRtcEngine_iOS/AINS (= 3.7.0.3)
-    - AgoraRtcEngine_iOS/AV1Dec (= 3.7.0.3)
-    - AgoraRtcEngine_iOS/ContentInspect (= 3.7.0.3)
-    - AgoraRtcEngine_iOS/FullAudioFormat (= 3.7.0.3)
-    - AgoraRtcEngine_iOS/ReplayKit (= 3.7.0.3)
-    - AgoraRtcEngine_iOS/ROIEnc (= 3.7.0.3)
-    - AgoraRtcEngine_iOS/RtcBasic (= 3.7.0.3)
-    - AgoraRtcEngine_iOS/SpatialAudio (= 3.7.0.3)
-    - AgoraRtcEngine_iOS/SuperResolution (= 3.7.0.3)
-    - AgoraRtcEngine_iOS/VideoPreprocess (= 3.7.0.3)
-    - AgoraRtcEngine_iOS/VirtualBackground (= 3.7.0.3)
-  - AgoraRtcEngine_iOS/AINS (3.7.0.3)
-  - AgoraRtcEngine_iOS/AV1Dec (3.7.0.3)
-  - AgoraRtcEngine_iOS/ContentInspect (3.7.0.3)
-  - AgoraRtcEngine_iOS/FullAudioFormat (3.7.0.3)
-  - AgoraRtcEngine_iOS/ReplayKit (3.7.0.3)
-  - AgoraRtcEngine_iOS/ROIEnc (3.7.0.3)
-  - AgoraRtcEngine_iOS/RtcBasic (3.7.0.3)
-  - AgoraRtcEngine_iOS/SpatialAudio (3.7.0.3)
-  - AgoraRtcEngine_iOS/SuperResolution (3.7.0.3)
-  - AgoraRtcEngine_iOS/VideoPreprocess (3.7.0.3)
-  - AgoraRtcEngine_iOS/VirtualBackground (3.7.0.3)
+  - AgoraIrisRTC_iOS (4.3.2-build.1)
+  - AgoraRtcEngine_iOS (4.3.2):
+    - AgoraRtcEngine_iOS/AIAEC (= 4.3.2)
+    - AgoraRtcEngine_iOS/AINS (= 4.3.2)
+    - AgoraRtcEngine_iOS/AudioBeauty (= 4.3.2)
+    - AgoraRtcEngine_iOS/ClearVision (= 4.3.2)
+    - AgoraRtcEngine_iOS/ContentInspect (= 4.3.2)
+    - AgoraRtcEngine_iOS/FaceCapture (= 4.3.2)
+    - AgoraRtcEngine_iOS/FaceDetection (= 4.3.2)
+    - AgoraRtcEngine_iOS/LipSync (= 4.3.2)
+    - AgoraRtcEngine_iOS/ReplayKit (= 4.3.2)
+    - AgoraRtcEngine_iOS/RtcBasic (= 4.3.2)
+    - AgoraRtcEngine_iOS/SpatialAudio (= 4.3.2)
+    - AgoraRtcEngine_iOS/VideoAv1CodecDec (= 4.3.2)
+    - AgoraRtcEngine_iOS/VideoAv1CodecEnc (= 4.3.2)
+    - AgoraRtcEngine_iOS/VideoCodecDec (= 4.3.2)
+    - AgoraRtcEngine_iOS/VideoCodecEnc (= 4.3.2)
+    - AgoraRtcEngine_iOS/VirtualBackground (= 4.3.2)
+    - AgoraRtcEngine_iOS/VQA (= 4.3.2)
+  - AgoraRtcEngine_iOS/AIAEC (4.3.2)
+  - AgoraRtcEngine_iOS/AINS (4.3.2)
+  - AgoraRtcEngine_iOS/AudioBeauty (4.3.2)
+  - AgoraRtcEngine_iOS/ClearVision (4.3.2)
+  - AgoraRtcEngine_iOS/ContentInspect (4.3.2)
+  - AgoraRtcEngine_iOS/FaceCapture (4.3.2)
+  - AgoraRtcEngine_iOS/FaceDetection (4.3.2)
+  - AgoraRtcEngine_iOS/LipSync (4.3.2)
+  - AgoraRtcEngine_iOS/ReplayKit (4.3.2)
+  - AgoraRtcEngine_iOS/RtcBasic (4.3.2)
+  - AgoraRtcEngine_iOS/SpatialAudio (4.3.2)
+  - AgoraRtcEngine_iOS/VideoAv1CodecDec (4.3.2)
+  - AgoraRtcEngine_iOS/VideoAv1CodecEnc (4.3.2)
+  - AgoraRtcEngine_iOS/VideoCodecDec (4.3.2)
+  - AgoraRtcEngine_iOS/VideoCodecEnc (4.3.2)
+  - AgoraRtcEngine_iOS/VirtualBackground (4.3.2)
+  - AgoraRtcEngine_iOS/VQA (4.3.2)
   - app_badge_plus (1.1.4):
+    - Flutter
+  - app_links (0.0.2):
     - Flutter
   - AppAuth (1.7.5):
     - AppAuth/Core (= 1.7.5)
@@ -95,12 +109,12 @@ PODS:
   - DKPhotoGallery/Resource (0.0.19):
     - SDWebImage
     - SwiftyGif
-  - ffmpeg-kit-ios-https (5.1.LTS)
-  - ffmpeg_kit_flutter (5.1.0.LTS):
-    - ffmpeg_kit_flutter/https-lts (= 5.1.0.LTS)
+  - ffmpeg-kit-ios-https (6.0)
+  - ffmpeg_kit_flutter (6.0.3):
+    - ffmpeg_kit_flutter/https (= 6.0.3)
     - Flutter
-  - ffmpeg_kit_flutter/https-lts (5.1.0.LTS):
-    - ffmpeg-kit-ios-https (= 5.1.LTS)
+  - ffmpeg_kit_flutter/https (6.0.3):
+    - ffmpeg-kit-ios-https (= 6.0)
     - Flutter
   - file_picker (0.0.1):
     - DKImagePickerController/PhotoGallery
@@ -280,6 +294,8 @@ PODS:
   - images_picker (0.0.1):
     - Flutter
     - ZLPhotoBrowser (= 4.2.5)
+  - iris_method_channel (0.0.1):
+    - Flutter
   - just_audio (0.0.1):
     - Flutter
   - launch_review (0.0.1):
@@ -381,6 +397,7 @@ PODS:
 DEPENDENCIES:
   - agora_rtc_engine (from `.symlinks/plugins/agora_rtc_engine/ios`)
   - app_badge_plus (from `.symlinks/plugins/app_badge_plus/ios`)
+  - app_links (from `.symlinks/plugins/app_links/ios`)
   - appcheck (from `.symlinks/plugins/appcheck/ios`)
   - appsflyer_sdk (from `.symlinks/plugins/appsflyer_sdk/ios`)
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
@@ -406,6 +423,7 @@ DEPENDENCIES:
   - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - images_picker (from `.symlinks/plugins/images_picker/ios`)
+  - iris_method_channel (from `.symlinks/plugins/iris_method_channel/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - launch_review (from `.symlinks/plugins/launch_review/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
@@ -473,6 +491,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/agora_rtc_engine/ios"
   app_badge_plus:
     :path: ".symlinks/plugins/app_badge_plus/ios"
+  app_links:
+    :path: ".symlinks/plugins/app_links/ios"
   appcheck:
     :path: ".symlinks/plugins/appcheck/ios"
   appsflyer_sdk:
@@ -523,6 +543,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   images_picker:
     :path: ".symlinks/plugins/images_picker/ios"
+  iris_method_channel:
+    :path: ".symlinks/plugins/iris_method_channel/ios"
   just_audio:
     :path: ".symlinks/plugins/just_audio/ios"
   launch_review:
@@ -567,10 +589,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/darwin"
 
 SPEC CHECKSUMS:
-  agora_rtc_engine: 47e0ddc177bae1b85eb00d01a0ea546d87ce0b8b
-  AgoraIrisRTC_iOS: d802443ae16f043e7b2805c978880eb62ee8154c
-  AgoraRtcEngine_iOS: 549bb3853d5afb18fabca4197786f39f31141da8
+  agora_rtc_engine: 14229f6b2fb40ab33cabba2b9f9c5b1c454ecb8e
+  AgoraIrisRTC_iOS: 3cb15344a503a1a35ab6d60481732a8beeda98fe
+  AgoraRtcEngine_iOS: eaa97751fcfe1b50d9b067e0df92752a6a5f899f
   app_badge_plus: 1b9a95a7b82b093f5599ffec39d0730c6f6e6d5a
+  app_links: e7a6750a915a9e161c58d91bc610e8cd1d4d0ad0
   AppAuth: 501c04eda8a8d11f179dbe8637b7a91bb7e5d2fa
   appcheck: e1ab9d4e03736f03e0401554a134d1ed502d7629
   appsflyer_sdk: e59c6b99ce2f28b93fe6b3045a97e8e1a20bce97
@@ -587,8 +610,8 @@ SPEC CHECKSUMS:
   device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
   DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c
   DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
-  ffmpeg-kit-ios-https: 9e50ffa7eaa6272a0021829e054ef241f2ecffb2
-  ffmpeg_kit_flutter: fb5bee3a6038231463ee99e30f97a5763e0ae40f
+  ffmpeg-kit-ios-https: f9c838aa5400a6c5ba12324c6b798f52197ba354
+  ffmpeg_kit_flutter: b4ca70cac3fc1d8ac14cdc660754b60870358732
   file_picker: 15fd9539e4eb735dc54bae8c0534a7a9511a03de
   file_selector_ios: f0670c1064a8c8450e38145d8043160105d0b97c
   Firebase: 0312a2352584f782ea56f66d91606891d4607f06
@@ -621,6 +644,7 @@ SPEC CHECKSUMS:
   image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
   images_picker: fa9364e3a7d3083c49f865fcfb2b9e7cdc574d3a
+  iris_method_channel: 0617c689164d8154c020c50f63ca79f92b8a7b9d
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   launch_review: 75d5a956ba8eaa493e9c9d4bf4c05e505e8d5ed0
   libwebp: 1786c9f4ff8a279e4dac1e8f385004d5fc253009
@@ -653,6 +677,6 @@ SPEC CHECKSUMS:
   webview_flutter_wkwebview: 0982481e3d9c78fd5c6f62a002fcd24fc791f1e4
   ZLPhotoBrowser: 4bfab86b851042e18d7f413284472aa68759626a
 
-PODFILE CHECKSUM: 9671b74ee51c8a769861e98842a5244b8065cf88
+PODFILE CHECKSUM: c2edf56cbaccadb020fabb5692e6e58cb3788ba8
 
 COCOAPODS: 1.15.2

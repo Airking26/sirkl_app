@@ -12,10 +12,12 @@ import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:sirkl/common/save_pref_keys.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/config/s_config.dart';
+import 'package:sirkl/controllers/auth/wallet_connect_modal_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
-import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 import 'package:sirkl/main.dart';
+import 'package:sirkl/models/update_me_dto.dart';
 import 'package:sirkl/repositories/google_repo.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
 import 'package:sirkl/views/global/dialog/positioned_dialog.dart';
@@ -23,7 +25,6 @@ import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
-import '../../controllers/home_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../../views/home/pdf_screen.dart';
 import 'my_communities_screen.dart';
@@ -39,12 +40,6 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   final box = GetStorage();
   PositionedDialog dialogMenu = PositionedDialog();
-  /*final SolanaWalletAdapter solanaWalletAdapter = SolanaWalletAdapter(
-      AppIdentity(
-          uri: Uri.parse('https://sirkl.io'),
-          icon: Uri.parse("logo.png"),
-          name: 'SIRKL.io'),
-      cluster: Cluster.mainnet);*/
 
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get _homeController => Get.find<HomeController>();
@@ -352,6 +347,42 @@ class _SettingScreenState extends State<SettingScreen> {
                               ],
                             )
                           : const SizedBox(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Visible in search",
+                              style: TextStyle(
+                                  fontFamily: "Gilroy",
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            SizedBox(
+                              height: 20,
+                              child: Switch(
+                                value:
+                                    _homeController.userMe.value.isSearchable ??
+                                        true,
+                                onChanged: (active) async {
+                                  await _homeController.updateMe(
+                                      UpdateMeDto(isSearchable: active));
+                                },
+                                activeColor: SColors.activeColor,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      Divider(
+                        color: MediaQuery.of(context).platformBrightness ==
+                                Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
+                      ),
                       InkWell(
                         onTap: () async {
                           if (!_profileController.contactUsClicked.value) {
@@ -460,11 +491,6 @@ class _SettingScreenState extends State<SettingScreen> {
                                               .w3mService
                                               ?.disconnect(
                                                   disconnectAllSessions: true);
-                                          /*if (isSolanaAddress(_homeController
-                                                  .userMe.value.wallet ??
-                                              "")) {
-                                            await solanaWalletAdapter.clear();
-                                          }*/
                                           Get.deleteAll(force: true);
                                           Phoenix.rebirth(Get.context!);
                                           Get.offAll(() => const MyHomePage(),
@@ -678,10 +704,21 @@ class _SettingScreenState extends State<SettingScreen> {
                           await _profileController
                               .deleteUser(_homeController.id.value);
                           await GetStorage().erase();
+                          _homeController.id.value = "";
+                          _homeController.isConfiguring.value = false;
                           _homeController.accessToken.value = "";
                           _homeController.address.value = "";
-                          Get.back();
-                          Navigator.pop(context);
+                          _homeController.streamChatToken.value = "";
+                          _navigationController.controller.value.jumpToTab(0);
+                          _navigationController.hideNavBar.value = true;
+                          _walletConnectModalController.w3mService
+                              ?.disconnect(disconnectAllSessions: true);
+                          Get.deleteAll(force: true);
+                          Phoenix.rebirth(Get.context!);
+                          Get.offAll(() => const MyHomePage(),
+                              duration: const Duration(seconds: 0),
+                              opaque: true);
+                          Get.reset();
                         },
                       )
                     ],

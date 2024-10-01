@@ -15,26 +15,30 @@ class UpdateMeDto {
       this.picture,
       this.description,
       this.nicknames,
-      this.hasSBT});
+      this.hasSBT,
+      this.isSearchable});
 
   String? userName;
   String? picture;
   String? description;
   bool? hasSBT;
   Map<String, String>? nicknames;
+  bool? isSearchable;
 
   factory UpdateMeDto.fromJson(Map<String, dynamic> json) => UpdateMeDto(
       userName: json["userName"],
       picture: json["picture"],
       description: json["description"],
       nicknames: json['nicknames'],
-      hasSBT: json['hasSBT']);
+      hasSBT: json['hasSBT'],
+      isSearchable: json['isSearchable']);
 
   Map<String, dynamic> toJson() => {
         "userName": userName,
         "picture": picture,
         "description": description,
         "nicknames": nicknames,
-        'hasSBT': hasSBT
+        'hasSBT': hasSBT,
+        'isSearchable': isSearchable
       };
 }

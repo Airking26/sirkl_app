@@ -102,6 +102,8 @@ class _ChannelPageState extends State<ChannelPage> {
                     onMessageSwiped: _reply,
                     messageBuilder:
                         (context, details, messages, defaultMessageWidget) {
+                      final message = details.message;
+                      //final decryptedMessageFuture = decryptMessage(message.text, derivedKey);
                       return defaultMessageWidget.copyWith(
                         onReplyTap: _reply,
                         customAttachmentBuilders: {

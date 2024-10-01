@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:sirkl/controllers/auth/wallet_connect_modal_controller.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
@@ -6,7 +7,6 @@ import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/controllers/profile_controller.dart';
-import 'package:sirkl/controllers/wallet_connect_modal_controller.dart';
 
 import 'web3_controller.dart';
 

@@ -37,10 +37,10 @@ packages:
     dependency: "direct main"
     description:
       name: agora_rtc_engine
-      sha256: c1379d78722b3f49f3691c72664b55e094bdf384059125a7bb601bd7217928f6
+      sha256: deefb5ea051c4d916552cbf76cfbdd652867aa9b554ff9afb3c732ec2e44652e
       url: "https://pub.dev"
     source: hosted
-    version: "5.3.1"
+    version: "6.3.2"
   animations:
     dependency: transitive
     description:
@@ -57,6 +57,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.4"
+  app_links:
+    dependency: "direct main"
+    description:
+      name: app_links
+      sha256: ad1a6d598e7e39b46a34f746f9a8b011ee147e4c275d407fa457e7a62f84dd99
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.3.2"
+  app_links_linux:
+    dependency: transitive
+    description:
+      name: app_links_linux
+      sha256: f5f7173a78609f3dfd4c2ff2c95bd559ab43c80a87dc6a095921d96c05688c81
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
+  app_links_platform_interface:
+    dependency: transitive
+    description:
+      name: app_links_platform_interface
+      sha256: "05f5379577c513b534a29ddea68176a4d4802c46180ee8e2e966257158772a3f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
+  app_links_web:
+    dependency: transitive
+    description:
+      name: app_links_web
+      sha256: af060ed76183f9e2b87510a9480e56a5352b6c249778d07bd2c95fc35632a555
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
   appcheck:
     dependency: transitive
     description:
@@ -153,16 +185,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
-  borsh_annotation:
-    dependency: transitive
-    description:
-      name: borsh_annotation
-      sha256: "4a226cf8b7a165ecf8020c0c8d366b2728167fd102ef9b9e89d94d86f89ac57b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.1+5"
   bs58:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: bs58
       sha256: "3ed24dadf386ca749ff50af678be1131ef569a3583a6f37b87b90c032270c767"
@@ -393,14 +417,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.10"
-  decimal:
-    dependency: transitive
-    description:
-      name: decimal
-      sha256: "24a261d5d5c87e86c7651c417a5dbdf8bcd7080dd592533910e8d0505a279f21"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.3"
   defer_pointer:
     dependency: "direct main"
     description:
@@ -569,13 +585,13 @@ packages:
     source: hosted
     version: "2.1.3"
   ffmpeg_kit_flutter:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: ffmpeg_kit_flutter
-      sha256: "2b13913a5850d5c0149fe5a322770e72b107e0941d112a5334bce71d91051134"
+      sha256: "843aae41823ca94a0988d975b4b6cdc6948744b9b7e2707d81a3a9cd237b0100"
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.0-LTS"
+    version: "6.0.3"
   ffmpeg_kit_flutter_platform_interface:
     dependency: transitive
     description:
@@ -1071,6 +1087,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.6.0"
+  gtk:
+    dependency: transitive
+    description:
+      name: gtk
+      sha256: e8ce9ca4b1df106e4d72dad201d345ea1a036cc12c360f1a7d5a758f78ffa42c
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   hex:
     dependency: "direct main"
     description:
@@ -1208,6 +1232,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.18.1"
+  iris_method_channel:
+    dependency: transitive
+    description:
+      name: iris_method_channel
+      sha256: "131d0a40ba646ba8fd4bf76e24d4ebd4aa3174ee39aa5fe8240c3b827979052c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   jiffy:
     dependency: "direct main"
     description:
@@ -1577,7 +1609,7 @@ packages:
     source: hosted
     version: "0.14.0"
   pinenacl:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       name: pinenacl
       sha256: "57e907beaacbc3c024a098910b6240758e899674de07d6949a67b52fd984cbdf"
@@ -1704,14 +1736,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
-  rational:
-    dependency: transitive
-    description:
-      name: rational
-      sha256: cb808fb6f1a839e6fc5f7d8cb3b0a10e1db48b3be102de73938c627f0b636336
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.3"
   record:
     dependency: "direct main"
     description:
@@ -1901,14 +1925,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0+3"
-  solana:
-    dependency: "direct overridden"
-    description:
-      name: solana
-      sha256: "349ae373501cd83d2df2285c76a97e5531d580f0e327732d883dcd0957981604"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.31.0"
   source_span:
     dependency: transitive
     description:
@@ -2377,10 +2393,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: f652077d0bdf60abe4c1f6377448e8655008eef28f128bc023f7b5e8dfeb48fc
+      sha256: "5c5f338a667b4c644744b661f309fb8080bb94b18a7e91ef1dbd343bed00ed6d"
       url: "https://pub.dev"
     source: hosted
-    version: "14.2.4"
+    version: "14.2.5"
   w_common:
     dependency: transitive
     description:

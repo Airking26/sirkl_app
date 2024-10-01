@@ -83,8 +83,8 @@ class _EditorTextfieldState extends State<EditorTextfield>
       style: TextStyle(
         textBaseline: TextBaseline.ideographic,
         color: _controller.textColor,
-        fontSize: 32,
-        fontWeight: FontWeight.w700,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
         decoration: TextDecoration.none,
         decorationColor: Colors.transparent,
         decorationThickness: 0,
@@ -305,19 +305,35 @@ class _StickerTextFieldState extends State<_StickerTextField> {
           style: TextStyle(
             textBaseline: TextBaseline.ideographic,
             color: widget.controller.textColor,
-            fontSize: 28 * (widget.scale ?? 1.0),
-            fontWeight: FontWeight.w700,
+            fontSize: 20 * (widget.scale ?? 1.0),
+            fontWeight: FontWeight.bold,
             decoration: TextDecoration.none,
             decorationColor: Colors.transparent,
             decorationThickness: 0,
             decorationStyle: TextDecorationStyle.dashed,
           ),
           decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.all(8),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide.none,
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide.none,
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide.none,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: const EdgeInsets.all(16),
             filled: true,
             fillColor: value.fillTextfield ? color : Colors.transparent,
           ),

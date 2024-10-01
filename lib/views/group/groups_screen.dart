@@ -169,11 +169,13 @@ class _GroupsScreenState extends State<GroupsScreen>
                                           unset: [
                                         "${_homeController.id.value}_favorite"
                                       ]);
-                                  await _profileController.updateNft(
-                                      NftModificationDto(
-                                          contractAddress: channel.id!,
-                                          id: _homeController.id.value,
-                                          isFav: false));
+                                  try {
+                                    await _profileController.updateNft(
+                                        NftModificationDto(
+                                            contractAddress: channel.id!,
+                                            id: _homeController.id.value,
+                                            isFav: false));
+                                  } catch (e) {}
                                   _commonController.refreshCommunities();
                                   _homeController.isInFav.remove(channel.id);
                                   _homeController.isInFav.refresh();
@@ -271,11 +273,13 @@ class _GroupsScreenState extends State<GroupsScreen>
                                           channel.id!, 'try', set: {
                                     "${_homeController.id.value}_favorite": true
                                   });
-                                  await _profileController.updateNft(
-                                      NftModificationDto(
-                                          contractAddress: channel.id!,
-                                          id: _homeController.id.value,
-                                          isFav: true));
+                                  try {
+                                    await _profileController.updateNft(
+                                        NftModificationDto(
+                                            contractAddress: channel.id!,
+                                            id: _homeController.id.value,
+                                            isFav: true));
+                                  } catch (e) {}
                                   _commonController.refreshCommunities();
                                   _homeController.isInFav.add(channel.id!);
                                   _homeController.isInFav.refresh();
