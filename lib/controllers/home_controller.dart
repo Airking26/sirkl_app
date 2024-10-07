@@ -137,7 +137,6 @@ class HomeController extends GetxController {
       displayPopupFirstConnection.value = true;
     }
 
-    //TODO : Try on IOS before release
     Future.wait([retrieveContractAddress(), getAllNftConfig()]);
 
     await connectUserToStream(StreamChat.of(context).client);

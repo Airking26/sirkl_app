@@ -70,7 +70,6 @@ class _EditorTextfieldState extends State<EditorTextfield>
     );
   }
 
-  // TODO(koiralapankaj007): responsive textfield for long text
   void _addSticker() {
     if (_controller.textController.text.isEmpty) return;
 

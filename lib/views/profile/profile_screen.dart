@@ -13,7 +13,6 @@ import 'package:sirkl/common/constants.dart' as con;
 import 'package:sirkl/common/utils.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/controllers/common_controller.dart';
-import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/models/nft_dto.dart';
@@ -42,7 +41,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
-  //final TextEditingController usernameTextEditingController = TextEditingController();
   final TextEditingController descriptionTextEditingController =
       TextEditingController();
   FocusNode focusNode = FocusNode();
@@ -61,10 +59,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _profileController.pagingController.addPageRequestListener((pageKey) {
       fetchNFTs();
     });
-    /*usernameTextEditingController.text =
-        _homeController.userMe.value.userName!.isEmpty
-            ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
-            : _homeController.userMe.value.userName!;*/
     descriptionTextEditingController.text =
         _homeController.userMe.value.description.isNullOrBlank!
             ? ""
@@ -192,41 +186,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         )),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 12.0),
-                                  child: /*_profileController
-                                      .isEditingProfile.value
-                                      ? SizedBox(
-                                    width: 200,
-                                    child: TextField(
-                                      //autofocus: true,
-                                      maxLines: 1,
-                                      controller: usernameTextEditingController,
-                                      maxLength: 13,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontFamily: "Gilroy",
-                                          fontWeight: FontWeight.w600,
-                                          color: MediaQuery.of(context)
-                                              .platformBrightness ==
-                                              Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black),
-                                      decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          isCollapsed: true,
-                                          hintText: _homeController.userMe.value.userName!
-                                              .isEmpty ||
-                                              _homeController.userMe.value
-                                                  .userName ==
-                                                  _homeController
-                                                      .userMe.value.wallet
-                                              ? "${_homeController.userMe.value.wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
-                                              : _homeController
-                                              .userMe.value.userName!),
-                                    ),
-                                  )
-                                      : */
-                                      Text(
+                                  child: Text(
                                     _homeController.userMe.value.userName!
                                                 .isEmpty ||
                                             _homeController
@@ -263,15 +223,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             onTap: () async {
                                               await _profileController.updateMe(
                                                   UpdateMeDto(
-                                                      /*userName: usernameTextEditingController
-                                                .text
-                                                .isEmpty
-                                                ? "${_homeController
-                                                .userMe
-                                                .value
-                                                .wallet!.substring(0, 6)}...${_homeController.userMe.value.wallet!.substring(_homeController.userMe.value.wallet!.length - 4)}"
-                                                : usernameTextEditingController
-                                                .text,*/
                                                       description:
                                                           descriptionTextEditingController
                                                                   .text.isEmpty
@@ -284,7 +235,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                               .value),
                                                   StreamChat.of(context)
                                                       .client);
-                                              //usernameTextEditingController.clear();
                                               descriptionTextEditingController
                                                   .clear();
                                             },
@@ -309,7 +259,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           const SettingScreen(),
                                                       withNavBar: false)
                                                   .then((value) {
-                                                //usernameTextEditingController.text = (value as Map)["name"];
                                                 _navigationController
                                                     .hideNavBar.value = false;
                                               });
@@ -653,7 +602,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     controller.dispose();
-    //usernameTextEditingController.dispose();
     super.dispose();
   }
 }
@@ -674,7 +622,6 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
-  GroupsController get _groupController => Get.find<GroupsController>();
 
   @override
   bool get wantKeepAlive => true;
@@ -790,7 +737,9 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                 Image.asset(
                   widget.nftDto.chain == "Polygon"
                       ? "assets/images/polygon.png"
-                      : "assets/images/ethereum-logo.png",
+                      : widget.nftDto.chain == 'Solana'
+                          ? "assets/images/solana.png"
+                          : "assets/images/ethereum-logo.png",
                   width: 12,
                   height: 12,
                 ),

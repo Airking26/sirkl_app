@@ -202,6 +202,7 @@ flutter:
     - assets/images/no_wallet.png
     - assets/images/ethereum-logo.png
     - assets/images/polygon.png
+    - assets/images/solana.png
     - assets/pdf/tc.pdf
     - assets/pdf/pp.pdf
     - assets/pdf/all.pdf

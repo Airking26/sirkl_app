@@ -478,7 +478,9 @@ class _CardNFTState extends State<CardNFT> with AutomaticKeepAliveClientMixin {
                 Image.asset(
                   widget.nftDto.chain == "Polygon"
                       ? "assets/images/polygon.png"
-                      : "assets/images/ethereum-logo.png",
+                      : widget.nftDto.chain == 'Solana'
+                          ? "assets/images/solana.png"
+                          : "assets/images/ethereum-logo.png",
                   width: 12,
                   height: 12,
                 ),

@@ -160,9 +160,7 @@ class CallController extends GetxController {
   Future<List<UserDTO>> searchUser(String substring, int offset) async {
     try {
       return await SearchRepo.searchUser(substring, offset.toString());
-    } catch (e) {
-      var k = e;
-    }
+    } catch (e) {}
 
     return [];
   }
