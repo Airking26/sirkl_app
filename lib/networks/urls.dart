@@ -2,7 +2,7 @@ class SUrls {
   static String get ethMainNetBaseUrl => "https://eth-mainnet.g.alchemy.com/";
   static String get etherscanBaseUrl => "https://api.etherscan.io/";
   static String baseURL =
-      'http://sirklserver-env.eba-advpp2ip.eu-west-1.elasticbeanstalk.com/';
+      'http://sirkltest-env.eba-5b2vmysf.eu-west-1.elasticbeanstalk.com/';
   static String infura =
       'https://mainnet.infura.io/v3/c193b412278e451ea6725b674de75ef2';
 

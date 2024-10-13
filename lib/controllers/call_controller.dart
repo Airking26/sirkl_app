@@ -53,7 +53,6 @@ class CallController extends GetxController {
 
   /// Function to initialize and setup Agora
   Future<void> setupVoiceSDKEngine(BuildContext context) async {
-    //rtcEngine = await RtcEngine.create(SConfig.AGORA_APP_ID);
     rtcEngine = createAgoraRtcEngine();
     await rtcEngine?.initialize(const RtcEngineContext(
       appId: SConfig.AGORA_APP_ID,

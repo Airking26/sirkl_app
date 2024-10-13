@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -13,6 +14,7 @@ import 'package:sirkl/common/save_pref_keys.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/auth/wallet_connect_modal_controller.dart';
+import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
@@ -44,6 +46,7 @@ class _SettingScreenState extends State<SettingScreen> {
   ProfileController get _profileController => Get.find<ProfileController>();
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
+  CallController get _callController => Get.find<CallController>();
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
   WalletConnectModalController get _walletConnectModalController =>
@@ -471,6 +474,14 @@ class _SettingScreenState extends State<SettingScreen> {
                                                     ? Colors.white
                                                     : Colors.black)),
                                         onPressed: () async {
+                                          await _callController.rtcEngine
+                                              ?.release();
+                                          await StreamChat.of(context)
+                                              .client
+                                              .removeDevice(_homeController
+                                                  .userMe.value.fcmToken!);
+                                          await FirebaseMessaging.instance
+                                              .deleteToken();
                                           await StreamChat.of(context)
                                               .client
                                               .disconnectUser();
@@ -700,6 +711,10 @@ class _SettingScreenState extends State<SettingScreen> {
                                         ? Colors.white
                                         : Colors.black)),
                         onPressed: () async {
+                          await _callController.rtcEngine?.release();
+                          await StreamChat.of(context).client.removeDevice(
+                              _homeController.userMe.value.fcmToken!);
+                          await FirebaseMessaging.instance.deleteToken();
                           await StreamChat.of(context).client.disconnectUser();
                           await _profileController
                               .deleteUser(_homeController.id.value);

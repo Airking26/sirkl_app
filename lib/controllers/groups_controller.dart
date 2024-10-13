@@ -39,9 +39,9 @@ class GroupsController extends GetxController {
   Future<void> _createChannelCommunity(
       StreamChatClient streamChatClient, GroupDto groupDto, String pic) async {
     _chatController.channel.value = streamChatClient
-        .channel("try", id: groupDto.contractAddress.toLowerCase(), extraData: {
+        .channel("try", id: groupDto.contractAddress, extraData: {
       "members": ["bot_one", "bot_two", "bot_three"],
-      "contractAddress": groupDto.contractAddress.toLowerCase(),
+      "contractAddress": groupDto.contractAddress,
       "image": pic,
       "name": groupDto.name
     });

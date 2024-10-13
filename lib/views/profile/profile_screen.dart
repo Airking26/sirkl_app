@@ -602,6 +602,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     controller.dispose();
+    pageKey = 0;
     super.dispose();
   }
 }
