@@ -25,8 +25,8 @@ import 'package:sirkl/views/profile/settings_screen.dart';
 import 'package:tiny_avatar/tiny_avatar.dart';
 
 import '../../controllers/profile_controller.dart';
+import '../notification_gamification/notifications_screen.dart';
 import 'my_story_viewer_screen.dart';
-import 'notifications_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -153,12 +153,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     : IconButton(
                                         onPressed: () async {
                                           pushNewScreen(context,
+                                                  withNavBar: false,
                                                   screen:
                                                       const NotificationScreen())
-                                              .then((value) => _profileController
-                                                  .checkIfHasUnreadNotification(
-                                                      _homeController
-                                                          .id.value));
+                                              .then((value) {
+                                            _profileController
+                                                .checkIfHasUnreadNotification(
+                                                    _homeController.id.value);
+                                            _navigationController
+                                                .hideNavBar.value = false;
+                                          });
                                         },
                                         icon: FlutterBadge(
                                           icon: Image.asset(

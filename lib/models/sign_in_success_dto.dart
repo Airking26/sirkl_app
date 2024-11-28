@@ -53,7 +53,8 @@ class UserDTO extends ISuspensionBean {
       this.nickname,
       this.updatedAt,
       this.hasSBT,
-      this.isSearchable});
+      this.isSearchable,
+      this.octoPoints});
 
   String? id;
   String? userName;
@@ -69,6 +70,7 @@ class UserDTO extends ISuspensionBean {
   DateTime? updatedAt;
   bool? hasSBT;
   bool? isSearchable;
+  int? octoPoints;
 
   factory UserDTO.fromJson(Map<String, dynamic> json) => UserDTO(
         id: json["id"],
@@ -86,6 +88,7 @@ class UserDTO extends ISuspensionBean {
         nickname: json['nickname'],
         hasSBT: json['hasSBT'],
         isSearchable: json['isSearchable'],
+        octoPoints: json["octoPoints"],
         updatedAt: json["updatedAt"] == null
             ? null
             : DateTime.parse(json["updatedAt"]),
@@ -105,6 +108,7 @@ class UserDTO extends ISuspensionBean {
         "nickname": nickname,
         "hasSBT": hasSBT,
         "isSearchable": isSearchable,
+        "octoPoints": octoPoints,
         "updatedAt": updatedAt == null ? null : updatedAt?.toIso8601String(),
       };
 

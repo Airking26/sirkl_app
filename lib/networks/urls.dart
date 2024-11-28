@@ -105,4 +105,16 @@ class SUrls {
 
   /// Report repo
   static const String signalmentReport = 'signalment/report';
+
+  /// Gamification Repo
+  static String retrieveUserGamificationProgress(
+          String gamificationCycleType) =>
+      "gamification/retrieve-user-task-progress/$gamificationCycleType";
+  static String retrieveLeaderboardDaily(String offset) =>
+      "gamification/leaderboard/daily/$offset";
+  static String retrieveLeaderboardWeekly(String offset) =>
+      "gamification/leaderboard/weekly/$offset";
+  static String retrieveLeaderboardAllTime(String offset) =>
+      "gamification/leaderboard/all-time/$offset";
+  static const String updateGamification = "gamification/update";
 }

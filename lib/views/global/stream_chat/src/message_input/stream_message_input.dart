@@ -13,10 +13,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart' hide debounce;
 import 'package:photo_manager/photo_manager.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:sirkl/common/enums/gamification_enums.dart';
+import 'package:sirkl/controllers/gamification_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/inbox_controller.dart';
 import 'package:sirkl/controllers/web3_controller.dart';
 import 'package:sirkl/models/request_to_join_dto.dart';
+import 'package:sirkl/models/task_progress_update_dto.dart';
 import 'package:sirkl/views/global/stream_chat/platform_widget_builder/src/platform_widget_builder.dart';
 import 'package:sirkl/views/global/stream_chat/src/message_input/attachment_button.dart';
 import 'package:sirkl/views/global/stream_chat/src/message_input/command_button.dart';
@@ -296,6 +299,9 @@ class StreamMessageInputState extends State<StreamMessageInput>
   InboxController get _chatController => Get.find<InboxController>();
 
   Web3Controller get _web3Controller => Get.find<Web3Controller>();
+
+  GamificationController get _gamificationController =>
+      Get.find<GamificationController>();
 
   void _createLocalController([Message? message]) {
     assert(_controller == null, '');
@@ -1625,6 +1631,12 @@ class StreamMessageInputState extends State<StreamMessageInput>
       final resp = await sendingFuture;
       if (resp.message?.type == 'error') {
         _effectiveController.message = message;
+      } else if (resp.message?.state ==
+              MessageState.completed(state: CompletedState.sent()) &&
+          streamChannel.channel.extraData['isConv'] == null) {
+        _gamificationController.updateTaskProgress(TaskProgressUpdateDto(
+            taskName: GamificationDailyTasks.communityInteraction.displayName,
+            cycleType: GamificationCycleType.daily.name));
       }
       _startSlowMode();
       widget.onMessageSent?.call(resp.message);

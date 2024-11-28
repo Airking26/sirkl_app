@@ -1,6 +1,9 @@
 import 'package:ezanimation/ezanimation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sirkl/common/enums/gamification_enums.dart';
+import 'package:sirkl/controllers/gamification_controller.dart';
+import 'package:sirkl/models/task_progress_update_dto.dart';
 import 'package:sirkl/views/global/stream_chat/stream_chat_flutter.dart';
 
 /// {@template streamReactionPicker}
@@ -29,10 +32,11 @@ class StreamReactionPicker extends StatefulWidget {
 class _StreamReactionPickerState extends State<StreamReactionPicker>
     with TickerProviderStateMixin {
   List<EzAnimation> animations = [];
+  GamificationController get _gamificationController =>
+      Get.find<GamificationController>();
 
   @override
   Widget build(BuildContext context) {
-    final chatThemeData = StreamChatTheme.of(context);
     final reactionIcons = StreamChatConfiguration.of(context).reactionIcons;
 
     if (animations.isEmpty && reactionIcons.isNotEmpty) {
@@ -51,7 +55,9 @@ class _StreamReactionPickerState extends State<StreamReactionPicker>
 
     final child = Material(
       borderRadius: BorderRadius.circular(24),
-      color: MediaQuery.of(context).platformBrightness == Brightness.dark?  const Color(0xFF102437) : Colors.white,
+      color: MediaQuery.of(context).platformBrightness == Brightness.dark
+          ? const Color(0xFF102437)
+          : Colors.white,
       clipBehavior: Clip.hardEdge,
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -153,6 +159,11 @@ class _StreamReactionPickerState extends State<StreamReactionPicker>
 
   /// Add a reaction to the message
   void sendReaction(BuildContext context, String reactionType) {
+    if (widget.message.user?.id != StreamChat.of(context).currentUser?.id) {
+      _gamificationController.updateTaskProgress(TaskProgressUpdateDto(
+          taskName: GamificationDailyTasks.upVotePost.displayName,
+          cycleType: GamificationCycleType.daily.name));
+    }
     StreamChannel.of(context).channel.sendReaction(
           widget.message,
           reactionType,

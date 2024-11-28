@@ -2,10 +2,13 @@ import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/enums/gamification_enums.dart';
 import 'package:sirkl/config/s_colors.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/gamification_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
+import 'package:sirkl/models/task_progress_update_dto.dart';
 import 'package:sirkl/views/global/nav_bar/persistent-tab-view.dart';
 
 import '../controllers/navigation_controller.dart';
@@ -30,6 +33,8 @@ class _NavigationRootScreenState extends State<NavigationRootScreen> {
   CommonController get _commonController => Get.find<CommonController>();
   HomeController get _homeController => Get.find<HomeController>();
   ProfileController get _profileController => Get.find<ProfileController>();
+  GamificationController get _gamificationController =>
+      Get.find<GamificationController>();
 
   late final List<Widget> _pages = [
     const HomeScreen(),
@@ -96,6 +101,9 @@ class _NavigationRootScreenState extends State<NavigationRootScreen> {
 
   @override
   void initState() {
+    _gamificationController.updateTaskProgress(TaskProgressUpdateDto(
+        taskName: GamificationDailyTasks.dailyCheckIn.displayName,
+        cycleType: GamificationCycleType.daily.name));
     if (!_homeController.blockInitialization.value) {
       _navigationController.controller.value.index =
           _homeController.accessToken.value.isNullOrBlank! ? 0 : 4;
@@ -105,6 +113,7 @@ class _NavigationRootScreenState extends State<NavigationRootScreen> {
     } else {
       _navigationController.hideNavBar.value = true;
     }
+
     super.initState();
   }
 

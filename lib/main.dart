@@ -233,7 +233,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             message.data["type"] == "1" ||
             message.data['type'] == "5" ||
             message.data['type'] == "6" ||
-            message.data['type'] == "7") {
+            message.data['type'] == "7" ||
+            message.data['type'] == "10" ||
+            message.data['type'] == "11") {
           LocalNotificationInitialize.showBigTextNotification(
               title: message.data["title"],
               body: message.data["body"],

@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,8 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' as http;
 import 'package:share_plus/share_plus.dart';
 import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/enums/gamification_enums.dart';
 import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:sirkl/common/save_pref_keys.dart';
 import 'package:sirkl/config/s_colors.dart';
@@ -16,9 +20,11 @@ import 'package:sirkl/config/s_config.dart';
 import 'package:sirkl/controllers/auth/wallet_connect_modal_controller.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/gamification_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/navigation_controller.dart';
 import 'package:sirkl/main.dart';
+import 'package:sirkl/models/task_progress_update_dto.dart';
 import 'package:sirkl/models/update_me_dto.dart';
 import 'package:sirkl/repositories/google_repo.dart';
 import 'package:sirkl/views/chats/detailed_chat_screen.dart';
@@ -47,6 +53,8 @@ class _SettingScreenState extends State<SettingScreen> {
   HomeController get _homeController => Get.find<HomeController>();
   CommonController get _commonController => Get.find<CommonController>();
   CallController get _callController => Get.find<CallController>();
+  GamificationController get _gamificationController =>
+      Get.find<GamificationController>();
   NavigationController get _navigationController =>
       Get.find<NavigationController>();
   WalletConnectModalController get _walletConnectModalController =>
@@ -151,8 +159,17 @@ class _SettingScreenState extends State<SettingScreen> {
                       onTap: () async {
                         var uri = await _profileController.createDynamicLink(
                             "/profileShared?id=${_homeController.id.value}");
-                        Share.share(
+                        var shareWithResult = await Share.shareWithResult(
                             "Check out my profile on SIRKL ${uri.toString()}");
+                        if (shareWithResult.status ==
+                                ShareResultStatus.success &&
+                            shareWithResult.raw.contains("twitter")) {
+                          _gamificationController.updateTaskProgress(
+                              TaskProgressUpdateDto(
+                                  taskName: GamificationDailyTasks
+                                      .shareOnX.displayName,
+                                  cycleType: GamificationCycleType.daily.name));
+                        }
                       },
                       child: Material(
                         borderRadius: BorderRadius.circular(10),
@@ -535,6 +552,31 @@ class _SettingScreenState extends State<SettingScreen> {
             ),
           )),
     );
+  }
+
+  Future<String?> fetchTweetText(String tweetId) async {
+    final String bearerToken =
+        "AAAAAAAAAAAAAAAAAAAAAMbWxAEAAAAAJ0V9FiZQ7qP%2FsR%2BwSnZ2Gq4Rj6k%3Dspc4ZvNVnuZrEocgc0063cUzMaq9erfUsVdidRBcUa5dlpdROr"; // Replace with your actual bearer token
+
+    final url = Uri.https('api.twitter.com', '/2/tweets/$tweetId', {
+      'tweet.fields': 'text',
+    });
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $bearerToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['data']['text'];
+    } else {
+      print(
+          'Failed to fetch tweet: ${response.statusCode} ${response.reasonPhrase}');
+      return null;
+    }
   }
 
   Container buildAppbar(BuildContext context) {

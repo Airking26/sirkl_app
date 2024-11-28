@@ -3,10 +3,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sirkl/common/enums/gamification_enums.dart';
 import 'package:sirkl/common/utils.dart';
+import 'package:sirkl/controllers/gamification_controller.dart';
 import 'package:sirkl/models/notification_added_admin_dto.dart';
 import 'package:sirkl/models/report_dto.dart';
 import 'package:sirkl/models/sign_in_success_dto.dart';
+import 'package:sirkl/models/task_progress_update_dto.dart';
 import 'package:sirkl/repositories/follow_repo.dart';
 import 'package:sirkl/repositories/notification_repo.dart';
 import 'package:sirkl/repositories/report_repo.dart';
@@ -28,6 +31,9 @@ class CommonController extends GetxController {
   late StreamChannelListController controllerOthers;
   late StreamChannelListController communityFavoritesController;
   late StreamChannelListController communityOthersController;
+
+  GamificationController get _gamificationController =>
+      Get.find<GamificationController>();
 
   void refreshAllInbox() async {
     controllerFriend.refresh();
@@ -56,6 +62,9 @@ class CommonController extends GetxController {
 
     try {
       UserDTO newUser = await FollowRepo.addUserToSirkl(id);
+      _gamificationController.updateTaskProgress(TaskProgressUpdateDto(
+          taskName: GamificationDailyTasks.connectWithNewUser.displayName,
+          cycleType: GamificationCycleType.daily.name));
       contactAddLoading.value = false;
       refreshAllInbox();
       if (!users.map((element) => element.id).contains(newUser.id)) {

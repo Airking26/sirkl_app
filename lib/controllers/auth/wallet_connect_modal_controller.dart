@@ -33,63 +33,69 @@ class WalletConnectModalController extends GetxController {
   var errorTextRetrieving = false.obs;
 
   final box = GetStorage();
-  late W3MService? w3mService;
+  W3MService? w3mService;
   late PhantomConnectService phantomConnectService;
 
   void initializeService(BuildContext context) async {
     phantomConnectService = PhantomConnectService(context);
 
-    w3mService = W3MService(
-      metadata: PairingMetadata(
-        name: name,
-        description: desc,
-        url: url,
-        icons: icons,
-        redirect: Redirect(
-          native: nativeUrl,
-          universal: universalUrl,
+    if (w3mService == null) {
+      w3mService = W3MService(
+        metadata: PairingMetadata(
+          name: name,
+          description: desc,
+          url: url,
+          icons: icons,
+          redirect: Redirect(
+            native: nativeUrl,
+            universal: universalUrl,
+          ),
         ),
-      ),
-      includedWalletIds: {
-        'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
-        '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust
-        'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa', // Coinbase
-        '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
-        '19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927' // Ledger
-      },
-      context: context,
-      projectId: projectID,
-      logLevel: LogLevel.error,
-      loginWithoutWalletWidget: Column(
-        children: [
-          WalletListItem(
-            imageUrl:
-                "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/channels4_profile.jpg",
-            title: 'Phantom',
-            onTap: () {
-              phantomConnectService.connectToPhantom();
-            },
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          WalletListItem(
-            title: "Connect without wallet",
-            imageUrl:
-                "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/no_wallet.png",
-            onTap: () async {
-              Get.back();
-              _homeController.isLoading.value = true;
-              await createWallet(context);
-            },
-          ),
-        ],
-      ),
-    );
+        includedWalletIds: {
+          'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
+          // MetaMask
+          '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0',
+          // Trust
+          'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa',
+          // Coinbase
+          '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369',
+          // Rainbow
+          '19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927'
+          // Ledger
+        },
+        context: context,
+        projectId: projectID,
+        logLevel: LogLevel.error,
+        loginWithoutWalletWidget: Column(
+          children: [
+            WalletListItem(
+              imageUrl:
+                  "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/channels4_profile.jpg",
+              title: 'Phantom',
+              onTap: () {
+                phantomConnectService.connectToPhantom();
+              },
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            WalletListItem(
+              title: "Connect without wallet",
+              imageUrl:
+                  "https://sirkl-bucket.s3.eu-central-1.amazonaws.com/no_wallet.png",
+              onTap: () async {
+                Get.back();
+                _homeController.isLoading.value = true;
+                await createWallet(context);
+              },
+            ),
+          ],
+        ),
+      );
 
-    w3mService?.onModalConnect.subscribe(_onModalConnect);
-
-    await w3mService?.init();
+      w3mService?.onModalConnect.subscribe(_onModalConnect);
+      await w3mService?.init();
+    }
   }
 
   void _onModalConnect(ModalConnect? event) {
@@ -97,7 +103,8 @@ class WalletConnectModalController extends GetxController {
     if (event != null &&
         event.session.address != null &&
         event.session.address!.isNotEmpty) {
-      w3mService?.closeModal();
+      Get.back();
+      //w3mService?.closeModal();
     }
   }
 
@@ -121,7 +128,7 @@ class WalletConnectModalController extends GetxController {
       w3mService?.launchConnectedWallet();
       await w3mService
           ?.request(
-        topic: w3mService!.session!.topic!,
+        topic: w3mService?.session?.topic,
         chainId: chainId,
         request: SessionRequestParams(
           method: 'personal_sign',

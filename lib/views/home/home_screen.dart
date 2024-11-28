@@ -1,6 +1,5 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:async';
 import 'dart:io';
 
 import 'package:azlistview/azlistview.dart';
@@ -13,7 +12,7 @@ import 'package:get/get.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:sirkl/common/constants.dart' as con;
+import 'package:sirkl/common/constants.dart';
 import 'package:sirkl/common/enums/pdf_type.dart';
 import 'package:sirkl/controllers/auth/wallet_connect_modal_controller.dart';
 import 'package:sirkl/controllers/call_controller.dart';
@@ -165,13 +164,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 50,
                   height: 50,
                   child: Icon(
-                    Icons.keyboard_arrow_left_rounded,
-                    size: 42,
+                    _homeController.qrActive.value
+                        ? Icons.keyboard_arrow_left_rounded
+                        : Icons.gamepad_outlined,
+                    size: 32,
                     color: _homeController.qrActive.value
                         ? MediaQuery.of(context).platformBrightness ==
                                 Brightness.dark
                             ? Colors.white
                             : Colors.black
+
+                        /// Check if only on home page
                         : Colors.transparent,
                   ),
                 ),
@@ -699,7 +702,6 @@ class _HomeScreenState extends State<HomeScreen> {
               subtitle: !_commonController.users[index].userName.isNullOrBlank!
                   ? Text(
                       "${_commonController.users[index].wallet!.substring(0, 6)}...${_commonController.users[index].wallet!.substring(_commonController.users[index].wallet!.length - 4)}",
-                      //maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           fontSize: 13,
@@ -758,8 +760,8 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
             _homeController.isConfiguring.value
-                ? con.configurationRes.tr
-                : con.noFriendsRes.tr,
+                ? configurationRes.tr
+                : noFriendsRes.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
                 color:
@@ -778,8 +780,8 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 54.0),
           child: Text(
             _homeController.isConfiguring.value
-                ? con.configurationSentenceRes.tr
-                : con.addUsersToSirklRes.tr,
+                ? configurationSentenceRes.tr
+                : addUsersToSirklRes.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
                 color:
@@ -1187,7 +1189,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Text(
-            con.walletConnectedRes.tr,
+            walletConnectedRes.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
                 color:
@@ -1205,7 +1207,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: TextHighlight(
-            text: con.bySigningRes.tr,
+            text: bySigningRes.tr,
             words: words,
             textAlign: TextAlign.center,
             textStyle: TextStyle(

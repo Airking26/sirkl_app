@@ -111,6 +111,7 @@ dependencies:
   app_links: ^6.3.2
   bs58: ^1.0.2
   pinenacl: ^0.6.0
+  appinio_social_share: ^0.3.2
 
 
 dependency_overrides:
@@ -203,6 +204,9 @@ flutter:
     - assets/images/ethereum-logo.png
     - assets/images/polygon.png
     - assets/images/solana.png
+    - assets/images/octo_dark.jpeg
+    - assets/images/octo_light.jpeg
+    - assets/images/octo.png
     - assets/pdf/tc.pdf
     - assets/pdf/pp.pdf
     - assets/pdf/all.pdf

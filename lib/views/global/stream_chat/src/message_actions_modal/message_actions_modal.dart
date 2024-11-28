@@ -146,7 +146,9 @@ class _MessageActionsModalState extends State<MessageActionsModal> {
                 ? CrossAxisAlignment.end
                 : CrossAxisAlignment.start,
             children: <Widget>[
-              if (widget.showReactions)
+              if (widget.showReactions &&
+                  widget.message.user?.id !=
+                      StreamChat.of(context).currentUser?.id)
                 LayoutBuilder(
                   builder: (context, constraints) {
                     return Align(

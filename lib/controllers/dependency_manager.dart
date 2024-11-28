@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:sirkl/controllers/auth/wallet_connect_modal_controller.dart';
 import 'package:sirkl/controllers/call_controller.dart';
 import 'package:sirkl/controllers/common_controller.dart';
+import 'package:sirkl/controllers/gamification_controller.dart';
 import 'package:sirkl/controllers/groups_controller.dart';
 import 'package:sirkl/controllers/home_controller.dart';
 import 'package:sirkl/controllers/inbox_controller.dart';
@@ -28,5 +29,6 @@ class GlobalDependencyManager extends Bindings {
     Get.put(CommonController(), permanent: _permanent);
     Get.put(Web3Controller(), permanent: _permanent);
     Get.put(WalletConnectModalController(), permanent: _permanent);
+    Get.put(GamificationController(), permanent: _permanent);
   }
 }
